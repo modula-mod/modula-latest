@@ -1,13 +1,13 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `067_legacy_duplicate_installation_versions`; 67 applied migrations. Git contains 67 ordered up migrations, latest `067_legacy_duplicate_installation_versions.sql`.
+Production PostgreSQL: 16.9; schema migration `067_legacy_duplicate_installation_versions`; 67 applied migrations. Git contains 68 ordered up migrations, latest `068_module_platform_records.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 291
-- Tables with API/worker source references: 278
+- Production tables: 295
+- Tables with API/worker source references: 282
 - Orphan candidates requiring manual confirmation: 13
 - Write-only candidates: 36
 - Read-only candidates: 22
@@ -2785,6 +2785,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/modules/marketplace-service.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_module_record_changes`
+
+- Purpose: module registry/runtime state
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `068_module_platform_records.sql`
+- Routes reading: none observed
+- Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`
+- Disposition: active read/write or ledger/schema table
+
 ### `greenfield_module_record_collections`
 
 - Purpose: module registry/runtime state
@@ -2813,10 +2830,61 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`
 - Migration introduced: `010_phase7b_module_runtime.sql`
-- Routes reading: `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- Routes reading: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
 - Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
 - API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_module_record_mutations`
+
+- Purpose: module registry/runtime state
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `068_module_platform_records.sql`
+- Routes reading: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_module_record_references`
+
+- Purpose: module registry/runtime state
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `068_module_platform_records.sql`
+- Routes reading: none observed
+- Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_module_record_revisions`
+
+- Purpose: module registry/runtime state
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `068_module_platform_records.sql`
+- Routes reading: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
+- API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_record_versions`

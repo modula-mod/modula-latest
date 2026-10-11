@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 409 application / 575 runtime method routes
-Route evidence: production-runtime at production revision 50dfc12045be639ad65acb95d2b4e94ea864ed42
+Route evidence: local-candidate-runtime for feature branch phase-module-platform-02; not deployed
 Public routes: 74
 Authenticated routes: 243
 Admin/internal routes: 92
@@ -18,7 +18,7 @@ Routes with response schemas: 0
 Routes with automated tests: 336
 Routes live-probed: 26 unique routes
 Routes with known callers: 204
-Database tables: 291
+Database tables: 295
 Workers: 1 GreenField worker
 Queues: PostgreSQL outbox plus background job tables
 Scheduled jobs: 0 module schedules; worker poll/reap loops are process timers
@@ -55,10 +55,10 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 | Moderation | 2 | 0 | 0 | 0 | 0 |
 | Operations | 6 | 0 | 0 | 0 | 0 |
 
-## Production conclusions
+## Candidate and production conclusions
 
 - The running API and worker are the same OCI revision, `50dfc12045be639ad65acb95d2b4e94ea864ed42`; that revision exactly matches captured `origin/main`.
-- Source/runtime reconciliation is exact: 575 = 409 application routes + 166 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
+- Candidate source/runtime reconciliation is exact: 575 = 409 application routes + 166 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 575 runtime method routes on 50dfc12045be639ad65acb95d2b4e94ea864ed42.
 - API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 

@@ -64,10 +64,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/account-data/routes.ts:38",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -98,10 +95,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/account-data/routes.ts:46",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -132,10 +126,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/account-data/routes.ts:48",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -166,10 +157,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/account-data/routes.ts:47",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -200,10 +188,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/account-data/routes.ts:52",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -227,10 +212,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/account-data/routes.ts:42",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -254,10 +236,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:48",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -288,10 +267,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:602",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -315,10 +291,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:491",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -344,10 +317,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:507",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -373,10 +343,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:511",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -395,10 +362,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:519",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -420,10 +384,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:565",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -447,10 +408,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:40",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -472,10 +430,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:41",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -499,10 +454,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:263",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -524,10 +476,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:268",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -551,10 +500,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:43",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -578,10 +524,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:574",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -605,10 +548,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:524",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -632,10 +572,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:539",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -659,10 +596,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:529",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -686,10 +620,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:42",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -713,10 +644,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2035",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -738,10 +666,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2045",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -765,10 +690,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:585",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -792,10 +714,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:616",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -817,10 +736,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:611",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -844,10 +760,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:289",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -866,10 +779,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:281",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -888,10 +798,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:440",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -910,10 +817,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:476",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -932,10 +836,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:498",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -954,10 +855,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:462",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -976,10 +874,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2183",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -998,10 +893,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:235",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1020,10 +912,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:239",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1042,10 +931,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:231",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1064,10 +950,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:243",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1086,10 +969,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:34",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1120,10 +1000,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:35",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1154,10 +1031,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:33",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1188,10 +1062,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:36",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1222,10 +1093,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:47",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1256,10 +1124,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:46",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1290,10 +1155,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:45",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1317,10 +1179,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1939",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1351,10 +1210,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1957",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1383,10 +1239,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1968",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1417,10 +1270,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1986",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1444,10 +1294,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:282",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1466,10 +1313,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:247",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1495,10 +1339,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:271",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1524,10 +1365,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:263",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1553,10 +1391,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:267",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1582,10 +1417,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:251",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1611,10 +1443,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:255",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1633,10 +1462,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:286",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -1662,10 +1488,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2346",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1689,10 +1512,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2338",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1723,10 +1543,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2640",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1750,10 +1567,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2330",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1777,10 +1591,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2484",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1811,10 +1622,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2494",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1838,10 +1646,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2607",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1865,10 +1670,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2582",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1899,10 +1701,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2627",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1926,10 +1725,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2463",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1960,10 +1756,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2401",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -1987,10 +1780,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2372",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2014,10 +1804,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2366",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2041,10 +1828,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2552",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2075,10 +1859,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2417",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2102,10 +1883,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2358",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2129,10 +1907,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2517",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2163,10 +1938,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2539",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2190,10 +1962,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2474",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2217,10 +1986,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2507",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2244,10 +2010,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2527",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2271,10 +2034,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:165",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2298,10 +2058,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:958",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2332,10 +2089,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1058",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2366,10 +2120,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1063",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2406,10 +2157,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1074",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2440,10 +2188,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1055",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2474,10 +2219,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1052",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2508,10 +2250,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1042",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2542,10 +2281,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1045",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2576,10 +2312,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1048",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2610,10 +2343,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1005",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2644,10 +2374,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1002",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2671,10 +2398,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:971",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2698,10 +2422,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:991",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2732,10 +2453,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:119",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2766,10 +2484,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:155",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2800,10 +2515,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:130",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2827,10 +2539,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:55",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2854,10 +2563,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:48",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2881,10 +2587,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:166",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2915,10 +2618,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:186",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2949,10 +2649,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:198",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -2983,10 +2680,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:209",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3010,10 +2704,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2193",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3044,10 +2735,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2258",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3078,10 +2766,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2270",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3112,10 +2797,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2282",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3139,10 +2821,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2305",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -3161,10 +2840,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2225",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3188,10 +2864,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2200",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3215,10 +2888,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2291",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3240,10 +2910,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2298",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3274,10 +2941,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-attachment-routes.ts:77",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3306,10 +2970,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-attachment-routes.ts:66",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3340,10 +3001,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-attachment-routes.ts:90",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -3362,10 +3020,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-attachment-routes.ts:35",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3396,10 +3051,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-attachment-routes.ts:48",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3423,10 +3075,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:729",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3450,10 +3099,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:719",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3477,10 +3123,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:716",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -3499,10 +3142,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:710",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3533,10 +3173,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:795",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3560,10 +3197,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:752",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3587,10 +3221,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:767",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3614,10 +3245,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:335",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -3636,10 +3264,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:816",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3663,10 +3288,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:821",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3690,10 +3312,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:47",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3717,10 +3336,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:690",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3744,10 +3360,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:665",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3771,10 +3384,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:624",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3798,10 +3408,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:639",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3838,10 +3445,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:81",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3878,10 +3482,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:320",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3912,10 +3513,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:115",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3952,10 +3550,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:380",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -3986,10 +3581,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:369",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4020,10 +3612,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:330",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4054,10 +3643,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:237",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4088,10 +3674,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:65",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4128,10 +3711,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:101",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4168,10 +3748,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:108",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4208,10 +3785,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:186",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4242,10 +3816,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:248",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4282,10 +3853,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:311",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4322,10 +3890,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:287",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4362,10 +3927,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:303",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4402,10 +3964,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:268",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4442,10 +4001,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:277",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4476,10 +4032,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:259",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4516,10 +4069,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:126",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4554,10 +4104,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:150",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4600,10 +4147,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:174",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4644,10 +4188,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:141",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4688,10 +4229,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:162",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4722,10 +4260,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:208",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4762,10 +4297,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:200",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 240,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4802,10 +4334,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:228",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4842,10 +4371,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:219",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4876,10 +4402,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:352",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4910,10 +4433,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/backend-fabric/routes.ts:341",
         "x-modula-auth": "signed service assertion",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4937,10 +4457,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1067",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4962,10 +4479,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1077",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -4996,10 +4510,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:172",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5028,10 +4539,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:154",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5062,10 +4570,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:198",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5094,10 +4599,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:198",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5128,10 +4630,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:184",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5162,10 +4661,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:223",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5194,10 +4690,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:210",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5228,10 +4721,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:131",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       },
       "post": {
@@ -5255,10 +4745,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:140",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5282,10 +4769,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:32",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5309,10 +4793,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:30",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5336,10 +4817,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/entitlements/routes.ts:31",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5363,10 +4841,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:46",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5390,10 +4865,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1335",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5424,10 +4896,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1419",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5456,10 +4925,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1344",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5490,10 +4956,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1362",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5524,10 +4987,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1353",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5558,10 +5018,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1371",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5585,10 +5042,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1288",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -5614,10 +5068,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1291",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -5643,10 +5094,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1296",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5670,10 +5118,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:44",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5697,10 +5142,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:45",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5737,10 +5179,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:43",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5764,10 +5203,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:36",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5791,10 +5227,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:38",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5825,10 +5258,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:40",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5859,10 +5289,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:39",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5886,10 +5313,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:48",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5911,10 +5335,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:49",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5945,10 +5366,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:50",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -5979,10 +5397,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:52",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6013,10 +5428,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:53",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6059,10 +5471,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:55",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6093,10 +5502,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:56",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6127,10 +5533,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:51",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6161,10 +5564,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:54",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6188,10 +5588,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:37",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6215,10 +5612,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:44",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6242,10 +5636,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:41",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6276,10 +5667,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:42",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6303,10 +5691,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2178",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -6325,10 +5710,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1197",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -6354,10 +5736,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1205",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -6383,10 +5762,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:320",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6417,10 +5793,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:310",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6451,10 +5824,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:300",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6485,10 +5855,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1229",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6517,10 +5884,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1217",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6551,10 +5915,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1239",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6585,10 +5946,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:318",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6619,10 +5977,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:328",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6659,10 +6014,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:394",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6699,10 +6051,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:340",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6733,10 +6082,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:431",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6767,10 +6113,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:411",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6794,10 +6137,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1200",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -6816,10 +6156,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1212",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6843,10 +6180,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1467",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -6872,10 +6206,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1498",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -6901,10 +6232,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1783",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6935,10 +6263,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1759",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -6969,10 +6294,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1771",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7003,10 +6325,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:337",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7037,10 +6356,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:347",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7064,10 +6380,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1265",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7098,10 +6411,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1270",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7132,10 +6442,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:359",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7159,10 +6466,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:36",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7186,10 +6490,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:21",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7213,10 +6514,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:26",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7240,10 +6538,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:72",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7267,10 +6562,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:258",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -7289,10 +6581,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:262",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -7311,10 +6600,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:23",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7336,10 +6622,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:14",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7370,10 +6653,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:29",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7404,10 +6684,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:57",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7444,10 +6721,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:71",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7484,10 +6758,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:78",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7518,10 +6789,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:50",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7552,10 +6820,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:64",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7586,10 +6851,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:43",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7626,10 +6888,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:85",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7660,10 +6919,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:36",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7694,10 +6950,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:72",
         "x-modula-auth": "build-service id plus request signature",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7721,10 +6974,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/developers/routes.ts:71",
         "x-modula-auth": "build-service id plus request signature",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7767,10 +7017,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:46",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7794,10 +7041,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:58",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7828,10 +7072,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2151",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -7857,10 +7098,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts:133",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -7879,10 +7117,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:274",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -7908,10 +7143,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:303",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -7935,10 +7167,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1438",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -7970,10 +7199,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:854",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8010,10 +7236,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:62",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8050,10 +7273,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:78",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8084,10 +7304,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:94",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8118,10 +7335,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:896",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8152,10 +7366,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:929",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8186,10 +7397,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:907",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8220,10 +7428,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:940",
         "x-modula-auth": "module backend bearer token plus HMAC signature",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8254,10 +7459,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:918",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8288,10 +7490,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:949",
         "x-modula-auth": "module backend bearer token plus HMAC signature",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8322,10 +7521,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:452",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8354,10 +7550,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:467",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8394,10 +7587,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:482",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8434,10 +7624,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:496",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8474,10 +7661,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:512",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8508,10 +7692,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:603",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8542,10 +7723,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:593",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8576,10 +7754,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:875",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8610,10 +7785,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:756",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8644,10 +7816,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:886",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8678,10 +7847,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:688",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8710,10 +7876,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:560",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8744,10 +7907,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:582",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8778,10 +7938,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:549",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8812,10 +7969,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:664",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8852,10 +8006,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:777",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8890,10 +8041,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:788",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8936,10 +8084,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:821",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -8980,10 +8125,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:799",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9024,10 +8166,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:810",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9070,10 +8209,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:843",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9116,10 +8252,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:832",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9150,10 +8283,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:442",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9190,10 +8320,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:528",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9224,10 +8351,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:720",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9256,10 +8380,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:730",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9290,10 +8411,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:710",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9324,10 +8442,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:678",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9358,10 +8473,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:641",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9392,10 +8504,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:627",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9426,10 +8535,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:615",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9460,10 +8566,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:746",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9500,10 +8603,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:766",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9527,10 +8627,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:740",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9554,10 +8651,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:289",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9588,10 +8682,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:295",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9615,10 +8706,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2004",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9649,10 +8737,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2019",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9676,10 +8761,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2028",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9703,10 +8785,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1285",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -9725,10 +8804,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1527",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9759,10 +8835,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1563",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9791,10 +8864,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1520",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       },
       "patch": {
@@ -9818,10 +8888,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1546",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9852,10 +8919,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:108",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       },
       "post": {
@@ -9879,10 +8943,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:117",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9913,10 +8974,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1587",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9945,10 +9003,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1587",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -9979,10 +9034,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:237",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10013,10 +9065,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:85",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10045,10 +9094,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:72",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10079,10 +9125,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:96",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10108,10 +9151,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1587",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10140,10 +9180,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1587",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10174,10 +9211,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1587",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10206,10 +9240,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1587",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10240,10 +9271,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1624",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10274,10 +9302,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:141",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10309,10 +9334,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:153",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10338,10 +9360,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1643",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10367,10 +9386,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1667",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10396,10 +9412,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1683",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10425,10 +9438,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1651",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10454,10 +9464,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1870",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10486,10 +9493,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1855",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10520,10 +9524,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1722",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10552,10 +9553,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1699",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10586,10 +9584,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1900",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10618,10 +9613,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1885",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10645,10 +9637,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1795",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10672,10 +9661,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1840",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10697,10 +9683,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1823",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10724,10 +9707,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1840",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10749,10 +9729,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1823",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10776,10 +9753,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1745",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10810,10 +9784,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/providers/routes.ts:28",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10844,10 +9815,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/providers/routes.ts:32",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10878,10 +9846,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/providers/routes.ts:30",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -10905,10 +9870,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2188",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10927,10 +9889,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:96",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10956,10 +9915,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:114",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -10985,10 +9941,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:270",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11019,10 +9972,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:200",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11054,10 +10004,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:209",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11076,10 +10023,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:105",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11105,10 +10049,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:123",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11134,10 +10075,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:132",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11163,10 +10101,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:282",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11192,10 +10127,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:219",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11221,10 +10153,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:229",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11256,10 +10185,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:248",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11278,10 +10204,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1915",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11305,10 +10228,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1928",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11332,10 +10252,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1088",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11359,10 +10276,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1177",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11393,10 +10307,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1186",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11420,10 +10331,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1097",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11445,10 +10353,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1111",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11479,10 +10384,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1154",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11511,10 +10413,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1103",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11543,10 +10442,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1130",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11570,10 +10466,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase6s-routes.ts:251",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11597,10 +10490,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2061",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11619,10 +10509,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2098",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11644,10 +10531,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2078",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11669,10 +10553,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2088",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11696,10 +10577,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2109",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11721,10 +10599,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2119",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11755,10 +10630,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2140",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11787,10 +10659,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2129",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11814,10 +10683,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2070",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11836,10 +10702,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:837",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11865,10 +10728,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1059",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11892,10 +10752,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:998",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11914,10 +10771,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:986",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11936,10 +10790,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1053",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -11963,10 +10814,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:874",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -11985,10 +10833,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:859",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12007,10 +10852,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1460",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12032,10 +10874,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1454",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12059,10 +10898,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:945",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12081,10 +10917,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:930",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12103,10 +10936,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:902",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12125,10 +10955,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1034",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 10,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12147,10 +10974,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/support/routes.ts:20",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12169,10 +10993,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:67",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12191,10 +11012,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts:79",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12225,10 +11043,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts:67",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12254,10 +11069,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts:121",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12288,10 +11100,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts:109",
         "x-modula-auth": "legacy or bridged bearer session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12315,10 +11124,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts:61",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 60,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12337,10 +11143,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/support/routes.ts:53",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12362,10 +11165,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/support/routes.ts:54",
         "x-modula-auth": "greenfield bearer access session",
-        "x-modula-rate-limit": {
-          "max": 30,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
           {
@@ -12389,10 +11189,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/support/routes.ts:29",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12411,10 +11208,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1251",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12440,10 +11234,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1255",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12462,10 +11253,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:254",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12484,10 +11272,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1435",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     },
@@ -12506,10 +11291,7 @@
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:250",
         "x-modula-auth": "none",
-        "x-modula-rate-limit": {
-          "max": 120,
-          "timeWindow": "1 minute"
-        },
+        "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
       }
     }

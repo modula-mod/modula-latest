@@ -2340,10 +2340,17 @@
   },
   "POST /v1/backend/products/:productId/records/:collection": {
     "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_records"
     ],
     "writes": [
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_records"
     ],
     "emits": [],
@@ -2351,21 +2358,33 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/record-service.ts#create",
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
-      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
     ]
   },
   "DELETE /v1/backend/products/:productId/records/:collection/:recordId": {
     "reads": [
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
     "writes": [
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
@@ -2374,11 +2393,15 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/record-service.ts#delete",
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
       "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
       "services/greenfield-api/src/modules/record-service.ts#updateExisting"
     ]
@@ -2400,11 +2423,17 @@
   "PUT /v1/backend/products/:productId/records/:collection/:recordId": {
     "reads": [
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
     "writes": [
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
@@ -2412,14 +2441,20 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
       "services/greenfield-api/src/modules/record-service.ts#patch",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
       "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
-      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting",
+      "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
     ]
   },
   "POST /v1/backend/products/:productId/resources": {
@@ -4536,10 +4571,17 @@
   },
   "POST /v1/modules/:moduleId/records/:collection": {
     "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_records"
     ],
     "writes": [
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_records"
     ],
     "emits": [],
@@ -4547,21 +4589,33 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/record-service.ts#create",
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
-      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
     ]
   },
   "DELETE /v1/modules/:moduleId/records/:collection/:recordId": {
     "reads": [
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
     "writes": [
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
@@ -4570,11 +4624,15 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/record-service.ts#delete",
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
       "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
       "services/greenfield-api/src/modules/record-service.ts#updateExisting"
     ]
@@ -4596,12 +4654,18 @@
   "PATCH /v1/modules/:moduleId/records/:collection/:recordId": {
     "reads": [
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
     "writes": [
       "failed",
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
@@ -4609,14 +4673,20 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
       "services/greenfield-api/src/modules/record-service.ts#patch",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
       "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
-      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting",
+      "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
     ]
   },
   "DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent": {
@@ -4645,11 +4715,17 @@
   "POST /v1/modules/:moduleId/records/:collection/:recordId/restore": {
     "reads": [
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
     "writes": [
+      "greenfield_module_record_changes",
       "greenfield_module_record_events",
+      "greenfield_module_record_mutations",
+      "greenfield_module_record_references",
+      "greenfield_module_record_revisions",
       "greenfield_module_record_versions",
       "greenfield_module_records"
     ],
@@ -4657,14 +4733,21 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#executeMutation",
       "services/greenfield-api/src/modules/record-service.ts#findRecord",
       "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#getRevision",
+      "services/greenfield-api/src/modules/record-service.ts#insertImmutableRevision",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
       "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishGenericRecordDomainEvent",
       "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#replaceReferences",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
       "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
       "services/greenfield-api/src/modules/record-service.ts#restore",
-      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting",
+      "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
     ]
   },
   "GET /v1/modules/:moduleId/runtime": {
@@ -4724,7 +4807,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/modules/settings-service.ts#get"
+      "services/greenfield-api/src/modules/settings-service.ts#get",
+      "services/greenfield-api/src/modules/settings-service.ts#resolveAuthorized"
     ]
   },
   "PATCH /v1/modules/:moduleId/settings": {
@@ -4740,9 +4824,9 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/modules/settings-service.ts#get",
+      "services/greenfield-api/src/modules/settings-service.ts#defaultsFor",
       "services/greenfield-api/src/modules/settings-service.ts#patch",
-      "services/greenfield-api/src/modules/settings-service.ts#schema"
+      "services/greenfield-api/src/modules/settings-service.ts#resolveAuthorized"
     ]
   },
   "GET /v1/modules/:moduleId/settings-schema": {
@@ -4752,6 +4836,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/settings-service.ts#defaultsFor",
+      "services/greenfield-api/src/modules/settings-service.ts#resolveAuthorized",
       "services/greenfield-api/src/modules/settings-service.ts#schema"
     ]
   },
