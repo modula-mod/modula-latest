@@ -94,7 +94,7 @@ test('frontend artifact is identity-bound, hash-bound, and rejects executable es
 
 test('frontend mirror accepts bounded query, lifecycle, defaults, and rich-text transforms', () => {
   const result = validateFrontendMutation(artifact => {
-    const views = artifact.views as Array<Record<string, unknown>>
+    const views = artifact.views as Record<string, unknown>[]
     const homeBindings = views[0]!.bindings as Array<Record<string, unknown>>
     homeBindings[0]!.query = {filters: {archived: false}, limit: 25, recordState: 'deleted'}
     const actions = artifact.actions as Array<Record<string, unknown>>
@@ -127,11 +127,49 @@ test('frontend mirror rejects unsafe lifecycle and input shaping', () => {
   assert.equal(transform.diagnostics.some(item => item.code === 'MPS-FRONTEND-139'), true)
 
   const filter = validateFrontendMutation(artifact => {
-    const views = artifact.views as Array<Record<string, unknown>>
+    const views = artifact.views as Record<string, unknown>[]
     const homeBindings = views[0]!.bindings as Array<Record<string, unknown>>
     homeBindings[0]!.query = {filters: {archived: {not: true}}}
   })
   assert.equal(filter.diagnostics.some(item => item.code === 'MPS-FRONTEND-138'), true)
+})
+
+test('frontend mirror validates neutral semantic Product UI and capability declarations', () => {
+  const accepted = validateFrontendMutation(artifact => {
+    artifact.capabilities = {
+      required: ['ui.richText@1'],
+      optional: [{id: 'ui.graph', version: '1', fallback: {id: 'ui.record-table', version: '1'}}],
+    }
+    const views = artifact.views as Record<string, unknown>[]
+    const root = views[0]!.root as Record<string, unknown>
+    const children = root.children as unknown[]
+    children.push({
+      id: 'alpha.graph',
+      type: 'Graph',
+      version: '1.0.0',
+      capability: {id: 'ui.graph', version: '1'},
+      nodeBinding: 'alpha.nodes',
+      edgeBinding: 'alpha.edges',
+      layout: 'hierarchical',
+    })
+  })
+  assert.equal(accepted.ok, true, accepted.diagnostics.map(item => item.message).join('; '))
+
+  const requiredFallback = validateFrontendMutation(artifact => {
+    artifact.capabilities = {required: [{id: 'ui.graph', version: '1', fallback: {id: 'ui.record-table', version: '1'}}]}
+  })
+  assert.equal(requiredFallback.diagnostics.some(item => item.code === 'MPS-FRONTEND-110'), true)
+
+  const undeclared = validateFrontendMutation(artifact => {
+    const views = artifact.views as Record<string, unknown>[]
+    const root = views[0]!.root as Record<string, unknown>
+    const children = root.children as unknown[]
+    children.push({
+      id: 'beta.graph', type: 'Graph', version: '1.0.0', capability: {id: 'ui.graph', version: '1'},
+      nodeBinding: 'beta.nodes', edgeBinding: 'beta.edges',
+    })
+  })
+  assert.equal(undeclared.diagnostics.some(item => item.code === 'MPS-FRONTEND-SEMANTIC-002'), true)
 })
 
 test('backend-free plugin does not bind fake infrastructure', () => {

@@ -17,6 +17,9 @@
     "test": "node --test --test-reporter=spec dist/tests/*.test.js",
     "test:src": "node --import tsx --test --test-reporter=spec src/tests/*.test.ts"
   },
+  "dependencies": {
+    "@modula/greenfield-module-ui-contracts": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^24.0.10",
     "typescript": "~5.9.2"

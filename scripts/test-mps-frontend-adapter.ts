@@ -88,6 +88,32 @@ assert.deepEqual(tasksCollection.query?.filters, {completed: false})
 assert.equal(tasksCollection.query?.recordState, 'deleted')
 assert.equal(tasksCollection.query?.defaultLimit, 25)
 
+const requiredUnavailable = JSON.parse(JSON.stringify(tasks)) as MpsFrontendArtifact
+requiredUnavailable.capabilities = {required: ['ui.graph@1']}
+const requiredUnavailableRoute = resolveMpsFrontendRoute(requiredUnavailable, [])
+assert(requiredUnavailableRoute, 'required-capability route resolves before negotiation')
+const blocked = adaptMpsFrontendView({frontend: requiredUnavailable, resolved: requiredUnavailableRoute})
+assert.equal(blocked.available, false)
+assert.equal(blocked.capabilityNegotiation?.error?.code, 'CAPABILITY_UNAVAILABLE')
+
+const optionalFallback = JSON.parse(JSON.stringify(tasks)) as MpsFrontendArtifact
+optionalFallback.capabilities = {
+  optional: [{id: 'ui.graph', version: '1', fallback: {id: 'ui.record-table', version: '1'}}],
+}
+const optionalFallbackRoute = resolveMpsFrontendRoute(optionalFallback, [])
+assert(optionalFallbackRoute, 'optional-capability route resolves before negotiation')
+const fallbackView = adaptMpsFrontendView({
+  frontend: optionalFallback,
+  resolved: optionalFallbackRoute,
+  hostCapabilities: [
+    {id: 'ui.graph', version: '1.0.0', status: 'unavailable'},
+    {id: 'ui.record-table', version: '1.0.0', status: 'available', renderer: 'audit.beta.table'},
+  ],
+})
+assert.equal(fallbackView.available, true)
+assert.equal(fallbackView.capabilityNegotiation?.optional[0]?.usedFallback, true)
+assert.equal(fallbackView.capabilityNegotiation?.optional[0]?.selected?.renderer, 'audit.beta.table')
+
 const shaped = shapeMpsActionInput({
   ...create,
   inputDefaults: {completed: false},
