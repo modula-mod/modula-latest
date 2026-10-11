@@ -774,6 +774,21 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.get('/v1/modules/:moduleId/records/sync', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string}
+    const query = (request.query as {after?: string; limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.sync(auth.accountId, params.moduleId, {
+        after: stringOrUndefined(query.after),
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record sync failed')
+    }
+  })
+
   app.get('/v1/modules/:moduleId/records/:collection', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -790,7 +805,13 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.code(201).send(successEnvelope(await records.create(auth.accountId, params.moduleId, params.collection, (request.body as any) ?? {}), request.id))
+      return reply.code(201).send(successEnvelope(await records.create(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record creation failed')
     }
@@ -807,12 +828,96 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/revisions', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    const query = (request.query as {limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.listRevisions(auth.accountId, params.moduleId, params.collection, params.recordId, {
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record revision lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/revisions/current', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.currentRevision(auth.accountId, params.moduleId, params.collection, params.recordId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record current revision lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.getRevision(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        Number(params.revision),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record revision lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/references', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    const query = (request.query as {fieldPath?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.forwardReferences(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        stringOrUndefined(query.fieldPath),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record reference lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/reverse-references', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    const query = (request.query as {sourceModuleId?: string; sourceRecordType?: string; fieldPath?: string; limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.reverseReferences(auth.accountId, params.moduleId, params.collection, params.recordId, {
+        sourceModuleId: stringOrUndefined(query.sourceModuleId),
+        sourceRecordType: stringOrUndefined(query.sourceRecordType),
+        fieldPath: stringOrUndefined(query.fieldPath),
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record reverse reference lookup failed')
+    }
+  })
+
   app.patch('/v1/modules/:moduleId/records/:collection/:recordId', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await records.patch(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+      return reply.send(successEnvelope(await records.patch(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record update failed')
     }
@@ -823,7 +928,14 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await records.delete(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+      return reply.send(successEnvelope(await records.delete(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record delete failed')
     }
@@ -834,7 +946,14 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await records.restore(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+      return reply.send(successEnvelope(await records.restore(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record restore failed')
     }
