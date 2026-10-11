@@ -1,8 +1,9 @@
-import {createHash} from 'node:crypto'
+import {createHash, createHmac, timingSafeEqual} from 'node:crypto'
 import {canonicalJsonStringify} from '@modula/greenfield-protocol'
 import type {GreenfieldModuleCollectionDefinition, GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
-import {sql} from 'kysely'
+import {sql, type Transaction} from 'kysely'
+import type {Database} from '../database/types.js'
 import type {ModulaDb} from '../database/client.js'
 import type {AppConfig} from '../config/index.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -15,6 +16,25 @@ import {GreenfieldModuleIdentityMigrationService} from './identity-migration-ser
 
 type ModuleRecordOperation = 'create' | 'update' | 'delete' | 'restore' | 'purge'
 type ModuleRecordVersionChangeSource = 'update' | 'restore' | 'import' | 'delete' | 'ai-assisted'
+type GenericRecordOperation = 'create' | 'update' | 'delete' | 'restore'
+type RecordVisibility = 'private' | 'teams' | 'followers' | 'public' | 'system'
+type RecordIdentity = {moduleId: string; recordType: string; recordId: string}
+type NormalizedReference = {fieldPath: string; ordinal: number; record: RecordIdentity}
+type MutationActor = {actorId?: string; requestId?: string}
+type ExecuteMutationInput = {
+  context: {runtime: GreenfieldModuleRuntimeContext; collectionDefinition: GreenfieldModuleCollectionDefinition}
+  collectionDefinition: GreenfieldModuleCollectionDefinition
+  operation: GenericRecordOperation
+  recordId: string
+  data?: Record<string, unknown>
+  visibility?: RecordVisibility
+  expectedRevision?: number
+  sourceRevision?: number
+  mutationId: string
+  actor: MutationActor
+  payloadInput: Record<string, unknown>
+  references?: NormalizedReference[]
+}
 
 export type ModuleRecordQuery = {
   cursor?: string
@@ -31,11 +51,18 @@ export type ModuleRecordQuery = {
   recordState?: 'active' | 'deleted'
 }
 
+export type ModuleRecordSyncQuery = {after?: string; limit?: number}
+export type ModuleRecordReverseReferenceQuery = {sourceModuleId?: string; sourceRecordType?: string; fieldPath?: string; limit?: number}
+
 export class GreenfieldModuleRecordService {
   private readonly access: GreenfieldModuleRuntimeAccessService
   private readonly views: GreenfieldModuleViewService
 
-  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
+  constructor(
+    private readonly db: ModulaDb,
+    private readonly config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>
+      & Partial<Pick<AppConfig, 'checkpointSigningKey' | 'sessionPepper'>>,
+  ) {
     this.access = new GreenfieldModuleRuntimeAccessService(db, config)
     this.views = new GreenfieldModuleViewService(db, config)
   }
@@ -115,13 +142,39 @@ export class GreenfieldModuleRecordService {
     return query.executeTakeFirst()
   }
 
-  async create(accountId: string, moduleId: string, collection: string, input: {data?: unknown; visibility?: string; recordId?: string}) {
+  async create(
+    accountId: string,
+    moduleId: string,
+    collection: string,
+    input: {data?: unknown; visibility?: string; recordId?: string; mutationId?: string},
+    actor: MutationActor = {},
+  ) {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const context = await this.resolveRecordContext(accountId, canonicalId, collection, 'write')
     const data = requireRecordData(input.data)
     const visibility = normalizeVisibility(input.visibility ?? context.collectionDefinition.defaultVisibility)
-    validateRecordData(context.collectionDefinition, data, visibility)
+    validateRecordData(context.collectionDefinition, data, visibility, Boolean(input.mutationId))
     const recordId = input.recordId ?? uuidv7()
+    if (input.mutationId) {
+      const references = extractReferences(context.collectionDefinition, data)
+      await this.validateReferenceTargets(accountId, references)
+      return this.executeMutation({
+        context,
+        collectionDefinition: context.collectionDefinition,
+        operation: 'create',
+        recordId,
+        data,
+        visibility,
+        mutationId: input.mutationId,
+        actor,
+        payloadInput: {data, visibility, requestedRecordId: input.recordId ?? null},
+        references,
+      })
+    }
+    // Explicit compatibility path for pre-MP02 clients. New clients must send
+    // mutationId and receive the atomic generic mutation contract above.
+    const legacyReferences = extractReferences(context.collectionDefinition, data)
+    await this.validateReferenceTargets(accountId, legacyReferences)
     const now = new Date()
     const searchText = buildSearchText(context.collectionDefinition, data)
     const folderRef = getStringField(data, context.collectionDefinition.folderField)
@@ -152,35 +205,627 @@ export class GreenfieldModuleRecordService {
         })
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId, accountId, moduleId: canonicalId, collection, operation: 'create', revision: 1, previousHash: null, eventHash, payloadHash, metadata: {visibility}})
+      await this.insertImmutableRevision(trx, {
+        accountId,
+        installationId: context.runtime.installationId,
+        moduleId: canonicalId,
+        recordType: collection,
+        recordId,
+        revision: 1,
+        baseRevision: null,
+        operation: 'create',
+        mutationId: `legacy:${eventId}`,
+        actorId: actor.actorId ?? null,
+        data,
+        visibility,
+        deleted: false,
+        payloadHash,
+        createdAt: now,
+      })
+      await this.replaceReferences(trx, context.runtime, collection, recordId, 1, legacyReferences, now)
+      await trx.insertInto('greenfield_module_record_changes').values({
+        account_id: accountId,
+        installation_id: context.runtime.installationId,
+        module_id: canonicalId,
+        record_type: collection,
+        record_id: recordId,
+        revision: 1,
+        operation: 'create',
+        deleted: false,
+        created_at: now,
+      }).execute()
       await new AuditRepository(trx).append('module.record.created', {moduleId: canonicalId, collection, visibility, eventHash}, {type: 'moduleRecord', id: recordId})
       await this.publishRecordDomainEvent(trx, {accountId, moduleId: canonicalId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null, eventDeclarations: context.runtime.manifest.contributions.events ?? []})
     })
     return this.get(accountId, canonicalId, collection, recordId)
   }
 
-  async patch(accountId: string, moduleId: string, collection: string, recordId: string, input: {data?: unknown; expectedRevision?: number; visibility?: string; changeSource?: ModuleRecordVersionChangeSource; versionMetadata?: Record<string, unknown>}) {
+  async patch(
+    accountId: string,
+    moduleId: string,
+    collection: string,
+    recordId: string,
+    input: {data?: unknown; expectedRevision?: number; visibility?: string; changeSource?: ModuleRecordVersionChangeSource; versionMetadata?: Record<string, unknown>; mutationId?: string},
+    actor: MutationActor = {},
+  ) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
+    if (input.mutationId) {
+      requireExpectedRevision(input.expectedRevision)
+      const patchData = requireRecordData(input.data)
+      const references = extractReferences(context.collectionDefinition, patchData)
+      await this.validateReferenceTargets(accountId, references)
+      return this.executeMutation({
+        context,
+        collectionDefinition: context.collectionDefinition,
+        operation: 'update',
+        recordId,
+        data: patchData,
+        visibility: input.visibility === undefined ? undefined : normalizeVisibility(input.visibility),
+        expectedRevision: input.expectedRevision,
+        mutationId: input.mutationId,
+        actor,
+        payloadInput: {data: patchData, visibility: input.visibility ?? null, expectedRevision: input.expectedRevision},
+        references,
+      })
+    }
     const current = await this.get(accountId, moduleId, collection, recordId)
-    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
     const data = {...(current.data as Record<string, unknown>), ...requireRecordData(input.data)}
     const visibility = normalizeVisibility(input.visibility ?? current.visibility)
-    validateRecordData(context.collectionDefinition, data, visibility)
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, data, visibility, 'update', input.changeSource ?? 'update', input.versionMetadata)
+    validateRecordData(context.collectionDefinition, data, visibility, false)
+    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
+    const legacyReferences = extractReferences(context.collectionDefinition, data)
+    await this.validateReferenceTargets(accountId, legacyReferences)
+    return this.updateExisting(context.runtime, context.collectionDefinition, current, data, visibility, 'update', input.changeSource ?? 'update', input.versionMetadata, legacyReferences, actor)
   }
 
-  async delete(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number} = {}) {
+  async delete(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number; mutationId?: string} = {}, actor: MutationActor = {}) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'delete')
+    if (input.mutationId) {
+      requireExpectedRevision(input.expectedRevision)
+      return this.executeMutation({
+        context,
+        collectionDefinition: context.collectionDefinition,
+        operation: 'delete',
+        recordId,
+        expectedRevision: input.expectedRevision,
+        mutationId: input.mutationId,
+        actor,
+        payloadInput: {expectedRevision: input.expectedRevision},
+        references: [],
+      })
+    }
     const current = await this.get(accountId, moduleId, collection, recordId)
     if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'delete')
+    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'delete', 'delete', {}, [], actor)
   }
 
-  async restore(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number} = {}) {
+  async restore(
+    accountId: string,
+    moduleId: string,
+    collection: string,
+    recordId: string,
+    input: {expectedRevision?: number; sourceRevision?: number; mutationId?: string} = {},
+    actor: MutationActor = {},
+  ) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
+    if (input.mutationId) {
+      requireExpectedRevision(input.expectedRevision)
+      if (!Number.isInteger(input.sourceRevision) || Number(input.sourceRevision) < 1) throw moduleError('VALIDATION_FAILED', 'sourceRevision is required')
+      const source = await this.getRevision(accountId, moduleId, collection, recordId, Number(input.sourceRevision))
+      const restoredData = requireRecordData(source.data)
+      const references = extractReferences(context.collectionDefinition, restoredData)
+      await this.validateReferenceTargets(accountId, references)
+      return this.executeMutation({
+        context,
+        collectionDefinition: context.collectionDefinition,
+        operation: 'restore',
+        recordId,
+        expectedRevision: input.expectedRevision,
+        sourceRevision: input.sourceRevision,
+        mutationId: input.mutationId,
+        actor,
+        payloadInput: {expectedRevision: input.expectedRevision, sourceRevision: input.sourceRevision},
+        references,
+      })
+    }
     const current = await this.findRecord(accountId, moduleId, collection, recordId, true)
     if (!current) throw moduleError('NOT_FOUND', 'Module record not found')
     if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'restore')
+    const legacyReferences = extractReferences(context.collectionDefinition, requireRecordData(current.data))
+    await this.validateReferenceTargets(accountId, legacyReferences)
+    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'restore', 'restore', {}, legacyReferences, actor)
+  }
+
+  async listRevisions(accountId: string, moduleId: string, collection: string, recordId: string, input: {limit?: number} = {}) {
+    await this.requireReadableRecord(accountId, moduleId, collection, recordId, true)
+    const limit = clampLimit(input.limit, 25)
+    const rows = await this.db
+      .selectFrom('greenfield_module_record_revisions')
+      .select(['revision_id', 'module_id', 'record_type', 'record_id', 'revision', 'base_revision', 'operation', 'mutation_id', 'actor_id', 'deleted', 'payload_hash', 'created_at'])
+      .where('account_id', '=', accountId)
+      .where('module_id', '=', resolveCanonicalModuleId(moduleId))
+      .where('record_type', '=', collection)
+      .where('record_id', '=', recordId)
+      .orderBy('revision', 'desc')
+      .limit(limit)
+      .execute()
+    return {record: recordIdentity(moduleId, collection, recordId), revisions: rows.map(serializeRevisionMetadata)}
+  }
+
+  async getRevision(accountId: string, moduleId: string, collection: string, recordId: string, revision: number) {
+    await this.requireReadableRecord(accountId, moduleId, collection, recordId, true)
+    if (!Number.isInteger(revision) || revision < 1) throw moduleError('VALIDATION_FAILED', 'Invalid revision')
+    const row = await this.db
+      .selectFrom('greenfield_module_record_revisions')
+      .selectAll()
+      .where('account_id', '=', accountId)
+      .where('module_id', '=', resolveCanonicalModuleId(moduleId))
+      .where('record_type', '=', collection)
+      .where('record_id', '=', recordId)
+      .where('revision', '=', revision)
+      .executeTakeFirst()
+    if (!row) throw moduleError('NOT_FOUND', 'Module record revision not found')
+    return {...serializeRevisionMetadata(row), data: row.data_snapshot, visibility: row.visibility}
+  }
+
+  async currentRevision(accountId: string, moduleId: string, collection: string, recordId: string) {
+    const current = await this.requireReadableRecord(accountId, moduleId, collection, recordId, true)
+    return {record: recordIdentity(moduleId, collection, recordId), revision: current.revision}
+  }
+
+  async forwardReferences(accountId: string, moduleId: string, collection: string, recordId: string, fieldPath?: string) {
+    await this.requireReadableRecord(accountId, moduleId, collection, recordId, false)
+    let query = this.db
+      .selectFrom('greenfield_module_record_references')
+      .selectAll()
+      .where('account_id', '=', accountId)
+      .where('source_module_id', '=', resolveCanonicalModuleId(moduleId))
+      .where('source_record_type', '=', collection)
+      .where('source_record_id', '=', recordId)
+    if (fieldPath) query = query.where('field_path', '=', fieldPath)
+    const rows = await query.orderBy('field_path').orderBy('ordinal').execute()
+    const references = []
+    for (const row of rows) {
+      if (!await this.canReadRecord(accountId, row.target_module_id, row.target_record_type, row.target_record_id)) continue
+      references.push({
+        fieldPath: row.field_path,
+        ordinal: row.ordinal,
+        record: recordIdentity(row.target_module_id, row.target_record_type, row.target_record_id),
+      })
+    }
+    return {record: recordIdentity(moduleId, collection, recordId), references}
+  }
+
+  async reverseReferences(
+    accountId: string,
+    moduleId: string,
+    collection: string,
+    recordId: string,
+    input: ModuleRecordReverseReferenceQuery = {},
+  ) {
+    await this.requireReadableRecord(accountId, moduleId, collection, recordId, false)
+    const limit = clampLimit(input.limit, 50)
+    let query = this.db
+      .selectFrom('greenfield_module_record_references')
+      .selectAll()
+      .where('account_id', '=', accountId)
+      .where('target_module_id', '=', resolveCanonicalModuleId(moduleId))
+      .where('target_record_type', '=', collection)
+      .where('target_record_id', '=', recordId)
+    if (input.sourceModuleId) query = query.where('source_module_id', '=', resolveCanonicalModuleId(input.sourceModuleId))
+    if (input.sourceRecordType) query = query.where('source_record_type', '=', input.sourceRecordType)
+    if (input.fieldPath) query = query.where('field_path', '=', input.fieldPath)
+    const rows = await query.orderBy('created_at', 'desc').limit(limit * 4).execute()
+    const references = []
+    for (const row of rows) {
+      if (references.length >= limit) break
+      if (!await this.canReadRecord(accountId, row.source_module_id, row.source_record_type, row.source_record_id)) continue
+      references.push({
+        source: recordIdentity(row.source_module_id, row.source_record_type, row.source_record_id),
+        sourceRevision: row.source_revision,
+        fieldPath: row.field_path,
+        ordinal: row.ordinal,
+      })
+    }
+    return {target: recordIdentity(moduleId, collection, recordId), references}
+  }
+
+  async sync(accountId: string, moduleId: string, input: ModuleRecordSyncQuery = {}) {
+    const canonicalId = resolveCanonicalModuleId(moduleId)
+    const runtime = await this.access.resolve(accountId, canonicalId, {requireEnabled: true})
+    const after = input.after ? decodeSyncCursor(input.after, runtime, this.syncSigningKey()) : '0'
+    const limit = clampLimit(input.limit, 100)
+    const rows = await this.db
+      .selectFrom('greenfield_module_record_changes')
+      .selectAll()
+      .where('account_id', '=', accountId)
+      .where('installation_id', '=', runtime.installationId)
+      .where('module_id', '=', canonicalId)
+      .where('change_sequence', '>', after)
+      .orderBy('change_sequence', 'asc')
+      .limit(limit)
+      .execute()
+    const changes = []
+    const tombstones = []
+    let latestRevision: {moduleId: string; recordType: string; recordId: string; revision: number} | null = null
+    for (const row of rows) {
+      try {
+        this.access.enforceCapability(runtime, collectionPermission(canonicalId, row.record_type, 'read'))
+      } catch {
+        continue
+      }
+      const identity = recordIdentity(canonicalId, row.record_type, row.record_id)
+      latestRevision = {...identity, revision: row.revision}
+      if (row.deleted) {
+        tombstones.push({...identity, revision: row.revision, changedAt: row.created_at.toISOString()})
+        continue
+      }
+      const current = await this.findRecord(accountId, canonicalId, row.record_type, row.record_id, false)
+      if (!current) continue
+      changes.push({record: current, latestRevision: {...identity, revision: current.revision}, changedAt: row.created_at.toISOString()})
+    }
+    const sequence = rows.at(-1)?.change_sequence ?? after
+    return {
+      changes,
+      tombstones,
+      latestRevision,
+      nextCursor: encodeSyncCursor(runtime, sequence, this.syncSigningKey()),
+    }
+  }
+
+  private async executeMutation(input: ExecuteMutationInput) {
+    const mutationId = requireMutationId(input.mutationId)
+    const {runtime} = input.context
+    const payloadHash = sha256(canonicalJsonStringify({
+      moduleId: runtime.moduleId,
+      recordType: input.collectionDefinition.collection,
+      operation: input.operation,
+      payload: input.payloadInput,
+    }))
+    return this.db.transaction().execute(async trx => {
+      const reservationId = uuidv7()
+      const reserved = await trx
+        .insertInto('greenfield_module_record_mutations')
+        .values({
+          mutation_row_id: reservationId,
+          account_id: runtime.accountId,
+          installation_id: runtime.installationId,
+          module_id: runtime.moduleId,
+          mutation_id: mutationId,
+          operation: input.operation,
+          record_type: input.collectionDefinition.collection,
+          record_id: input.recordId,
+          payload_hash: payloadHash,
+          status: 'pending',
+          result: null,
+          created_at: new Date(),
+          completed_at: null,
+        })
+        .onConflict(conflict => conflict.columns(['account_id', 'installation_id', 'mutation_id']).doNothing())
+        .returning('mutation_row_id')
+        .executeTakeFirst()
+      if (!reserved) {
+        const previous = await trx
+          .selectFrom('greenfield_module_record_mutations')
+          .select(['payload_hash', 'status', 'result'])
+          .where('account_id', '=', runtime.accountId)
+          .where('installation_id', '=', runtime.installationId)
+          .where('mutation_id', '=', mutationId)
+          .executeTakeFirstOrThrow()
+        if (previous.payload_hash !== payloadHash) throw moduleError('MUTATION_REUSE_CONFLICT', 'Mutation ID was already used for a different payload')
+        if (previous.status !== 'completed' || previous.result === null) throw moduleError('CONFLICT', 'Mutation is already in progress')
+        return previous.result as Record<string, unknown>
+      }
+
+      const current = await trx
+        .selectFrom('greenfield_module_records')
+        .selectAll()
+        .where('account_id', '=', runtime.accountId)
+        .where('module_id', '=', runtime.moduleId)
+        .where('collection', '=', input.collectionDefinition.collection)
+        .where('record_id', '=', input.recordId)
+        .forUpdate()
+        .executeTakeFirst()
+      if (input.operation === 'create' && current) throw moduleError('CONFLICT', 'Module record already exists')
+      if (input.operation !== 'create' && !current) throw moduleError('NOT_FOUND', 'Module record not found')
+      if (current && current.revision !== input.expectedRevision) throw moduleError('REVISION_CONFLICT', 'Module record revision conflict')
+
+      let data = input.data
+      let visibility = input.visibility
+      let references = input.references ?? []
+      if (input.operation === 'restore') {
+        const source = await trx
+          .selectFrom('greenfield_module_record_revisions')
+          .select(['data_snapshot', 'visibility'])
+          .where('account_id', '=', runtime.accountId)
+          .where('module_id', '=', runtime.moduleId)
+          .where('record_type', '=', input.collectionDefinition.collection)
+          .where('record_id', '=', input.recordId)
+          .where('revision', '=', input.sourceRevision!)
+          .executeTakeFirst()
+        if (!source) throw moduleError('NOT_FOUND', 'Module record revision not found')
+        data = requireRecordData(source.data_snapshot)
+        visibility = source.visibility
+        references = extractReferences(input.collectionDefinition, data)
+      }
+      if (input.operation === 'update' && current) {
+        data = {...requireRecordData(current.data), ...requireRecordData(input.data)}
+        visibility = input.visibility ?? current.visibility
+        references = extractReferences(input.collectionDefinition, data)
+      }
+      if (input.operation === 'delete' && current) {
+        data = requireRecordData(current.data)
+        visibility = current.visibility
+        references = []
+      }
+      if (!data || !visibility) throw moduleError('VALIDATION_FAILED', 'Record mutation data is incomplete')
+      validateRecordData(input.collectionDefinition, data, visibility, true)
+
+      const revision = current ? current.revision + 1 : 1
+      const baseRevision = current?.revision ?? null
+      const deleted = input.operation === 'delete'
+      const now = new Date()
+      const recordPayloadHash = sha256(canonicalJsonStringify(deleted ? {deleted: true} : data))
+      if (current) {
+        const updated = await trx
+          .updateTable('greenfield_module_records')
+          .set({
+            data,
+            visibility,
+            search_text: buildSearchText(input.collectionDefinition, data),
+            folder_ref: getStringField(data, input.collectionDefinition.folderField),
+            source_uri: getStringField(data, 'sourceUri'),
+            installation_id: runtime.installationId,
+            revision,
+            updated_at: now,
+            deleted_at: deleted ? now : null,
+          })
+          .where('account_id', '=', runtime.accountId)
+          .where('module_id', '=', runtime.moduleId)
+          .where('collection', '=', input.collectionDefinition.collection)
+          .where('record_id', '=', input.recordId)
+          .where('revision', '=', current.revision)
+          .executeTakeFirst()
+        if (updated.numUpdatedRows !== 1n) throw moduleError('REVISION_CONFLICT', 'Module record revision conflict')
+      } else {
+        await trx.insertInto('greenfield_module_records').values({
+          record_id: input.recordId,
+          account_id: runtime.accountId,
+          module_id: runtime.moduleId,
+          installation_id: runtime.installationId,
+          collection: input.collectionDefinition.collection,
+          schema_ref: input.collectionDefinition.schemaRef,
+          visibility,
+          data,
+          search_text: buildSearchText(input.collectionDefinition, data),
+          folder_ref: getStringField(data, input.collectionDefinition.folderField),
+          source_uri: getStringField(data, 'sourceUri'),
+          retained_after_uninstall: false,
+          revision,
+          created_at: now,
+          updated_at: now,
+          deleted_at: null,
+        }).execute()
+      }
+
+      await this.insertImmutableRevision(trx, {
+        accountId: runtime.accountId,
+        installationId: runtime.installationId,
+        moduleId: runtime.moduleId,
+        recordType: input.collectionDefinition.collection,
+        recordId: input.recordId,
+        revision,
+        baseRevision,
+        operation: input.operation,
+        mutationId,
+        actorId: input.actor.actorId ?? null,
+        data,
+        visibility,
+        deleted,
+        payloadHash: recordPayloadHash,
+        createdAt: now,
+      })
+      await this.replaceReferences(trx, runtime, input.collectionDefinition.collection, input.recordId, revision, references, now)
+      await trx.insertInto('greenfield_module_record_changes').values({
+        account_id: runtime.accountId,
+        installation_id: runtime.installationId,
+        module_id: runtime.moduleId,
+        record_type: input.collectionDefinition.collection,
+        record_id: input.recordId,
+        revision,
+        operation: input.operation,
+        deleted,
+        created_at: now,
+      }).execute()
+
+      const eventId = uuidv7()
+      const previous = await trx.selectFrom('greenfield_module_record_events').select('event_hash')
+        .where('account_id', '=', runtime.accountId)
+        .where('module_id', '=', runtime.moduleId)
+        .where('collection', '=', input.collectionDefinition.collection)
+        .where('record_id', '=', input.recordId)
+        .orderBy('revision', 'desc').executeTakeFirst()
+      const eventHash = hashRecordEvent({eventId, recordId: input.recordId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, operation: input.operation, revision, payloadHash: recordPayloadHash})
+      await this.insertRecordEvent(trx, {eventId, recordId: input.recordId, accountId: runtime.accountId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, operation: input.operation, revision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash: recordPayloadHash, metadata: {visibility, mutationId, baseRevision}})
+      await new AuditRepository(trx).append(`module.record.${input.operation}`, {moduleId: runtime.moduleId, recordType: input.collectionDefinition.collection, revision, mutationId, eventHash}, {type: 'moduleRecord', id: input.recordId, actorId: input.actor.actorId ?? null}, {accountId: runtime.accountId, requestId: input.actor.requestId})
+      await this.publishGenericRecordDomainEvent(trx, {accountId: runtime.accountId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, recordId: input.recordId, operation: input.operation, revision, schemaRef: input.collectionDefinition.schemaRef, data, eventDeclarations: runtime.manifest.contributions.events ?? []})
+
+      const result = deleted
+        ? {deleted: true, recordId: input.recordId, revision}
+        : await trx.selectFrom('greenfield_module_records').selectAll()
+          .where('account_id', '=', runtime.accountId).where('module_id', '=', runtime.moduleId)
+          .where('collection', '=', input.collectionDefinition.collection).where('record_id', '=', input.recordId)
+          .executeTakeFirstOrThrow()
+      const storedResult = jsonValue(result)
+      await trx.updateTable('greenfield_module_record_mutations').set({status: 'completed', result: storedResult, completed_at: now})
+        .where('mutation_row_id', '=', reservationId).execute()
+      return result
+    })
+  }
+
+  private async requireReadableRecord(
+    accountId: string,
+    moduleId: string,
+    collection: string,
+    recordId: string,
+    includeDeleted: boolean,
+  ) {
+    await this.resolveRecordContext(accountId, moduleId, collection, 'read')
+    const record = await this.findRecord(accountId, moduleId, collection, recordId, includeDeleted)
+    if (!record) throw moduleError('NOT_FOUND', 'Module record not found')
+    return record
+  }
+
+  private async canReadRecord(accountId: string, moduleId: string, collection: string, recordId: string): Promise<boolean> {
+    try {
+      await this.requireReadableRecord(accountId, moduleId, collection, recordId, false)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private async validateReferenceTargets(accountId: string, references: NormalizedReference[]): Promise<void> {
+    const unique = new Map(references.map(reference => [
+      `${reference.record.moduleId}\u0000${reference.record.recordType}\u0000${reference.record.recordId}`,
+      reference.record,
+    ]))
+    for (const record of unique.values()) {
+      await this.requireReadableRecord(accountId, record.moduleId, record.recordType, record.recordId, false)
+    }
+  }
+
+  private syncSigningKey(): string {
+    if (this.config?.checkpointSigningKey) return this.config.checkpointSigningKey
+    if (this.config?.sessionPepper) return this.config.sessionPepper
+    if (this.config?.environment === 'production') throw moduleError('CAPABILITY_DISABLED', 'Module sync cursor signing key is not configured')
+    return 'development-module-record-sync-signing-key'
+  }
+
+  private async insertImmutableRevision(
+    trx: Transaction<Database>,
+    input: {
+      accountId: string
+      installationId: string
+      moduleId: string
+      recordType: string
+      recordId: string
+      revision: number
+      baseRevision: number | null
+      operation: GenericRecordOperation
+      mutationId: string
+      actorId: string | null
+      data: Record<string, unknown>
+      visibility: RecordVisibility
+      deleted: boolean
+      payloadHash: string
+      createdAt: Date
+    },
+  ): Promise<void> {
+    const revisionId = sha256(canonicalJsonStringify({
+      accountId: input.accountId,
+      installationId: input.installationId,
+      moduleId: input.moduleId,
+      recordType: input.recordType,
+      recordId: input.recordId,
+      revision: input.revision,
+      mutationId: input.mutationId,
+      payloadHash: input.payloadHash,
+    }))
+    await trx.insertInto('greenfield_module_record_revisions').values({
+      revision_id: revisionId,
+      account_id: input.accountId,
+      installation_id: input.installationId,
+      module_id: input.moduleId,
+      record_type: input.recordType,
+      record_id: input.recordId,
+      revision: input.revision,
+      base_revision: input.baseRevision,
+      operation: input.operation,
+      mutation_id: input.mutationId,
+      actor_id: input.actorId,
+      data_snapshot: input.data,
+      visibility: input.visibility,
+      deleted: input.deleted,
+      payload_hash: input.payloadHash,
+      created_at: input.createdAt,
+    }).execute()
+  }
+
+  private async replaceReferences(
+    trx: Transaction<Database>,
+    runtime: GreenfieldModuleRuntimeContext,
+    recordType: string,
+    recordId: string,
+    revision: number,
+    references: NormalizedReference[],
+    createdAt: Date,
+  ): Promise<void> {
+    await trx.deleteFrom('greenfield_module_record_references')
+      .where('account_id', '=', runtime.accountId)
+      .where('source_module_id', '=', runtime.moduleId)
+      .where('source_record_type', '=', recordType)
+      .where('source_record_id', '=', recordId)
+      .execute()
+    if (references.length === 0) return
+    await trx.insertInto('greenfield_module_record_references').values(references.map(reference => ({
+      reference_id: uuidv7(),
+      account_id: runtime.accountId,
+      source_installation_id: runtime.installationId,
+      source_module_id: runtime.moduleId,
+      source_record_type: recordType,
+      source_record_id: recordId,
+      source_revision: revision,
+      field_path: reference.fieldPath,
+      ordinal: reference.ordinal,
+      target_module_id: reference.record.moduleId,
+      target_record_type: reference.record.recordType,
+      target_record_id: reference.record.recordId,
+      created_at: createdAt,
+    }))).execute()
+  }
+
+  private async publishGenericRecordDomainEvent(
+    trx: Transaction<Database>,
+    input: {
+      accountId: string
+      moduleId: string
+      collection: string
+      recordId: string
+      operation: GenericRecordOperation
+      revision: number
+      schemaRef: string
+      data: Record<string, unknown>
+      eventDeclarations: Array<{eventType: string; direction: string}>
+    },
+  ): Promise<void> {
+    const action = input.operation === 'create' ? 'created'
+      : input.operation === 'update' ? 'updated'
+        : input.operation === 'delete' ? 'deleted'
+          : 'restored'
+    const normalizedCollection = input.collection.replace(/[^a-z0-9-]+/g, '-')
+    const declared = input.eventDeclarations.find(event =>
+      event.direction === 'emits' && new RegExp(`\\.${normalizedCollection}\\.${action}\\.v\\d+$`).test(event.eventType),
+    )
+    const moduleSlug = input.moduleId.split('.').at(-1) ?? input.moduleId
+    const eventType = declared?.eventType ?? `${moduleSlug}.${normalizedCollection}.${action}.v1`
+    await new GreenfieldEventBus(trx).publish({
+      eventType,
+      aggregateType: input.collection,
+      aggregateId: input.recordId,
+      aggregateVersion: input.revision,
+      accountId: input.accountId,
+      visibility: 'account',
+      classification: 'private',
+      idempotencyKey: `${eventType}:${input.accountId}:${input.moduleId}:${input.collection}:${input.recordId}:${input.revision}`,
+      payload: {
+        record: recordIdentity(input.moduleId, input.collection, input.recordId),
+        revision: input.revision,
+        deleted: input.operation === 'delete',
+        payloadHash: sha256(canonicalJsonStringify(input.operation === 'delete' ? {deleted: true} : input.data)),
+      },
+      metadata: {source: 'greenfield.module-records', schemaRef: input.schemaRef},
+    })
   }
 
   async purge(accountId: string, moduleId: string, collection: string, recordId: string, input: {confirm?: boolean; expectedRevision?: number} = {}) {
@@ -234,6 +879,8 @@ export class GreenfieldModuleRecordService {
     operation: ModuleRecordOperation,
     changeSource: ModuleRecordVersionChangeSource = operation === 'restore' ? 'restore' : operation === 'delete' ? 'delete' : 'update',
     versionMetadata: Record<string, unknown> = {},
+    references: NormalizedReference[] = [],
+    actor: MutationActor = {},
   ) {
     const nextRevision = current.revision + 1
     const now = new Date()
@@ -266,6 +913,37 @@ export class GreenfieldModuleRecordService {
         .where('module_id', '=', context.moduleId)
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {visibility, changeSource, provenance: redactedVersionMetadata(versionMetadata)}})
+      if (operation !== 'purge') {
+        await this.insertImmutableRevision(trx, {
+          accountId: context.accountId,
+          installationId: context.installationId,
+          moduleId: context.moduleId,
+          recordType: current.collection,
+          recordId: current.record_id,
+          revision: nextRevision,
+          baseRevision: current.revision,
+          operation,
+          mutationId: `legacy:${eventId}`,
+          actorId: actor.actorId ?? null,
+          data,
+          visibility,
+          deleted: operation === 'delete',
+          payloadHash,
+          createdAt: now,
+        })
+        await this.replaceReferences(trx, context, current.collection, current.record_id, nextRevision, references, now)
+        await trx.insertInto('greenfield_module_record_changes').values({
+          account_id: context.accountId,
+          installation_id: context.installationId,
+          module_id: context.moduleId,
+          record_type: current.collection,
+          record_id: current.record_id,
+          revision: nextRevision,
+          operation,
+          deleted: operation === 'delete',
+          created_at: now,
+        }).execute()
+      }
       await new AuditRepository(trx).append(`module.record.${operation === 'delete' ? 'deleted' : 'updated'}`, {moduleId: context.moduleId, collection: current.collection, eventHash}, {type: 'moduleRecord', id: current.record_id})
       await this.publishRecordDomainEvent(trx, {accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, recordId: current.record_id, operation, revision: nextRevision, schemaRef: collectionDefinition.schemaRef, data, previousData: current.data as Record<string, unknown>, eventDeclarations: context.manifest.contributions.events ?? []})
     })
@@ -372,13 +1050,18 @@ export class GreenfieldModuleRecordService {
   }
 }
 
-function validateRecordData(definition: GreenfieldModuleCollectionDefinition, data: Record<string, unknown>, visibility: string): void {
+function validateRecordData(
+  definition: GreenfieldModuleCollectionDefinition,
+  data: Record<string, unknown>,
+  visibility: string,
+  strictReferences = false,
+): void {
   if (visibility === 'public' && definition.defaultVisibility === 'private') throw moduleError('FORBIDDEN', 'Collection is private by default and cannot publish records')
   const fieldsByName = new Map(definition.fields.map(field => [field.name, field]))
   for (const field of definition.fields) {
     const value = data[field.name]
     if (field.required && (value === undefined || value === null || value === '')) throw moduleError('VALIDATION_FAILED', `Missing required field ${field.name}`)
-    if (value !== undefined && value !== null) validateFieldValue(field, value)
+    if (value !== undefined && value !== null) validateFieldValue(field, value, strictReferences)
   }
   if (fieldsByName.size > 0) {
     for (const key of Object.keys(data)) {
@@ -387,14 +1070,22 @@ function validateRecordData(definition: GreenfieldModuleCollectionDefinition, da
   }
 }
 
-function validateFieldValue(field: GreenfieldModuleFieldDefinition, value: unknown): void {
+function validateFieldValue(field: GreenfieldModuleFieldDefinition, value: unknown, strictReferences: boolean): void {
   if (field.sensitive || field.secretRefRequired) {
     if (!value || typeof value !== 'object' || Array.isArray(value) || typeof (value as {secretRef?: unknown}).secretRef !== 'string') {
       throw moduleError('VALIDATION_FAILED', `Sensitive field ${field.name} must use a secret reference`)
     }
     return
   }
-  if (['text', 'multilineText', 'url', 'recordReference', 'assetReference', 'date', 'dateTime'].includes(field.type) && typeof value !== 'string') {
+  if (field.type === 'recordReference') {
+    if (!strictReferences && typeof value === 'string') return
+    const values = Array.isArray(value) ? value : [value]
+    if (values.length === 0 || !values.every(item => parseRecordReference(item) !== null)) {
+      throw moduleError('VALIDATION_FAILED', `Field ${field.name} must use a structured record reference`)
+    }
+    return
+  }
+  if (['text', 'multilineText', 'url', 'assetReference', 'date', 'dateTime'].includes(field.type) && typeof value !== 'string') {
     throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be text`)
   }
   if (field.type === 'number' && typeof value !== 'number') throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be numeric`)
@@ -405,6 +1096,127 @@ function validateFieldValue(field: GreenfieldModuleFieldDefinition, value: unkno
   }
   if (field.type === 'json') validateJsonField(field.name, value)
   if (field.type === 'richText') validateJsonField(field.name, value)
+}
+
+function extractReferences(definition: GreenfieldModuleCollectionDefinition, data: Record<string, unknown>): NormalizedReference[] {
+  const referenceFields = new Set([
+    ...definition.fields.filter(field => field.type === 'recordReference').map(field => field.name),
+    ...(definition.referenceFields ?? []),
+  ])
+  const references: NormalizedReference[] = []
+  for (const fieldPath of referenceFields) {
+    const value = data[fieldPath]
+    if (value === undefined || value === null || value === '') continue
+    const values = Array.isArray(value) ? value : [value]
+    values.forEach((candidate, ordinal) => {
+      const record = parseRecordReference(candidate)
+      if (record) references.push({fieldPath, ordinal, record})
+    })
+  }
+  return references
+}
+
+function parseRecordReference(value: unknown): RecordIdentity | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const outer = value as {record?: unknown}
+  if (!outer.record || typeof outer.record !== 'object' || Array.isArray(outer.record)) return null
+  const record = outer.record as {moduleId?: unknown; recordType?: unknown; recordId?: unknown}
+  if (typeof record.moduleId !== 'string' || typeof record.recordType !== 'string' || typeof record.recordId !== 'string') return null
+  if (!/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/.test(record.recordType) || record.recordId.length === 0 || record.recordId.length > 512) return null
+  try {
+    return {moduleId: resolveCanonicalModuleId(record.moduleId), recordType: record.recordType, recordId: record.recordId}
+  } catch {
+    return null
+  }
+}
+
+function recordIdentity(moduleId: string, recordType: string, recordId: string): RecordIdentity {
+  return {moduleId: resolveCanonicalModuleId(moduleId), recordType, recordId}
+}
+
+function serializeRevisionMetadata(row: {
+  revision_id: string
+  module_id: string
+  record_type: string
+  record_id: string
+  revision: number
+  base_revision: number | null
+  operation: string
+  mutation_id: string | null
+  actor_id: string | null
+  deleted: boolean
+  payload_hash: string
+  created_at: Date
+}) {
+  return {
+    revisionId: row.revision_id,
+    record: recordIdentity(row.module_id, row.record_type, row.record_id),
+    revision: row.revision,
+    baseRevision: row.base_revision,
+    operation: row.operation,
+    mutationId: row.mutation_id,
+    actorId: row.actor_id,
+    deleted: row.deleted,
+    payloadHash: row.payload_hash,
+    changedAt: row.created_at.toISOString(),
+  }
+}
+
+function requireExpectedRevision(value: unknown): asserts value is number {
+  if (!Number.isInteger(value) || Number(value) < 1) throw moduleError('VALIDATION_FAILED', 'expectedRevision is required')
+}
+
+function requireMutationId(value: unknown): string {
+  if (typeof value !== 'string' || value.length < 1 || value.length > 200 || !/^[A-Za-z0-9._:-]+$/.test(value)) {
+    throw moduleError('VALIDATION_FAILED', 'Invalid mutationId')
+  }
+  return value
+}
+
+function jsonValue<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
+}
+
+type SyncCursorClaims = {v: 1; accountId: string; installationId: string; moduleId: string; sequence: string}
+
+function encodeSyncCursor(runtime: GreenfieldModuleRuntimeContext, sequence: string, key: string): string {
+  const claims: SyncCursorClaims = {
+    v: 1,
+    accountId: runtime.accountId,
+    installationId: runtime.installationId,
+    moduleId: runtime.moduleId,
+    sequence,
+  }
+  const body = Buffer.from(JSON.stringify(claims), 'utf8').toString('base64url')
+  const signature = createHmac('sha256', key).update(body).digest('base64url')
+  return `${body}.${signature}`
+}
+
+function decodeSyncCursor(value: string, runtime: GreenfieldModuleRuntimeContext, key: string): string {
+  const [body, signature, extra] = value.split('.')
+  if (!body || !signature || extra) throw moduleError('INVALID_CURSOR', 'Invalid sync cursor')
+  const expected = createHmac('sha256', key).update(body).digest()
+  let actual: Buffer
+  try {
+    actual = Buffer.from(signature, 'base64url')
+  } catch {
+    throw moduleError('INVALID_CURSOR', 'Invalid sync cursor')
+  }
+  if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) throw moduleError('INVALID_CURSOR', 'Invalid sync cursor')
+  let claims: SyncCursorClaims
+  try {
+    claims = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as SyncCursorClaims
+  } catch {
+    throw moduleError('INVALID_CURSOR', 'Invalid sync cursor')
+  }
+  if (
+    claims.v !== 1
+    || claims.accountId !== runtime.accountId
+    || claims.installationId !== runtime.installationId
+    || claims.moduleId !== runtime.moduleId
+    || !/^\d+$/.test(claims.sequence)
+  ) throw moduleError('INVALID_CURSOR', 'Sync cursor does not match this installation scope')
+  return claims.sequence
 }
 
 function requireRecordData(value: unknown): Record<string, unknown> {
