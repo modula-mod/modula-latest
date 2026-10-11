@@ -1,8 +1,8 @@
 # MODULA GREENFIELD — API-ATLAS-01
 
-Status: **PASS**. Candidate source and locally built runtime routes are reconciled; deployment, database, edge and operational facts remain sourced only from the production snapshot. Route completeness passed: 575 runtime method routes = 409 mapped application routes + 166 explicitly excluded framework-derived routes. Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.
+Status: **PASS**. Candidate source and locally built runtime routes are reconciled; deployment, database, edge and operational facts remain sourced only from the production snapshot. Route completeness passed: 587 runtime method routes = 415 mapped application routes + 172 explicitly excluded framework-derived routes. Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.
 
-This directory combines production truth captured at 2026-10-10T22:02:13.369Z with fresh local candidate route evidence captured at 2026-10-11T19:57:57.463Z. The machine-readable source of truth is `api-atlas.json`; Markdown files are generated views. Candidate evidence never claims deployment. Secret values and production row data are excluded.
+This directory combines production truth captured at 2026-10-10T22:02:13.369Z with fresh local candidate route evidence captured at 2026-10-11T20:01:46.370Z. The machine-readable source of truth is `api-atlas.json`; Markdown files are generated views. Candidate evidence never claims deployment. Secret values and production row data are excluded.
 
 ## Contents
 

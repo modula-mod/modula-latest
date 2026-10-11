@@ -9,20 +9,20 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "phase-module-platform-02",
-      "sourceSha256": "3ecfae31ccfa68581677f1036d91fe2340a90ddb48c35f1d189079498f8a874a",
-      "capturedAt": "2026-10-11T19:57:57.463Z",
-      "routeCount": 575
+      "sourceSha256": "076b615a7d0d66b8ece1bd665a29ff4b27e92043cb9c84f24f7e48910a97702c",
+      "capturedAt": "2026-10-11T20:01:46.370Z",
+      "routeCount": 587
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 575,
-    "applicationRuntimeRoutes": 409,
-    "mappedApplicationRoutes": 409,
+    "runtimeMethodRoutes": 587,
+    "applicationRuntimeRoutes": 415,
+    "mappedApplicationRoutes": 415,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 409,
+    "sourceRoutes": 415,
     "sourceOnlyRoutes": 0,
-    "explicitlyExcludedFrameworkRoutes": 166,
+    "explicitlyExcludedFrameworkRoutes": 172,
     "frameworkRoutes": [
       {
         "method": "OPTIONS",
@@ -276,12 +276,42 @@
       },
       {
         "method": "HEAD",
+        "path": "/v1/modules/:moduleId/records/sync",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
         "path": "/v1/modules/:moduleId/records/:collection",
         "reason": "Fastify automatic HEAD companion for GET"
       },
       {
         "method": "HEAD",
         "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
         "reason": "Fastify automatic HEAD companion for GET"
       },
       {
@@ -856,7 +886,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "575 = 409 application + 166 framework-derived"
+    "equation": "587 = 415 application + 172 framework-derived"
   },
   "routes": [
     {
@@ -9792,7 +9822,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 958
+        "line": 1077
       },
       "handler": "inline",
       "controllerServices": [
@@ -9916,7 +9946,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1058
+        "line": 1177
       },
       "handler": "inline",
       "controllerServices": [
@@ -10021,7 +10051,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1063
+        "line": 1182
       },
       "handler": "inline",
       "controllerServices": [
@@ -10132,7 +10162,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1074
+        "line": 1193
       },
       "handler": "inline",
       "controllerServices": [
@@ -10244,7 +10274,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1055
+        "line": 1174
       },
       "handler": "inline",
       "controllerServices": [
@@ -10348,7 +10378,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1052
+        "line": 1171
       },
       "handler": "inline",
       "controllerServices": [
@@ -10452,7 +10482,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1042
+        "line": 1161
       },
       "handler": "inline",
       "controllerServices": [],
@@ -10551,7 +10581,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1045
+        "line": 1164
       },
       "handler": "inline",
       "controllerServices": [
@@ -10662,7 +10692,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1048
+        "line": 1167
       },
       "handler": "inline",
       "controllerServices": [
@@ -10772,7 +10802,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1005
+        "line": 1124
       },
       "handler": "inline",
       "controllerServices": [
@@ -10897,7 +10927,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1002
+        "line": 1121
       },
       "handler": "inline",
       "controllerServices": [
@@ -11018,7 +11048,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 971
+        "line": 1090
       },
       "handler": "inline",
       "controllerServices": [
@@ -11133,7 +11163,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 991
+        "line": 1110
       },
       "handler": "inline",
       "controllerServices": [
@@ -29194,7 +29224,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 854
+        "line": 973
       },
       "handler": "inline",
       "controllerServices": [
@@ -29807,7 +29837,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 896
+        "line": 1015
       },
       "handler": "inline",
       "controllerServices": [
@@ -29946,7 +29976,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 929
+        "line": 1048
       },
       "handler": "inline",
       "controllerServices": [
@@ -30088,7 +30118,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 907
+        "line": 1026
       },
       "handler": "inline",
       "controllerServices": [
@@ -30233,7 +30263,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 940
+        "line": 1059
       },
       "handler": "inline",
       "controllerServices": [
@@ -30368,7 +30398,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 918
+        "line": 1037
       },
       "handler": "inline",
       "controllerServices": [
@@ -30509,7 +30539,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 949
+        "line": 1068
       },
       "handler": "inline",
       "controllerServices": [
@@ -31674,7 +31704,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 875
+        "line": 994
       },
       "handler": "inline",
       "controllerServices": [
@@ -31953,7 +31983,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 886
+        "line": 1005
       },
       "handler": "inline",
       "controllerServices": [
@@ -32831,7 +32861,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 777
+        "line": 792
       },
       "handler": "inline",
       "controllerServices": [
@@ -32971,7 +33001,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 788
+        "line": 803
       },
       "handler": "inline",
       "controllerServices": [
@@ -33007,7 +33037,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -33133,7 +33163,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 821
+        "line": 926
       },
       "handler": "inline",
       "controllerServices": [
@@ -33169,7 +33199,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -33297,7 +33327,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 799
+        "line": 820
       },
       "handler": "inline",
       "controllerServices": [
@@ -33436,7 +33466,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 810
+        "line": 908
       },
       "handler": "inline",
       "controllerServices": [
@@ -33472,7 +33502,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -33603,7 +33633,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 843
+        "line": 962
       },
       "handler": "inline",
       "controllerServices": [
@@ -33746,6 +33776,150 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/references",
+      "domain": "Modules",
+      "method": "GET",
+      "effectiveRoute": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 873
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "records.forwardReferences"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [
+          "{fieldPath?: string}) ?? {}"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_record_references",
+          "greenfield_module_records"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/modules/record-service.ts#canReadRecord",
+          "services/greenfield-api/src/modules/record-service.ts#findRecord",
+          "services/greenfield-api/src/modules/record-service.ts#forwardReferences",
+          "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+          "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "POST /v1/modules/:moduleId/records/:collection/:recordId/restore",
       "domain": "Modules",
       "method": "POST",
@@ -33755,7 +33929,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 832
+        "line": 944
       },
       "handler": "inline",
       "controllerServices": [
@@ -33791,7 +33965,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -33852,6 +34026,716 @@
           "services/greenfield-api/src/modules/record-service.ts#restore",
           "services/greenfield-api/src/modules/record-service.ts#updateExisting",
           "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "domain": "Modules",
+      "method": "GET",
+      "effectiveRoute": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 891
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "records.reverseReferences"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [
+          "{sourceModuleId?: string"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "bounded-limit or route-specific list",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "route-specific"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_record_references",
+          "greenfield_module_records"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/modules/record-service.ts#canReadRecord",
+          "services/greenfield-api/src/modules/record-service.ts#findRecord",
+          "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+          "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+          "services/greenfield-api/src/modules/record-service.ts#reverseReferences"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "domain": "Modules",
+      "method": "GET",
+      "effectiveRoute": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 831
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "records.listRevisions"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [
+          "{limit?: string}) ?? {}"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "bounded-limit or route-specific list",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "route-specific"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_record_revisions",
+          "greenfield_module_records"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/modules/record-service.ts#findRecord",
+          "services/greenfield-api/src/modules/record-service.ts#listRevisions",
+          "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+          "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "domain": "Modules",
+      "method": "GET",
+      "effectiveRoute": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 856
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "records.getRevision"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_record_revisions",
+          "greenfield_module_records"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/modules/record-service.ts#findRecord",
+          "services/greenfield-api/src/modules/record-service.ts#getRevision",
+          "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+          "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "domain": "Modules",
+      "method": "GET",
+      "effectiveRoute": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 845
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "records.currentRevision"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_records"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/modules/record-service.ts#currentRevision",
+          "services/greenfield-api/src/modules/record-service.ts#findRecord",
+          "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+          "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/sync",
+      "domain": "Modules",
+      "method": "GET",
+      "effectiveRoute": "/v1/modules/:moduleId/records/sync",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/records/sync",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 777
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "records.sync"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{moduleId: string}"
+        ],
+        "query": [
+          "{after?: string"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "bounded-limit or route-specific list",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "route-specific"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_record_changes",
+          "greenfield_module_records"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/modules/record-service.ts#findRecord",
+          "services/greenfield-api/src/modules/record-service.ts#sync",
+          "services/greenfield-api/src/modules/record-service.ts#syncSigningKey"
         ],
         "confidence": "method-level-static"
       },
@@ -70107,7 +70991,9 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
+      "routeReads": [
+        "GET /v1/modules/:moduleId/records/sync"
+      ],
       "routeWrites": [
         "POST /v1/backend/products/:productId/records/:collection",
         "DELETE /v1/backend/products/:productId/records/:collection/:recordId",
@@ -70505,7 +71391,10 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
+      "routeReads": [
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/references",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references"
+      ],
       "routeWrites": [
         "POST /v1/backend/products/:productId/records/:collection",
         "DELETE /v1/backend/products/:productId/records/:collection/:recordId",
@@ -70547,7 +71436,9 @@
         "POST /v1/modules/:moduleId/records/:collection",
         "DELETE /v1/modules/:moduleId/records/:collection/:recordId",
         "PATCH /v1/modules/:moduleId/records/:collection/:recordId",
-        "POST /v1/modules/:moduleId/records/:collection/:recordId/restore"
+        "POST /v1/modules/:moduleId/records/:collection/:recordId/restore",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision"
       ],
       "routeWrites": [
         "POST /v1/backend/products/:productId/records/:collection",
@@ -70933,7 +71824,13 @@
         "GET /v1/modules/:moduleId/records/:collection/:recordId",
         "PATCH /v1/modules/:moduleId/records/:collection/:recordId",
         "DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/references",
         "POST /v1/modules/:moduleId/records/:collection/:recordId/restore",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+        "GET /v1/modules/:moduleId/records/sync",
         "POST /v1/modules/:moduleId/services/:serviceId/invoke",
         "POST /v1/modules/:moduleId/uninstall-preview"
       ],

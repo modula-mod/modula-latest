@@ -33,8 +33,8 @@
 - Command: `docker-entrypoint.sh node services/greenfield-api/dist/main.js`
 - Working directory: `/app`
 - Host binding: loopback `127.0.0.1:4020 -> container 4020`
-- Fastify application routes: 409
-- Automatic HEAD routes: 165
+- Fastify application routes: 415
+- Automatic HEAD routes: 171
 - Framework OPTIONS routes: 1
 
 ## Registration graph

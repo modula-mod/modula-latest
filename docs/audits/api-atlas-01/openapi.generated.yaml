@@ -2056,7 +2056,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:958",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1077",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2087,7 +2087,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1058",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1177",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2118,7 +2118,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1063",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1182",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2155,7 +2155,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1074",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1193",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2186,7 +2186,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1055",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1174",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2217,7 +2217,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1052",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1171",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2248,7 +2248,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1042",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1161",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2279,7 +2279,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1045",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1164",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2310,7 +2310,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1048",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1167",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2341,7 +2341,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1005",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1124",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2372,7 +2372,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1002",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1121",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2396,7 +2396,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:971",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1090",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -2420,7 +2420,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:991",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1110",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7197,7 +7197,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:854",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:973",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7333,7 +7333,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:896",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1015",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7364,7 +7364,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:929",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1048",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7395,7 +7395,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:907",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1026",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7426,7 +7426,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:940",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1059",
         "x-modula-auth": "module backend bearer token plus HMAC signature",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7457,7 +7457,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:918",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1037",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7488,7 +7488,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:949",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1068",
         "x-modula-auth": "module backend bearer token plus HMAC signature",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7752,7 +7752,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:875",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:994",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -7814,7 +7814,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:886",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:1005",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8004,7 +8004,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:777",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:792",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8039,7 +8039,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:788",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:803",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8082,7 +8082,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:821",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:926",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8123,7 +8123,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:799",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:820",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8164,7 +8164,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:810",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:908",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8207,7 +8207,50 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:843",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:962",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/modules/{moduleId}/records/{collection}/{recordId}/references": {
+      "get": {
+        "operationId": "get_v1_modules_moduleId_records_collection_recordId_references",
+        "summary": "Modules: GET /v1/modules/:moduleId/records/:collection/:recordId/references",
+        "tags": [
+          "Modules"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:873",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8250,7 +8293,216 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:832",
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:944",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/modules/{moduleId}/records/{collection}/{recordId}/reverse-references": {
+      "get": {
+        "operationId": "get_v1_modules_moduleId_records_collection_recordId_reverse_references",
+        "summary": "Modules: GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+        "tags": [
+          "Modules"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:891",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/modules/{moduleId}/records/{collection}/{recordId}/revisions": {
+      "get": {
+        "operationId": "get_v1_modules_moduleId_records_collection_recordId_revisions",
+        "summary": "Modules: GET /v1/modules/:moduleId/records/:collection/:recordId/revisions",
+        "tags": [
+          "Modules"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:831",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/modules/{moduleId}/records/{collection}/{recordId}/revisions/{revision}": {
+      "get": {
+        "operationId": "get_v1_modules_moduleId_records_collection_recordId_revisions_revision",
+        "summary": "Modules: GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+        "tags": [
+          "Modules"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:856",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/modules/{moduleId}/records/{collection}/{recordId}/revisions/current": {
+      "get": {
+        "operationId": "get_v1_modules_moduleId_records_collection_recordId_revisions_current",
+        "summary": "Modules: GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+        "tags": [
+          "Modules"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:845",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/modules/{moduleId}/records/sync": {
+      "get": {
+        "operationId": "get_v1_modules_moduleId_records_sync",
+        "summary": "Modules: GET /v1/modules/:moduleId/records/sync",
+        "tags": [
+          "Modules"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:777",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",

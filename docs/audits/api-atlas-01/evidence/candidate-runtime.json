@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-11T19:57:57.463Z",
+  "capturedAt": "2026-10-11T20:01:46.370Z",
   "source": {
     "branch": "phase-module-platform-02",
-    "headAtCapture": "321a2d3bc9c60e6e864bbd0d56ef7696b2d2af67",
+    "headAtCapture": "c175d303a48f2d6af1b4acc5009fecd6cb6a19ae",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "3ecfae31ccfa68581677f1036d91fe2340a90ddb48c35f1d189079498f8a874a"
+    "apiSourceSha256": "076b615a7d0d66b8ece1bd665a29ff4b27e92043cb9c84f24f7e48910a97702c"
   },
   "runtimeRoutes": [
     {
@@ -1210,6 +1210,24 @@
     },
     {
       "method": "GET",
+      "url": "/v1/modules/:moduleId/records/sync",
+      "path": "/v1/modules/:moduleId/records/sync",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/sync",
+      "path": "/v1/modules/:moduleId/records/sync",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/modules/:moduleId/records/:collection",
       "path": "/v1/modules/:moduleId/records/:collection",
       "prefix": "",
@@ -1248,6 +1266,96 @@
       "method": "HEAD",
       "url": "/v1/modules/:moduleId/records/:collection/:recordId",
       "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
       "prefix": "",
       "schema": null,
       "config": null,

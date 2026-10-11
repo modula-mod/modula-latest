@@ -4712,6 +4712,23 @@
       "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
     ]
   },
+  "GET /v1/modules/:moduleId/records/:collection/:recordId/references": {
+    "reads": [
+      "greenfield_module_record_references",
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#canReadRecord",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#forwardReferences",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
   "POST /v1/modules/:moduleId/records/:collection/:recordId/restore": {
     "reads": [
       "greenfield_module_record_events",
@@ -4748,6 +4765,85 @@
       "services/greenfield-api/src/modules/record-service.ts#restore",
       "services/greenfield-api/src/modules/record-service.ts#updateExisting",
       "services/greenfield-api/src/modules/record-service.ts#validateReferenceTargets"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references": {
+    "reads": [
+      "greenfield_module_record_references",
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#canReadRecord",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#reverseReferences"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions": {
+    "reads": [
+      "greenfield_module_record_revisions",
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#listRevisions",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision": {
+    "reads": [
+      "greenfield_module_record_revisions",
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#getRevision",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/current": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#currentRevision",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#requireReadableRecord",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/sync": {
+    "reads": [
+      "greenfield_module_record_changes",
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#sync",
+      "services/greenfield-api/src/modules/record-service.ts#syncSigningKey"
     ]
   },
   "GET /v1/modules/:moduleId/runtime": {

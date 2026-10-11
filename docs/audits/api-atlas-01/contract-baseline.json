@@ -15974,7 +15974,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -15992,7 +15992,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "fd582fbb67371b1cb292219bfb71982660efbddfb594597c42c4108dda4d8f32"
+      "sourceContractSha256": "cf55bde1305f64bcc016276243106fe1c24da5d8adc0071e69adeef87676a811"
     },
     {
       "id": "DELETE /v1/modules/:moduleId/records/:collection/:recordId",
@@ -16032,7 +16032,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -16050,7 +16050,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "d3d7b725f7f891ac1cfe68941c4266b70bf7ef989fb1356fe7ad6d6aedf0a7a0"
+      "sourceContractSha256": "682eab7b730446f5325bf7c581d739ebd145dc729c2d69dda7f361d9c6040062"
     },
     {
       "id": "GET /v1/modules/:moduleId/records/:collection/:recordId",
@@ -16146,7 +16146,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -16164,7 +16164,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "506fd4eab619884bbf2214170a5b2325a76c683c4f777ee152e8ec6171e79880"
+      "sourceContractSha256": "061fb59742e33def67983d447b8dcd33a6c8c1b3600c46679fbb80ea4a03e0bb"
     },
     {
       "id": "DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent",
@@ -16225,6 +16225,64 @@
       "sourceContractSha256": "05d83007b88a35d1474a37f2a4587eb9aabb4fa618e1328b44bc685ab52950aa"
     },
     {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/references",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [
+          "{fieldPath?: string}) ?? {}"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "ffa45ed62fb30e5421dc1618a902483e8d0bb7a3e58d1485a0e2fae6ca6b4e7f"
+    },
+    {
       "id": "POST /v1/modules/:moduleId/records/:collection/:recordId/restore",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -16262,7 +16320,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {}), request.id))"
+          "any) ?? {},"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -16280,7 +16338,293 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "60e61f90cf451bae0e0e423067e242cb2ca198279ae46e5b5f5058f4faa30c08"
+      "sourceContractSha256": "d790550da870176c1f72c3c84736a75413e1248c3f7e1c7657a55b38b7640fd3"
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [
+          "{sourceModuleId?: string"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "bounded-limit or route-specific list",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "route-specific"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "6c7ca980ed341ffb2b5f9c05a7d9367a766de47b49d9a09cc9e2a2a515032468"
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [
+          "{limit?: string}) ?? {}"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "bounded-limit or route-specific list",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "route-specific"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "27253fa5358fca4a008d53615836bddac097ccc15d2bf8e1f1c2551627a09fc9"
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "4a5c8b4988c79083526c5f54509b47d05105c05dc2187e704a9eaa8afe7db818"
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "any"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "00544c61f35532f9597905bc08709a2e6f07d30fdb35877bc3a5bc29c0e5eecf"
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/records/sync",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{moduleId: string}"
+        ],
+        "query": [
+          "{after?: string"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "bounded-limit or route-specific list",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "route-specific"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "5ef403159653b420f080053a78ad7fcb96437e4362b4d3d0b1c6e43683f53f5f"
     },
     {
       "id": "GET /v1/modules/:moduleId/runtime",

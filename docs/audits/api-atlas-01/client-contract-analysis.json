@@ -849,7 +849,8 @@
       "normalized": "/v1/modules/:param/records/:param",
       "matchedRoutes": [
         "GET /v1/modules/:moduleId/records/:collection",
-        "POST /v1/modules/:moduleId/records/:collection"
+        "POST /v1/modules/:moduleId/records/:collection",
+        "GET /v1/modules/:moduleId/records/sync"
       ],
       "status": "matched"
     },
@@ -872,7 +873,8 @@
       "normalized": "/v1/modules/:param/records/:param",
       "matchedRoutes": [
         "GET /v1/modules/:moduleId/records/:collection",
-        "POST /v1/modules/:moduleId/records/:collection"
+        "POST /v1/modules/:moduleId/records/:collection",
+        "GET /v1/modules/:moduleId/records/sync"
       ],
       "status": "matched"
     },
