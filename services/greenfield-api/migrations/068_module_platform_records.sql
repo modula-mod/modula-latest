@@ -91,7 +91,7 @@ SELECT
   account_id, installation_id, module_id, collection, record_id, revision,
   CASE WHEN revision > 1 THEN revision - 1 ELSE NULL END,
   'import', NULL, NULL, data, visibility, deleted_at IS NOT NULL,
-  md5(data::text), updated_at
+  encode(sha256(convert_to(data::text, 'UTF8')), 'hex'), updated_at
 FROM greenfield_module_records
 ON CONFLICT (account_id, module_id, record_type, record_id, revision) DO NOTHING;
 
