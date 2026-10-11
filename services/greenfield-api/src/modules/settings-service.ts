@@ -1,48 +1,48 @@
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
+import {AuditRepository} from '../domains/audit/repository.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {redactModuleSecrets} from './module-domain.js'
 import {moduleError} from './module-errors.js'
-import {GreenfieldModuleInstallationService} from './installation-service.js'
-import {GreenfieldModuleRegistryService} from './registry-service.js'
+import {GreenfieldModuleRuntimeAccessService, type GreenfieldModuleRuntimeContext} from './runtime-access.js'
 
 export class GreenfieldModuleSettingsService {
+  private readonly access: GreenfieldModuleRuntimeAccessService
+
   constructor(
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
-  ) {}
+  ) {
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
+  }
 
   async schema(accountId: string, moduleId: string) {
-    const installed = await new GreenfieldModuleInstallationService(this.db, this.config).getInstalled(accountId, moduleId)
-    if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
-    const release = await new GreenfieldModuleRegistryService(this.db).getVersion(moduleId, installed.version)
+    const context = await this.resolveAuthorized(accountId, moduleId, 'settings:read')
+    const settings = context.manifest.contributions.settings ?? []
     return {
-      moduleId,
-      version: installed.version,
-      settings: release.manifest.contributions.settings ?? [],
-      schemaRefs: (release.manifest.contributions.settings ?? []).map(setting => setting.schemaRef),
-      defaults: (release.manifest.extensions?.settingsDefaults ?? {}) as Record<string, unknown>,
+      moduleId: context.moduleId,
+      version: context.version,
+      settings,
+      schemaRefs: settings.map(setting => setting.schemaRef),
+      defaults: redactModuleSecrets(this.defaultsFor(context)),
     }
   }
 
   async get(accountId: string, moduleId: string) {
-    const installed = await new GreenfieldModuleInstallationService(this.db, this.config).getInstalled(accountId, moduleId)
-    if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    const context = await this.resolveAuthorized(accountId, moduleId, 'settings:read')
     const settings = await this.db
       .selectFrom('greenfield_module_installation_settings')
       .selectAll()
-      .where('installation_id', '=', installed.installationId)
+      .where('installation_id', '=', context.installationId)
       .executeTakeFirst()
     return settings
       ? {...settings, values: redactModuleSecrets(settings.values)}
-      : {module_id: moduleId, installation_id: installed.installationId, version: 0, values: {}, secret_refs: {}}
+      : {module_id: context.moduleId, installation_id: context.installationId, version: 0, values: {}, secret_refs: {}}
   }
 
   async patch(accountId: string, moduleId: string, patch: Record<string, unknown>) {
-    const installed = await new GreenfieldModuleInstallationService(this.db, this.config).getInstalled(accountId, moduleId)
-    if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
-    const schema = await this.schema(accountId, moduleId)
-    const defaults = schema.defaults
+    const context = await this.resolveAuthorized(accountId, moduleId, 'settings:write')
+    const defaults = this.defaultsFor(context)
     const knownKeys = new Set(Object.keys(defaults))
     for (const key of Object.keys(patch)) {
       if (knownKeys.size > 0 && !knownKeys.has(key)) throw moduleError('VALIDATION_FAILED', `Unknown module setting ${key}`)
@@ -50,7 +50,7 @@ export class GreenfieldModuleSettingsService {
     const existing = await this.db
       .selectFrom('greenfield_module_installation_settings')
       .selectAll()
-      .where('installation_id', '=', installed.installationId)
+      .where('installation_id', '=', context.installationId)
       .executeTakeFirst()
     const now = new Date()
     const nextValues = {...defaults, ...((existing?.values as Record<string, unknown> | undefined) ?? {}), ...patch}
@@ -68,8 +68,8 @@ export class GreenfieldModuleSettingsService {
           .insertInto('greenfield_module_installation_settings')
           .values({
             settings_id: settingsId,
-            installation_id: installed.installationId,
-            module_id: moduleId,
+            installation_id: context.installationId,
+            module_id: context.moduleId,
             scope: 'installation',
             schema_version: 1,
             values: nextValues,
@@ -92,7 +92,41 @@ export class GreenfieldModuleSettingsService {
           created_at: now,
         })
         .execute()
+      await new AuditRepository(trx).append(
+        'module.settings.updated',
+        {moduleId: context.moduleId, version: nextVersion, changedKeys: Object.keys(patch).sort()},
+        {type: 'moduleInstallation', id: context.installationId, actorId: accountId},
+        {accountId},
+      )
     })
-    return this.get(accountId, moduleId)
+    const acknowledgement = {
+      module_id: context.moduleId,
+      installation_id: context.installationId,
+      version: nextVersion,
+      updated_at: now,
+    }
+    if (!context.grantedPermissions.includes('settings:read')) return acknowledgement
+    return {
+      settings_id: settingsId,
+      ...acknowledgement,
+      scope: existing?.scope ?? 'installation',
+      schema_version: existing?.schema_version ?? 1,
+      values: redactModuleSecrets(nextValues),
+      secret_refs: existing?.secret_refs ?? {},
+      updated_by: accountId,
+    }
+  }
+
+  private async resolveAuthorized(accountId: string, moduleId: string, capability: 'settings:read' | 'settings:write') {
+    const context = await this.access.resolve(accountId, moduleId, {requireEnabled: true})
+    this.access.enforceCapability(context, capability)
+    return context
+  }
+
+  private defaultsFor(context: GreenfieldModuleRuntimeContext): Record<string, unknown> {
+    const defaults = context.manifest.extensions?.settingsDefaults
+    return defaults && typeof defaults === 'object' && !Array.isArray(defaults)
+      ? defaults as Record<string, unknown>
+      : {}
   }
 }

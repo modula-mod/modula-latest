@@ -29,6 +29,8 @@ export const RESTRICTED_SYSTEM_PERMISSIONS = [
 
 const STATIC_PERMISSIONS = new Set([
   ...RESTRICTED_SYSTEM_PERMISSIONS,
+  'settings:read',
+  'settings:write',
   'jobs:create',
   'events:subscribe',
   'notifications:create',

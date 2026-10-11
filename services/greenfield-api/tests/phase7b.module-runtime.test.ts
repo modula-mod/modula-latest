@@ -323,6 +323,7 @@ describeIf('Phase 7B module runtime API', () => {
           `records:module.${moduleId}.note:read`,
           `records:module.${moduleId}.note:write`,
           `records:module.${moduleId}.note:delete`,
+          'settings:write',
         ]),
         denied_permissions: jsonb([]),
         high_risk_increase: false,
@@ -359,6 +360,7 @@ function moduleManifest(moduleId: string, version: string): GreenfieldModuleMani
       {permission: `records:module.${moduleId}.note:read`, reason: 'Read private notes', risk: 'low'},
       {permission: `records:module.${moduleId}.note:write`, reason: 'Write private notes', risk: 'medium'},
       {permission: `records:module.${moduleId}.note:delete`, reason: 'Delete private notes', risk: 'high'},
+      {permission: 'settings:write', reason: 'Update installation settings', risk: 'medium'},
     ],
     contributions: {
       schemas: [{id: `${moduleId}.schemas.note`, title: 'Note schema', schemaRef: 'schemas/vault-note.v1.schema.json', collection: 'note', defaultVisibility: 'private'}],
