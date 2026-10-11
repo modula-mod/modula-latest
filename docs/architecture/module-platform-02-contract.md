@@ -4,9 +4,121 @@ Status: **frozen for MODULE-PLATFORM-02 implementation**
 
 Base: `d13bb309fd09a8025733bf44fab4033591b485b6`
 
+Addendum status: **frozen for MODULE-PLATFORM-02B completion**
+
 This contract is module-neutral. Account and installation scope are derived by
 the server from authenticated ownership and the selected installation; clients
 must not gain access by asserting either scope.
+
+## MP02B precision addendum
+
+This addendum resolves implementation precision only; it does not replace or
+redesign the frozen MP02 contract.
+
+### Canonical mutation payloads
+
+The server constructs the operation-specific payload; a client supplies
+`mutationId`, never a trusted payload hash. After endpoint validation and
+normalization, the server serializes the payload as deterministic JSON and
+computes lower-case hexadecimal SHA-256 over its UTF-8 bytes.
+
+- object keys are recursively sorted by Unicode code point; omitted object
+  members are absent rather than equivalent to `null`;
+- arrays preserve order and may contain explicit `null`, but may not contain
+  holes or `undefined` values;
+- strings, including object keys, are normalized to Unicode NFC before
+  serialization;
+- numbers must be finite JSON numbers; `NaN`, infinities and arbitrary-precision
+  integer values are rejected, and negative zero canonicalizes as `0`;
+- booleans and `null` use JSON literals;
+- timestamps are validated and normalized to RFC 3339 UTC with millisecond
+  precision before serialization;
+- a record reference hashes as the exact normalized object
+  `{moduleId,recordType,recordId}`; aliases are resolved before hashing;
+- a media identity hashes as its authoritative asset ID plus normalized binding
+  fields. Filenames, delivery URLs and other mutable presentation metadata are
+  not substitutes for asset identity.
+
+The canonical payload includes operation, canonical record identity, normalized
+operation body and precondition (`expectedRevision` where required). Equal
+`mutationId` plus equal canonical payload returns the stored original result;
+equal `mutationId` plus any different canonical payload is
+`MUTATION_REUSE_CONFLICT`.
+
+### Revisions and purge
+
+Revision is a monotonically increasing positive integer scoped to
+`{account,moduleId,recordType,recordId}`. Once allocated it is never reused.
+Create allocates 1; update, delete and restore each allocate the next value.
+Restore copies readable historical content into a new current revision and
+never edits history. Re-creation after delete continues the sequence rather
+than replacing historical rows. Privacy purge is a distinct destructive
+lifecycle: current content and normal history may be physically removed under
+account/privacy policy, a non-content purge marker/change may remain, and old
+sync cursors may be invalidated. Recovery after a production purge is by the
+documented backup/restore process, not revision reuse.
+
+### Sync cursor and tombstones
+
+Cursor internal format v1 is an authenticated envelope containing only
+`version`, canonical account scope, installation scope, module scope and last
+ordered change sequence. It is base64url encoded and HMAC-SHA-256 signed. It is
+opaque to clients; unknown versions, invalid signatures, wrong scope and
+expired retention fail as `INVALID_CURSOR`.
+
+Tombstone kinds are:
+
+- `deleted`: the caller is still entitled to identify the record; identity and
+  latest revision may be returned, never deleted content;
+- `visibility-lost`: the client receives only an opaque cache-eviction key it
+  already obtained while authorized and no title, owner, share state or other
+  current record metadata;
+- `purged`: the caller may receive an opaque eviction marker when already in
+  scope; otherwise the cursor is invalidated without confirming existence.
+
+Share expiry/revocation and policy changes are evaluated at read time. A stale
+index, cursor or cached share never extends access.
+
+### Shared-editor media contribution
+
+An active `edit` share may bind an asset the recipient legitimately owns or is
+otherwise authorized to use. The binding belongs to the shared record; the
+asset remains owned by its original owner and is never silently transferred.
+Record access governs binding visibility. Share expiry/revocation removes the
+recipient's access to the record and its bindings without deleting the owner's
+asset. Unbinding does not delete the asset.
+
+### Host function request lifecycle
+
+A host request has stable request identity and exactly one state transition
+path: `created -> dispatched -> completed`, or from a non-terminal state to
+`cancelled`, `timed-out`, `host-unavailable`, or `module-unloaded`. Completion
+is accepted once, validates the declared output schema and is rejected after a
+terminal state. Cancellation is best effort but terminal server state wins;
+late/duplicate completions cannot create side effects. Timeout is declared or
+platform-bounded and begins when dispatched. MP02B defines negotiation and
+lifecycle only; it does not execute native code.
+
+### Inter-module request capability
+
+The canonical capability is
+`module.action:request:<targetModuleId>:<actionId>:<version>`. It must be
+requested by the source release and explicitly granted by its exact-release
+permission review. A wildcard is not implied. The target separately declares
+the action and applies its own invocation policy.
+
+### Capability provenance and Product UI versions
+
+Every host capability descriptor states provenance as one of `native`,
+`fallback`, `emulated`, or `unavailable`, with capability ID, semantic contract
+version, renderer/provider identity where applicable, availability, limits and
+an explicit fallback descriptor. Emulation may not claim native provenance.
+
+Product UI uses contract version `1.0.0` for the MP02 primitives. Each primitive
+declaration carries that version, typed input model, emitted events/actions,
+required and optional capability IDs, explicit fallback, and loading, empty and
+error states. Any incompatible semantic change requires a new contract version;
+renderer-only improvements do not.
 
 ## Canonical identities
 
