@@ -97,7 +97,6 @@ export function statusForError(code: ApiErrorCode): number {
       return 409
     case 'AI_RESULT_EXPIRED':
     case 'AI_RESULT_NOT_APPLICABLE':
-    case 'INVALID_CURSOR':
       return 400
     case 'CAPABILITY_UNAVAILABLE':
       return 503
