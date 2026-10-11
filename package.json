@@ -250,6 +250,7 @@
     "registry:import-module": "node scripts/registry/import-module.mjs",
     "registry:verify-release": "node scripts/registry/verify-release.mjs",
     "registry:publish-release": "node scripts/registry/publish-release.mjs",
+    "greenfield:permissions-reconcile": "pnpm --filter @modula/greenfield-api permissions:reconcile",
     "verify:phase6-frontend": "node scripts/verify-phase6-atproto-frontend.mjs",
     "verify:phase6-frontend-boundary": "node scripts/verify-phase6-frontend-boundary.mjs",
     "api:dev": "pnpm --filter @modula/greenfield-api dev",

@@ -65,6 +65,8 @@ export function statusForError(code: ApiErrorCode): number {
       return 401
     case 'FORBIDDEN':
     case 'PERMISSION_REVIEW_REQUIRED':
+    case 'MODULE_PERMISSION_DENIED':
+    case 'INSTALLATION_DISABLED':
     case 'UNTRUSTED_RELEASE':
     case 'ACCOUNT_SUSPENDED':
     case 'CAPABILITY_DISABLED':

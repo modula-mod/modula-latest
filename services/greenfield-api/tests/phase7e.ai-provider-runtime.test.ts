@@ -375,7 +375,7 @@ describeIfDb('Phase 7E AI provider runtime', () => {
 
   it('blocks disabled modules before AI execution', async () => {
     await db.updateTable('greenfield_extension_installations').set({status: 'disabled', updated_at: new Date()}).where('installation_id', '=', installationId).execute()
-    await expect(new GreenfieldModuleRuntimeAccessService(db).resolve(accountId, moduleId, {requireEnabled: true})).rejects.toMatchObject({code: 'FORBIDDEN'})
+    await expect(new GreenfieldModuleRuntimeAccessService(db).resolve(accountId, moduleId, {requireEnabled: true})).rejects.toMatchObject({code: 'INSTALLATION_DISABLED'})
   })
 
   function baseRequest(overrides: Partial<Parameters<GreenfieldAIProviderRuntimeService['executeModuleRequest']>[0]> = {}) {

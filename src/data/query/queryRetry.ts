@@ -9,6 +9,9 @@ export function queryRetry(failureCount: number, error: unknown): boolean {
     error.code === 'UNAUTHENTICATED' ||
     error.code === 'SESSION_EXPIRED' ||
     error.code === 'FORBIDDEN' ||
+    error.code === 'PERMISSION_REVIEW_REQUIRED' ||
+    error.code === 'MODULE_PERMISSION_DENIED' ||
+    error.code === 'INSTALLATION_DISABLED' ||
     error.code === 'NOT_FOUND' ||
     error.code === 'CONFLICT' ||
     error.code === 'CANCELLED' ||

@@ -92,6 +92,7 @@ export class GreenfieldModuleInstallationService {
           .where('installation_id', '=', row.installation_id)
           .where('release_id', '=', row.release_id)
           .orderBy('reviewed_at', 'desc')
+          .orderBy('review_id', 'desc')
           .executeTakeFirst(),
         this.db
           .selectFrom('greenfield_extension_runtime_projection')
@@ -133,7 +134,8 @@ export class GreenfieldModuleInstallationService {
     if (!row) return undefined
     const review = await this.db.selectFrom('greenfield_module_permission_reviews').select('granted_permissions')
       .where('installation_id', '=', installationId).where('account_id', '=', accountId)
-      .where('release_id', '=', row.release_id).orderBy('reviewed_at', 'desc').executeTakeFirst()
+      .where('release_id', '=', row.release_id).orderBy('reviewed_at', 'desc')
+      .orderBy('review_id', 'desc').executeTakeFirst()
     return {installationId: row.installation_id, accountId: row.account_id, status: row.status as GreenfieldModuleInstallationStatus,
       moduleId: resolveCanonicalModuleId(row.module_id), version: row.version, extensionVersionId: row.extension_version_id,
       grantedPermissions: arrayOfStrings(review?.granted_permissions), permissionReviewRequired: !review,
@@ -360,7 +362,14 @@ export class GreenfieldModuleInstallationService {
         .where('install_descriptor', 'is not', null)
         .orderBy('created_at', 'desc')
         .executeTakeFirst()
-      if (plan?.install_descriptor) return plan.install_descriptor as IssuedInstallDescriptor
+      if (plan?.install_descriptor) {
+        const descriptor = plan.install_descriptor as IssuedInstallDescriptor
+        const descriptorGranted = [...(descriptor.permissions?.granted ?? [])].sort()
+        const effectiveGranted = [...(installed.grantedPermissions ?? [])].sort()
+        // Permission decisions can change after an install/update plan. Reuse
+        // the immutable issued descriptor only while its effective grants match.
+        if (JSON.stringify(descriptorGranted) === JSON.stringify(effectiveGranted)) return descriptor
+      }
     }
     const declared = Array.from(new Set([
       ...release.manifest.permissions.map(permission => permission.permission),
