@@ -133,7 +133,9 @@ describeIfDb.sequential('neutral module settings authorization matrix', () => {
   }
 
   async function provision(family: 'alpha' | 'beta', label: string, requested: string[], granted: string[], denied: string[] = [], status: GreenfieldModuleInstallationStatus = 'enabled', review = true) {
-    const moduleId = `audit.module.${family}.${label}.${suffix}`
+    // Keep the namespace owned by the shared first-party fixture publisher so
+    // this suite remains isolated when the full database test matrix runs.
+    const moduleId = `modula.mp02settings.${family}.${label}.${suffix}`
     const permissions: GreenfieldModulePermission[] = requested.map(permission => ({permission, reason: `Test ${permission}`}))
     const manifest = adapterManifest(moduleId, '1.0.0', {
       permissions,
