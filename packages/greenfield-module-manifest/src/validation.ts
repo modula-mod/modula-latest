@@ -282,6 +282,68 @@ function validateContributions(
   for (const route of contributions.routes ?? []) {
     if (!route.path?.startsWith(`/module/${moduleId}`)) add('$.contributions.routes', 'INVALID_ROUTE', 'Module routes must live under /module/{moduleId}')
   }
+  for (const [index, fn] of (contributions.functions ?? []).entries()) {
+    if (!('executionMode' in fn)) continue
+    const path = `$.contributions.functions[${index}]`
+    if (!/^[a-z][a-z0-9-]*$/.test(fn.functionId)) add(`${path}.functionId`, 'INVALID_FUNCTION_ID', 'Governed function IDs must be local lowercase identifiers')
+    if (!isSemver(fn.version)) add(`${path}.version`, 'INVALID_SEMVER', 'Governed function version must be semantic')
+    if (!['host', 'server', 'remote', 'community'].includes(fn.executionMode)) add(`${path}.executionMode`, 'INVALID_EXECUTION_MODE', 'Unsupported governed function execution mode')
+    validateInlineJsonSchema(fn.inputSchema, `${path}.inputSchema`, add)
+    validateInlineJsonSchema(fn.outputSchema, `${path}.outputSchema`, add)
+    validateStringArray(fn.requiredCapabilities, `${path}.requiredCapabilities`, 80, add)
+    if (typeof fn.mutating !== 'boolean') add(`${path}.mutating`, 'INVALID_BOOLEAN', 'mutating must be boolean')
+    if (fn.timeoutMs !== undefined && (!Number.isInteger(fn.timeoutMs) || fn.timeoutMs < 100 || fn.timeoutMs > 120_000)) {
+      add(`${path}.timeoutMs`, 'INVALID_TIMEOUT', 'timeoutMs must be 100..120000')
+    }
+  }
+  for (const [index, action] of (contributions.interModuleActions ?? []).entries()) {
+    const path = `$.contributions.interModuleActions[${index}]`
+    if (!/^[a-z][a-z0-9-]*$/.test(action.actionId)) add(`${path}.actionId`, 'INVALID_ACTION_ID', 'Inter-module action IDs must be local lowercase identifiers')
+    if (!isSemver(action.version)) add(`${path}.version`, 'INVALID_SEMVER', 'Inter-module action version must be semantic')
+    validateInlineJsonSchema(action.inputSchema, `${path}.inputSchema`, add)
+    validateInlineJsonSchema(action.outputSchema, `${path}.outputSchema`, add)
+    validateStringArray(action.requiredCapabilities, `${path}.requiredCapabilities`, 80, add)
+    if (!Array.isArray(action.allowedSourceModules) || action.allowedSourceModules.length > 80) {
+      add(`${path}.allowedSourceModules`, 'INVALID_SOURCE_POLICY', 'allowedSourceModules must be a bounded array')
+    } else {
+      action.allowedSourceModules.forEach((source, sourceIndex) => {
+        if (!isGreenfieldModuleId(source)) add(`${path}.allowedSourceModules[${sourceIndex}]`, 'INVALID_MODULE_ID', 'Allowed source module must be a reverse-domain ID')
+      })
+    }
+    if (!action.execution || !['record.create', 'function.invoke'].includes(action.execution.kind)) {
+      add(`${path}.execution`, 'INVALID_ACTION_EXECUTION', 'Inter-module action execution must be record.create or function.invoke')
+    }
+    if (typeof action.mutating !== 'boolean') add(`${path}.mutating`, 'INVALID_BOOLEAN', 'mutating must be boolean')
+  }
+}
+
+function validateInlineJsonSchema(value: any, path: string, add: (path: string, code: string, message: string) => void, depth = 0): void {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    add(path, 'INVALID_JSON_SCHEMA', 'Inline JSON schema must be an object')
+    return
+  }
+  if (depth > 16) {
+    add(path, 'INVALID_JSON_SCHEMA', 'Inline JSON schema exceeds maximum depth')
+    return
+  }
+  if (value.type !== undefined && !['object', 'array', 'string', 'number', 'integer', 'boolean', 'null'].includes(value.type)) {
+    add(`${path}.type`, 'INVALID_JSON_SCHEMA', 'Unsupported JSON schema type')
+  }
+  if (value.required !== undefined) validateStringArray(value.required, `${path}.required`, 100, add)
+  if (value.properties !== undefined) {
+    if (!value.properties || typeof value.properties !== 'object' || Array.isArray(value.properties) || Object.keys(value.properties).length > 100) {
+      add(`${path}.properties`, 'INVALID_JSON_SCHEMA', 'Schema properties must be a bounded object')
+    } else {
+      for (const [key, child] of Object.entries(value.properties)) validateInlineJsonSchema(child, `${path}.properties.${key}`, add, depth + 1)
+    }
+  }
+  if (value.items !== undefined) validateInlineJsonSchema(value.items, `${path}.items`, add, depth + 1)
+}
+
+function validateStringArray(value: unknown, path: string, maximum: number, add: (path: string, code: string, message: string) => void): void {
+  if (!Array.isArray(value) || value.length > maximum || value.some(entry => typeof entry !== 'string' || !entry.trim())) {
+    add(path, 'INVALID_STRING_ARRAY', 'Value must be a bounded array of non-empty strings')
+  }
 }
 
 function validateLifecycle(lifecycle: any, add: (path: string, code: string, message: string) => void) {

@@ -41,6 +41,8 @@ import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.
 import {GreenfieldProductFrontendService} from '../../product-standard/frontend-service.js'
 import {GreenfieldAIExtensionActionService} from '../../ai/extension-action-service.js'
 import {statusForAiError} from '../../ai/errors.js'
+import {GreenfieldGovernedFunctionService} from '../governed-function-service.js'
+import {GreenfieldInterModuleActionService} from '../inter-module-action-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -88,6 +90,8 @@ export async function registerModuleRoutes(
   const mpsIngest = new GreenfieldMpsIngestService(db)
   const productFrontends = new GreenfieldProductFrontendService(db, config)
   const extensionAi = new GreenfieldAIExtensionActionService(db, config)
+  const governedFunctions = new GreenfieldGovernedFunctionService(db, config)
+  const interModuleActions = new GreenfieldInterModuleActionService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -1135,6 +1139,128 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module action failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/functions/:functionId/:version/invoke', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; functionId: string; version: string}
+    const body = (request.body as {input?: unknown; mutationId?: string} | null) ?? {}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.invoke(
+        auth.accountId,
+        params.moduleId,
+        params.functionId,
+        params.version,
+        body.input ?? {},
+        {mutationId: stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body), requestId: request.id},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Governed module function invocation failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/host-function-executors', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string}
+    try {
+      return reply.code(201).send(successEnvelope(await governedFunctions.registerHostExecutor(
+        auth.accountId, params.moduleId, (request.body as any) ?? {},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function executor registration failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/host-function-executors/:executorId/requests', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; executorId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.pendingHostRequests(auth.accountId, params.moduleId, params.executorId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function request lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/host-function-requests/:requestId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; requestId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.getHostRequest(auth.accountId, params.moduleId, params.requestId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function request lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/host-function-requests/:requestId/complete', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; requestId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.completeHostRequest(
+        auth.accountId, params.moduleId, params.requestId, (request.body as any)?.output,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function completion failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/host-function-requests/:requestId/cancel', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; requestId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.cancelHostRequest(auth.accountId, params.moduleId, params.requestId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function cancellation failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/runtime-credentials', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string}
+    const body = (request.body as {ttlSeconds?: number} | null) ?? {}
+    try {
+      return reply.code(201).send(successEnvelope(await interModuleActions.issueRuntimeCredential(
+        auth.accountId, params.moduleId, body.ttlSeconds,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module runtime credential issue failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/runtime-credentials/:credentialId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; credentialId: string}
+    try {
+      return reply.send(successEnvelope(await interModuleActions.revokeRuntimeCredential(
+        auth.accountId, params.moduleId, params.credentialId,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module runtime credential revoke failed')
+    }
+  })
+
+  app.post('/v1/module-runtime/actions/:targetModuleId/:actionId/:version', routeConfig.writeConfig, async (request, reply) => {
+    const params = request.params as {targetModuleId: string; actionId: string; version: string}
+    const body = (request.body as {input?: unknown; mutationId?: string} | null) ?? {}
+    try {
+      const credential = signatureHeader(request, 'x-modula-runtime-credential')
+      if (!credential) throw moduleError('UNAUTHENTICATED', 'Module runtime credential is required')
+      return reply.send(successEnvelope(await interModuleActions.request(
+        credential,
+        {targetModuleId: params.targetModuleId, actionId: params.actionId, version: params.version},
+        body.input ?? {},
+        {mutationId: stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body), requestId: request.id},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Inter-module action failed')
     }
   })
 

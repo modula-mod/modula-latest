@@ -554,7 +554,7 @@ export class GreenfieldModuleRecordService {
       operation: input.operation,
       payload: input.payloadInput,
     }))
-    return this.db.transaction().execute(async trx => {
+    const execute = async (trx: Transaction<Database>) => {
       const reservationId = uuidv7()
       const reserved = await trx
         .insertInto('greenfield_module_record_mutations')
@@ -723,7 +723,11 @@ export class GreenfieldModuleRecordService {
       await trx.updateTable('greenfield_module_record_mutations').set({status: 'completed', result: storedResult, completed_at: now})
         .where('mutation_row_id', '=', reservationId).execute()
       return result
-    })
+    }
+    const candidate = this.db as ModulaDb & {isTransaction?: boolean}
+    return candidate.isTransaction
+      ? execute(this.db as unknown as Transaction<Database>)
+      : this.db.transaction().execute(execute)
   }
 
   private async requireReadableRecord(

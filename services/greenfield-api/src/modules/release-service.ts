@@ -32,6 +32,7 @@ type ContributionType =
   | 'schema'
   | 'tool'
   | 'function'
+  | 'interModuleAction'
   | 'widget'
   | 'plugin'
   | 'connector'
@@ -60,6 +61,7 @@ const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, Co
   schemas: 'schema',
   tools: 'tool',
   functions: 'function',
+  interModuleActions: 'interModuleAction',
   widgets: 'widget',
   plugins: 'plugin',
   connectors: 'connector',
