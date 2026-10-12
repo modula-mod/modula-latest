@@ -297,7 +297,7 @@
     },
     {
       "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
-      "line": 83,
+      "line": 95,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
@@ -653,6 +653,13 @@
       "excerpt": "if (visiting.has(id)) throw new Error(`Standard 2 hook ordering cycle detected: ${[...path, id].join(' -> ')}`)"
     },
     {
+      "file": "services/greenfield-worker/src/search/module-record-projector.ts",
+      "line": 99,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!moduleId || !recordType || !recordId) throw new Error('Generic module record projection requires moduleId, recordType, and recordId')"
+    },
+    {
       "file": "packages/api-contracts/src/identifiers.ts",
       "line": 15,
       "marker": "throw new Error",
@@ -878,14 +885,14 @@
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
-      "line": 119,
+      "line": 124,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!validation.valid) throw new Error(validation.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
-      "line": 121,
+      "line": 126,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (seen.has(key)) throw new Error(`Duplicate host capability ${key}`)"
@@ -927,35 +934,35 @@
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 61,
+      "line": 114,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "| (ProductUiBase<'Search'> & {queryBinding: string; placeholder?: string; scope?: string})"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 98,
+      "line": 151,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "Search: ['queryBinding', 'placeholder', 'scope'],"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 125,
+      "line": 178,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!result.valid) throw new Error(result.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 165,
+      "line": 218,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 165,
+      "line": 218,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
@@ -2301,7 +2308,7 @@
     },
     {
       "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
-      "line": 83,
+      "line": 95,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
@@ -2657,6 +2664,13 @@
       "excerpt": "if (visiting.has(id)) throw new Error(`Standard 2 hook ordering cycle detected: ${[...path, id].join(' -> ')}`)"
     },
     {
+      "file": "services/greenfield-worker/src/search/module-record-projector.ts",
+      "line": 99,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!moduleId || !recordType || !recordId) throw new Error('Generic module record projection requires moduleId, recordType, and recordId')"
+    },
+    {
       "file": "packages/api-contracts/src/identifiers.ts",
       "line": 15,
       "marker": "throw new Error",
@@ -2882,14 +2896,14 @@
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
-      "line": 119,
+      "line": 124,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!validation.valid) throw new Error(validation.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
-      "line": 121,
+      "line": 126,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (seen.has(key)) throw new Error(`Duplicate host capability ${key}`)"
@@ -2931,35 +2945,35 @@
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 61,
+      "line": 114,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "| (ProductUiBase<'Search'> & {queryBinding: string; placeholder?: string; scope?: string})"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 98,
+      "line": 151,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "Search: ['queryBinding', 'placeholder', 'scope'],"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 125,
+      "line": 178,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!result.valid) throw new Error(result.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 165,
+      "line": 218,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
-      "line": 165,
+      "line": 218,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"

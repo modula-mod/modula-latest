@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-11T20:01:46.370Z",
+  "capturedAt": "2026-10-12T13:29:28.579Z",
   "source": {
     "branch": "phase-module-platform-02",
-    "headAtCapture": "c175d303a48f2d6af1b4acc5009fecd6cb6a19ae",
+    "headAtCapture": "6232a965907ba99cf62682c007482cc2059ae419",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "076b615a7d0d66b8ece1bd665a29ff4b27e92043cb9c84f24f7e48910a97702c"
+    "apiSourceSha256": "31515241d2108a2acc88ed342cfd802f01593b41be56fef7966365185f98c08b"
   },
   "runtimeRoutes": [
     {
@@ -1210,6 +1210,105 @@
     },
     {
       "method": "GET",
+      "url": "/v1/modules/:moduleId/records/shares/received",
+      "path": "/v1/modules/:moduleId/records/shares/received",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/shares/received",
+      "path": "/v1/modules/:moduleId/records/shares/received",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/shares/owned",
+      "path": "/v1/modules/:moduleId/records/shares/owned",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/shares/owned",
+      "path": "/v1/modules/:moduleId/records/shares/owned",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/record",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/record",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/modules/:moduleId/records/sync",
       "path": "/v1/modules/:moduleId/records/sync",
       "prefix": "",
@@ -1266,6 +1365,69 @@
       "method": "HEAD",
       "url": "/v1/modules/:moduleId/records/:collection/:recordId",
       "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/shares",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/shares",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/order",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/order",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -1401,6 +1563,105 @@
       "method": "POST",
       "url": "/v1/modules/:moduleId/actions/:actionId",
       "path": "/v1/modules/:moduleId/actions/:actionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/functions/:functionId/:version/invoke",
+      "path": "/v1/modules/:moduleId/functions/:functionId/:version/invoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-executors",
+      "path": "/v1/modules/:moduleId/host-function-executors",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "path": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "path": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId/complete",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId/complete",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId/cancel",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/runtime-credentials",
+      "path": "/v1/modules/:moduleId/runtime-credentials",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/runtime-credentials/:credentialId",
+      "path": "/v1/modules/:moduleId/runtime-credentials/:credentialId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/module-runtime/actions/:targetModuleId/:actionId/:version",
+      "path": "/v1/module-runtime/actions/:targetModuleId/:actionId/:version",
       "prefix": "",
       "schema": null,
       "config": null,
