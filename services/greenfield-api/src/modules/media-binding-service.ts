@@ -83,7 +83,7 @@ export class GreenfieldModuleMediaBindingService {
       await trx.updateTable('attachments').set({attached_at: asset.attached_at ?? now, updated_at: now}).where('attachment_id', '=', assetId).execute()
       await this.emitChange(trx, runtime, target, recordType, recordId, record.revision, 'bind', {bindingId})
       await new AuditRepository(trx).append('module.record.media.bound', {moduleId: runtime.moduleId, recordType, bindingId}, {type: 'moduleRecord', id: recordId, actorId: actor.actorId ?? null}, {accountId: target.ownerAccountId, requestId: actor.requestId})
-      await this.publishChange(trx, runtime, target, recordType, recordId, record.revision, 'bind', {bindingId})
+      await this.publishChange(trx, runtime, recordType, recordId, record.revision, 'bind', {bindingId})
       const created = await trx.selectFrom('greenfield_module_record_media_bindings').selectAll().where('binding_id', '=', bindingId).executeTakeFirstOrThrow()
       return toBinding(created)
     })
@@ -101,7 +101,7 @@ export class GreenfieldModuleMediaBindingService {
       await trx.deleteFrom('greenfield_module_record_media_bindings').where('binding_id', '=', bindingId).execute()
       await this.emitChange(trx, runtime, target, recordType, recordId, target.revision, 'unbind', {bindingId})
       await new AuditRepository(trx).append('module.record.media.unbound', {moduleId: runtime.moduleId, recordType, bindingId}, {type: 'moduleRecord', id: recordId, actorId: actor.actorId ?? null}, {accountId: target.ownerAccountId, requestId: actor.requestId})
-      await this.publishChange(trx, runtime, target, recordType, recordId, target.revision, 'unbind', {bindingId})
+      await this.publishChange(trx, runtime, recordType, recordId, target.revision, 'unbind', {bindingId})
       return {unbound: true, bindingId}
     })
   }
@@ -132,7 +132,7 @@ export class GreenfieldModuleMediaBindingService {
       }
       await this.emitChange(trx, runtime, target, recordType, recordId, target.revision, 'reorder', {bindings: requested})
       await new AuditRepository(trx).append('module.record.media.reordered', {moduleId: runtime.moduleId, recordType, count: requested.length}, {type: 'moduleRecord', id: recordId, actorId: actor.actorId ?? null}, {accountId: target.ownerAccountId, requestId: actor.requestId})
-      await this.publishChange(trx, runtime, target, recordType, recordId, target.revision, 'reorder', {bindings: requested})
+      await this.publishChange(trx, runtime, recordType, recordId, target.revision, 'reorder', {bindings: requested})
       return {record: {moduleId: runtime.moduleId, recordType, recordId}, bindings: requested}
     })
   }
@@ -152,7 +152,7 @@ export class GreenfieldModuleMediaBindingService {
       if (!row) throw moduleError('NOT_FOUND', 'Media binding not found')
       await this.emitChange(trx, runtime, target, recordType, recordId, target.revision, 'metadata', {bindingId})
       await new AuditRepository(trx).append('module.record.media.updated', {moduleId: runtime.moduleId, recordType, bindingId}, {type: 'moduleRecord', id: recordId, actorId: actor.actorId ?? null}, {accountId: target.ownerAccountId, requestId: actor.requestId})
-      await this.publishChange(trx, runtime, target, recordType, recordId, target.revision, 'metadata', {bindingId})
+      await this.publishChange(trx, runtime, recordType, recordId, target.revision, 'metadata', {bindingId})
       return toBinding(row)
     })
   }
@@ -198,13 +198,13 @@ export class GreenfieldModuleMediaBindingService {
     }))).execute()
   }
 
-  private async publishChange(trx: Transaction<Database>, runtime: GreenfieldModuleRuntimeContext, target: RecordTarget, recordType: string, recordId: string, revision: number, operation: 'bind' | 'unbind' | 'reorder' | 'metadata', details: Record<string, unknown>) {
+  private async publishChange(trx: Transaction<Database>, runtime: GreenfieldModuleRuntimeContext, recordType: string, recordId: string, revision: number, operation: 'bind' | 'unbind' | 'reorder' | 'metadata', details: Record<string, unknown>) {
     await new GreenfieldEventBus(trx).publish({
       eventType: 'module.record.media.changed.v1',
       aggregateType: 'module-record',
       aggregateId: recordId,
       aggregateVersion: revision,
-      accountId: target.ownerAccountId,
+      accountId: runtime.accountId,
       producerKind: 'product',
       producerId: runtime.moduleId,
       productId: runtime.moduleId,

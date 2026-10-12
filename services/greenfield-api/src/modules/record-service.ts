@@ -379,6 +379,7 @@ export class GreenfieldModuleRecordService {
   async sync(accountId: string, moduleId: string, input: ModuleRecordSyncQuery = {}) {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const runtime = await this.access.resolve(accountId, canonicalId, {requireEnabled: true})
+    await this.materializeExpiredShareChanges(runtime)
     const after = input.after ? decodeSyncCursor(input.after, runtime, this.syncSigningKey()) : '0'
     const limit = clampLimit(input.limit, 100)
     const rows = await this.db
@@ -421,19 +422,6 @@ export class GreenfieldModuleRecordService {
       if (!current) continue
       changes.push({record: current, latestRevision: {...identity, revision: current.revision}, changedAt: row.created_at.toISOString()})
     }
-    const expiredShares = await this.db.selectFrom('greenfield_module_record_shares as share')
-      .leftJoin('greenfield_module_records as record', join => join
-        .onRef('record.account_id', '=', 'share.owner_account_id').onRef('record.module_id', '=', 'share.module_id')
-        .onRef('record.collection', '=', 'share.record_type').onRef('record.record_id', '=', 'share.record_id'))
-      .select(['share.module_id', 'share.record_type', 'share.record_id', 'share.expires_at', 'record.revision'])
-      .where('share.recipient_account_id', '=', accountId).where('share.module_id', '=', canonicalId)
-      .where('share.revoked_at', 'is', null).where('share.expires_at', '<=', new Date()).execute()
-    for (const expired of expiredShares) {
-      const identity = recordIdentity(expired.module_id, expired.record_type, expired.record_id)
-      if (!tombstones.some(item => item.moduleId === identity.moduleId && item.recordType === identity.recordType && item.recordId === identity.recordId)) {
-        tombstones.push({...identity, revision: expired.revision ?? 0, reason: 'visibility-lost', changedAt: expired.expires_at!.toISOString()})
-      }
-    }
     const sequence = rows.at(-1)?.change_sequence ?? after
     return {
       changes,
@@ -442,6 +430,29 @@ export class GreenfieldModuleRecordService {
       latestRevision,
       nextCursor: encodeSyncCursor(runtime, sequence, this.syncSigningKey()),
     }
+  }
+
+  private async materializeExpiredShareChanges(runtime: GreenfieldModuleRuntimeContext): Promise<void> {
+    await this.db.transaction().execute(async trx => {
+      const expired = await trx.selectFrom('greenfield_module_record_shares as share')
+        .innerJoin('greenfield_module_records as record', join => join
+          .onRef('record.account_id', '=', 'share.owner_account_id').onRef('record.module_id', '=', 'share.module_id')
+          .onRef('record.collection', '=', 'share.record_type').onRef('record.record_id', '=', 'share.record_id'))
+        .select(['share.share_id', 'share.owner_account_id', 'share.record_type', 'share.record_id', 'share.expires_at', 'record.revision'])
+        .where('share.recipient_account_id', '=', runtime.accountId).where('share.module_id', '=', runtime.moduleId)
+        .where('share.revoked_at', 'is', null).where('share.visibility_lost_at', 'is', null)
+        .where('share.expires_at', '<=', new Date()).forUpdate().execute()
+      for (const share of expired) {
+        await trx.insertInto('greenfield_module_record_changes').values({
+          account_id: runtime.accountId, installation_id: runtime.installationId, owner_account_id: share.owner_account_id,
+          module_id: runtime.moduleId, record_type: share.record_type, record_id: share.record_id,
+          revision: share.revision, operation: 'visibility-lost', change_kind: 'visibility', details: {},
+          deleted: true, created_at: share.expires_at!,
+        }).execute()
+        await trx.updateTable('greenfield_module_record_shares').set({visibility_lost_at: new Date(), updated_at: new Date()})
+          .where('share_id', '=', share.share_id).where('visibility_lost_at', 'is', null).execute()
+      }
+    })
   }
 
   private async hasActiveShare(accountId: string, ownerAccountId: string, moduleId: string, recordType: string, recordId: string): Promise<boolean> {
