@@ -34,6 +34,7 @@ type ExecuteMutationInput = {
   actor: MutationActor
   payloadInput: Record<string, unknown>
   references?: NormalizedReference[]
+  recordAccountId?: string
 }
 
 export type ModuleRecordQuery = {
@@ -278,6 +279,42 @@ export class GreenfieldModuleRecordService {
     return this.updateExisting(context.runtime, context.collectionDefinition, current, data, visibility, 'update', input.changeSource ?? 'update', input.versionMetadata, legacyReferences, actor)
   }
 
+  async patchShared(
+    accountId: string,
+    ownerAccountId: string,
+    moduleId: string,
+    collection: string,
+    recordId: string,
+    input: {data?: unknown; expectedRevision?: number; visibility?: string; mutationId?: string},
+    actor: MutationActor = {},
+  ) {
+    const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
+    const share = await this.db.selectFrom('greenfield_module_record_shares').select('share_id')
+      .where('owner_account_id', '=', ownerAccountId).where('recipient_account_id', '=', accountId)
+      .where('module_id', '=', context.runtime.moduleId).where('record_type', '=', collection)
+      .where('record_id', '=', recordId).where('permission', '=', 'edit').where('revoked_at', 'is', null)
+      .where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', new Date())])).executeTakeFirst()
+    if (!share) throw moduleError('NOT_FOUND', 'Editable record share not found')
+    requireExpectedRevision(input.expectedRevision)
+    const patchData = requireRecordData(input.data)
+    const references = extractReferences(context.collectionDefinition, patchData)
+    await this.validateReferenceTargets(accountId, references)
+    return this.executeMutation({
+      context,
+      collectionDefinition: context.collectionDefinition,
+      operation: 'update',
+      recordId,
+      data: patchData,
+      visibility: input.visibility === undefined ? undefined : normalizeVisibility(input.visibility),
+      expectedRevision: input.expectedRevision,
+      mutationId: requireMutationId(input.mutationId),
+      actor,
+      payloadInput: {data: patchData, visibility: input.visibility ?? null, expectedRevision: input.expectedRevision},
+      references,
+      recordAccountId: ownerAccountId,
+    })
+  }
+
   async delete(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number; mutationId?: string} = {}, actor: MutationActor = {}) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'delete')
     if (input.mutationId) {
@@ -447,6 +484,7 @@ export class GreenfieldModuleRecordService {
       .execute()
     const changes = []
     const tombstones = []
+    const resourceChanges = []
     let latestRevision: {moduleId: string; recordType: string; recordId: string; revision: number} | null = null
     for (const row of rows) {
       try {
@@ -456,26 +494,60 @@ export class GreenfieldModuleRecordService {
       }
       const identity = recordIdentity(canonicalId, row.record_type, row.record_id)
       latestRevision = {...identity, revision: row.revision}
-      if (row.deleted) {
-        tombstones.push({...identity, revision: row.revision, changedAt: row.created_at.toISOString()})
+      const ownerAccountId = row.owner_account_id ?? accountId
+      const sharedAccess = ownerAccountId === accountId || await this.hasActiveShare(accountId, ownerAccountId, canonicalId, row.record_type, row.record_id)
+      if (!sharedAccess) {
+        tombstones.push({...identity, revision: row.revision, reason: 'visibility-lost', changedAt: row.created_at.toISOString()})
         continue
       }
-      const current = await this.findRecord(accountId, canonicalId, row.record_type, row.record_id, false)
+      if (row.change_kind === 'media') {
+        resourceChanges.push({kind: 'media-binding', operation: row.operation, record: identity, revision: row.revision, details: row.details, changedAt: row.created_at.toISOString()})
+        continue
+      }
+      if (row.deleted) {
+        tombstones.push({...identity, revision: row.revision, reason: row.change_kind === 'visibility' ? 'visibility-lost' : 'deleted', changedAt: row.created_at.toISOString()})
+        continue
+      }
+      const current = await this.findRecord(ownerAccountId, canonicalId, row.record_type, row.record_id, false)
       if (!current) continue
       changes.push({record: current, latestRevision: {...identity, revision: current.revision}, changedAt: row.created_at.toISOString()})
+    }
+    const expiredShares = await this.db.selectFrom('greenfield_module_record_shares as share')
+      .leftJoin('greenfield_module_records as record', join => join
+        .onRef('record.account_id', '=', 'share.owner_account_id').onRef('record.module_id', '=', 'share.module_id')
+        .onRef('record.collection', '=', 'share.record_type').onRef('record.record_id', '=', 'share.record_id'))
+      .select(['share.module_id', 'share.record_type', 'share.record_id', 'share.expires_at', 'record.revision'])
+      .where('share.recipient_account_id', '=', accountId).where('share.module_id', '=', canonicalId)
+      .where('share.revoked_at', 'is', null).where('share.expires_at', '<=', new Date()).execute()
+    for (const expired of expiredShares) {
+      const identity = recordIdentity(expired.module_id, expired.record_type, expired.record_id)
+      if (!tombstones.some(item => item.moduleId === identity.moduleId && item.recordType === identity.recordType && item.recordId === identity.recordId)) {
+        tombstones.push({...identity, revision: expired.revision ?? 0, reason: 'visibility-lost', changedAt: expired.expires_at!.toISOString()})
+      }
     }
     const sequence = rows.at(-1)?.change_sequence ?? after
     return {
       changes,
       tombstones,
+      resourceChanges,
       latestRevision,
       nextCursor: encodeSyncCursor(runtime, sequence, this.syncSigningKey()),
     }
   }
 
+  private async hasActiveShare(accountId: string, ownerAccountId: string, moduleId: string, recordType: string, recordId: string): Promise<boolean> {
+    const share = await this.db.selectFrom('greenfield_module_record_shares').select('share_id')
+      .where('owner_account_id', '=', ownerAccountId).where('recipient_account_id', '=', accountId)
+      .where('module_id', '=', moduleId).where('record_type', '=', recordType).where('record_id', '=', recordId)
+      .where('revoked_at', 'is', null).where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', new Date())]))
+      .executeTakeFirst()
+    return Boolean(share)
+  }
+
   private async executeMutation(input: ExecuteMutationInput) {
     const mutationId = requireMutationId(input.mutationId)
     const {runtime} = input.context
+    const recordAccountId = input.recordAccountId ?? runtime.accountId
     const payloadHash = sha256(canonicalJsonStringify({
       moduleId: runtime.moduleId,
       recordType: input.collectionDefinition.collection,
@@ -520,7 +592,7 @@ export class GreenfieldModuleRecordService {
       const current = await trx
         .selectFrom('greenfield_module_records')
         .selectAll()
-        .where('account_id', '=', runtime.accountId)
+        .where('account_id', '=', recordAccountId)
         .where('module_id', '=', runtime.moduleId)
         .where('collection', '=', input.collectionDefinition.collection)
         .where('record_id', '=', input.recordId)
@@ -537,7 +609,7 @@ export class GreenfieldModuleRecordService {
         const source = await trx
           .selectFrom('greenfield_module_record_revisions')
           .select(['data_snapshot', 'visibility'])
-          .where('account_id', '=', runtime.accountId)
+          .where('account_id', '=', recordAccountId)
           .where('module_id', '=', runtime.moduleId)
           .where('record_type', '=', input.collectionDefinition.collection)
           .where('record_id', '=', input.recordId)
@@ -575,12 +647,12 @@ export class GreenfieldModuleRecordService {
             search_text: buildSearchText(input.collectionDefinition, data),
             folder_ref: getStringField(data, input.collectionDefinition.folderField),
             source_uri: getStringField(data, 'sourceUri'),
-            installation_id: runtime.installationId,
+            installation_id: current.installation_id ?? runtime.installationId,
             revision,
             updated_at: now,
             deleted_at: deleted ? now : null,
           })
-          .where('account_id', '=', runtime.accountId)
+          .where('account_id', '=', recordAccountId)
           .where('module_id', '=', runtime.moduleId)
           .where('collection', '=', input.collectionDefinition.collection)
           .where('record_id', '=', input.recordId)
@@ -590,7 +662,7 @@ export class GreenfieldModuleRecordService {
       } else {
         await trx.insertInto('greenfield_module_records').values({
           record_id: input.recordId,
-          account_id: runtime.accountId,
+          account_id: recordAccountId,
           module_id: runtime.moduleId,
           installation_id: runtime.installationId,
           collection: input.collectionDefinition.collection,
@@ -609,7 +681,7 @@ export class GreenfieldModuleRecordService {
       }
 
       await this.insertImmutableRevision(trx, {
-        accountId: runtime.accountId,
+        accountId: recordAccountId,
         installationId: runtime.installationId,
         moduleId: runtime.moduleId,
         recordType: input.collectionDefinition.collection,
@@ -625,35 +697,26 @@ export class GreenfieldModuleRecordService {
         payloadHash: recordPayloadHash,
         createdAt: now,
       })
-      await this.replaceReferences(trx, runtime, input.collectionDefinition.collection, input.recordId, revision, references, now)
-      await trx.insertInto('greenfield_module_record_changes').values({
-        account_id: runtime.accountId,
-        installation_id: runtime.installationId,
-        module_id: runtime.moduleId,
-        record_type: input.collectionDefinition.collection,
-        record_id: input.recordId,
-        revision,
-        operation: input.operation,
-        deleted,
-        created_at: now,
-      }).execute()
+      await this.replaceReferences(trx, runtime, input.collectionDefinition.collection, input.recordId, revision, references, now, recordAccountId)
+      await this.insertRecordSyncChanges(trx, runtime, recordAccountId, current?.installation_id ?? runtime.installationId,
+        input.collectionDefinition.collection, input.recordId, revision, input.operation, deleted, now)
 
       const eventId = uuidv7()
       const previous = await trx.selectFrom('greenfield_module_record_events').select('event_hash')
-        .where('account_id', '=', runtime.accountId)
+        .where('account_id', '=', recordAccountId)
         .where('module_id', '=', runtime.moduleId)
         .where('collection', '=', input.collectionDefinition.collection)
         .where('record_id', '=', input.recordId)
         .orderBy('revision', 'desc').executeTakeFirst()
       const eventHash = hashRecordEvent({eventId, recordId: input.recordId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, operation: input.operation, revision, payloadHash: recordPayloadHash})
-      await this.insertRecordEvent(trx, {eventId, recordId: input.recordId, accountId: runtime.accountId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, operation: input.operation, revision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash: recordPayloadHash, metadata: {visibility, mutationId, baseRevision}})
-      await new AuditRepository(trx).append(`module.record.${input.operation}`, {moduleId: runtime.moduleId, recordType: input.collectionDefinition.collection, revision, mutationId, eventHash}, {type: 'moduleRecord', id: input.recordId, actorId: input.actor.actorId ?? null}, {accountId: runtime.accountId, requestId: input.actor.requestId})
-      await this.publishGenericRecordDomainEvent(trx, {accountId: runtime.accountId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, recordId: input.recordId, operation: input.operation, revision, schemaRef: input.collectionDefinition.schemaRef, data, eventDeclarations: runtime.manifest.contributions.events ?? []})
+      await this.insertRecordEvent(trx, {eventId, recordId: input.recordId, accountId: recordAccountId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, operation: input.operation, revision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash: recordPayloadHash, metadata: {visibility, mutationId, baseRevision}})
+      await new AuditRepository(trx).append(`module.record.${input.operation}`, {moduleId: runtime.moduleId, recordType: input.collectionDefinition.collection, revision, mutationId, eventHash}, {type: 'moduleRecord', id: input.recordId, actorId: input.actor.actorId ?? null}, {accountId: recordAccountId, requestId: input.actor.requestId})
+      await this.publishGenericRecordDomainEvent(trx, {accountId: recordAccountId, moduleId: runtime.moduleId, collection: input.collectionDefinition.collection, recordId: input.recordId, operation: input.operation, revision, schemaRef: input.collectionDefinition.schemaRef, data, eventDeclarations: runtime.manifest.contributions.events ?? []})
 
       const result = deleted
         ? {deleted: true, recordId: input.recordId, revision}
         : await trx.selectFrom('greenfield_module_records').selectAll()
-          .where('account_id', '=', runtime.accountId).where('module_id', '=', runtime.moduleId)
+          .where('account_id', '=', recordAccountId).where('module_id', '=', runtime.moduleId)
           .where('collection', '=', input.collectionDefinition.collection).where('record_id', '=', input.recordId)
           .executeTakeFirstOrThrow()
       const storedResult = jsonValue(result)
@@ -760,9 +823,10 @@ export class GreenfieldModuleRecordService {
     revision: number,
     references: NormalizedReference[],
     createdAt: Date,
+    recordAccountId = runtime.accountId,
   ): Promise<void> {
     await trx.deleteFrom('greenfield_module_record_references')
-      .where('account_id', '=', runtime.accountId)
+      .where('account_id', '=', recordAccountId)
       .where('source_module_id', '=', runtime.moduleId)
       .where('source_record_type', '=', recordType)
       .where('source_record_id', '=', recordId)
@@ -770,7 +834,7 @@ export class GreenfieldModuleRecordService {
     if (references.length === 0) return
     await trx.insertInto('greenfield_module_record_references').values(references.map(reference => ({
       reference_id: uuidv7(),
-      account_id: runtime.accountId,
+      account_id: recordAccountId,
       source_installation_id: runtime.installationId,
       source_module_id: runtime.moduleId,
       source_record_type: recordType,
@@ -782,6 +846,37 @@ export class GreenfieldModuleRecordService {
       target_record_type: reference.record.recordType,
       target_record_id: reference.record.recordId,
       created_at: createdAt,
+    }))).execute()
+  }
+
+  private async insertRecordSyncChanges(
+    trx: Transaction<Database>,
+    runtime: GreenfieldModuleRuntimeContext,
+    ownerAccountId: string,
+    ownerInstallationId: string | null,
+    recordType: string,
+    recordId: string,
+    revision: number,
+    operation: GenericRecordOperation,
+    deleted: boolean,
+    createdAt: Date,
+  ): Promise<void> {
+    const audiences = new Map<string, string | null>([[ownerAccountId, ownerInstallationId]])
+    const shares = await trx.selectFrom('greenfield_module_record_shares').select('recipient_account_id')
+      .where('owner_account_id', '=', ownerAccountId).where('module_id', '=', runtime.moduleId)
+      .where('record_type', '=', recordType).where('record_id', '=', recordId).where('revoked_at', 'is', null)
+      .where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', createdAt)])).execute()
+    for (const share of shares) {
+      const installation = await trx.selectFrom('greenfield_extension_installations as installation')
+        .innerJoin('greenfield_module_releases as release', 'release.extension_version_id', 'installation.extension_version_id')
+        .select('installation.installation_id').where('installation.account_id', '=', share.recipient_account_id)
+        .where('installation.status', '=', 'enabled').where('release.module_id', '=', runtime.moduleId).executeTakeFirst()
+      if (installation) audiences.set(share.recipient_account_id, installation.installation_id)
+    }
+    await trx.insertInto('greenfield_module_record_changes').values([...audiences].map(([accountId, installationId]) => ({
+      account_id: accountId, installation_id: installationId, owner_account_id: ownerAccountId,
+      module_id: runtime.moduleId, record_type: recordType, record_id: recordId, revision,
+      operation, change_kind: 'record' as const, details: {}, deleted, created_at: createdAt,
     }))).execute()
   }
 
