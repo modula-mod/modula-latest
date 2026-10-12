@@ -51,6 +51,7 @@ export function statusForError(code: ApiErrorCode): number {
     case 'INVALID_ACTION_SCHEMA':
     case 'CAPABILITY_UNKNOWN':
     case 'AKI_ABSTAINED':
+    case 'INVALID_CURSOR':
       return 400
     case 'UNAUTHENTICATED':
     case 'INVALID_CREDENTIALS':
@@ -80,10 +81,13 @@ export function statusForError(code: ApiErrorCode): number {
     case 'GOVERNOR_BLOCKED':
       return 403
     case 'NOT_FOUND':
+    case 'FUNCTION_NOT_AVAILABLE':
     case 'AI_ACTION_NOT_DECLARED':
     case 'MISSION_NOT_FOUND':
       return 404
     case 'CONFLICT':
+    case 'REVISION_CONFLICT':
+    case 'MUTATION_REUSE_CONFLICT':
     case 'NOTE_REVISION_CONFLICT':
     case 'AI_RESULT_ALREADY_APPLIED':
     case 'INVALID_MISSION_STATE':
@@ -94,6 +98,8 @@ export function statusForError(code: ApiErrorCode): number {
     case 'AI_RESULT_EXPIRED':
     case 'AI_RESULT_NOT_APPLICABLE':
       return 400
+    case 'CAPABILITY_UNAVAILABLE':
+      return 503
     case 'RATE_LIMITED':
       return 429
     default:

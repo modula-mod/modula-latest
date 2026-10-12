@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@modula/greenfield-module-manifest": "workspace:*",
+    "@modula/greenfield-module-ui-contracts": "workspace:*",
     "@modula/module-sdk": "file:../../../modula-mod/modula-module-standard/packages/module-sdk"
   },
   "devDependencies": {

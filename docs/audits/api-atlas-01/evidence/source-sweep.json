@@ -297,7 +297,7 @@
     },
     {
       "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
-      "line": 83,
+      "line": 95,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
@@ -653,6 +653,13 @@
       "excerpt": "if (visiting.has(id)) throw new Error(`Standard 2 hook ordering cycle detected: ${[...path, id].join(' -> ')}`)"
     },
     {
+      "file": "services/greenfield-worker/src/search/module-record-projector.ts",
+      "line": 99,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!moduleId || !recordType || !recordId) throw new Error('Generic module record projection requires moduleId, recordType, and recordId')"
+    },
+    {
       "file": "packages/api-contracts/src/identifiers.ts",
       "line": 15,
       "marker": "throw new Error",
@@ -877,39 +884,88 @@
       "excerpt": "if (!/^[a-z0-9-]+$/.test(collection)) throw new Error('Collection suffix must be lowercase kebab identifier')"
     },
     {
+      "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
+      "line": 124,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!validation.valid) throw new Error(validation.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
+      "line": 126,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (seen.has(key)) throw new Error(`Duplicate host capability ${key}`)"
+    },
+    {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 90,
+      "line": 93,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder?: string"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 394,
+      "line": 397,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "checkKnownKeys(field, path, ['fieldId', 'name', 'type', 'label', 'required', 'sensitive', 'secretRefRequired', 'options', 'referenceCollection', 'placeholder', 'helpText'], add)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 417,
+      "line": 420,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 417,
+      "line": 420,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 417,
+      "line": 420,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 114,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "| (ProductUiBase<'Search'> & {queryBinding: string; placeholder?: string; scope?: string})"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 151,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "Search: ['queryBinding', 'placeholder', 'scope'],"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 178,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!result.valid) throw new Error(result.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 218,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 218,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
     },
     {
       "file": "packages/greenfield-product-standard/src/kinds.ts",
@@ -920,7 +976,7 @@
     },
     {
       "file": "packages/greenfield-product-standard/src/tests/ingest.test.ts",
-      "line": 137,
+      "line": 175,
       "marker": "fake",
       "classification": "test-fixture-or-development",
       "excerpt": "test('backend-free plugin does not bind fake infrastructure', () => {"
@@ -1186,7 +1242,7 @@
     },
     {
       "file": "src/data/repositories/contracts/ModuleRepository.ts",
-      "line": 52,
+      "line": 54,
       "marker": "PLACEHOLDER",
       "classification": "possible-runtime-placeholder",
       "excerpt": "| 'PLACEHOLDER'"
@@ -1354,21 +1410,21 @@
     },
     {
       "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
-      "line": 209,
+      "line": 226,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
     },
     {
       "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
-      "line": 209,
+      "line": 226,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
     },
     {
       "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
-      "line": 209,
+      "line": 226,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
@@ -2252,7 +2308,7 @@
     },
     {
       "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
-      "line": 83,
+      "line": 95,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
@@ -2608,6 +2664,13 @@
       "excerpt": "if (visiting.has(id)) throw new Error(`Standard 2 hook ordering cycle detected: ${[...path, id].join(' -> ')}`)"
     },
     {
+      "file": "services/greenfield-worker/src/search/module-record-projector.ts",
+      "line": 99,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!moduleId || !recordType || !recordId) throw new Error('Generic module record projection requires moduleId, recordType, and recordId')"
+    },
+    {
       "file": "packages/api-contracts/src/identifiers.ts",
       "line": 15,
       "marker": "throw new Error",
@@ -2832,39 +2895,88 @@
       "excerpt": "if (!/^[a-z0-9-]+$/.test(collection)) throw new Error('Collection suffix must be lowercase kebab identifier')"
     },
     {
+      "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
+      "line": 124,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!validation.valid) throw new Error(validation.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/host-capabilities.ts",
+      "line": 126,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (seen.has(key)) throw new Error(`Duplicate host capability ${key}`)"
+    },
+    {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 90,
+      "line": 93,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder?: string"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 394,
+      "line": 397,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "checkKnownKeys(field, path, ['fieldId', 'name', 'type', 'label', 'required', 'sensitive', 'secretRefRequired', 'options', 'referenceCollection', 'placeholder', 'helpText'], add)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 417,
+      "line": 420,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 417,
+      "line": 420,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
     },
     {
       "file": "packages/greenfield-module-ui-contracts/src/index.ts",
-      "line": 417,
+      "line": 420,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 114,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "| (ProductUiBase<'Search'> & {queryBinding: string; placeholder?: string; scope?: string})"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 151,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "Search: ['queryBinding', 'placeholder', 'scope'],"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 178,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!result.valid) throw new Error(result.issues.map(issue => `${issue.path} ${issue.code}: ${issue.message}`).join('; '))"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 218,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/product-ui.ts",
+      "line": 218,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "optionalString(input.placeholder, `${path}.placeholder`, issues, 160)"
     },
     {
       "file": "packages/greenfield-product-standard/src/kinds.ts",
@@ -3106,7 +3218,7 @@
     },
     {
       "file": "src/data/repositories/contracts/ModuleRepository.ts",
-      "line": 52,
+      "line": 54,
       "marker": "PLACEHOLDER",
       "classification": "possible-runtime-placeholder",
       "excerpt": "| 'PLACEHOLDER'"
@@ -3274,21 +3386,21 @@
     },
     {
       "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
-      "line": 209,
+      "line": 226,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
     },
     {
       "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
-      "line": 209,
+      "line": 226,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
     },
     {
       "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
-      "line": 209,
+      "line": 226,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"

@@ -2,12 +2,14 @@ import {describe, expect, it} from 'vitest'
 import {
   defineFunction,
   defineModule20,
+  defineProductUiNode,
   defineSchema,
   defineStandardApiOperation,
   defineStandardService,
   defineStandardVersionedSection,
   defineTool,
   moduleRecordCollection,
+  negotiateHostCapabilities,
 } from '../src/index.js'
 
 describe('Greenfield module SDK builders', () => {
@@ -72,5 +74,27 @@ describe('Greenfield module SDK builders', () => {
     expect(manifest.sectionVersions.services).toBe('2.0.0')
     expect(manifest.serviceRegistry?.items?.[0]?.id).toBe('digital.modula.vault-notes.service.search')
     expect(manifest.apiRegistry?.items?.[0]?.path).toBe('/api/modula/digital.modula.vault-notes/create-note')
+  })
+})
+
+describe('Product UI SDK and testkit exports', () => {
+  it('builds a neutral alpha semantic node and negotiates beta host support', () => {
+    const node = defineProductUiNode({
+      id: 'audit.alpha.create',
+      type: 'Button',
+      version: '1.0.0',
+      capability: {id: 'ui.button', version: '1'},
+      label: 'Create',
+      actionId: 'audit.alpha.actions.create',
+      role: 'prominent',
+    })
+    expect(node.type).toBe('Button')
+
+    const negotiation = negotiateHostCapabilities({
+      host: [{id: 'ui.button', version: '1.0.0', status: 'available', provenance: 'native', renderer: 'audit.beta.button'}],
+      required: ['ui.button@1'],
+    })
+    expect(negotiation.ok).toBe(true)
+    expect(negotiation.required[0]?.selected?.renderer).toBe('audit.beta.button')
   })
 })

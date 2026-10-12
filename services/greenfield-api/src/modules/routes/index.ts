@@ -12,6 +12,8 @@ import {GreenfieldModuleManifestService} from '../manifest-service.js'
 import {moduleError} from '../module-errors.js'
 import {GreenfieldModulePublisherService} from '../publisher-service.js'
 import {GreenfieldModuleRecordService} from '../record-service.js'
+import {GreenfieldModuleMediaBindingService} from '../media-binding-service.js'
+import {GreenfieldModuleRecordSharingService} from '../record-sharing-service.js'
 import type {ModuleRecordQuery} from '../record-service.js'
 import {GreenfieldModuleRegistryService} from '../registry-service.js'
 import {GreenfieldModuleReleaseService} from '../release-service.js'
@@ -39,6 +41,8 @@ import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.
 import {GreenfieldProductFrontendService} from '../../product-standard/frontend-service.js'
 import {GreenfieldAIExtensionActionService} from '../../ai/extension-action-service.js'
 import {statusForAiError} from '../../ai/errors.js'
+import {GreenfieldGovernedFunctionService} from '../governed-function-service.js'
+import {GreenfieldInterModuleActionService} from '../inter-module-action-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -68,6 +72,8 @@ export async function registerModuleRoutes(
   const contributions = new GreenfieldModuleContributionService(db, config)
   const views = new GreenfieldModuleViewService(db, config)
   const records = new GreenfieldModuleRecordService(db, config)
+  const mediaBindings = new GreenfieldModuleMediaBindingService(db, config)
+  const recordSharing = new GreenfieldModuleRecordSharingService(db, config)
   const actions = new GreenfieldModuleActionService(db, config)
   const exports = new GreenfieldModuleExportService(db, config)
   const health = new GreenfieldModuleHealthService(db, config)
@@ -84,6 +90,8 @@ export async function registerModuleRoutes(
   const mpsIngest = new GreenfieldMpsIngestService(db)
   const productFrontends = new GreenfieldProductFrontendService(db, config)
   const extensionAi = new GreenfieldAIExtensionActionService(db, config)
+  const governedFunctions = new GreenfieldGovernedFunctionService(db, config)
+  const interModuleActions = new GreenfieldInterModuleActionService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -774,6 +782,98 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.get('/v1/modules/:moduleId/records/shares/received', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await recordSharing.listReceived(auth.accountId, canonicalModuleParam(request)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared records lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/shares/owned', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const query = (request.query as {recordType?: string; recordId?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await recordSharing.listOwned(auth.accountId, canonicalModuleParam(request), stringOrUndefined(query.recordType), stringOrUndefined(query.recordId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Owned record shares lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/record-shares/:shareId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.read(auth.accountId, params.moduleId, params.shareId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared record lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/record-shares/:shareId/revisions', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    const query = (request.query as {limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await recordSharing.history(auth.accountId, params.moduleId, params.shareId, query.limit === undefined ? 25 : Number(query.limit)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared record history lookup failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/record-shares/:shareId/record', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.edit(auth.accountId, params.moduleId, params.shareId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared record update failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/record-shares/:shareId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.update(auth.accountId, params.moduleId, params.shareId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record share update failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/record-shares/:shareId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.revoke(auth.accountId, params.moduleId, params.shareId, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record share revoke failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/sync', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string}
+    const query = (request.query as {after?: string; limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.sync(auth.accountId, params.moduleId, {
+        after: stringOrUndefined(query.after),
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record sync failed')
+    }
+  })
+
   app.get('/v1/modules/:moduleId/records/:collection', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -790,7 +890,13 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.code(201).send(successEnvelope(await records.create(auth.accountId, params.moduleId, params.collection, (request.body as any) ?? {}), request.id))
+      return reply.code(201).send(successEnvelope(await records.create(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record creation failed')
     }
@@ -807,12 +913,162 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/records/:collection/:recordId/shares', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.code(201).send(successEnvelope(await recordSharing.create(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record share creation failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/media', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.list(auth.accountId, params.moduleId, params.collection, params.recordId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/records/:collection/:recordId/media', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.code(201).send(successEnvelope(await mediaBindings.bind(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media bind failed')
+    }
+  })
+
+  app.put('/v1/modules/:moduleId/records/:collection/:recordId/media/order', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.reorder(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media reorder failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string; bindingId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.updateMetadata(auth.accountId, params.moduleId, params.collection, params.recordId, params.bindingId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media metadata update failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string; bindingId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.unbind(auth.accountId, params.moduleId, params.collection, params.recordId, params.bindingId, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media unbind failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/revisions', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    const query = (request.query as {limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.listRevisions(auth.accountId, params.moduleId, params.collection, params.recordId, {
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record revision lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/revisions/current', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.currentRevision(auth.accountId, params.moduleId, params.collection, params.recordId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record current revision lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.getRevision(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        Number(params.revision),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record revision lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/references', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    const query = (request.query as {fieldPath?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.forwardReferences(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        stringOrUndefined(query.fieldPath),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record reference lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/reverse-references', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    const query = (request.query as {sourceModuleId?: string; sourceRecordType?: string; fieldPath?: string; limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await records.reverseReferences(auth.accountId, params.moduleId, params.collection, params.recordId, {
+        sourceModuleId: stringOrUndefined(query.sourceModuleId),
+        sourceRecordType: stringOrUndefined(query.sourceRecordType),
+        fieldPath: stringOrUndefined(query.fieldPath),
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record reverse reference lookup failed')
+    }
+  })
+
   app.patch('/v1/modules/:moduleId/records/:collection/:recordId', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await records.patch(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+      return reply.send(successEnvelope(await records.patch(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record update failed')
     }
@@ -823,7 +1079,14 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await records.delete(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+      return reply.send(successEnvelope(await records.delete(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record delete failed')
     }
@@ -834,7 +1097,14 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await records.restore(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+      return reply.send(successEnvelope(await records.restore(
+        auth.accountId,
+        params.moduleId,
+        params.collection,
+        params.recordId,
+        (request.body as any) ?? {},
+        {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
+      ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record restore failed')
     }
@@ -869,6 +1139,128 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module action failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/functions/:functionId/:version/invoke', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; functionId: string; version: string}
+    const body = (request.body as {input?: unknown; mutationId?: string} | null) ?? {}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.invoke(
+        auth.accountId,
+        params.moduleId,
+        params.functionId,
+        params.version,
+        body.input ?? {},
+        {mutationId: stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body), requestId: request.id},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Governed module function invocation failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/host-function-executors', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string}
+    try {
+      return reply.code(201).send(successEnvelope(await governedFunctions.registerHostExecutor(
+        auth.accountId, params.moduleId, (request.body as any) ?? {},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function executor registration failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/host-function-executors/:executorId/requests', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; executorId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.pendingHostRequests(auth.accountId, params.moduleId, params.executorId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function request lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/host-function-requests/:requestId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; requestId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.getHostRequest(auth.accountId, params.moduleId, params.requestId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function request lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/host-function-requests/:requestId/complete', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; requestId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.completeHostRequest(
+        auth.accountId, params.moduleId, params.requestId, (request.body as any)?.output,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function completion failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/host-function-requests/:requestId/cancel', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; requestId: string}
+    try {
+      return reply.send(successEnvelope(await governedFunctions.cancelHostRequest(auth.accountId, params.moduleId, params.requestId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Host function cancellation failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/runtime-credentials', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string}
+    const body = (request.body as {ttlSeconds?: number} | null) ?? {}
+    try {
+      return reply.code(201).send(successEnvelope(await interModuleActions.issueRuntimeCredential(
+        auth.accountId, params.moduleId, body.ttlSeconds,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module runtime credential issue failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/runtime-credentials/:credentialId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; credentialId: string}
+    try {
+      return reply.send(successEnvelope(await interModuleActions.revokeRuntimeCredential(
+        auth.accountId, params.moduleId, params.credentialId,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module runtime credential revoke failed')
+    }
+  })
+
+  app.post('/v1/module-runtime/actions/:targetModuleId/:actionId/:version', routeConfig.writeConfig, async (request, reply) => {
+    const params = request.params as {targetModuleId: string; actionId: string; version: string}
+    const body = (request.body as {input?: unknown; mutationId?: string} | null) ?? {}
+    try {
+      const credential = signatureHeader(request, 'x-modula-runtime-credential')
+      if (!credential) throw moduleError('UNAUTHENTICATED', 'Module runtime credential is required')
+      return reply.send(successEnvelope(await interModuleActions.request(
+        credential,
+        {targetModuleId: params.targetModuleId, actionId: params.actionId, version: params.version},
+        body.input ?? {},
+        {mutationId: stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body), requestId: request.id},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Inter-module action failed')
     }
   })
 
@@ -1210,7 +1602,7 @@ function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fall
   if (typeof code === 'string' && code.startsWith('AI_')) {
     return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))
   }
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'MODULE_PERMISSION_DENIED', 'INSTALLATION_DISABLED', 'UNTRUSTED_RELEASE', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'MODULE_PERMISSION_DENIED', 'INSTALLATION_DISABLED', 'UNTRUSTED_RELEASE', 'CONFLICT', 'REVISION_CONFLICT', 'MUTATION_REUSE_CONFLICT', 'NOTE_REVISION_CONFLICT', 'INVALID_CURSOR', 'FUNCTION_NOT_AVAILABLE', 'CAPABILITY_UNAVAILABLE', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)

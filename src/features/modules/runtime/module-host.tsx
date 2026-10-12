@@ -8,6 +8,7 @@ import {ModuleLoadingState} from '@/features/modules/runtime/module-loading-stat
 import {ModulePermissionGate} from '@/features/modules/runtime/module-permission-gate'
 import {resolveModuleRouteView} from '@/features/modules/runtime/module-route-resolver'
 import {adaptMpsFrontendView, resolveMpsFrontendRoute} from '@/features/modules/runtime/mps-frontend-adapter'
+import {GREENFIELD_HOST_CAPABILITIES} from '@/features/modules/runtime/host-capabilities'
 import {isInstalledModuleState} from '@/features/modules/identity/installPresentation'
 import {useModuleDetailQuery, useModuleFrontendQuery, useModuleHostCompositionQuery, useModuleViewsQuery} from '@/features/modules/hooks'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
@@ -87,7 +88,7 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
     ? resolveMpsFrontendRoute(frontend.data.frontend, path)
     : null
   const view = frontend.data.source === 'mps'
-    ? resolvedMps ? adaptMpsFrontendView({frontend: frontend.data.frontend, resolved: resolvedMps}) : null
+    ? resolvedMps ? adaptMpsFrontendView({frontend: frontend.data.frontend, resolved: resolvedMps, hostCapabilities: GREENFIELD_HOST_CAPABILITIES}) : null
     : resolveModuleRouteView(views.data ?? [], path)
   if (!view) {
     return (
@@ -116,7 +117,10 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
           onOpenSettings={openSettings}
         />
       }>
-      <ModulePermissionGate available={view.available !== false} reason="Permission required">
+      <ModulePermissionGate
+        available={view.available !== false}
+        reason={view.capabilityNegotiation?.error?.code === 'CAPABILITY_UNAVAILABLE' ? 'Capability unavailable' : 'Permission required'}
+        body={view.capabilityNegotiation?.error?.message}>
         <ModuleViewRenderer
           moduleId={moduleId}
           view={view}

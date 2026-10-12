@@ -184,7 +184,7 @@ describeIfDb.sequential('generic historical permission reconciliation', () => {
     expect(list.json().data.items).toEqual(expect.arrayContaining([expect.objectContaining({record_id: `permission-note-${suffix}`})]))
     const created = await app.inject({
       method: 'POST', url: `/v1/modules/${moduleId}/records/note`, headers: auth(),
-      payload: {data: {
+      payload: {mutationId: `permission-create-${suffix}`, data: {
         id: `permission-new-${suffix}`,
         title: 'New note',
         body: {schemaVersion: '1.0.0', blocks: [{id: `block-${suffix}`, type: 'paragraph', text: 'Created', marks: []}]},
@@ -193,7 +193,7 @@ describeIfDb.sequential('generic historical permission reconciliation', () => {
     expect(created.statusCode, created.body).toBe(201)
     const removed = await app.inject({
       method: 'DELETE', url: `/v1/modules/${moduleId}/records/note/${created.json().data.record_id}`,
-      headers: auth(), payload: {expectedRevision: 1},
+      headers: auth(), payload: {expectedRevision: 1, mutationId: `permission-delete-${suffix}`},
     })
     expect(removed.statusCode, removed.body).toBe(200)
   })

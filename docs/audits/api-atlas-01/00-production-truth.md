@@ -50,13 +50,13 @@ flowchart TD
 - Registry release assets: separate immutable-cache location.
 - `/v1/stories`: 25 MiB and 300s timeouts.
 - attachment byte upload: 101 MiB, proxy buffering disabled, 300s timeouts.
-- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 406/409 application routes carry Fastify rate-limit configuration.
+- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 0/437 application routes carry Fastify rate-limit configuration.
 - Every registered route is transport-reachable through the catch-all; feature flags and handler authorization still determine application availability. `/v1/internal/ssrf-check` is handler-hidden in production.
 
 ## Versions and migration truth
 
 - Applied migrations: 67; latest `067_legacy_duplicate_installation_versions` at 2026-10-10T09:09:10.219911+00:00.
-- Git up migrations: 67; latest `067_legacy_duplicate_installation_versions.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
+- Git up migrations: 71; latest `071_module_record_search_projection.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
 - Production runtime routes: 575; excluded automatic production framework routes: 166. Candidate route counts, when present, are reported only in the HTTP atlas and do not alter deployment truth.
 
 ## Safe configuration

@@ -1,10 +1,18 @@
 import {createHash} from 'node:crypto'
+import {
+  PRODUCT_UI_PRIMITIVES,
+  formatHostCapabilityReference,
+  parseHostCapabilityReference,
+  validateProductUiNode,
+  type HostCapabilityRequirement,
+} from '@modula/greenfield-module-ui-contracts'
 import {ingestError, type IngestDiagnostic} from './diagnostics.js'
 
 const COMPONENTS = new Set([
   'section', 'text', 'label', 'metadata', 'badge', 'image', 'icon', 'divider', 'stack', 'row', 'grid', 'scroll',
   'recordList', 'recordRow', 'field', 'button', 'menu', 'search', 'filter', 'sort', 'tabs', 'picker', 'toolbar',
   'emptyState', 'errorState', 'loadingState', 'media', 'progress',
+  ...PRODUCT_UI_PRIMITIVES,
 ])
 const ACTIONS = new Set([
   'route.open', 'record.create', 'record.read', 'record.update', 'record.delete', 'record.restore', 'record.purge', 'record.query', 'function.invoke',
@@ -16,7 +24,6 @@ const FORBIDDEN_FIELDS = new Set([
   'script', 'rawjs', 'rawhtml', 'html', 'jsx', 'tsx', 'css', 'style', 'remotebundle', 'remoteentry',
   'customcomponentname', 'webview', 'unsafewebview', 'networkurl', 'eval',
 ])
-const CAPABILITY_PATTERN = /^(ui|audio|camera|media|file|share|map|game)\.[a-z][A-Za-z0-9.-]*@[1-9][0-9]*$/
 const ROUTE_PATTERN = /^\/$|^\/(?:[a-z0-9-]+|:[a-z][a-zA-Z0-9]*)(?:\/(?:[a-z0-9-]+|:[a-z][a-zA-Z0-9]*))*\/?$/
 const SHA256_PATTERN = /^[a-f0-9]{64}$/
 const SAFE_PATH_PATTERN = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))(?!.*\\)[A-Za-z0-9._/-]+$/
@@ -45,7 +52,10 @@ export type MpsFrontendArtifact = {
   contributions?: Array<Record<string, unknown> & {id: string; target: string}>
   resources?: Array<{id: string; path: string; mediaType: string; sha256: string; alt?: unknown}>
   settings?: {viewId: string}
-  capabilities?: {required?: string[]; optional?: string[]}
+  capabilities?: {
+    required?: (string | HostCapabilityRequirement)[]
+    optional?: (string | HostCapabilityRequirement)[]
+  }
   platformRequirements?: Record<string, unknown>
   accessibility: Record<string, unknown>
 }
@@ -118,6 +128,7 @@ export function validateMpsFrontendArtifact(input: {
     if (typeof route.path === 'string') routePaths.add(route.path)
     if (route.viewId && !viewIds.has(route.viewId)) diagnostics.push(error('MPS-FRONTEND-104', `routes/${index}/viewId`, 'Frontend route references an unknown view.'))
   }
+  const declaredCapabilities = validateCapabilities(artifact.capabilities, diagnostics)
   for (const [index, view] of views.entries()) {
     if (!VIEW_KINDS.has(String(view.kind))) diagnostics.push(error('MPS-FRONTEND-105', `views/${index}/kind`, 'Frontend view kind is unsupported.'))
     const bindings = Array.isArray(view.bindings) ? view.bindings.filter(isRecord) : []
@@ -125,8 +136,8 @@ export function validateMpsFrontendArtifact(input: {
       if (!DATA_SOURCES.has(String(binding.source))) diagnostics.push(error('MPS-FRONTEND-106', `views/${index}/bindings/${bindingIndex}`, 'Frontend data binding source is unsupported.'))
       inspectRecordQuery(binding.query, `views/${index}/bindings/${bindingIndex}/query`, diagnostics)
     }
-    inspectComponent(view.root, `views/${index}/root`, actionIds, resourceIds, diagnostics, {nodes: 0}, 1)
-    if (isRecord(view.states)) for (const [state, component] of Object.entries(view.states)) inspectComponent(component, `views/${index}/states/${state}`, actionIds, resourceIds, diagnostics, {nodes: 0}, 1)
+    inspectComponent(view.root, `views/${index}/root`, actionIds, resourceIds, declaredCapabilities, diagnostics, {nodes: 0}, 1)
+    if (isRecord(view.states)) for (const [state, component] of Object.entries(view.states)) inspectComponent(component, `views/${index}/states/${state}`, actionIds, resourceIds, declaredCapabilities, diagnostics, {nodes: 0}, 1)
   }
   for (const [index, action] of actions.entries()) {
     if (!ACTIONS.has(String(action.family))) diagnostics.push(error('MPS-FRONTEND-107', `actions/${index}/family`, 'Frontend action family is unsupported.'))
@@ -137,8 +148,6 @@ export function validateMpsFrontendArtifact(input: {
     if (action.family === 'record.purge' && action.confirm !== true) diagnostics.push(error('MPS-FRONTEND-136', `actions/${index}/confirm`, 'record.purge requires explicit destructive confirmation.'))
     inspectActionInput(action.input, fieldIds, `actions/${index}/input`, diagnostics)
   }
-  const capabilities = [...(artifact.capabilities?.required ?? []), ...(artifact.capabilities?.optional ?? [])]
-  for (const capability of capabilities) if (!CAPABILITY_PATTERN.test(capability)) diagnostics.push(error('MPS-FRONTEND-110', 'capabilities', `Invalid frontend capability ${capability}.`))
   for (const [index, resource] of resources.entries()) {
     if (!SAFE_PATH_PATTERN.test(resource.path) || !SHA256_PATTERN.test(resource.sha256)) diagnostics.push(error('MPS-FRONTEND-111', `resources/${index}`, 'Frontend resource path or hash is invalid.'))
   }
@@ -227,7 +236,7 @@ function inspectForbiddenFields(value: unknown, path: string, diagnostics: Inges
   }
 }
 
-function inspectComponent(value: unknown, path: string, actions: Set<string>, resources: Set<string>, diagnostics: IngestDiagnostic[], counter: {nodes: number}, depth: number): void {
+function inspectComponent(value: unknown, path: string, actions: Set<string>, resources: Set<string>, capabilities: Set<string>, diagnostics: IngestDiagnostic[], counter: {nodes: number}, depth: number): void {
   counter.nodes += 1
   if (depth > 24 || counter.nodes > 2_048) {
     diagnostics.push(error('MPS-FRONTEND-114', path, 'Frontend component tree exceeds safety limits.'))
@@ -237,10 +246,50 @@ function inspectComponent(value: unknown, path: string, actions: Set<string>, re
     diagnostics.push(error('MPS-FRONTEND-115', path, 'Frontend component is unknown.'))
     return
   }
+  if ((PRODUCT_UI_PRIMITIVES as readonly string[]).includes(String(value.type))) {
+    const validation = validateProductUiNode(value)
+    for (const issue of validation.issues) diagnostics.push(error('MPS-FRONTEND-SEMANTIC-001', `${path}${issue.path.slice(1)}`, `${issue.code}: ${issue.message}`))
+    const requirement = parseHostCapabilityReference(value.capability as HostCapabilityRequirement)
+    if (requirement && !capabilities.has(formatHostCapabilityReference(requirement))) {
+      diagnostics.push(error('MPS-FRONTEND-SEMANTIC-002', `${path}/capability`, 'Semantic component capability must be declared by the frontend artifact.'))
+    }
+  }
   if (typeof value.action === 'string' && !actions.has(value.action)) diagnostics.push(error('MPS-FRONTEND-116', `${path}/action`, 'Frontend component references an unknown action.'))
+  for (const key of ['actionId', 'submitActionId', 'restoreActionId', 'rowActionId', 'moveActionId']) {
+    if (typeof value[key] === 'string' && !actions.has(value[key])) diagnostics.push(error('MPS-FRONTEND-116', `${path}/${key}`, 'Frontend component references an unknown action.'))
+  }
+  if (Array.isArray(value.actionIds)) for (const [index, action] of value.actionIds.entries()) {
+    if (typeof action === 'string' && !actions.has(action)) diagnostics.push(error('MPS-FRONTEND-116', `${path}/actionIds/${index}`, 'Frontend component references an unknown action.'))
+  }
   if (typeof value.resource === 'string' && !resources.has(value.resource)) diagnostics.push(error('MPS-FRONTEND-117', `${path}/resource`, 'Frontend component references an unknown resource.'))
   if (typeof value.icon === 'string' && /^(?:https?:|data:|javascript:)/i.test(value.icon)) diagnostics.push(error('MPS-FRONTEND-SECURITY-002', `${path}/icon`, 'Remote and executable icon URLs are forbidden.'))
-  if (Array.isArray(value.children)) value.children.forEach((child, index) => inspectComponent(child, `${path}/children/${index}`, actions, resources, diagnostics, counter, depth + 1))
+  if (Array.isArray(value.children)) value.children.forEach((child, index) => inspectComponent(child, `${path}/children/${index}`, actions, resources, capabilities, diagnostics, counter, depth + 1))
+  if (value.fallback !== undefined) inspectComponent(value.fallback, `${path}/fallback`, actions, resources, capabilities, diagnostics, counter, depth + 1)
+}
+
+function validateCapabilities(
+  input: MpsFrontendArtifact['capabilities'],
+  diagnostics: IngestDiagnostic[],
+): Set<string> {
+  const declared = new Set<string>()
+  for (const [kind, values] of [['required', input?.required ?? []], ['optional', input?.optional ?? []]] as const) {
+    if (!Array.isArray(values) || values.length > 80) {
+      diagnostics.push(error('MPS-FRONTEND-110', `capabilities/${kind}`, 'Frontend capabilities must be a bounded array.'))
+      continue
+    }
+    for (const [index, value] of values.entries()) {
+      const requirement = parseHostCapabilityReference(value)
+      if (!requirement) {
+        diagnostics.push(error('MPS-FRONTEND-110', `capabilities/${kind}/${index}`, 'Frontend capability must be a versioned semantic reference.'))
+        continue
+      }
+      if (kind === 'required' && requirement.fallback) diagnostics.push(error('MPS-FRONTEND-110', `capabilities/${kind}/${index}/fallback`, 'Required capabilities cannot declare a fallback.'))
+      const key = formatHostCapabilityReference(requirement)
+      if (declared.has(key)) diagnostics.push(error('MPS-FRONTEND-110', `capabilities/${kind}/${index}`, `Duplicate frontend capability ${key}.`))
+      declared.add(key)
+    }
+  }
+  return declared
 }
 
 function error(code: string, path: string, message: string): IngestDiagnostic {

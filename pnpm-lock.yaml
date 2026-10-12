@@ -336,6 +336,9 @@ importers:
       '@modula/greenfield-module-manifest':
         specifier: workspace:*
         version: link:../greenfield-module-manifest
+      '@modula/greenfield-module-ui-contracts':
+        specifier: workspace:*
+        version: link:../greenfield-module-ui-contracts
       '@modula/module-sdk':
         specifier: file:../../../modula-mod/modula-module-standard/packages/module-sdk
         version: file:../modula-mod/modula-module-standard/packages/module-sdk
@@ -357,6 +360,10 @@ importers:
         version: 3.2.7(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
 
   packages/greenfield-product-standard:
+    dependencies:
+      '@modula/greenfield-module-ui-contracts':
+        specifier: workspace:*
+        version: link:../greenfield-module-ui-contracts
     devDependencies:
       '@types/node':
         specifier: ^24.0.10

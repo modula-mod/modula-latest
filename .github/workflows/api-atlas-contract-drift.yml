@@ -8,7 +8,11 @@ on:
       - 'apps/**'
       - 'packages/**'
       - 'tools/api-atlas/**'
+      - 'scripts/**'
       - 'docs/audits/api-atlas-01/**'
+      - 'docs/architecture/**'
+      - 'docs/validation/**'
+      - '.github/workflows/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
   push:
@@ -88,10 +92,24 @@ jobs:
         run: CI=true pnpm api:test
       - name: Worker tests
         run: CI=true pnpm worker:test
+      - name: Module SDK contract tests
+        run: CI=true pnpm --filter @modula/greenfield-module-sdk test
+      - name: Product UI contract tests
+        run: CI=true pnpm --filter @modula/greenfield-module-ui-contracts test
+      - name: Intelligence governance tests
+        run: CI=true pnpm --filter @modula/intelligence-governance test
       - name: API typecheck
         run: CI=true pnpm --filter @modula/greenfield-api typecheck
       - name: Worker typecheck
         run: CI=true pnpm --filter @modula/greenfield-worker typecheck
+      - name: Root typecheck
+        run: CI=true pnpm typecheck
+      - name: Root lint
+        run: CI=true pnpm lint
+      - name: Production web build
+        run: CI=true pnpm build:web
+      - name: Vault runtime special-case gate
+        run: CI=true pnpm verify:mp02b-vault-special-cases
       - name: Trust bootstrap CLI typecheck
         run: >-
           pnpm --filter @modula/greenfield-api exec tsc --noEmit --module NodeNext
@@ -160,7 +178,7 @@ jobs:
           MODULA_READONLY_PASSWORD: modula_ci_readonly
           MODULA_BACKUP_PASSWORD: modula_ci_backup
         run: bash ops/docker/postgres/init-roles.sh
-      - name: Migrations 066-067 and API-FIX-01 database regressions
+      - name: Full migration chain and API-FIX-01 database regressions
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
@@ -188,4 +206,25 @@ jobs:
           tests/phase7e.notifications.test.ts
           tests/module-trust-guard.test.ts
           tests/legacy-installation-data-migration.test.ts
+          tests/phase7e.vault-notes-search-projector.test.ts
+          --maxWorkers=1 --no-file-parallelism
+      - name: Pre-write MP02 migration down and reapply proof
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec tsx
+          scripts/verify-migration-cycle.ts 068_module_platform_records
+      - name: MP02 and MP02B database acceptance
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/module-platform-02.records.test.ts
+          tests/permission-reconciliation.test.ts
+          tests/module-platform-02b.media-sharing.test.ts
+          tests/module-platform-02b.functions-actions.test.ts
+          tests/module-platform-02b.search-contract.test.ts
+          tests/module-platform-02b.canonical-mutations.test.ts
           --maxWorkers=1 --no-file-parallelism

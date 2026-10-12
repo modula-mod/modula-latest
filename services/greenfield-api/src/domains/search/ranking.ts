@@ -4,6 +4,7 @@ export function entityRankingWeight(entityType: GreenfieldSearchEntityType): num
   if (entityType === 'profile') return 9
   if (entityType === 'module') return 7
   if (entityType === 'module-release') return 5
+  if (entityType === 'module-record') return 3
   return 3
 }
 

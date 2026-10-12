@@ -8,6 +8,7 @@ import {ProfileRepository} from '../domains/profiles/repository.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {applyBrowserVisibleMediaHeaders} from './media-response.js'
+import {collectionPermission, GreenfieldModuleRuntimeAccessService, mediaPermission} from '../modules/runtime-access.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -30,6 +31,7 @@ export async function registerAttachmentRoutes(
   const attachments = new AttachmentService(db, config)
   const posts = new PostRepository(db, config.publicApiUrl)
   const profiles = new ProfileRepository(db)
+  const moduleAccess = new GreenfieldModuleRuntimeAccessService(db, config)
   const {writeConfig, feedConfig, mutationsAllowed} = options
 
   app.post('/v1/attachments/uploads', writeConfig, async (request, reply) => {
@@ -116,6 +118,31 @@ export async function registerAttachmentRoutes(
         .limit(5).execute()
       for (const binding of commentBindings) {
         if (await posts.getById(binding.post_id, request.auth?.actorId ?? null)) { allowed = true; break }
+      }
+    }
+    if (!allowed && request.auth?.accountId) {
+      const moduleBindings = await db.selectFrom('greenfield_module_record_media_bindings as binding')
+        .innerJoin('greenfield_module_records as record', join => join
+          .onRef('record.account_id', '=', 'binding.record_owner_account_id').onRef('record.module_id', '=', 'binding.module_id')
+          .onRef('record.collection', '=', 'binding.record_type').onRef('record.record_id', '=', 'binding.record_id'))
+        .select(['binding.record_owner_account_id', 'binding.module_id', 'binding.record_type', 'binding.record_id'])
+        .where('binding.asset_id', '=', attachmentId).where('record.deleted_at', 'is', null).limit(20).execute()
+      for (const binding of moduleBindings) {
+        const owns = binding.record_owner_account_id === request.auth.accountId
+        const share = owns ? true : Boolean(await db.selectFrom('greenfield_module_record_shares').select('share_id')
+          .where('owner_account_id', '=', binding.record_owner_account_id).where('recipient_account_id', '=', request.auth.accountId)
+          .where('module_id', '=', binding.module_id).where('record_type', '=', binding.record_type).where('record_id', '=', binding.record_id)
+          .where('revoked_at', 'is', null).where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', new Date())])).executeTakeFirst())
+        if (!share) continue
+        try {
+          const runtime = await moduleAccess.resolve(request.auth.accountId, binding.module_id, {requireEnabled: true})
+          moduleAccess.enforceCapability(runtime, collectionPermission(binding.module_id, binding.record_type, 'read'))
+          moduleAccess.enforceCapability(runtime, mediaPermission(binding.module_id, binding.record_type, 'read'))
+          allowed = true
+          break
+        } catch {
+          // Asset identifiers do not bypass module trust, permission review or record access.
+        }
       }
     }
     if (!allowed) return sendError(reply, 'FORBIDDEN', 'Attachment unavailable', request.id)

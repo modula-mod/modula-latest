@@ -61,7 +61,7 @@ export class GreenfieldModuleActionService {
       if (previous) return {idempotent: true, status: previous.status, result: previous.result}
     }
 
-    const result = await this.dispatch(accountId, moduleId, action, payload)
+    const result = await this.dispatch(accountId, moduleId, action, payload, input.idempotencyKey ?? uuidv7())
     await this.recordEvent(accountId, moduleId, action, input.idempotencyKey ?? null, 'completed', payload, result, null)
     return {idempotent: false, status: 'completed', result}
   }
@@ -92,22 +92,27 @@ export class GreenfieldModuleActionService {
     return result.value
   }
 
-  private async dispatch(accountId: string, moduleId: string, action: GreenfieldModuleAction, input: Record<string, unknown>) {
-    if (action.kind === 'record.create') return this.records.create(accountId, moduleId, requiredTargetCollection(action), {data: input})
+  private async dispatch(accountId: string, moduleId: string, action: GreenfieldModuleAction, input: Record<string, unknown>, mutationId: string) {
+    if (action.kind === 'record.create') return this.records.create(accountId, moduleId, requiredTargetCollection(action), {data: input, mutationId})
     if (action.kind === 'record.update') {
       const recordId = readRecordId(action, input)
       return this.records.patch(accountId, moduleId, requiredTargetCollection(action), recordId, {
         data: recordPatchInput(action, input),
         expectedRevision: numberOrUndefined(input.expectedRevision),
+        mutationId,
       })
     }
     if (action.kind === 'record.delete') {
       const recordId = readRecordId(action, input)
-      return this.records.delete(accountId, moduleId, requiredTargetCollection(action), recordId, {expectedRevision: numberOrUndefined(input.expectedRevision)})
+      return this.records.delete(accountId, moduleId, requiredTargetCollection(action), recordId, {expectedRevision: numberOrUndefined(input.expectedRevision), mutationId})
     }
     if (action.kind === 'record.restore') {
       const recordId = readRecordId(action, input)
-      return this.records.restore(accountId, moduleId, requiredTargetCollection(action), recordId, {expectedRevision: numberOrUndefined(input.expectedRevision)})
+      return this.records.restore(accountId, moduleId, requiredTargetCollection(action), recordId, {
+        expectedRevision: numberOrUndefined(input.expectedRevision),
+        sourceRevision: numberOrUndefined(input.sourceRevision),
+        mutationId,
+      })
     }
     if (action.kind === 'record.purge') {
       const recordId = readRecordId(action, input)

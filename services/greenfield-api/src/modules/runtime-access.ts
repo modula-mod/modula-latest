@@ -114,6 +114,14 @@ export function collectionPermission(moduleId: string, collection: string, opera
   return `records:module.${moduleId}.${collection}:${operation}`
 }
 
+export function mediaPermission(moduleId: string, collection: string, operation: 'read' | 'write'): string {
+  return `media:module.${moduleId}.${collection}:${operation}`
+}
+
+export function sharingPermission(moduleId: string, collection: string, operation: 'read' | 'write'): string {
+  return `sharing:module.${moduleId}.${collection}:${operation}`
+}
+
 export function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 }

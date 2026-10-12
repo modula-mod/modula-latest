@@ -200,6 +200,12 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       'digital.modula.vault-notes.views.settings',
     ]))
 
+    // Historical settings:register consent is not upgraded implicitly. This
+    // fixture records an explicit review of the new data capabilities.
+    await db.updateTable('greenfield_module_permission_reviews').set({
+      granted_permissions: jsonb([...approvedVaultPermissions(), 'settings:read', 'settings:write']),
+    }).where('installation_id', '=', installationId).execute()
+
     const settings = await app.inject({
       method: 'PATCH',
       url: `/v1/modules/${moduleId}/settings`,

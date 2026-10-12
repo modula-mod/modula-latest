@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {validateGreenfieldModuleAction, validateGreenfieldModuleCollection, validateGreenfieldModuleView} from '../src/index.js'
 
-const moduleId = 'digital.modula.vault-notes'
+const moduleId = 'audit.module.alpha'
 
 describe('Greenfield module UI contracts', () => {
   it('accepts declarative module views and actions', () => {
@@ -25,7 +25,7 @@ describe('Greenfield module UI contracts', () => {
           actionId: `${moduleId}.actions.create-note`,
           kind: 'record.create',
           label: 'Create note',
-          inputSchema: {schemaRef: 'schemas/vault-note.v1.schema.json'},
+          inputSchema: {schemaRef: 'schemas/alpha-note.v1.schema.json'},
           capability: `records:module.${moduleId}.note:write`,
           confirmationPolicy: 'none',
           destructive: false,
@@ -56,7 +56,7 @@ describe('Greenfield module UI contracts', () => {
   it('requires secret references for sensitive fields', () => {
     const result = validateGreenfieldModuleCollection({
       collection: 'note',
-      schemaRef: 'schemas/vault-note.v1.schema.json',
+      schemaRef: 'schemas/alpha-note.v1.schema.json',
       defaultVisibility: 'private',
       fields: [{fieldId: 'apiKey', name: 'apiKey', type: 'text', label: 'API key', sensitive: true}],
       searchableFields: ['title'],
@@ -70,7 +70,7 @@ describe('Greenfield module UI contracts', () => {
   it('accepts persisted JSON schema definitions for server-side record validation', () => {
     const result = validateGreenfieldModuleCollection({
       collection: 'note',
-      schemaRef: 'schemas/vault-note.v1.schema.json',
+      schemaRef: 'schemas/alpha-note.v1.schema.json',
       defaultVisibility: 'private',
       fields: [{fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true}],
       searchableFields: ['title'],
@@ -89,7 +89,7 @@ describe('Greenfield module UI contracts', () => {
   })
 
   it('validates neutral query filters, rich-text transforms, and confirmed purge', () => {
-    const taskModuleId = 'example.modula.reference-tasks'
+    const taskModuleId = 'audit.module.beta'
     const action = {
       actionId: `${taskModuleId}.actions.purge-task`,
       kind: 'record.purge' as const,

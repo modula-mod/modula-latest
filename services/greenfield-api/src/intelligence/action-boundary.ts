@@ -6,8 +6,6 @@ import {GreenfieldModuleRecordService, type ModuleRecordQuery} from '../modules/
 import {collectionPermission, GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js'
 import {GreenfieldModuleViewService} from '../modules/view-service.js'
 
-const VAULT_NOTES = 'digital.modula.vault-notes'
-
 export type ResolvedProposalBoundary = {
   registered: boolean
   schemaValid: boolean
@@ -28,19 +26,32 @@ export class IntelligenceActionBoundary {
   }
 
   async availableActions(accountId: string): Promise<GaiaAvailableAction[]> {
-    try {
-      const context = await this.access.resolve(accountId, VAULT_NOTES, {requireEnabled: true})
-      const collection = (await this.views.collectionsForRelease(context)).find(item => item.collection === 'note')
-      if (!collection) return []
-      const result: GaiaAvailableAction[] = []
-      const read = collectionPermission(context.moduleId, collection.collection, 'read')
-      const write = collectionPermission(context.moduleId, collection.collection, 'write')
-      if (context.grantedPermissions.includes(read)) result.push({family: 'record.query', capability: read, moduleId: context.moduleId, collection: collection.collection})
-      if (context.grantedPermissions.includes(write)) result.push({family: 'record.create', capability: write, moduleId: context.moduleId, collection: collection.collection})
-      return result
-    } catch {
-      return []
+    const modules = await this.db
+      .selectFrom('greenfield_extension_installations as installation')
+      .innerJoin('greenfield_module_releases as release', 'release.extension_version_id', 'installation.extension_version_id')
+      .select('release.module_id')
+      .distinct()
+      .where('installation.account_id', '=', accountId)
+      .where('installation.status', '=', 'enabled')
+      .where('release.release_state', '=', 'published')
+      .execute()
+    const result: GaiaAvailableAction[] = []
+    for (const module of modules) {
+      try {
+        const context = await this.access.resolve(accountId, module.module_id, {requireEnabled: true})
+        const collections = await this.views.collectionsForRelease(context)
+        for (const collection of collections) {
+          const read = collectionPermission(context.moduleId, collection.collection, 'read')
+          const write = collectionPermission(context.moduleId, collection.collection, 'write')
+          if (context.grantedPermissions.includes(read)) result.push({family: 'record.query', capability: read, moduleId: context.moduleId, collection: collection.collection})
+          if (context.grantedPermissions.includes(write)) result.push({family: 'record.create', capability: write, moduleId: context.moduleId, collection: collection.collection})
+        }
+      } catch {
+        // A disabled, untrusted, or unreviewed installation contributes no
+        // actions; one invalid module must not hide unrelated valid modules.
+      }
     }
+    return result.sort((left, right) => `${left.moduleId}:${left.collection}:${left.family}`.localeCompare(`${right.moduleId}:${right.collection}:${right.family}`))
   }
 
   async revalidate(accountId: string, workspaceId: string | undefined, proposal: ModulaActionProposal): Promise<ResolvedProposalBoundary> {
@@ -78,6 +89,7 @@ export class IntelligenceActionBoundary {
         data: input.data,
         visibility: typeof input.visibility === 'string' ? input.visibility : undefined,
         recordId: typeof input.recordId === 'string' ? input.recordId : undefined,
+        mutationId: proposal.idempotencyKey ?? proposal.id,
       })
     }
     throw new Error(`Unsupported governed runtime action ${proposal.family}`)

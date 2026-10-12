@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-10T09:18:50.786Z",
+  "capturedAt": "2026-10-12T13:29:28.579Z",
   "source": {
-    "branch": "phase-api-fix-01c-production-acceptance",
-    "headAtCapture": "66a372608b6dded726df6c3e328e7936f9b493e4",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "956789be8b821a974a3a33481fedbdd690b1aa9d2803232bfa027f10062d2b4d"
+    "branch": "phase-module-platform-02",
+    "headAtCapture": "6232a965907ba99cf62682c007482cc2059ae419",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "31515241d2108a2acc88ed342cfd802f01593b41be56fef7966365185f98c08b"
   },
   "runtimeRoutes": [
     {
@@ -1210,6 +1210,123 @@
     },
     {
       "method": "GET",
+      "url": "/v1/modules/:moduleId/records/shares/received",
+      "path": "/v1/modules/:moduleId/records/shares/received",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/shares/received",
+      "path": "/v1/modules/:moduleId/records/shares/received",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/shares/owned",
+      "path": "/v1/modules/:moduleId/records/shares/owned",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/shares/owned",
+      "path": "/v1/modules/:moduleId/records/shares/owned",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/record",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/record",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/sync",
+      "path": "/v1/modules/:moduleId/records/sync",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/sync",
+      "path": "/v1/modules/:moduleId/records/sync",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/modules/:moduleId/records/:collection",
       "path": "/v1/modules/:moduleId/records/:collection",
       "prefix": "",
@@ -1248,6 +1365,159 @@
       "method": "HEAD",
       "url": "/v1/modules/:moduleId/records/:collection/:recordId",
       "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/shares",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/shares",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/order",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/order",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -1293,6 +1563,105 @@
       "method": "POST",
       "url": "/v1/modules/:moduleId/actions/:actionId",
       "path": "/v1/modules/:moduleId/actions/:actionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/functions/:functionId/:version/invoke",
+      "path": "/v1/modules/:moduleId/functions/:functionId/:version/invoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-executors",
+      "path": "/v1/modules/:moduleId/host-function-executors",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "path": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "path": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId/complete",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId/complete",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId/cancel",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/runtime-credentials",
+      "path": "/v1/modules/:moduleId/runtime-credentials",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/runtime-credentials/:credentialId",
+      "path": "/v1/modules/:moduleId/runtime-credentials/:credentialId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/module-runtime/actions/:targetModuleId/:actionId/:version",
+      "path": "/v1/module-runtime/actions/:targetModuleId/:actionId/:version",
       "prefix": "",
       "schema": null,
       "config": null,

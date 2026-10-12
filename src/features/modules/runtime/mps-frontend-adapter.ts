@@ -1,8 +1,13 @@
-import type {
-  GreenfieldModuleAction,
-  GreenfieldModuleActionKind,
-  GreenfieldModuleFieldDefinition,
-  GreenfieldModuleLayoutNode,
+import {
+  formatHostCapabilityReference,
+  negotiateHostCapabilities,
+  parseHostCapabilityReference,
+  PRODUCT_UI_PRIMITIVES,
+  type HostCapabilityDescriptor,
+  type GreenfieldModuleAction,
+  type GreenfieldModuleActionKind,
+  type GreenfieldModuleFieldDefinition,
+  type GreenfieldModuleLayoutNode,
 } from '@modula/greenfield-module-ui-contracts'
 
 import type {
@@ -13,6 +18,7 @@ import type {
   MpsFrontendView,
   ModuleRuntimeView,
 } from '@/data/repositories/contracts'
+import {GREENFIELD_HOST_CAPABILITIES} from '@/features/modules/runtime/host-capabilities'
 
 const ACTION_FAMILIES = new Set<GreenfieldModuleActionKind>([
   'route.open',
@@ -61,8 +67,9 @@ export function resolveMpsFrontendRoute(
 export function adaptMpsFrontendView(input: {
   frontend: MpsFrontendArtifact
   resolved: ResolvedMpsFrontendRoute
+  hostCapabilities?: readonly HostCapabilityDescriptor[]
 }): ModuleRuntimeView {
-  const {frontend, resolved} = input
+  const {frontend, resolved, hostCapabilities = GREENFIELD_HOST_CAPABILITIES} = input
   const view = resolved.view
   const collection = collectionFor(view)
   const recordBinding = recordBindingFor(view, resolved.params)
@@ -82,6 +89,15 @@ export function adaptMpsFrontendView(input: {
   const title = view.kind === 'form' && !recordBinding && collection
     ? `New ${titleize(collection)}`
     : declaredTitle
+  const capabilityNegotiation = negotiateHostCapabilities({
+    host: hostCapabilities,
+    required: frontend.capabilities?.required,
+    optional: frontend.capabilities?.optional,
+  })
+  const requiredCapabilities = (frontend.capabilities?.required ?? [])
+    .map(parseHostCapabilityReference)
+    .filter((requirement): requirement is NonNullable<typeof requirement> => Boolean(requirement))
+    .map(formatHostCapabilityReference)
 
   return {
     viewId: `${frontend.productId}.${view.id}`,
@@ -101,8 +117,9 @@ export function adaptMpsFrontendView(input: {
       body: typeof empty.description === 'string' ? empty.description : undefined,
       actionId: typeof firstActionReference(empty) === 'string' ? firstActionReference(empty) : undefined,
     } : undefined,
-    requiredCapabilities: frontend.capabilities?.required ?? [],
-    available: true,
+    requiredCapabilities,
+    capabilityNegotiation,
+    available: capabilityNegotiation.ok,
   }
 }
 
@@ -291,6 +308,7 @@ function adaptLayout(root: MpsFrontendComponent, viewKind: MpsFrontendView['kind
   const convert = (component: MpsFrontendComponent): GreenfieldModuleLayoutNode | null => {
     sequence += 1
     const id = typeof component.id === 'string' ? component.id : `node-${sequence}`
+    if ((PRODUCT_UI_PRIMITIVES as readonly string[]).includes(component.type)) return null
     const children = component.children?.map(convert).filter((child): child is GreenfieldModuleLayoutNode => Boolean(child))
     if (component.type === 'recordList' || component.type === 'recordRow' || component.type === 'field'
       || component.type === 'search' || component.type === 'filter' || component.type === 'sort') return null

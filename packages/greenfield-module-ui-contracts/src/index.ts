@@ -1,3 +1,6 @@
+export * from './host-capabilities.js'
+export * from './product-ui.js'
+
 export const GREENFIELD_MODULE_VIEW_KINDS = [
   'collection',
   'detail',

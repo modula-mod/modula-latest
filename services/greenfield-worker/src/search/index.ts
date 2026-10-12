@@ -1,14 +1,14 @@
-import {vaultNotesIdentityFamily, type GreenfieldDomainEvent} from '@modula/greenfield-contracts'
+import type {GreenfieldDomainEvent} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {GreenfieldSearchEntityType, ModulaWorkerDb} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
 import {projectModuleRelease} from './module-release-projector.js'
 import {projectModule} from './module-projector.js'
+import {projectModuleRecord} from './module-record-projector.js'
 import {projectPost} from './post-projector.js'
 import {projectProfile} from './profile-projector.js'
 import {entityIdFromEvent, SearchProjector, type SearchProjectionContext} from './projector.js'
 import {isSearchOperationalEvent, SEARCH_PROJECTOR_BY_EVENT} from './subscribers.js'
-import {projectVaultNotesRecord} from './vault-notes-projector.js'
 
 export async function handleSearchIndex(db: ModulaWorkerDb, rawPayload: unknown): Promise<void> {
   const payload = normalizePayload(rawPayload)
@@ -27,7 +27,8 @@ export async function handleSearchIndex(db: ModulaWorkerDb, rawPayload: unknown)
     else if (mapping.entityType === 'profile') await projectProfile(db, projector, context)
     else if (mapping.entityType === 'module') await projectModule(db, projector, context)
     else if (mapping.entityType === 'module-release') await projectModuleRelease(db, projector, context)
-    else await projectVaultNotesRecord(db, projector, context)
+    else if (mapping.entityType === 'module-record') await projectModuleRecord(db, projector, context)
+    else throw new PermanentJobError('VALIDATION_FAILED', `Unsupported search projection entity type ${mapping.entityType}`)
     await projector.recordSuccess(context)
   } catch (error) {
     await projector.recordFailure(context, error)
@@ -135,6 +136,13 @@ function normalizePayload(rawPayload: unknown): {event: GreenfieldDomainEvent<Re
 }
 
 function fallbackMapping(payload: {event: GreenfieldDomainEvent<Record<string, unknown>>}) {
+  const nestedRecord = record(payload.event.payload?.record)
+  if (
+    (typeof payload.event.payload?.moduleId === 'string' && (typeof payload.event.payload?.collection === 'string' || typeof payload.event.payload?.recordType === 'string'))
+    || (typeof nestedRecord.moduleId === 'string' && typeof nestedRecord.recordType === 'string')
+  ) {
+    return {projectorId: 'search.module-record-projector', entityType: 'module-record' as const}
+  }
   if (payload.event.aggregateType === 'profile' || payload.event.eventType.endsWith('.profile')) {
     return {projectorId: 'search.profile-projector', entityType: 'profile' as const}
   }
@@ -147,11 +155,19 @@ function fallbackMapping(payload: {event: GreenfieldDomainEvent<Record<string, u
   return {projectorId: 'search.post-projector', entityType: 'post' as const}
 }
 
-type ReindexCandidate = {entityType: GreenfieldSearchEntityType; entityId: string}
+type ReindexCandidate = {entityType: GreenfieldSearchEntityType; entityId: string; accountId?: string; moduleId?: string; recordType?: string}
 
 async function reindexCandidates(db: ModulaWorkerDb, request: {mode: string; entity_type: GreenfieldSearchEntityType | null; entity_id: string | null; account_id: string | null}): Promise<ReindexCandidate[]> {
   if (request.mode === 'single-entity') {
     if (!request.entity_type || !request.entity_id) throw new PermanentJobError('VALIDATION_FAILED', 'single-entity reindex requires entity type and id')
+    if (request.entity_type === 'module-record') {
+      const document = await db.selectFrom('search_documents').select(['account_id', 'metadata']).where('entity_type', '=', 'module-record').where('entity_id', '=', request.entity_id).executeTakeFirst()
+      const metadata = record(document?.metadata)
+      if (!document?.account_id || typeof metadata.moduleId !== 'string' || typeof metadata.recordType !== 'string' || typeof metadata.recordId !== 'string') {
+        throw new PermanentJobError('VALIDATION_FAILED', 'module-record reindex identity was not found')
+      }
+      return [{entityType: 'module-record', entityId: metadata.recordId, accountId: document.account_id, moduleId: metadata.moduleId, recordType: metadata.recordType}]
+    }
     return [{entityType: request.entity_type, entityId: request.entity_id}]
   }
   if (request.mode === 'entity-type') {
@@ -160,42 +176,33 @@ async function reindexCandidates(db: ModulaWorkerDb, request: {mode: string; ent
   }
   if (request.mode === 'account-scope') {
     if (!request.account_id) throw new PermanentJobError('VALIDATION_FAILED', 'account-scope reindex requires account id')
-    const rows = await sql<{entity_type: GreenfieldSearchEntityType; entity_id: string}>`
-      SELECT 'post'::text AS entity_type, posts.id AS entity_id
+    const rows = await sql<{entity_type: GreenfieldSearchEntityType; entity_id: string; account_id: string | null; module_id: string | null; record_type: string | null}>`
+      SELECT 'post'::text AS entity_type, posts.id AS entity_id, actors.account_id, NULL::text AS module_id, NULL::text AS record_type
       FROM posts
       INNER JOIN actors ON actors.id = posts.author_actor_id
       WHERE actors.account_id = ${request.account_id}
       UNION ALL
-      SELECT 'profile'::text AS entity_type, profiles.id AS entity_id
+      SELECT 'profile'::text AS entity_type, profiles.id AS entity_id, actors.account_id, NULL::text AS module_id, NULL::text AS record_type
       FROM profiles
       INNER JOIN actors ON actors.id = profiles.actor_id
       WHERE actors.account_id = ${request.account_id}
       UNION ALL
-      SELECT 'note'::text AS entity_type, record_id AS entity_id
+      SELECT 'module-record'::text AS entity_type, record_id AS entity_id, account_id, module_id, collection AS record_type
       FROM greenfield_module_records
       WHERE account_id = ${request.account_id}
-        AND module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))})
-        AND collection = 'note'
-      UNION ALL
-      SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id
-      FROM greenfield_module_records
-      WHERE account_id = ${request.account_id}
-        AND module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))})
-        AND collection = 'folder'
       LIMIT 100
     `.execute(db)
-    return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id}))
+    return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id, accountId: row.account_id ?? undefined, moduleId: row.module_id ?? undefined, recordType: row.record_type ?? undefined}))
   }
-  const rows = await sql<{entity_type: GreenfieldSearchEntityType; entity_id: string}>`
-    SELECT 'post'::text AS entity_type, id AS entity_id FROM posts
-    UNION ALL SELECT 'profile'::text AS entity_type, id AS entity_id FROM profiles
-    UNION ALL SELECT 'module'::text AS entity_type, slug AS entity_id FROM greenfield_extension_catalogue WHERE kind = 'module'
-    UNION ALL SELECT 'module-release'::text AS entity_type, release_id AS entity_id FROM greenfield_module_releases
-    UNION ALL SELECT 'note'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))}) AND collection = 'note'
-    UNION ALL SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))}) AND collection = 'folder'
+  const rows = await sql<{entity_type: GreenfieldSearchEntityType; entity_id: string; account_id: string | null; module_id: string | null; record_type: string | null}>`
+    SELECT 'post'::text AS entity_type, id AS entity_id, NULL::text AS account_id, NULL::text AS module_id, NULL::text AS record_type FROM posts
+    UNION ALL SELECT 'profile'::text AS entity_type, id AS entity_id, NULL::text, NULL::text, NULL::text FROM profiles
+    UNION ALL SELECT 'module'::text AS entity_type, slug AS entity_id, NULL::text, NULL::text, NULL::text FROM greenfield_extension_catalogue WHERE kind = 'module'
+    UNION ALL SELECT 'module-release'::text AS entity_type, release_id AS entity_id, NULL::text, NULL::text, NULL::text FROM greenfield_module_releases
+    UNION ALL SELECT 'module-record'::text AS entity_type, record_id AS entity_id, account_id, module_id, collection AS record_type FROM greenfield_module_records
     LIMIT 100
   `.execute(db)
-  return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id}))
+  return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id, accountId: row.account_id ?? undefined, moduleId: row.module_id ?? undefined, recordType: row.record_type ?? undefined}))
 }
 
 async function idsForEntityType(db: ModulaWorkerDb, entityType: GreenfieldSearchEntityType): Promise<ReindexCandidate[]> {
@@ -208,12 +215,11 @@ async function idsForEntityType(db: ModulaWorkerDb, entityType: GreenfieldSearch
   if (entityType === 'module') {
     return (await db.selectFrom('greenfield_extension_catalogue').select('slug').where('kind', '=', 'module').limit(100).execute()).map(row => ({entityType, entityId: row.slug}))
   }
-  if (entityType === 'note') {
-    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', 'in', [...vaultNotesIdentityFamily()]).where('collection', '=', 'note').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
+  if (entityType === 'module-record') {
+    return (await db.selectFrom('greenfield_module_records').select(['record_id', 'account_id', 'module_id', 'collection']).limit(100).execute())
+      .map(row => ({entityType, entityId: row.record_id, accountId: row.account_id, moduleId: row.module_id, recordType: row.collection}))
   }
-  if (entityType === 'vault-folder') {
-    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', 'in', [...vaultNotesIdentityFamily()]).where('collection', '=', 'folder').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
-  }
+  if (entityType === 'note' || entityType === 'vault-folder') return []
   return (await db.selectFrom('greenfield_module_releases').select('release_id').limit(100).execute()).map(row => ({entityType, entityId: row.release_id}))
 }
 
@@ -231,9 +237,7 @@ function syntheticReindexEvent(
         ? 'module.discovered'
         : candidate.entityType === 'module-release'
           ? 'module.release.published'
-          : candidate.entityType === 'note'
-            ? 'vault-notes.note.updated'
-            : 'vault-notes.folder.updated'
+          : 'module.record.updated'
   return {
     eventId: row.event_id,
     eventType,
@@ -241,7 +245,7 @@ function syntheticReindexEvent(
     aggregateType: candidate.entityType === 'module-release' ? 'moduleRelease' : candidate.entityType,
     aggregateId: candidate.entityId,
     aggregateVersion: now.getTime(),
-    accountId: request.account_id ?? undefined,
+    accountId: candidate.accountId ?? request.account_id ?? undefined,
     actorId: request.requested_by_actor_id ?? undefined,
     producerKind: 'service',
     producerId: 'service.greenfield-worker',
@@ -252,7 +256,7 @@ function syntheticReindexEvent(
     recordedAt: now.toISOString(),
     visibility: 'internal',
     classification: 'internal',
-    payload: {entityId: candidate.entityId, sourceVersion: now.getTime()},
+    payload: {entityId: candidate.entityId, recordId: candidate.entityId, moduleId: candidate.moduleId, collection: candidate.recordType, sourceVersion: now.getTime()},
     metadata: {source: 'greenfield.search.reindex', reindexId: request.reindex_id},
   }
 }
@@ -305,7 +309,12 @@ function projectorIdFor(entityType: GreenfieldSearchEntityType): string {
   if (entityType === 'profile') return 'search.profile-projector'
   if (entityType === 'module') return 'search.module-projector'
   if (entityType === 'module-release') return 'search.module-release-projector'
-  return 'search.vault-notes-projector'
+  if (entityType === 'module-record') return 'search.module-record-projector'
+  return 'search.legacy-module-record-projector'
+}
+
+function record(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 }
 
 async function cancellationRequested(db: ModulaWorkerDb, reindexId: string): Promise<boolean> {

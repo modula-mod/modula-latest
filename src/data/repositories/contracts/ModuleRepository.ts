@@ -2,6 +2,8 @@ import type {
   GreenfieldModuleAction,
   GreenfieldModuleFieldDefinition,
   GreenfieldModuleView,
+  HostCapabilityNegotiation,
+  HostCapabilityRequirement,
 } from '@modula/greenfield-module-ui-contracts'
 import type {
   GreenfieldModuleMarketplace,
@@ -255,6 +257,7 @@ export type ModuleUninstallPreview = {
 export type ModuleRuntimeView = GreenfieldModuleView & {
   allowedActions?: GreenfieldModuleAction[]
   available?: boolean
+  capabilityNegotiation?: HostCapabilityNegotiation
   recordBinding?: {source: 'record.detail'; collection: string; recordId: string}
   recordListActionIds?: string[]
   searchEnabled?: boolean
@@ -301,7 +304,10 @@ export type MpsFrontendArtifact = {
   actions?: MpsFrontendAction[]
   contributions?: Record<string, unknown>[]
   settings?: {viewId: string}
-  capabilities?: {required?: string[]; optional?: string[]}
+  capabilities?: {
+    required?: (string | HostCapabilityRequirement)[]
+    optional?: (string | HostCapabilityRequirement)[]
+  }
   accessibility: Record<string, unknown>
 }
 
