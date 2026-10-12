@@ -75,7 +75,7 @@ describeIfDb('Greenfield Backend V1 migration ledger security', () => {
   it('retains the exact migration ledger and schema version', async () => {
     const version = await db.selectFrom('schema_metadata').select('value').where('key', '=', 'schema_version').executeTakeFirstOrThrow()
     const latest = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(db)
-    expect(version.value).toBe('067')
-    expect(latest.rows[0]?.id).toBe('067_legacy_duplicate_installation_versions')
+    expect(version.value).toBe('071')
+    expect(latest.rows[0]?.id).toBe('071_module_record_search_projection')
   })
 })
