@@ -1,4 +1,5 @@
 import type {GreenfieldModulePlatform} from './compatibility.js'
+import type {GreenfieldJsonSchema, GreenfieldGovernedFunctionExecutionMode} from '@modula/greenfield-contracts'
 
 export type GreenfieldModuleContributionBase = {
   id: string
@@ -39,12 +40,42 @@ export type GreenfieldModuleToolContribution = GreenfieldModuleContributionBase 
   surfaces: string[]
 }
 
-export type GreenfieldModuleFunctionContribution = GreenfieldModuleContributionBase & {
+export type GreenfieldModuleLegacyFunctionContribution = GreenfieldModuleContributionBase & {
   functionId: string
   mode: 'declarative' | 'builtIn' | 'backgroundJob' | 'remoteHttp'
   inputSchemaRef: string
   outputSchemaRef: string
   executionRequired: boolean
+}
+
+export type GreenfieldModuleGovernedFunctionContribution = GreenfieldModuleContributionBase & {
+  functionId: string
+  version: string
+  inputSchema: GreenfieldJsonSchema
+  outputSchema: GreenfieldJsonSchema
+  requiredCapabilities: string[]
+  executionMode: GreenfieldGovernedFunctionExecutionMode
+  mutating: boolean
+  timeoutMs?: number
+  executionRequired: true
+}
+
+export type GreenfieldModuleFunctionContribution =
+  | GreenfieldModuleLegacyFunctionContribution
+  | GreenfieldModuleGovernedFunctionContribution
+
+export type GreenfieldModuleInterModuleActionContribution = GreenfieldModuleContributionBase & {
+  actionId: string
+  version: string
+  inputSchema: GreenfieldJsonSchema
+  outputSchema: GreenfieldJsonSchema
+  requiredCapabilities: string[]
+  allowedSourceModules: string[]
+  execution:
+    | {kind: 'record.create'; collection: string}
+    | {kind: 'function.invoke'; functionId: string; functionVersion: string}
+  mutating: boolean
+  executionRequired: true
 }
 
 export type GreenfieldModuleWidgetContribution = GreenfieldModuleContributionBase & {
@@ -82,6 +113,7 @@ export type GreenfieldModuleContributions = {
   schemas?: GreenfieldModuleSchemaContribution[]
   tools?: GreenfieldModuleToolContribution[]
   functions?: GreenfieldModuleFunctionContribution[]
+  interModuleActions?: GreenfieldModuleInterModuleActionContribution[]
   widgets?: GreenfieldModuleWidgetContribution[]
   plugins?: GreenfieldModulePluginContribution[]
   connectors?: GreenfieldModuleConnectorContribution[]
@@ -97,6 +129,7 @@ export const CONTRIBUTION_GROUPS = [
   'schemas',
   'tools',
   'functions',
+  'interModuleActions',
   'widgets',
   'plugins',
   'connectors',
