@@ -12,6 +12,8 @@ import {GreenfieldModuleManifestService} from '../manifest-service.js'
 import {moduleError} from '../module-errors.js'
 import {GreenfieldModulePublisherService} from '../publisher-service.js'
 import {GreenfieldModuleRecordService} from '../record-service.js'
+import {GreenfieldModuleMediaBindingService} from '../media-binding-service.js'
+import {GreenfieldModuleRecordSharingService} from '../record-sharing-service.js'
 import type {ModuleRecordQuery} from '../record-service.js'
 import {GreenfieldModuleRegistryService} from '../registry-service.js'
 import {GreenfieldModuleReleaseService} from '../release-service.js'
@@ -68,6 +70,8 @@ export async function registerModuleRoutes(
   const contributions = new GreenfieldModuleContributionService(db, config)
   const views = new GreenfieldModuleViewService(db, config)
   const records = new GreenfieldModuleRecordService(db, config)
+  const mediaBindings = new GreenfieldModuleMediaBindingService(db, config)
+  const recordSharing = new GreenfieldModuleRecordSharingService(db, config)
   const actions = new GreenfieldModuleActionService(db, config)
   const exports = new GreenfieldModuleExportService(db, config)
   const health = new GreenfieldModuleHealthService(db, config)
@@ -774,6 +778,83 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.get('/v1/modules/:moduleId/records/shares/received', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await recordSharing.listReceived(auth.accountId, canonicalModuleParam(request)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared records lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/shares/owned', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const query = (request.query as {recordType?: string; recordId?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await recordSharing.listOwned(auth.accountId, canonicalModuleParam(request), stringOrUndefined(query.recordType), stringOrUndefined(query.recordId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Owned record shares lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/record-shares/:shareId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.read(auth.accountId, params.moduleId, params.shareId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared record lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/record-shares/:shareId/revisions', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    const query = (request.query as {limit?: string}) ?? {}
+    try {
+      return reply.send(successEnvelope(await recordSharing.history(auth.accountId, params.moduleId, params.shareId, query.limit === undefined ? 25 : Number(query.limit)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared record history lookup failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/record-shares/:shareId/record', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.edit(auth.accountId, params.moduleId, params.shareId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Shared record update failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/record-shares/:shareId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.update(auth.accountId, params.moduleId, params.shareId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record share update failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/record-shares/:shareId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; shareId: string}
+    try {
+      return reply.send(successEnvelope(await recordSharing.revoke(auth.accountId, params.moduleId, params.shareId, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record share revoke failed')
+    }
+  })
+
   app.get('/v1/modules/:moduleId/records/sync', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -825,6 +906,72 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await records.get(auth.accountId, params.moduleId, params.collection, params.recordId), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module record lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/records/:collection/:recordId/shares', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.code(201).send(successEnvelope(await recordSharing.create(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record share creation failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId/media', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.list(auth.accountId, params.moduleId, params.collection, params.recordId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/records/:collection/:recordId/media', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.code(201).send(successEnvelope(await mediaBindings.bind(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media bind failed')
+    }
+  })
+
+  app.put('/v1/modules/:moduleId/records/:collection/:recordId/media/order', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.reorder(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media reorder failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string; bindingId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.updateMetadata(auth.accountId, params.moduleId, params.collection, params.recordId, params.bindingId, (request.body as any) ?? {}, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media metadata update failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as {moduleId: string; collection: string; recordId: string; bindingId: string}
+    try {
+      return reply.send(successEnvelope(await mediaBindings.unbind(auth.accountId, params.moduleId, params.collection, params.recordId, params.bindingId, {actorId: actorIdForAccount(auth.accountId), requestId: request.id}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Record media unbind failed')
     }
   })
 
