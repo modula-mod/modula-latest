@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0.0",
+  "token": "digital.modula.vault-notes",
+  "baselineSha": "5ed0382db158a051190b1ef6119028815d3c60c9",
+  "baselineRuntimeSourceOccurrences": 29,
+  "allowedCompatibility": [
+    {
+      "path": "packages/greenfield-contracts/src/canonical-module-identity.ts",
+      "maximumOccurrences": 5,
+      "category": "canonical identity overlay",
+      "reason": "Canonical and historical identifiers must converge without corrupting installed production lineage.",
+      "removalCondition": "Retain while any supported release, migration, or stored identifier uses a legacy Vault alias."
+    },
+    {
+      "path": "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts",
+      "maximumOccurrences": 1,
+      "category": "historical migration",
+      "reason": "The 1.8 migration adapter is deliberately product-specific recovery code, not the normal module runtime.",
+      "removalCondition": "Remove after the legacy migration support window and production inventory prove no eligible installations remain."
+    },
+    {
+      "path": "src/components/composer/ComposerToolsDrawer.tsx",
+      "maximumOccurrences": 1,
+      "category": "composer compatibility",
+      "reason": "The current built-in Create Note shortcut predates contribution-driven capture actions.",
+      "removalCondition": "Replace when composer actions resolve installed module contributions generically."
+    },
+    {
+      "path": "src/components/feed/FeedPostItem.tsx",
+      "maximumOccurrences": 2,
+      "category": "feed compatibility",
+      "reason": "Legacy feed module cards infer missing canonical identities from historical payloads.",
+      "removalCondition": "Remove after feed payloads always carry a canonical module action identity."
+    },
+    {
+      "path": "src/data/repositories/api/ApiModuleRepository.ts",
+      "maximumOccurrences": 1,
+      "category": "release overlay",
+      "reason": "The production 1.x installability overlay preserves legacy registry behavior during canonical release convergence.",
+      "removalCondition": "Remove after registry installability is authoritative for every supported Vault release."
+    },
+    {
+      "path": "src/data/repositories/api/ApiToolsRepository.ts",
+      "maximumOccurrences": 1,
+      "category": "tool compatibility",
+      "reason": "Legacy seeded tool metadata still maps a Vault tool to its canonical module owner.",
+      "removalCondition": "Remove when tool discovery always supplies manifest-derived module ownership."
+    },
+    {
+      "path": "src/features/board/screens/BoardScreen.tsx",
+      "maximumOccurrences": 6,
+      "category": "board widget compatibility",
+      "reason": "The founder board ships a historical Vault widget ID before generic contribution hydration is complete.",
+      "removalCondition": "Replace with manifest widget identity and route metadata from the installed product."
+    },
+    {
+      "path": "src/features/feed/postActions/runPostAction.ts",
+      "maximumOccurrences": 1,
+      "category": "feed capture compatibility",
+      "reason": "The save-to-note action still targets a historical route contract.",
+      "removalCondition": "Replace with a reviewed inter-module action contributed by the target module."
+    },
+    {
+      "path": "src/features/modules/components/presentation/ModuleCollection.tsx",
+      "maximumOccurrences": 1,
+      "category": "presentation fixture",
+      "reason": "A curated marketplace collection contains explicit product IDs as content, not runtime dispatch.",
+      "removalCondition": "Move the collection to server-authored marketplace merchandising metadata."
+    },
+    {
+      "path": "src/features/modules/components/product-detail/ProductCover.tsx",
+      "maximumOccurrences": 1,
+      "category": "presentation fallback",
+      "reason": "A bounded local cover fallback supports a historical release missing artwork metadata.",
+      "removalCondition": "Remove after all supported releases provide verified product-owned artwork."
+    },
+    {
+      "path": "src/features/modules/identity/moduleArtwork.ts",
+      "maximumOccurrences": 2,
+      "category": "presentation fallback",
+      "reason": "Historical module artwork aliases preserve existing catalogue visuals.",
+      "removalCondition": "Remove after artwork is exclusively supplied by immutable release metadata."
+    },
+    {
+      "path": "src/features/modules/identity/moduleIdentitySubtext.ts",
+      "maximumOccurrences": 1,
+      "category": "presentation fallback",
+      "reason": "Legacy identity copy delegates to the canonical module identity helper.",
+      "removalCondition": "Remove when every caller supplies canonical module identity directly."
+    },
+    {
+      "path": "src/features/modules/identity/productCopy.ts",
+      "maximumOccurrences": 1,
+      "category": "presentation fallback",
+      "reason": "Bundled product copy is a temporary fallback for a release missing product-owned copy.",
+      "removalCondition": "Remove after verified release presentation metadata is mandatory."
+    },
+    {
+      "path": "src/features/profile/components/ProfileModuleCard.tsx",
+      "maximumOccurrences": 1,
+      "category": "profile compatibility",
+      "reason": "Legacy profile module IDs need a canonical marketplace route.",
+      "removalCondition": "Remove when profile content always stores canonical module IDs and route metadata."
+    },
+    {
+      "path": "src/features/profile/data/resolveProfilePublicContent.ts",
+      "maximumOccurrences": 1,
+      "category": "profile compatibility",
+      "reason": "Legacy public profile payloads still contain the old module-vault-notes identity.",
+      "removalCondition": "Remove after the public profile backfill and compatibility window complete."
+    }
+  ]
+}

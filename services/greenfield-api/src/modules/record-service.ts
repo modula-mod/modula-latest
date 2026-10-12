@@ -925,6 +925,7 @@ export class GreenfieldModuleRecordService {
       },
       metadata: {source: 'greenfield.module-records', schemaRef: input.schemaRef},
     })
+    await this.publishCanonicalRecordChangedEvent(trx, input)
   }
 
   async purge(accountId: string, moduleId: string, collection: string, recordId: string, input: {confirm?: boolean; expectedRevision?: number} = {}) {
@@ -1144,6 +1145,46 @@ export class GreenfieldModuleRecordService {
       classification: input.operation === 'purge' ? 'sensitive' : 'private',
       idempotencyKey: `${eventType}:${input.accountId}:${input.moduleId}:${input.collection}:${input.recordId}:${input.revision}`,
       payload: redactedRecordEventPayload(input),
+      metadata: {source: 'greenfield.module-records', schemaRef: input.schemaRef},
+    })
+    await this.publishCanonicalRecordChangedEvent(trx, input)
+  }
+
+  /**
+   * Product events remain part of the module contract. Search and other
+   * platform projections consume this stable, product-neutral companion event
+   * so a normal module never needs a product-ID subscription.
+   */
+  private async publishCanonicalRecordChangedEvent(
+    trx: Transaction<Database>,
+    input: {
+      accountId: string
+      moduleId: string
+      collection: string
+      recordId: string
+      operation: ModuleRecordOperation
+      revision: number
+      schemaRef: string
+    },
+  ): Promise<void> {
+    await new GreenfieldEventBus(trx).publish({
+      eventType: 'module.record.changed',
+      aggregateType: 'moduleRecord',
+      aggregateId: input.recordId,
+      aggregateVersion: input.revision,
+      accountId: input.accountId,
+      visibility: 'account',
+      classification: input.operation === 'purge' ? 'sensitive' : 'private',
+      idempotencyKey: `module.record.changed:${input.accountId}:${input.moduleId}:${input.collection}:${input.recordId}:${input.revision}`,
+      payload: {
+        moduleId: input.moduleId,
+        recordType: input.collection,
+        recordId: input.recordId,
+        revision: input.revision,
+        sourceVersion: input.revision,
+        operation: input.operation,
+        deleted: input.operation === 'delete' || input.operation === 'purge',
+      },
       metadata: {source: 'greenfield.module-records', schemaRef: input.schemaRef},
     })
   }

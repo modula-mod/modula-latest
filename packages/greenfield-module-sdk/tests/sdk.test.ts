@@ -91,7 +91,7 @@ describe('Product UI SDK and testkit exports', () => {
     expect(node.type).toBe('Button')
 
     const negotiation = negotiateHostCapabilities({
-      host: [{id: 'ui.button', version: '1.0.0', status: 'available', renderer: 'audit.beta.button'}],
+      host: [{id: 'ui.button', version: '1.0.0', status: 'available', provenance: 'native', renderer: 'audit.beta.button'}],
       required: ['ui.button@1'],
     })
     expect(negotiation.ok).toBe(true)

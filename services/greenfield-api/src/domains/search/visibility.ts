@@ -17,11 +17,12 @@ const METADATA_ALLOWLIST: Record<GreenfieldSearchEntityType, Set<string>> = {
   ]),
   note: new Set(['moduleId', 'folderId', 'folderName', 'sourceTitle', 'sourceAuthor', 'archived', 'pinned', 'favourite', 'dataSchemaVersion']),
   'vault-folder': new Set(['moduleId', 'parentFolderId', 'position']),
+  'module-record': new Set(['kind', 'moduleId', 'recordType', 'recordId', 'display']),
 }
 
 export function resourceTypeForSearch(entityType: GreenfieldSearchEntityType): string {
   if (entityType === 'module-release') return 'module'
-  if (entityType === 'note' || entityType === 'vault-folder') return 'module.record'
+  if (entityType === 'note' || entityType === 'vault-folder' || entityType === 'module-record') return 'module.record'
   return entityType
 }
 

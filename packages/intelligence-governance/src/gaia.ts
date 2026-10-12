@@ -43,7 +43,7 @@ export class DeterministicTestPlanner implements GaiaPlanner {
   private proposal(input: GaiaPlanningInput): ModulaActionProposal {
     const common = {id: this.id(), missionId: input.mission.id, requestedBy: 'gaia' as const}
     if (input.mission.objective === RECENT_VAULT_NOTES_OBJECTIVE) {
-      const action = find(input.availableActions, 'record.query', 'digital.modula.vault-notes')
+      const action = find(input.availableActions, 'record.query', 'note')
       return {
         ...common,
         moduleId: action.moduleId,
@@ -54,7 +54,7 @@ export class DeterministicTestPlanner implements GaiaPlanner {
       }
     }
     if (input.mission.objective === REVERSIBLE_WRITE_FIXTURE_OBJECTIVE) {
-      const action = find(input.availableActions, 'record.create', 'digital.modula.vault-notes')
+      const action = find(input.availableActions, 'record.create', 'note')
       return {
         ...common,
         moduleId: action.moduleId,
@@ -87,8 +87,9 @@ export class DeterministicTestPlanner implements GaiaPlanner {
   }
 }
 
-function find(actions: GaiaAvailableAction[], family: string, moduleId: string): GaiaAvailableAction {
-  const found = actions.find(action => action.family === family && action.moduleId === moduleId)
-  if (!found) throw new IntelligenceError('CAPABILITY_UNKNOWN', `No registered ${family} capability is available for ${moduleId}`)
+function find(actions: GaiaAvailableAction[], family: string, preferredCollection?: string): GaiaAvailableAction {
+  const eligible = actions.filter(action => action.family === family)
+  const found = eligible.find(action => action.collection === preferredCollection) ?? eligible[0]
+  if (!found) throw new IntelligenceError('CAPABILITY_UNKNOWN', `No registered ${family} capability is available`)
   return found
 }
