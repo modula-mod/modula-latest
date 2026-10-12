@@ -208,6 +208,12 @@ jobs:
           tests/legacy-installation-data-migration.test.ts
           tests/phase7e.vault-notes-search-projector.test.ts
           --maxWorkers=1 --no-file-parallelism
+      - name: Pre-write MP02 migration down and reapply proof
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec tsx
+          scripts/verify-migration-cycle.ts 068_module_platform_records
       - name: MP02 and MP02B database acceptance
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
@@ -222,9 +228,3 @@ jobs:
           tests/module-platform-02b.search-contract.test.ts
           tests/module-platform-02b.canonical-mutations.test.ts
           --maxWorkers=1 --no-file-parallelism
-      - name: MP02 migration down and reapply proof
-        env:
-          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
-        run: >-
-          CI=true pnpm --filter @modula/greenfield-api exec tsx
-          scripts/verify-migration-cycle.ts 068_module_platform_records
