@@ -8,16 +8,19 @@ import {filtersForPersistence, normalizeSearchQuery, parseSearchRequest, searchL
 import {excerptFor, matchedFieldsFor} from './ranking.js'
 import {SearchRepository} from './repository.js'
 import {resourceTypeForSearch, toSearchResult} from './visibility.js'
+import {ModuleRecordSearchAccessEvaluator} from './module-record-access.js'
 
 export class GreenfieldSearchService {
   private readonly repository: SearchRepository
   private readonly policy: GreenfieldPolicyEngine
   private readonly audit: AuditRepository
+  private readonly moduleRecordAccess: ModuleRecordSearchAccessEvaluator
 
   constructor(private readonly db: ModulaDb, private readonly config: AppConfig) {
     this.repository = new SearchRepository(db)
     this.policy = new GreenfieldPolicyEngine(db)
     this.audit = new AuditRepository(db)
+    this.moduleRecordAccess = new ModuleRecordSearchAccessEvaluator(db, config)
   }
 
   async search(raw: Record<string, unknown>, actor: SearchActorContext) {
@@ -29,6 +32,18 @@ export class GreenfieldSearchService {
     const page = await this.repository.search(parsed, actor, limits)
     const results = []
     for (const row of page.rows) {
+      if (row.entityType === 'module-record') {
+        if (!(await this.moduleRecordAccess.canRead(row.metadata, row.accountId, actor.accountId))) continue
+        await this.audit.append(
+          'search.module-record.result-authorized',
+          {moduleId: row.metadata.moduleId, recordType: row.metadata.recordType},
+          {type: 'moduleRecord', id: String(row.metadata.recordId ?? row.entityId), actorId: actor.actorId},
+          {accountId: actor.accountId, requestId: actor.requestId, correlationId: actor.correlationId},
+        )
+        const matchedFields = matchedFieldsFor(row, parsed.normalizedQuery, parsed.tags)
+        results.push(toSearchResult(row, matchedFields, excerptFor(row, parsed.normalizedQuery)))
+        continue
+      }
       const decision = await this.policy.evaluateAndAudit({
         actorId: actor.actorId,
         accountId: actor.accountId ?? undefined,
@@ -203,6 +218,7 @@ export class GreenfieldSearchService {
     if (!actorAccountId) throw Object.assign(new Error('Account scope requires authentication'), {code: 'FORBIDDEN', searchCode: 'ACCOUNT_SCOPE_REQUIRED'})
     if (requestedAccountId !== actorAccountId) throw Object.assign(new Error('Account scope is not visible'), {code: 'FORBIDDEN', searchCode: 'RESOURCE_NOT_VISIBLE'})
   }
+
 }
 
 function requireAccount(actor: SearchActorContext): string {

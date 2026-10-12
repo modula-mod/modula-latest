@@ -34,7 +34,7 @@ export type GreenfieldEventDeliveryStatus =
   | 'retrying'
   | 'dead_lettered'
   | 'cancelled'
-export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder' | 'module-record'
 export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
 export type GreenfieldSearchDocumentStatus = 'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'
 export type GreenfieldSearchReindexMode = 'single-entity' | 'entity-type' | 'account-scope' | 'full-index'

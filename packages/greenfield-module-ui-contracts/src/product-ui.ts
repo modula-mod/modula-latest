@@ -47,6 +47,59 @@ export const PRODUCT_UI_CAPABILITY_BY_PRIMITIVE = {
   CommandMenu: 'ui.command-menu',
 } as const satisfies Record<ProductUiPrimitive, string>
 
+export type ProductUiPrimitiveContract = {
+  contractVersion: typeof PRODUCT_UI_SCHEMA_VERSION
+  inputModel: readonly string[]
+  events: readonly string[]
+  actions: readonly string[]
+  requiredCapabilities: readonly string[]
+  optionalCapabilities: readonly string[]
+  fallbackBehavior: 'block' | 'read-only' | 'list' | 'form' | 'explicit-node'
+  states: {loading: string; error: string; empty: string}
+}
+
+/**
+ * Renderer-neutral lifecycle contract for advanced Product UI primitives.
+ * Renderers may adapt presentation, but must preserve these bindings, events,
+ * actions, capability requirements, fallbacks, and observable states.
+ */
+export const PRODUCT_UI_PRIMITIVE_CONTRACTS = {
+  RichDocumentEditor: contract(['documentField', 'readOnly', 'toolbarId'], ['document.changed', 'selection.changed'], ['record.update'], ['ui.document-editor'], ['ui.editor-toolbar'], 'read-only'),
+  EditorToolbar: contract(['editorId', 'actionIds'], ['command.selected'], ['editor.command'], ['ui.editor-toolbar'], ['ui.command-menu'], 'explicit-node'),
+  PropertyEditor: contract(['binding', 'fields'], ['field.changed', 'validation.changed'], ['record.update'], ['ui.property-editor'], ['ui.form'], 'form'),
+  ReferencePicker: contract(['fieldPath', 'recordType', 'multiple'], ['selection.changed', 'search.changed'], ['reference.select'], ['ui.reference-picker'], ['ui.search'], 'explicit-node'),
+  AttachmentGallery: contract(['binding', 'fieldPath', 'role', 'reorderable'], ['attachment.selected', 'order.changed'], ['media.bind', 'media.unbind', 'media.reorder'], ['ui.attachment-gallery'], ['media.attachment-picker'], 'list'),
+  RevisionBrowser: contract(['recordBinding', 'restoreActionId'], ['revision.selected'], ['record.restore'], ['ui.revision-browser'], [], 'list'),
+  Graph: contract(['nodeBinding', 'edgeBinding', 'layout'], ['node.selected', 'viewport.changed'], ['record.open'], ['ui.graph'], ['ui.list'], 'explicit-node'),
+  RecordTable: contract(['binding', 'columns', 'rowActionId'], ['row.selected', 'sort.changed'], ['record.open'], ['ui.record-table'], ['ui.list'], 'list'),
+  RecordBoard: contract(['binding', 'groupBy', 'columns', 'moveActionId'], ['card.selected', 'card.moved'], ['record.open', 'record.update'], ['ui.record-board'], ['ui.list'], 'list'),
+  CommandMenu: contract(['actionIds', 'search'], ['query.changed', 'command.selected'], ['action.invoke'], ['ui.command-menu'], ['ui.menu', 'ui.search'], 'explicit-node'),
+} as const satisfies Record<
+  'RichDocumentEditor' | 'EditorToolbar' | 'PropertyEditor' | 'ReferencePicker' | 'AttachmentGallery' |
+  'RevisionBrowser' | 'Graph' | 'RecordTable' | 'RecordBoard' | 'CommandMenu',
+  ProductUiPrimitiveContract
+>
+
+function contract(
+  inputModel: readonly string[],
+  events: readonly string[],
+  actions: readonly string[],
+  requiredCapabilities: readonly string[],
+  optionalCapabilities: readonly string[],
+  fallbackBehavior: ProductUiPrimitiveContract['fallbackBehavior'],
+): ProductUiPrimitiveContract {
+  return {
+    contractVersion: PRODUCT_UI_SCHEMA_VERSION,
+    inputModel,
+    events,
+    actions,
+    requiredCapabilities,
+    optionalCapabilities,
+    fallbackBehavior,
+    states: {loading: 'host.loading', error: 'host.error', empty: 'host.empty'},
+  }
+}
+
 type ProductUiBase<T extends ProductUiPrimitive> = {
   id: string
   type: T

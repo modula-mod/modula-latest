@@ -497,6 +497,7 @@ export class SearchRepository {
       release: entityRankingWeight('module-release'),
       note: entityRankingWeight('note'),
       folder: entityRankingWeight('vault-folder'),
+      record: entityRankingWeight('module-record'),
     }
     const orderBy = orderBySql(input.sort)
     const createdAfter = input.createdAfter ? new Date(input.createdAfter) : null
@@ -540,6 +541,7 @@ export class SearchRepository {
               WHEN 'module-release' THEN ${rankWeights.release}::float
               WHEN 'note' THEN ${rankWeights.note}::float
               WHEN 'vault-folder' THEN ${rankWeights.folder}::float
+              WHEN 'module-record' THEN ${rankWeights.record}::float
               ELSE ${rankWeights.post}::float
             END
             + LEAST(10, GREATEST(0, 10 - EXTRACT(EPOCH FROM (NOW() - updated_at)) / 86400 / 14))::float
@@ -571,6 +573,21 @@ export class SearchRepository {
             visibility = 'public'
             OR (${actor.actorId}::text IS NOT NULL AND owner_id = ${actor.actorId})
             OR (${actor.accountId}::text IS NOT NULL AND account_id = ${actor.accountId})
+            OR (
+              entity_type = 'module-record'
+              AND ${actor.accountId}::text IS NOT NULL
+              AND EXISTS (
+                SELECT 1
+                FROM greenfield_module_record_shares AS record_share
+                WHERE record_share.owner_account_id = search_documents.account_id
+                  AND record_share.recipient_account_id = ${actor.accountId}
+                  AND record_share.module_id = search_documents.metadata->>'moduleId'
+                  AND record_share.record_type = search_documents.metadata->>'recordType'
+                  AND record_share.record_id = search_documents.metadata->>'recordId'
+                  AND record_share.revoked_at IS NULL
+                  AND (record_share.expires_at IS NULL OR record_share.expires_at > NOW())
+              )
+            )
             OR (
               visibility = 'followers'
               AND ${actor.actorId}::text IS NOT NULL

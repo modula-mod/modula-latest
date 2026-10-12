@@ -99,6 +99,7 @@ export const greenfieldEventSchemas: readonly GreenfieldEventSchemaDefinition[] 
   event('module.release.published', 'modules', 'moduleRelease', 'internal'),
   event('module.release.quarantined', 'modules', 'moduleRelease', 'sensitive', 'manual-approval-required'),
   event('module.release.revoked', 'modules', 'moduleRelease', 'sensitive', 'manual-approval-required'),
+  event('module.record.changed', 'modules', 'moduleRecord', 'private'),
 
   searchOperationalEvent('search.document-indexed', 'searchDocument'),
   searchOperationalEvent('search.document-deleted', 'searchDocument'),

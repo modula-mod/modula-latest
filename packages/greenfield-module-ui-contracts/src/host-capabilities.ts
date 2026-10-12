@@ -1,7 +1,9 @@
 export const HOST_CAPABILITY_STATUSES = ['available', 'unavailable', 'degraded'] as const
+export const HOST_CAPABILITY_PROVENANCE = ['native', 'fallback', 'emulated', 'unavailable'] as const
 export const HOST_CAPABILITY_DISCOVERY_VERSION = '1.0.0' as const
 
 export type HostCapabilityStatus = (typeof HOST_CAPABILITY_STATUSES)[number]
+export type HostCapabilityProvenance = (typeof HOST_CAPABILITY_PROVENANCE)[number]
 
 export const MODULA_HOST_CAPABILITY_IDS = [
   'ui.button',
@@ -41,11 +43,14 @@ export type HostCapabilityRequirement = HostCapabilityReference & {
   fallback?: HostCapabilityReference
 }
 
-export type HostCapabilityConstraintValue = string | number | boolean | null
+export type HostCapabilityConstraintValue = string | number | boolean | null | readonly string[]
 
 export type HostCapabilityDescriptor = HostCapabilityReference & {
   status: HostCapabilityStatus
+  /** How this capability is actually supplied. Never infer native from renderer presence. */
+  provenance: HostCapabilityProvenance
   renderer?: string
+  provider?: string
   /** A truthful host hint. It is never selected unless the module also declares it. */
   fallback?: HostCapabilityReference
   constraints?: Record<string, HostCapabilityConstraintValue>
@@ -128,11 +133,15 @@ export function validateHostCapabilityDescriptor(input: unknown): HostCapability
   const issues: HostCapabilityValidationIssue[] = []
   if (!isRecord(input)) return {valid: false, issues: [{path: '$', code: 'CAPABILITY_NOT_OBJECT', message: 'Host capability descriptor must be an object'}]}
   const descriptor = input as Partial<HostCapabilityDescriptor> & Record<string, unknown>
-  const allowed = new Set(['id', 'version', 'status', 'renderer', 'fallback', 'constraints'])
+  const allowed = new Set(['id', 'version', 'status', 'provenance', 'renderer', 'provider', 'fallback', 'constraints'])
   for (const key of Object.keys(input)) if (!allowed.has(key)) issues.push({path: `$.${key}`, code: 'UNKNOWN_PROPERTY', message: `${key} is not part of the host capability contract`})
   if (!isCapabilityReference(input)) issues.push({path: '$', code: 'INVALID_CAPABILITY_REFERENCE', message: 'Capability ID and version must be bounded semantic identifiers'})
   if (!HOST_CAPABILITY_STATUSES.includes(descriptor.status as HostCapabilityStatus)) issues.push({path: '$.status', code: 'INVALID_CAPABILITY_STATUS', message: 'Capability status must be available, unavailable, or degraded'})
+  if (!HOST_CAPABILITY_PROVENANCE.includes(descriptor.provenance as HostCapabilityProvenance)) issues.push({path: '$.provenance', code: 'INVALID_CAPABILITY_PROVENANCE', message: 'Capability provenance must be native, fallback, emulated, or unavailable'})
+  if (descriptor.status === 'unavailable' && descriptor.provenance !== 'unavailable') issues.push({path: '$.provenance', code: 'UNAVAILABLE_PROVENANCE_REQUIRED', message: 'Unavailable capabilities must declare unavailable provenance'})
+  if (descriptor.status !== 'unavailable' && descriptor.provenance === 'unavailable') issues.push({path: '$.provenance', code: 'AVAILABLE_PROVENANCE_REQUIRED', message: 'Available or degraded capabilities must declare their real implementation provenance'})
   if (descriptor.renderer !== undefined && (typeof descriptor.renderer !== 'string' || !RENDERER_PATTERN.test(descriptor.renderer))) issues.push({path: '$.renderer', code: 'INVALID_RENDERER', message: 'Renderer must be a semantic identifier'})
+  if (descriptor.provider !== undefined && (typeof descriptor.provider !== 'string' || !RENDERER_PATTERN.test(descriptor.provider))) issues.push({path: '$.provider', code: 'INVALID_PROVIDER', message: 'Provider must be a semantic identifier'})
   if (descriptor.fallback !== undefined) {
     if (!isCapabilityReference(descriptor.fallback)) issues.push({path: '$.fallback', code: 'INVALID_CAPABILITY_FALLBACK', message: 'Fallback must be a versioned capability reference'})
     else if (descriptor.fallback.id === descriptor.id && versionsCompatible(String(descriptor.version), descriptor.fallback.version)) issues.push({path: '$.fallback', code: 'SELF_CAPABILITY_FALLBACK', message: 'Capability fallback cannot select itself'})
@@ -140,12 +149,17 @@ export function validateHostCapabilityDescriptor(input: unknown): HostCapability
   if (descriptor.constraints !== undefined) {
     if (!isRecord(descriptor.constraints) || Object.keys(descriptor.constraints).length > 32) issues.push({path: '$.constraints', code: 'INVALID_CAPABILITY_CONSTRAINTS', message: 'Capability constraints must be a bounded object'})
     else for (const [key, value] of Object.entries(descriptor.constraints)) {
-      if (!CONSTRAINT_KEY_PATTERN.test(key) || !(value === null || ['string', 'number', 'boolean'].includes(typeof value))) {
-        issues.push({path: `$.constraints.${key}`, code: 'INVALID_CAPABILITY_CONSTRAINT', message: 'Capability constraints use semantic keys and scalar JSON values'})
+      if (!CONSTRAINT_KEY_PATTERN.test(key) || !isConstraintValue(value)) {
+        issues.push({path: `$.constraints.${key}`, code: 'INVALID_CAPABILITY_CONSTRAINT', message: 'Capability constraints use semantic keys and bounded scalar or string-list JSON values'})
       }
     }
   }
   return {valid: issues.length === 0, value: issues.length === 0 ? input as HostCapabilityDescriptor : undefined, issues}
+}
+
+function isConstraintValue(value: unknown): value is HostCapabilityConstraintValue {
+  if (value === null || ['string', 'number', 'boolean'].includes(typeof value)) return true
+  return Array.isArray(value) && value.length <= 64 && value.every(item => typeof item === 'string' && item.length <= 160)
 }
 
 export function negotiateHostCapabilities(input: {

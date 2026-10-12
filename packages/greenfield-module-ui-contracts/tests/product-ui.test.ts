@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {
   PRODUCT_UI_SCHEMA_VERSION,
+  PRODUCT_UI_PRIMITIVE_CONTRACTS,
   createHostCapabilityDiscovery,
   defineProductUiNode,
   negotiateHostCapabilities,
@@ -13,6 +14,18 @@ import {
 const capability = (id: string) => ({id, version: '1'})
 
 describe('renderer-neutral Product UI contracts', () => {
+  it('versions lifecycle, capability, fallback, and state contracts for every advanced primitive', () => {
+    expect(Object.keys(PRODUCT_UI_PRIMITIVE_CONTRACTS)).toHaveLength(10)
+    for (const descriptor of Object.values(PRODUCT_UI_PRIMITIVE_CONTRACTS)) {
+      expect(descriptor.contractVersion).toBe(PRODUCT_UI_SCHEMA_VERSION)
+      expect(descriptor.inputModel.length).toBeGreaterThan(0)
+      expect(descriptor.events.length).toBeGreaterThan(0)
+      expect(descriptor.actions.length).toBeGreaterThan(0)
+      expect(descriptor.requiredCapabilities.length).toBe(1)
+      expect(descriptor.states).toEqual({loading: 'host.loading', error: 'host.error', empty: 'host.empty'})
+    }
+  })
+
   it('validates neutral alpha contracts for every advanced semantic primitive', () => {
     const alpha: ProductUiNode[] = [
       {id: 'alpha.editor', type: 'RichDocumentEditor', version: PRODUCT_UI_SCHEMA_VERSION, capability: capability('ui.document-editor'), documentField: 'body'},
@@ -78,9 +91,9 @@ describe('renderer-neutral Product UI contracts', () => {
 
 describe('truthful host capability discovery', () => {
   const host = [
-    {id: 'ui.graph', version: '1.0.0', status: 'unavailable'},
-    {id: 'ui.record-table', version: '1.0.0', status: 'available', renderer: 'web.record-table'},
-    {id: 'intelligence.local', version: '1.0.0', status: 'degraded', renderer: 'host.nodus-broker', constraints: {maximumInput: 4096, streaming: false}},
+    {id: 'ui.graph', version: '1.0.0', status: 'unavailable', provenance: 'unavailable'},
+    {id: 'ui.record-table', version: '1.0.0', status: 'available', provenance: 'native', renderer: 'web.record-table'},
+    {id: 'intelligence.local', version: '1.0.0', status: 'degraded', provenance: 'emulated', renderer: 'host.nodus-broker', provider: 'fixture.local', constraints: {maximumInput: 4096, streaming: false, supportedTasks: ['summarize', 'rewrite'], privacyClasses: ['private']}},
   ] satisfies HostCapabilityDescriptor[]
 
   it('fails a required unavailable capability with the canonical error', () => {
@@ -112,6 +125,7 @@ describe('truthful host capability discovery', () => {
 
   it('validates versioned descriptors and bounded constraints', () => {
     expect(validateHostCapabilityDescriptor(host[2]).valid).toBe(true)
+    expect(validateHostCapabilityDescriptor({...host[2], provenance: 'unavailable'}).valid).toBe(false)
     expect(validateHostCapabilityDescriptor({...host[2], constraints: {payload: {unbounded: true}}}).valid).toBe(false)
   })
 
