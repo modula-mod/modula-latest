@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {readFileSync} from 'node:fs'
+import {sql} from 'kysely'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {migrateUp} from '../../greenfield-api/src/database/migrate.js'
 import {createDb, type ModulaWorkerDb} from '../src/database.js'
@@ -7,6 +8,7 @@ import {handleSearchIndex} from '../src/search/index.js'
 
 const testDatabaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeLive = testDatabaseUrl ? describe : describe.skip
+const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
 describe('MP02 generic module record search projector source', () => {
   it('routes module record events without product-specific branches', () => {
@@ -79,18 +81,18 @@ describeLive('MP02 generic module record search projector (live database)', () =
       collection: recordType,
       schema_ref: 'schemas/alpha-note.schema.json',
       default_visibility: 'private',
-      fields: [
+      fields: jsonb([
         {name: 'title', type: 'text'},
         {name: 'plainTextProjection', type: 'multilineText'},
         {name: 'pinned', type: 'boolean'},
         {name: 'secretSummary', type: 'text', sensitive: true},
-      ],
-      searchable_fields: ['title', 'plainTextProjection', 'secretSummary'],
-      filterable_fields: ['pinned', 'secretSummary'],
-      sortable_fields: ['title'],
+      ]),
+      searchable_fields: jsonb(['title', 'plainTextProjection', 'secretSummary']),
+      filterable_fields: jsonb(['pinned', 'secretSummary']),
+      sortable_fields: jsonb(['title']),
       folder_field: null,
-      reference_fields: [],
-      schema_definition: {},
+      reference_fields: jsonb([]),
+      schema_definition: jsonb({}),
       retention_policy: 'keepOnUninstall',
       registration_status: 'registered',
       created_at: now,
@@ -107,7 +109,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
           collection: 'folder',
           schema_ref: 'schemas/folder.schema.json',
           visibility: 'private',
-          data: {name: `Worker Folder ${suffix}`, position: 0},
+          data: jsonb({name: `Worker Folder ${suffix}`, position: 0}),
           search_text: `Worker Folder ${suffix}`,
           folder_ref: null,
           source_uri: null,
@@ -125,7 +127,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
           collection: recordType,
           schema_ref: 'schemas/alpha-note.schema.json',
           visibility: 'private',
-          data: {
+          data: jsonb({
             title: `Worker Note ${suffix}`,
             plainTextProjection: `worker searchable ${suffix}`,
             folderId,
@@ -135,7 +137,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
             favourite: false,
             dataSchemaVersion: '1.0.0',
             secretSummary: `never-index-${suffix}`,
-          },
+          }),
           search_text: `Worker Note worker searchable ${suffix}`,
           folder_ref: folderId,
           source_uri: null,
@@ -205,8 +207,8 @@ describeLive('MP02 generic module record search projector (live database)', () =
         idempotency_key: null,
         visibility: input.visibility,
         classification: input.classification,
-        payload: input.payload,
-        metadata: input.metadata,
+        payload: jsonb(input.payload),
+        metadata: jsonb(input.metadata),
         occurred_at: new Date(input.occurredAt),
         recorded_at: new Date(input.recordedAt),
       })

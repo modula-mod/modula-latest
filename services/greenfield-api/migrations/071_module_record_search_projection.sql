@@ -1,6 +1,26 @@
 -- MODULE-PLATFORM-02B: product-neutral record search delivery.
 -- Migrations 069 and 070 are owned by the preceding MP02B integration waves.
 
+ALTER TABLE search_documents DROP CONSTRAINT IF EXISTS search_documents_entity_type_check;
+ALTER TABLE search_documents
+  ADD CONSTRAINT search_documents_entity_type_check
+  CHECK (entity_type IN ('post','profile','module','module-release','note','vault-folder','module-record'));
+
+ALTER TABLE search_projection_state DROP CONSTRAINT IF EXISTS search_projection_state_entity_type_check;
+ALTER TABLE search_projection_state
+  ADD CONSTRAINT search_projection_state_entity_type_check
+  CHECK (entity_type IN ('post','profile','module','module-release','note','vault-folder','module-record'));
+
+ALTER TABLE search_projection_failures DROP CONSTRAINT IF EXISTS search_projection_failures_entity_type_check;
+ALTER TABLE search_projection_failures
+  ADD CONSTRAINT search_projection_failures_entity_type_check
+  CHECK (entity_type IN ('post','profile','module','module-release','note','vault-folder','module-record'));
+
+ALTER TABLE search_reindex_requests DROP CONSTRAINT IF EXISTS search_reindex_requests_entity_type_check;
+ALTER TABLE search_reindex_requests
+  ADD CONSTRAINT search_reindex_requests_entity_type_check
+  CHECK (entity_type IS NULL OR entity_type IN ('post','profile','module','module-release','note','vault-folder','module-record'));
+
 INSERT INTO greenfield_event_schema_registry (
   event_type,
   event_version,

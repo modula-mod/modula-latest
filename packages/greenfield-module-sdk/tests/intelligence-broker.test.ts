@@ -6,7 +6,10 @@ const authorized: ModuleIntelligenceAuthorization = {
   remoteAllowed: true, classificationAllowed: true, providerAllowed: true,
 }
 
-const provider = (providerClass: 'local' | 'remote', execute = vi.fn(async () => ({ok: true}))): ModuleIntelligenceExecution => ({
+const provider = (
+  providerClass: 'local' | 'remote',
+  execute: ModuleIntelligenceExecution['execute'] = vi.fn(async () => ({ok: true})),
+): ModuleIntelligenceExecution => ({
   provider: {
     providerId: `fixture.${providerClass}`, providerClass, version: '1.0.0',
     supportedTasks: ['summarize', 'rewrite'], maximumInput: 4096, streaming: true,

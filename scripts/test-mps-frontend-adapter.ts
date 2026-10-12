@@ -106,8 +106,8 @@ const fallbackView = adaptMpsFrontendView({
   frontend: optionalFallback,
   resolved: optionalFallbackRoute,
   hostCapabilities: [
-    {id: 'ui.graph', version: '1.0.0', status: 'unavailable'},
-    {id: 'ui.record-table', version: '1.0.0', status: 'available', renderer: 'audit.beta.table'},
+    {id: 'ui.graph', version: '1.0.0', status: 'unavailable', provenance: 'unavailable'},
+    {id: 'ui.record-table', version: '1.0.0', status: 'available', provenance: 'native', renderer: 'audit.beta.table'},
   ],
 })
 assert.equal(fallbackView.available, true)
