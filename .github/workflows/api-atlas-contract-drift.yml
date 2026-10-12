@@ -8,7 +8,11 @@ on:
       - 'apps/**'
       - 'packages/**'
       - 'tools/api-atlas/**'
+      - 'scripts/**'
       - 'docs/audits/api-atlas-01/**'
+      - 'docs/architecture/**'
+      - 'docs/validation/**'
+      - '.github/workflows/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
   push:
@@ -88,6 +92,12 @@ jobs:
         run: CI=true pnpm api:test
       - name: Worker tests
         run: CI=true pnpm worker:test
+      - name: Module SDK contract tests
+        run: CI=true pnpm --filter @modula/greenfield-module-sdk test
+      - name: Product UI contract tests
+        run: CI=true pnpm --filter @modula/greenfield-module-ui-contracts test
+      - name: Intelligence governance tests
+        run: CI=true pnpm --filter @modula/intelligence-governance test
       - name: API typecheck
         run: CI=true pnpm --filter @modula/greenfield-api typecheck
       - name: Worker typecheck
@@ -212,3 +222,9 @@ jobs:
           tests/module-platform-02b.search-contract.test.ts
           tests/module-platform-02b.canonical-mutations.test.ts
           --maxWorkers=1 --no-file-parallelism
+      - name: MP02 migration down and reapply proof
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec tsx
+          scripts/verify-migration-cycle.ts 068_module_platform_records
