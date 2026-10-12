@@ -4,7 +4,7 @@ import {
   type GreenfieldHostFunctionCapability,
   type GreenfieldJsonSchema,
 } from '@modula/greenfield-contracts'
-import {canonicalJsonStringify} from '@modula/greenfield-protocol'
+import {canonicalJsonStringify, canonicalMutationJsonStringify} from '@modula/greenfield-protocol'
 import {createHash, randomBytes} from 'node:crypto'
 import {sql, type Transaction} from 'kysely'
 import type {AppConfig} from '../config/index.js'
@@ -54,7 +54,7 @@ export class GreenfieldGovernedFunctionService {
 
     if (declaration.executionMode === 'community') {
       await this.recordTerminalInvocation(context, declaration, requestIdentity, 'failed', 'FUNCTION_EXECUTION_UNSUPPORTED', 0)
-      throw moduleError('CAPABILITY_DISABLED', 'Community function execution is unsupported; no fallback was attempted')
+      throw moduleError('FUNCTION_NOT_AVAILABLE', 'Community function execution is unsupported; no fallback was attempted')
     }
     if (declaration.executionMode === 'host') {
       return this.dispatchHost(context, declaration, input, mutationId, requestIdentity)
@@ -196,22 +196,9 @@ export class GreenfieldGovernedFunctionService {
       await this.recordTerminalInvocation(context, declaration, requestIdentity, 'failed', 'REMOTE_NETWORK_POLICY_DENIED', 0)
       throw moduleError('CAPABILITY_DISABLED', 'Remote function network policy denied; no fallback was attempted')
     }
-    const payloadHash = this.invocationPayloadHash(context, declaration, input)
     if (mutationId) {
-      const prior = await this.db.selectFrom('greenfield_function_mutations').selectAll()
-        .where('account_id', '=', context.accountId).where('installation_id', '=', context.installationId)
-        .where('function_id', '=', declaration.functionId).where('function_version', '=', declaration.version)
-        .where('mutation_id', '=', mutationId).executeTakeFirst()
-      if (prior) {
-        if (prior.payload_hash !== payloadHash) throw moduleError('MUTATION_REUSE_CONFLICT', 'Mutation ID was reused with a different function payload')
-        if (prior.status !== 'completed') throw moduleError('CONFLICT', 'Function mutation is already in progress')
-        return {idempotent: true, status: 'completed', output: prior.result}
-      }
-      await this.db.insertInto('greenfield_function_mutations').values({
-        mutation_row_id: uuidv7(), account_id: context.accountId, installation_id: context.installationId,
-        function_id: declaration.functionId, function_version: declaration.version, mutation_id: mutationId,
-        payload_hash: payloadHash, status: 'pending', result: null, created_at: new Date(), completed_at: null,
-      }).execute()
+      const replay = await this.withTransaction(trx => this.reserveMutation(trx, context, declaration, input, mutationId))
+      if (replay) return replay
     }
     const invocationId = uuidv7()
     const started = Date.now()
@@ -339,7 +326,7 @@ export class GreenfieldGovernedFunctionService {
   }
 
   private invocationPayloadHash(context: GreenfieldModuleRuntimeContext, declaration: GreenfieldGovernedFunctionDeclaration, input: unknown): string {
-    return sha256(canonicalJsonStringify({moduleId: context.moduleId, releaseId: context.releaseId, functionId: declaration.functionId, version: declaration.version, input}))
+    return sha256(canonicalMutationJsonStringify({moduleId: context.moduleId, releaseId: context.releaseId, functionId: declaration.functionId, version: declaration.version, input}))
   }
 
   private async insertInvocation(trx: Transaction<Database>, invocationId: string, context: GreenfieldModuleRuntimeContext, declaration: GreenfieldGovernedFunctionDeclaration, requestIdentity: string, status: Database['greenfield_function_invocations']['status']) {

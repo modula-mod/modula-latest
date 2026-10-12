@@ -1,5 +1,5 @@
 import {createHash, createHmac, timingSafeEqual} from 'node:crypto'
-import {canonicalJsonStringify} from '@modula/greenfield-protocol'
+import {canonicalJsonStringify, canonicalMutationJsonStringify} from '@modula/greenfield-protocol'
 import type {GreenfieldModuleCollectionDefinition, GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {sql, type Transaction} from 'kysely'
@@ -154,91 +154,23 @@ export class GreenfieldModuleRecordService {
     const context = await this.resolveRecordContext(accountId, canonicalId, collection, 'write')
     const data = requireRecordData(input.data)
     const visibility = normalizeVisibility(input.visibility ?? context.collectionDefinition.defaultVisibility)
-    validateRecordData(context.collectionDefinition, data, visibility, Boolean(input.mutationId))
+    const mutationId = requireMutationId(input.mutationId)
+    validateRecordData(context.collectionDefinition, data, visibility, true)
     const recordId = input.recordId ?? uuidv7()
-    if (input.mutationId) {
-      const references = extractReferences(context.collectionDefinition, data)
-      await this.validateReferenceTargets(accountId, references)
-      return this.executeMutation({
-        context,
-        collectionDefinition: context.collectionDefinition,
-        operation: 'create',
-        recordId,
-        data,
-        visibility,
-        mutationId: input.mutationId,
-        actor,
-        payloadInput: {data, visibility, requestedRecordId: input.recordId ?? null},
-        references,
-      })
-    }
-    // Explicit compatibility path for pre-MP02 clients. New clients must send
-    // mutationId and receive the atomic generic mutation contract above.
-    const legacyReferences = extractReferences(context.collectionDefinition, data)
-    await this.validateReferenceTargets(accountId, legacyReferences)
-    const now = new Date()
-    const searchText = buildSearchText(context.collectionDefinition, data)
-    const folderRef = getStringField(data, context.collectionDefinition.folderField)
-    const sourceUri = getStringField(data, 'sourceUri')
-    const payloadHash = sha256(canonicalJsonStringify(data))
-    const eventId = uuidv7()
-    const eventHash = hashRecordEvent({eventId, recordId, moduleId: canonicalId, collection, operation: 'create', revision: 1, payloadHash})
-    await this.db.transaction().execute(async trx => {
-      await trx
-        .insertInto('greenfield_module_records')
-        .values({
-          record_id: recordId,
-          account_id: accountId,
-          module_id: canonicalId,
-          installation_id: context.runtime.installationId,
-          collection,
-          schema_ref: context.collectionDefinition.schemaRef,
-          visibility,
-          data,
-          search_text: searchText,
-          folder_ref: folderRef,
-          source_uri: sourceUri,
-          retained_after_uninstall: false,
-          revision: 1,
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-        })
-        .execute()
-      await this.insertRecordEvent(trx, {eventId, recordId, accountId, moduleId: canonicalId, collection, operation: 'create', revision: 1, previousHash: null, eventHash, payloadHash, metadata: {visibility}})
-      await this.insertImmutableRevision(trx, {
-        accountId,
-        installationId: context.runtime.installationId,
-        moduleId: canonicalId,
-        recordType: collection,
-        recordId,
-        revision: 1,
-        baseRevision: null,
-        operation: 'create',
-        mutationId: `legacy:${eventId}`,
-        actorId: actor.actorId ?? null,
-        data,
-        visibility,
-        deleted: false,
-        payloadHash,
-        createdAt: now,
-      })
-      await this.replaceReferences(trx, context.runtime, collection, recordId, 1, legacyReferences, now)
-      await trx.insertInto('greenfield_module_record_changes').values({
-        account_id: accountId,
-        installation_id: context.runtime.installationId,
-        module_id: canonicalId,
-        record_type: collection,
-        record_id: recordId,
-        revision: 1,
-        operation: 'create',
-        deleted: false,
-        created_at: now,
-      }).execute()
-      await new AuditRepository(trx).append('module.record.created', {moduleId: canonicalId, collection, visibility, eventHash}, {type: 'moduleRecord', id: recordId})
-      await this.publishRecordDomainEvent(trx, {accountId, moduleId: canonicalId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null, eventDeclarations: context.runtime.manifest.contributions.events ?? []})
+    const references = extractReferences(context.collectionDefinition, data)
+    await this.validateReferenceTargets(accountId, references)
+    return this.executeMutation({
+      context,
+      collectionDefinition: context.collectionDefinition,
+      operation: 'create',
+      recordId,
+      data,
+      visibility,
+      mutationId,
+      actor,
+      payloadInput: {data, visibility, requestedRecordId: input.recordId ?? null},
+      references,
     })
-    return this.get(accountId, canonicalId, collection, recordId)
   }
 
   async patch(
@@ -250,33 +182,23 @@ export class GreenfieldModuleRecordService {
     actor: MutationActor = {},
   ) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
-    if (input.mutationId) {
-      requireExpectedRevision(input.expectedRevision)
-      const patchData = requireRecordData(input.data)
-      const references = extractReferences(context.collectionDefinition, patchData)
-      await this.validateReferenceTargets(accountId, references)
-      return this.executeMutation({
-        context,
-        collectionDefinition: context.collectionDefinition,
-        operation: 'update',
-        recordId,
-        data: patchData,
-        visibility: input.visibility === undefined ? undefined : normalizeVisibility(input.visibility),
-        expectedRevision: input.expectedRevision,
-        mutationId: input.mutationId,
-        actor,
-        payloadInput: {data: patchData, visibility: input.visibility ?? null, expectedRevision: input.expectedRevision},
-        references,
-      })
-    }
-    const current = await this.get(accountId, moduleId, collection, recordId)
-    const data = {...(current.data as Record<string, unknown>), ...requireRecordData(input.data)}
-    const visibility = normalizeVisibility(input.visibility ?? current.visibility)
-    validateRecordData(context.collectionDefinition, data, visibility, false)
-    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
-    const legacyReferences = extractReferences(context.collectionDefinition, data)
-    await this.validateReferenceTargets(accountId, legacyReferences)
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, data, visibility, 'update', input.changeSource ?? 'update', input.versionMetadata, legacyReferences, actor)
+    requireExpectedRevision(input.expectedRevision)
+    const patchData = requireRecordData(input.data)
+    const references = extractReferences(context.collectionDefinition, patchData)
+    await this.validateReferenceTargets(accountId, references)
+    return this.executeMutation({
+      context,
+      collectionDefinition: context.collectionDefinition,
+      operation: 'update',
+      recordId,
+      data: patchData,
+      visibility: input.visibility === undefined ? undefined : normalizeVisibility(input.visibility),
+      expectedRevision: input.expectedRevision,
+      mutationId: requireMutationId(input.mutationId),
+      actor,
+      payloadInput: {data: patchData, visibility: input.visibility ?? null, expectedRevision: input.expectedRevision},
+      references,
+    })
   }
 
   async patchShared(
@@ -317,23 +239,18 @@ export class GreenfieldModuleRecordService {
 
   async delete(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number; mutationId?: string} = {}, actor: MutationActor = {}) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'delete')
-    if (input.mutationId) {
-      requireExpectedRevision(input.expectedRevision)
-      return this.executeMutation({
-        context,
-        collectionDefinition: context.collectionDefinition,
-        operation: 'delete',
-        recordId,
-        expectedRevision: input.expectedRevision,
-        mutationId: input.mutationId,
-        actor,
-        payloadInput: {expectedRevision: input.expectedRevision},
-        references: [],
-      })
-    }
-    const current = await this.get(accountId, moduleId, collection, recordId)
-    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'delete', 'delete', {}, [], actor)
+    requireExpectedRevision(input.expectedRevision)
+    return this.executeMutation({
+      context,
+      collectionDefinition: context.collectionDefinition,
+      operation: 'delete',
+      recordId,
+      expectedRevision: input.expectedRevision,
+      mutationId: requireMutationId(input.mutationId),
+      actor,
+      payloadInput: {expectedRevision: input.expectedRevision},
+      references: [],
+    })
   }
 
   async restore(
@@ -345,32 +262,24 @@ export class GreenfieldModuleRecordService {
     actor: MutationActor = {},
   ) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
-    if (input.mutationId) {
-      requireExpectedRevision(input.expectedRevision)
-      if (!Number.isInteger(input.sourceRevision) || Number(input.sourceRevision) < 1) throw moduleError('VALIDATION_FAILED', 'sourceRevision is required')
-      const source = await this.getRevision(accountId, moduleId, collection, recordId, Number(input.sourceRevision))
-      const restoredData = requireRecordData(source.data)
-      const references = extractReferences(context.collectionDefinition, restoredData)
-      await this.validateReferenceTargets(accountId, references)
-      return this.executeMutation({
-        context,
-        collectionDefinition: context.collectionDefinition,
-        operation: 'restore',
-        recordId,
-        expectedRevision: input.expectedRevision,
-        sourceRevision: input.sourceRevision,
-        mutationId: input.mutationId,
-        actor,
-        payloadInput: {expectedRevision: input.expectedRevision, sourceRevision: input.sourceRevision},
-        references,
-      })
-    }
-    const current = await this.findRecord(accountId, moduleId, collection, recordId, true)
-    if (!current) throw moduleError('NOT_FOUND', 'Module record not found')
-    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
-    const legacyReferences = extractReferences(context.collectionDefinition, requireRecordData(current.data))
-    await this.validateReferenceTargets(accountId, legacyReferences)
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'restore', 'restore', {}, legacyReferences, actor)
+    requireExpectedRevision(input.expectedRevision)
+    if (!Number.isInteger(input.sourceRevision) || Number(input.sourceRevision) < 1) throw moduleError('VALIDATION_FAILED', 'sourceRevision is required')
+    const source = await this.getRevision(accountId, moduleId, collection, recordId, Number(input.sourceRevision))
+    const restoredData = requireRecordData(source.data)
+    const references = extractReferences(context.collectionDefinition, restoredData)
+    await this.validateReferenceTargets(accountId, references)
+    return this.executeMutation({
+      context,
+      collectionDefinition: context.collectionDefinition,
+      operation: 'restore',
+      recordId,
+      expectedRevision: input.expectedRevision,
+      sourceRevision: input.sourceRevision,
+      mutationId: requireMutationId(input.mutationId),
+      actor,
+      payloadInput: {expectedRevision: input.expectedRevision, sourceRevision: input.sourceRevision},
+      references,
+    })
   }
 
   async listRevisions(accountId: string, moduleId: string, collection: string, recordId: string, input: {limit?: number} = {}) {
@@ -548,11 +457,15 @@ export class GreenfieldModuleRecordService {
     const mutationId = requireMutationId(input.mutationId)
     const {runtime} = input.context
     const recordAccountId = input.recordAccountId ?? runtime.accountId
-    const payloadHash = sha256(canonicalJsonStringify({
-      moduleId: runtime.moduleId,
-      recordType: input.collectionDefinition.collection,
+    const payloadHash = sha256(canonicalMutationJsonStringify({
       operation: input.operation,
+      record: {
+        moduleId: runtime.moduleId,
+        recordType: input.collectionDefinition.collection,
+        recordId: input.recordId,
+      },
       payload: input.payloadInput,
+      expectedRevision: input.expectedRevision ?? null,
     }))
     const execute = async (trx: Transaction<Database>) => {
       const reservationId = uuidv7()

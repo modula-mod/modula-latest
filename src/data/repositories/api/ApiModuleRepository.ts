@@ -272,21 +272,21 @@ export class ApiModuleRepository implements ModuleRepository {
 
   createRecord(moduleId: string, collection: string, data: Record<string, unknown>): Promise<ModuleRecord> {
     return localOnlyFallback(
-      this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, body: {data}}, decodeRecord),
+      this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, body: {data, mutationId: idempotencyKey('record-create', moduleId)}}, decodeRecord),
       () => createLocalRecord(moduleId, collection, data),
     )
   }
 
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord> {
     return localOnlyFallback(
-      this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {data, expectedRevision}}, decodeRecord),
+      this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {data, expectedRevision, mutationId: idempotencyKey('record-update', moduleId)}}, decodeRecord),
       () => updateLocalRecord(moduleId, collection, recordId, data, expectedRevision),
     )
   }
 
   deleteRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown> {
     return localOnlyFallback(
-      this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision}}, value => value),
+      this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision, mutationId: idempotencyKey('record-delete', moduleId)}}, value => value),
       () => deleteLocalRecord(moduleId, collection, recordId, expectedRevision),
     )
   }
@@ -295,7 +295,7 @@ export class ApiModuleRepository implements ModuleRepository {
     return this.client.post({
       path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/restore`,
       authenticated: true,
-      body: {expectedRevision},
+      body: {expectedRevision, sourceRevision: expectedRevision, mutationId: idempotencyKey('record-restore', moduleId)},
     }, decodeRecord)
   }
 

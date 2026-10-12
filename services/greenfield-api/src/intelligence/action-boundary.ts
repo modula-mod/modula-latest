@@ -89,6 +89,7 @@ export class IntelligenceActionBoundary {
         data: input.data,
         visibility: typeof input.visibility === 'string' ? input.visibility : undefined,
         recordId: typeof input.recordId === 'string' ? input.recordId : undefined,
+        mutationId: proposal.idempotencyKey ?? proposal.id,
       })
     }
     throw new Error(`Unsupported governed runtime action ${proposal.family}`)

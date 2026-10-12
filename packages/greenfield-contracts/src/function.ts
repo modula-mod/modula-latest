@@ -67,8 +67,8 @@ export type GreenfieldInterModuleActionIdentity = {
 }
 
 /** Canonical reviewed capability a source module must request for a target action. */
-export function interModuleRequestCapability(targetModuleId: string, actionId: string): string {
-  return `actions:${targetModuleId}.${actionId}:request`
+export function interModuleRequestCapability(targetModuleId: string, actionId: string, version: string): string {
+  return `module.action:request:${targetModuleId}:${actionId}:${version}`
 }
 
 /** Canonical reviewed capability required to invoke a declared module function. */

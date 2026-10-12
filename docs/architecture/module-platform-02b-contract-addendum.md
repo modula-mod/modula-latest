@@ -13,8 +13,8 @@ The server, never the client, calculates `payloadHash` as lower-case hexadecimal
 SHA-256 over UTF-8 bytes of canonical JSON. Canonical JSON recursively sorts
 object keys by Unicode code point, preserves array order, emits booleans and
 `null` as JSON literals, rejects non-finite numbers, normalizes negative zero to
-zero, and uses the shortest round-trippable JSON number form. Strings are valid
-Unicode and are preserved without compatibility or case normalization. An
+zero, and uses the shortest round-trippable JSON number form. Strings and object
+keys are normalized to Unicode NFC without compatibility or case normalization. An
 omitted object property is absent; an explicitly supplied `null` is present and
 therefore hashes differently. API timestamps are parsed, validated and emitted
 as UTC RFC 3339 with millisecond precision before hashing.

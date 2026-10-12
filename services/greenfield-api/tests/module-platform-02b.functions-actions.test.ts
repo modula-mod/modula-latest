@@ -106,8 +106,8 @@ describeIf('MODULE-PLATFORM-02B governed functions and inter-module actions', ()
     await setAlphaPermissions(alpha.permissions)
 
     const community = await authenticated('POST', `/v1/modules/${alphaId}/functions/community/1.0.0/invoke`, {input: {message: 'never run'}})
-    expect(community.statusCode).toBe(403)
-    expect(community.json().error.code).toBe('CAPABILITY_DISABLED')
+    expect(community.statusCode).toBe(404)
+    expect(community.json().error.code).toBe('FUNCTION_NOT_AVAILABLE')
     expect(community.json().error.message).toContain('no fallback')
 
     const remote = await authenticated('POST', `/v1/modules/${alphaId}/functions/remote/1.0.0/invoke`, {input: {message: 'never transmit'}})
@@ -218,9 +218,9 @@ describeIf('MODULE-PLATFORM-02B governed functions and inter-module actions', ()
       .where('module_id', '=', betaId).where('record_id', '=', `beta-task-${suffix}`).executeTakeFirstOrThrow()
     expect(revision.actor_id).toBe(`module:${alphaId}:${alpha.installationId}`)
     expect(alpha.permissions).not.toContain(`records:module.${betaId}.task:write`)
-    expect(alpha.permissions).toContain(interModuleRequestCapability(betaId, 'create-task'))
+    expect(alpha.permissions).toContain(interModuleRequestCapability(betaId, 'create-task', '1.0.0'))
 
-    await setAlphaPermissions(alpha.permissions.filter(permission => permission !== interModuleRequestCapability(betaId, 'create-task')))
+    await setAlphaPermissions(alpha.permissions.filter(permission => permission !== interModuleRequestCapability(betaId, 'create-task', '1.0.0')))
     const denied = await runtimeAction({mutationId: 'alpha-to-beta-denied', input: {recordId: `denied-${suffix}`, title: 'Denied'}})
     expect(denied.statusCode).toBe(403)
     expect(denied.json().error.code).toBe('MODULE_PERMISSION_DENIED')
@@ -308,7 +308,7 @@ async function seedAlpha(db: Kysely<Database>, accountId: string, moduleId: stri
     governedFunctionInvokeCapability(moduleId, 'host-pick'),
     governedFunctionInvokeCapability(moduleId, 'community'),
     governedFunctionInvokeCapability(moduleId, 'remote'),
-    interModuleRequestCapability(betaId, 'create-task'),
+    interModuleRequestCapability(betaId, 'create-task', '1.0.0'),
   ]
   const manifest = baseManifest(moduleId, permissions)
   manifest.contributions.functions = [

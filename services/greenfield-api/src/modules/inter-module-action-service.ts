@@ -4,7 +4,7 @@ import {
   type GreenfieldJsonSchema,
 } from '@modula/greenfield-contracts'
 import type {GreenfieldModuleInterModuleActionContribution} from '@modula/greenfield-module-manifest'
-import {canonicalJsonStringify} from '@modula/greenfield-protocol'
+import {canonicalMutationJsonStringify} from '@modula/greenfield-protocol'
 import {createHash} from 'node:crypto'
 import {sql, type Transaction} from 'kysely'
 import type {AppConfig} from '../config/index.js'
@@ -75,14 +75,14 @@ export class GreenfieldInterModuleActionService {
     const source = await this.authenticateRuntimeCredential(credential)
     const target = await this.access.resolve(source.accountId, identity.targetModuleId, {requireEnabled: true})
     const action = await this.resolveAction(target, identity.actionId, identity.version)
-    this.access.enforceCapability(source, interModuleRequestCapability(target.moduleId, action.actionId))
+    this.access.enforceCapability(source, interModuleRequestCapability(target.moduleId, action.actionId, action.version))
     if (!action.allowedSourceModules.includes(source.moduleId)) throw moduleError('MODULE_PERMISSION_DENIED', 'Target policy does not allow this source module')
     for (const capability of action.requiredCapabilities) this.access.enforceCapability(target, capability)
     assertGovernedSchemaValue(action.inputSchema, input, 'input')
     const mutationId = action.mutating
       ? requireIdentity(options.mutationId, 'mutationId')
       : boundedIdentity(options.mutationId) ?? boundedIdentity(options.requestId) ?? uuidv7()
-    const payloadHash = sha256(canonicalJsonStringify({
+    const payloadHash = sha256(canonicalMutationJsonStringify({
       sourceModuleId: source.moduleId,
       sourceReleaseId: source.releaseId,
       targetModuleId: target.moduleId,

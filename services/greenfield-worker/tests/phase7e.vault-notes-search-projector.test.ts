@@ -21,6 +21,7 @@ describe('MP02 generic module record search projector source', () => {
     expect(projector).toContain("entityType: 'module-record'")
     expect(projector).toContain("visibility: 'account'")
     expect(projector).toContain('searchable_fields')
+    expect(projector).toContain(".where('schema_ref', '=', row.schema_ref)")
   })
 })
 

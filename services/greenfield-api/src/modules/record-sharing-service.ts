@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto'
-import {canonicalJsonStringify} from '@modula/greenfield-protocol'
+import {canonicalMutationJsonStringify} from '@modula/greenfield-protocol'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import type {Transaction} from 'kysely'
 import type {Database} from '../database/types.js'
@@ -32,10 +32,9 @@ export class GreenfieldModuleRecordSharingService {
     const expiresAt = optionalDate(input.expiresAt, 'expiresAt')
     if (expiresAt && expiresAt <= new Date()) throw moduleError('VALIDATION_FAILED', 'expiresAt must be in the future')
     if (recipientAccountId === accountId) throw moduleError('VALIDATION_FAILED', 'A record cannot be shared with its owner')
-    const payloadHash = sha256(canonicalJsonStringify({
-      moduleId: runtime.moduleId,
-      recordType,
-      recordId,
+    const payloadHash = sha256(canonicalMutationJsonStringify({
+      operation: 'share.create',
+      record: {moduleId: runtime.moduleId, recordType, recordId},
       recipientAccountId,
       permission,
       expiresAt: expiresAt?.toISOString() ?? null,

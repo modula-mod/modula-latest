@@ -30,6 +30,7 @@ export async function projectModuleRecord(db: ModulaWorkerDb, projector: SearchP
     .select(['fields', 'searchable_fields', 'filterable_fields'])
     .where('module_id', '=', row.module_id)
     .where('collection', '=', row.collection)
+    .where('schema_ref', '=', row.schema_ref)
     .where('registration_status', 'not in', ['quarantined', 'revoked'])
     .orderBy('updated_at', 'desc')
     .executeTakeFirst()
