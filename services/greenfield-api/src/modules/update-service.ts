@@ -11,6 +11,7 @@ import type {IssuedInstallDescriptor} from './install-descriptor-service.js'
 import {GreenfieldModuleVersionSwitchService, type VersionSwitchOptions} from './version-switch-service.js'
 import {GreenfieldRegistryTrustService} from './registry-trust-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {GreenfieldModuleDistributionService} from './distribution-service.js'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -25,6 +26,8 @@ export type GreenfieldModuleUpdateInput = {
   acknowledgeDowngradeRisk?: boolean
   hostVersion?: string | null
   platform?: string | null
+  /** Optimistic concurrency token returned by the canonical update plan. */
+  expectedDescriptorRevision?: string
 }
 
 /**
@@ -101,6 +104,14 @@ export class GreenfieldModuleUpdateService {
       }
     }
 
+    if (input.expectedDescriptorRevision) {
+      const current = await new GreenfieldModuleDistributionService(this.db, this.config)
+        .installationDescriptor(accountId, installed.moduleId, input)
+      if (current.descriptorRevision !== input.expectedDescriptorRevision) {
+        throw moduleError('REVISION_CONFLICT', 'Installation descriptor changed after the update plan was issued')
+      }
+    }
+
     const evaluation = await new GreenfieldModuleVersionSwitchService(this.db, this.config).evaluate(accountId, installed, input.version, {
       ...input,
       retainReviewedGrantsOnly: legacyTrustMigration,
@@ -130,7 +141,7 @@ export class GreenfieldModuleUpdateService {
     const approved = new Set(input.approvedPermissionIncrease ? evaluation.permissions.requiresConsent : (input.approvedPermissions ?? []))
     const missingConsent = evaluation.permissions.requiresConsent.filter(permission => !approved.has(permission))
     if (missingConsent.length && !legacyTrustMigration) {
-      throw moduleError('VALIDATION_FAILED', `PERMISSION_CONSENT_REQUIRED: ${evaluation.toVersion} adds permissions that need your consent: ${missingConsent.join(', ')}`)
+      throw moduleError('PERMISSION_REVIEW_REQUIRED', `${evaluation.toVersion} adds permissions that need review: ${missingConsent.join(', ')}`)
     }
     if (evaluation.direction === 'downgrade' && evaluation.dataSchema.older && !input.acknowledgeDowngradeRisk) {
       throw moduleError('VALIDATION_FAILED', `DOWNGRADE_ACKNOWLEDGEMENT_REQUIRED: ${evaluation.toVersion} declares an older data schema; confirm the downgrade to continue`)

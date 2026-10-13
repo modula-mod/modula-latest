@@ -10,7 +10,7 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
 
-describeIfDb.sequential('API-FIX-01 and module-platform migrations through 071', () => {
+describeIfDb.sequential('API-FIX-01, module-platform and distribution migrations through 072', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -88,6 +88,7 @@ describeIfDb.sequential('API-FIX-01 and module-platform migrations through 071',
       '066_trust_privacy_fail_closed', '067_legacy_duplicate_installation_versions',
       '068_module_platform_records', '069_module_platform_media_sharing',
       '070_module_platform_functions_actions', '071_module_record_search_projection',
+      '072_module_distribution_protocol',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -95,7 +96,7 @@ describeIfDb.sequential('API-FIX-01 and module-platform migrations through 071',
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('071')
+    expect(version.rows[0]?.value).toBe('072')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -104,7 +105,7 @@ describeIfDb.sequential('API-FIX-01 and module-platform migrations through 071',
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('071_module_record_search_projection')
+    expect(applied.at(-1)).toBe('072_module_distribution_protocol')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)

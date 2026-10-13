@@ -1,5 +1,6 @@
 import {
   extractModuleStandard20Summary,
+  compareSemver,
   runtimeSupportDiagnosticsForManifest,
   runtimeSupportForStandardVersion,
   type GreenfieldModuleManifest,
@@ -42,6 +43,8 @@ export class GreenfieldModuleRegistryService {
         'greenfield_module_releases.module_id',
         'greenfield_module_releases.version',
         'greenfield_module_releases.release_state',
+        'greenfield_module_releases.release_channel',
+        'greenfield_module_releases.release_sha256',
         'greenfield_module_releases.license_status',
         'greenfield_module_releases.trust_level',
         'greenfield_module_releases.published_at',
@@ -60,6 +63,7 @@ export class GreenfieldModuleRegistryService {
 
     const byModule = new Map<string, GreenfieldRegistryModuleSummary>()
     const latestReleaseIds = new Map<string, string>()
+    const latestReleaseDigests = new Map<string, string | null>()
     for (const row of releases as any[]) {
       const manifest = row.manifest as GreenfieldModuleManifest
       const canonicalId = resolveCanonicalModuleId(row.module_id)
@@ -68,10 +72,14 @@ export class GreenfieldModuleRegistryService {
       const beta = classifyBetaModule({moduleId: canonicalId, status: row.release_state, manifest: manifest as any})
       if (!beta.visibleInBeta) continue
       const existing = byModule.get(canonicalId)
-      const newer = !existing || versionIsNewer(row.version, existing.latestVersion)
+      const existingChannel = existing?.releaseChannel ?? null
+      const preferredChannel = row.release_channel === 'stable' && existingChannel !== 'stable'
+      const sameChannelNewer = row.release_channel === existingChannel && versionIsNewer(row.version, existing?.latestVersion)
+      const newer = !existing || preferredChannel || sameChannelNewer
       if (newer) {
         const installable = row.release_state === 'published'
         latestReleaseIds.set(canonicalId, row.release_id)
+        latestReleaseDigests.set(canonicalId, row.release_sha256 ?? null)
         byModule.set(canonicalId, {
           moduleId: canonicalId,
           productKind: row.product_kind,
@@ -80,11 +88,15 @@ export class GreenfieldModuleRegistryService {
           publisherId: row.publisher_id,
           publisherName: row.display_name,
           latestVersion: row.version,
+          registryReleaseId: row.release_id,
+          releaseChannel: row.release_channel,
           trustLevel: row.trust_level,
           licenseStatus: row.license_status,
           status: row.release_state,
           installable,
           platforms: manifest.compatibility.platforms,
+          permissionRequirements: manifest.permissions,
+          compatibility: manifest.compatibility as unknown as Record<string, unknown>,
           standard: standardMetadataForManifest(manifest),
           betaClassification: beta.classification,
           installability: installabilityForBetaModule({
@@ -120,6 +132,9 @@ export class GreenfieldModuleRegistryService {
         publisherId: 'modula',
         publisherName: row.publisher,
         latestVersion: null,
+        registryReleaseId: null,
+        releaseChannel: null,
+        releaseSizeBytes: null,
         trustLevel: row.trust,
         licenseStatus: manifest.inactive ? 'unknown' : 'firstParty',
         status,
@@ -139,9 +154,15 @@ export class GreenfieldModuleRegistryService {
 
     const items = Array.from(byModule.values()).sort((a, b) => a.moduleId.localeCompare(b.moduleId)).slice(0, limit)
     const presentations = await this.presentation.forReleases(items.map(item => latestReleaseIds.get(item.moduleId) ?? ''))
+    const digests = [...new Set(items.map(item => latestReleaseDigests.get(item.moduleId)).filter((value): value is string => Boolean(value)))]
+    const blobSizes = digests.length
+      ? await this.db.selectFrom('greenfield_release_asset_blobs').select(['sha256', 'byte_size']).where('sha256', 'in', digests).execute()
+      : []
+    const sizeByDigest = new Map(blobSizes.map(row => [row.sha256, Number(row.byte_size)]))
     for (const item of items as any[]) {
       const releaseId = latestReleaseIds.get(item.moduleId)
       item.registryReleaseId = releaseId ?? null
+      item.releaseSizeBytes = sizeByDigest.get(latestReleaseDigests.get(item.moduleId) ?? '') ?? null
       item.presentation = releaseId ? summaryPresentation(presentations.get(releaseId) ?? null) : null
     }
     await Promise.all((items as any[]).map(async item => {
@@ -168,8 +189,10 @@ export class GreenfieldModuleRegistryService {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const releases = await this.listVersions(canonicalId)
     if (releases.length > 0) {
-      const latest = releases[0]!
-      const latestPublishedVersion = releases.find(item => item.releaseState === 'published')?.version ?? null
+      const latest = releases.find(item => item.releaseState === 'published' && item.releaseChannel === 'stable')
+        ?? releases.find(item => item.releaseChannel === 'stable')
+        ?? releases[0]!
+      const latestPublishedVersion = releases.find(item => item.releaseState === 'published' && item.releaseChannel === 'stable')?.version ?? null
       const beta = classifyBetaModule({moduleId: latest.moduleId, status: latest.releaseState, manifest: latest.manifest as any})
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
       const manifestRecord = latest.manifest as Record<string, unknown>
@@ -198,6 +221,7 @@ export class GreenfieldModuleRegistryService {
         description: latest.manifest.description,
         publisher: latest.manifest.publisher,
         latestVersion: latest.version,
+        releaseChannel: latest.releaseChannel,
         status: latest.releaseState,
         trust: latest.trustLevel,
         license: latest.licenseStatus,
@@ -290,6 +314,7 @@ export class GreenfieldModuleRegistryService {
         'greenfield_module_releases.version',
         'greenfield_module_releases.publisher_id',
         'greenfield_module_releases.release_state',
+        'greenfield_module_releases.release_channel',
         'greenfield_module_releases.manifest_sha256',
         'greenfield_module_releases.release_sha256',
         'greenfield_module_releases.signature_key_id',
@@ -315,6 +340,7 @@ export class GreenfieldModuleRegistryService {
       version: row.version,
       publisherId: row.publisher_id,
       releaseState: row.release_state,
+      releaseChannel: row.release_channel ?? 'stable',
       manifest: row.manifest,
       manifestSha256: row.manifest_sha256,
       releaseSha256: row.release_sha256,
@@ -402,17 +428,11 @@ function summaryTrust(trust: Awaited<ReturnType<GreenfieldRegistryTrustService['
 
 function versionIsNewer(candidate: string, current: string | null | undefined): boolean {
   if (!current) return true
-  const parse = (value: string) => value.split(/[.-]/).map(part => Number.parseInt(part, 10) || 0)
-  const left = parse(candidate)
-  const right = parse(current)
-  const length = Math.max(left.length, right.length)
-  for (let index = 0; index < length; index += 1) {
-    const a = left[index] ?? 0
-    const b = right[index] ?? 0
-    if (a > b) return true
-    if (a < b) return false
+  try {
+    return compareSemver(candidate, current) > 0
+  } catch {
+    return false
   }
-  return false
 }
 
 function standardMetadataForManifest(input: unknown): GreenfieldRegistryStandardMetadata {

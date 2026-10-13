@@ -1,5 +1,6 @@
 import {generateKeyPairSync, randomBytes, randomUUID, sign, type KeyObject} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {sql} from 'kysely'
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
@@ -189,8 +190,11 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     const {manifest, evidence} = signedImport(id)
     const imported = await releases.importPendingReview(manifest, evidence)
     await releases.publishRelease(id, '1.0.0')
-    await db.updateTable('greenfield_module_releases').set({release_sha256: sha256(`altered-${suffix}`)})
-      .where('release_id', '=', imported.releaseId).execute()
+    await db.transaction().execute(async trx => {
+      await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+      await trx.updateTable('greenfield_module_releases').set({release_sha256: sha256(`altered-${suffix}`)})
+        .where('release_id', '=', imported.releaseId).execute()
+    })
     await expect(releases.verifyRelease(id, '1.0.0')).rejects.toThrow(/signature invalid/)
     const response = await app.inject({method: 'POST', url: `/v1/modules/${id}/install`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `digest-mismatch-${suffix}`},

@@ -66,6 +66,7 @@ export type GreenfieldModuleReleaseRecord = {
   version: string
   publisherId: string
   releaseState: string
+  releaseChannel: 'stable' | 'beta' | 'rc' | 'dev'
   manifest: GreenfieldModuleManifest
   manifestSha256: string
   releaseSha256: string | null
@@ -90,6 +91,9 @@ export type GreenfieldModuleInstallationRow = {
   permissionReviewRequired?: boolean
   productKind?: GreenfieldExtensionProductKind
   lifecycleState?: string
+  updatePolicy?: 'automaticStable' | 'followChannel' | 'lockedVersion' | 'manual'
+  releaseChannel?: 'stable' | 'beta' | 'rc' | 'dev'
+  lockedVersion?: string | null
 }
 
 export const INSTALLED_MODULE_STATES: GreenfieldModuleInstallationStatus[] = [

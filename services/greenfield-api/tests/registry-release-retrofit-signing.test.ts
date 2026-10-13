@@ -1,5 +1,6 @@
 import {generateKeyPairSync, randomUUID, sign} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
+import {sql} from 'kysely'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
@@ -203,8 +204,11 @@ describeIfDb('retrospective publisher release signatures', () => {
     expect(projectionMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
     await db.updateTable('greenfield_module_release_signatures')
       .set({statement: signatureRow.statement}).where('signature_id', '=', signatureRow.signature_id).execute()
-    await db.updateTable('greenfield_module_releases')
-      .set({release_sha256: sha256('different release bytes')}).where('release_id', '=', release.releaseId).execute()
+    await db.transaction().execute(async trx => {
+      await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+      await trx.updateTable('greenfield_module_releases')
+        .set({release_sha256: sha256('different release bytes')}).where('release_id', '=', release.releaseId).execute()
+    })
     const releaseMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
     expect(releaseMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
   })

@@ -153,8 +153,9 @@ export async function registerBackendFabricRoutes(
       const collection = collectionParam(request)
       requireAssertionOperation(assertion, collectionPermission(productId, collection, 'write'))
       await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const mutationId = requiredIdempotencyKey(request)
       return executeIdempotent(db, assertion, request, `records.create:${collection}`, async () =>
-        records.create(assertion.accountId, productId, collection, {data: requireObject(request.body)}),
+        records.create(assertion.accountId, productId, collection, {data: requireObject(request.body), mutationId}),
       )
     }, 201)
   })

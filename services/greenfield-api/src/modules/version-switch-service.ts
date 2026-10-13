@@ -1,4 +1,4 @@
-import {classifyPermissionRisk, satisfiesSemverRange} from '@modula/greenfield-module-manifest'
+import {classifyPermissionRisk, compareSemver, satisfiesSemverRange} from '@modula/greenfield-module-manifest'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
@@ -255,21 +255,7 @@ export function directionOf(fromVersion: string, toVersion: string): VersionSwit
 
 /** Numeric semver comparison; a pre-release sorts below its release. */
 export function compareVersions(left: string, right: string): number {
-  const split = (value: string) => {
-    const [core = '', pre] = value.split('-', 2)
-    return {core: core.split('.').map(part => Number.parseInt(part, 10) || 0), pre: pre ?? null}
-  }
-  const a = split(left)
-  const b = split(right)
-  for (let index = 0; index < Math.max(a.core.length, b.core.length); index += 1) {
-    const x = a.core[index] ?? 0
-    const y = b.core[index] ?? 0
-    if (x !== y) return x > y ? 1 : -1
-  }
-  if (a.pre === b.pre) return 0
-  if (a.pre === null) return 1
-  if (b.pre === null) return -1
-  return a.pre > b.pre ? 1 : -1
+  return compareSemver(left, right)
 }
 
 function targetDeclared(release: GreenfieldModuleReleaseRecord): string[] {

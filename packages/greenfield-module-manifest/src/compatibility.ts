@@ -23,10 +23,22 @@ export function isSemverRange(value: string): boolean {
   return SEMVER_RANGE_PATTERN.test(value)
 }
 
-export function parseSemver(value: string): [number, number, number] | null {
+export type ParsedSemver = {
+  core: [number, number, number]
+  prerelease: Array<string | number>
+}
+
+export function parseSemver(value: string): ParsedSemver | null {
   const match = SEMVER_PATTERN.exec(value)
   if (!match) return null
-  return [Number(match[1]), Number(match[2]), Number(match[3])]
+  const withoutBuild = value.split('+', 1)[0]!
+  const prereleaseText = withoutBuild.includes('-') ? withoutBuild.slice(withoutBuild.indexOf('-') + 1) : ''
+  return {
+    core: [Number(match[1]), Number(match[2]), Number(match[3])],
+    prerelease: prereleaseText
+      ? prereleaseText.split('.').map(identifier => /^\d+$/.test(identifier) ? Number(identifier) : identifier)
+      : [],
+  }
 }
 
 export function compareSemver(a: string, b: string): number {
@@ -34,8 +46,22 @@ export function compareSemver(a: string, b: string): number {
   const right = parseSemver(b)
   if (!left || !right) throw new Error('Invalid semantic version')
   for (let index = 0; index < 3; index += 1) {
-    const delta = left[index]! - right[index]!
+    const delta = left.core[index]! - right.core[index]!
     if (delta !== 0) return delta
+  }
+  if (!left.prerelease.length && !right.prerelease.length) return 0
+  if (!left.prerelease.length) return 1
+  if (!right.prerelease.length) return -1
+  for (let index = 0; index < Math.max(left.prerelease.length, right.prerelease.length); index += 1) {
+    const a = left.prerelease[index]
+    const b = right.prerelease[index]
+    if (a === undefined) return -1
+    if (b === undefined) return 1
+    if (a === b) continue
+    if (typeof a === 'number' && typeof b === 'number') return a < b ? -1 : 1
+    if (typeof a === 'number') return -1
+    if (typeof b === 'number') return 1
+    return a < b ? -1 : 1
   }
   return 0
 }
@@ -46,15 +72,19 @@ export function satisfiesSemverRange(version: string, range: string): boolean {
   const trimmed = range.trim()
   if (trimmed.startsWith('^')) {
     const base = trimmed.slice(1)
-    const v = parseSemver(version)!
     const b = parseSemver(base)!
-    return v[0] === b[0] && compareSemver(version, base) >= 0
+    const upper = b.core[0] > 0
+      ? `${b.core[0] + 1}.0.0`
+      : b.core[1] > 0
+        ? `0.${b.core[1] + 1}.0`
+        : `0.0.${b.core[2] + 1}`
+    return compareSemver(version, base) >= 0 && compareSemver(version, upper) < 0
   }
   if (trimmed.startsWith('~')) {
     const base = trimmed.slice(1)
     const v = parseSemver(version)!
     const b = parseSemver(base)!
-    return v[0] === b[0] && v[1] === b[1] && compareSemver(version, base) >= 0
+    return v.core[0] === b.core[0] && v.core[1] === b.core[1] && compareSemver(version, base) >= 0
   }
   const parts = trimmed.split(/\s+/).filter(Boolean)
   if (parts.length > 1) {

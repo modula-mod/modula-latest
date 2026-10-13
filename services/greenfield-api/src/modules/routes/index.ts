@@ -43,6 +43,8 @@ import {GreenfieldAIExtensionActionService} from '../../ai/extension-action-serv
 import {statusForAiError} from '../../ai/errors.js'
 import {GreenfieldGovernedFunctionService} from '../governed-function-service.js'
 import {GreenfieldInterModuleActionService} from '../inter-module-action-service.js'
+import {GreenfieldModuleDistributionService, type DistributionHostContext} from '../distribution-service.js'
+import {validateHostCapabilityDescriptor, type HostCapabilityDescriptor} from '@modula/greenfield-module-ui-contracts'
 
 type RouteConfig = Record<string, unknown>
 
@@ -92,6 +94,8 @@ export async function registerModuleRoutes(
   const extensionAi = new GreenfieldAIExtensionActionService(db, config)
   const governedFunctions = new GreenfieldGovernedFunctionService(db, config)
   const interModuleActions = new GreenfieldInterModuleActionService(db, config)
+  const distribution = new GreenfieldModuleDistributionService(db, config)
+  const artifactConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 240, timeWindow: '1 minute'}}} : {}
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -205,6 +209,17 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.get('/v1/admin/registry/artifacts/orphans', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      return reply.send(successEnvelope(await distribution.orphanArtifactReport(), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Artifact orphan report failed')
+    }
+  })
+
   app.get('/v1/registry/modules/:moduleId/versions', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
@@ -234,20 +249,40 @@ export async function registerModuleRoutes(
   })
 
   // Immutable release package, when the registry holds the verified bytes.
-  app.get('/v1/registry/releases/:releaseId/artifact', routeConfig.profileConfig, async (request, reply) => {
+  app.get('/v1/registry/releases/:releaseId/artifact', artifactConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      const artifact = await registry.presentation.readReleaseArtifact(String((request.params as {releaseId?: string}).releaseId ?? ''))
-      return reply
-        .header('ETag', `"sha256-${artifact.sha256}"`)
-        .header('Cache-Control', 'public, max-age=31536000, immutable')
-        .header('X-Content-Type-Options', 'nosniff')
-        .header('Content-Disposition', `attachment; filename="${artifact.filename}"`)
-        .header('X-Modula-Artifact-Sha256', artifact.sha256)
-        .type('application/gzip')
-        .send(artifact.bytes)
+      const legacy = await registry.presentation.readReleaseArtifact(String((request.params as {releaseId?: string}).releaseId ?? ''))
+      const artifact = await distribution.readArtifact(legacy.sha256, request.auth?.accountId ?? null)
+      reply
+        .header('Deprecation', 'true')
+        .header('Link', `</v1/registry/artifacts/${legacy.sha256}>; rel="successor-version"`)
+      return sendArtifactBytes(request, reply, artifact)
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Release artifact lookup failed')
+    }
+  })
+
+  app.get('/v1/registry/releases/:releaseId/descriptor', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      const releaseId = String((request.params as {releaseId?: string}).releaseId ?? '')
+      return reply.send(successEnvelope(await distribution.releaseDescriptorById(releaseId, distributionContext(request.query)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Release descriptor lookup failed')
+    }
+  })
+
+  // Canonical content-addressed artifact delivery. Executable artifacts are
+  // installation-scoped; artwork is public. Both are immutable and resumable.
+  app.get('/v1/registry/artifacts/:sha256', artifactConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      const sha256 = String((request.params as {sha256?: string}).sha256 ?? '')
+      const artifact = await distribution.readArtifact(sha256, request.auth?.accountId ?? null)
+      return sendArtifactBytes(request, reply, artifact)
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Artifact lookup failed')
     }
   })
 
@@ -565,20 +600,49 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/install-plan', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as Record<string, unknown> | null) ?? {}
+      const version = typeof body.version === 'string' && body.version.trim() ? body.version.trim() : null
+      return reply.send(successEnvelope(await distribution.installPlan(
+        auth.accountId,
+        canonicalModuleParam(request),
+        version,
+        distributionContext(body),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Install plan failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/install', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
+      const moduleId = canonicalModuleParam(request)
+      const hostContext = distributionContext(body)
+      const result = await installations.install(auth.accountId, moduleId, {
+        version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
+        approvedPermissions: body.approvedPermissions,
+        platform: modulePlatform(body.platform),
+        hostVersion: hostContext.hostVersion,
+        idempotencyKey: idempotencyKey(request, body),
+      })
+      let installationDescriptor = null
+      try {
+        installationDescriptor = await distribution.installationDescriptor(auth.accountId, moduleId, hostContext)
+      } catch (error) {
+        // Historical releases can predate the complete artifact inventory. The
+        // legacy descriptor remains in the response; new distribution-ready
+        // releases always return the canonical descriptor here.
+        if (!['NOT_FOUND', 'UNTRUSTED_RELEASE'].includes(String((error as {code?: unknown})?.code ?? ''))) throw error
+      }
       return reply.code(202).send(
         successEnvelope(
-          await installations.install(auth.accountId, canonicalModuleParam(request), {
-            version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
-            approvedPermissions: body.approvedPermissions,
-            platform: modulePlatform(body.platform),
-            hostVersion: parseTrustOptions({hostVersion: body.hostVersion}).hostVersion,
-            idempotencyKey: idempotencyKey(request, body),
-          }),
+          {...result, installationDescriptor, distributionReady: installationDescriptor !== null},
           request.id,
         ),
       )
@@ -595,6 +659,34 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await installations.getInstallDescriptor(auth.accountId, canonicalModuleParam(request), {hostVersion: options.hostVersion}), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install descriptor lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/installation-descriptor', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const descriptor = await distribution.installationDescriptor(auth.accountId, canonicalModuleParam(request), distributionContext(request.query))
+      const etag = `"descriptor-${descriptor.descriptorRevision}"`
+      reply.header('ETag', etag).header('Cache-Control', 'private, no-cache, must-revalidate')
+      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      return reply.send(successEnvelope(descriptor, request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Installation descriptor lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/updates', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const feed = await distribution.updateFeed(auth.accountId, distributionContext(request.query))
+      const etag = `"updates-${feed.revision}"`
+      reply.header('ETag', etag).header('Cache-Control', 'private, no-cache, must-revalidate')
+      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      return reply.send(successEnvelope(feed, request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module update feed failed')
     }
   })
 
@@ -646,6 +738,41 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/update-plan', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as Record<string, unknown> | null) ?? {}
+      const version = typeof body.version === 'string' && body.version.trim() ? body.version.trim() : null
+      return reply.send(successEnvelope(await distribution.updatePlan(
+        auth.accountId,
+        canonicalModuleParam(request),
+        version,
+        distributionContext(body),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Update plan failed')
+    }
+  })
+
+  app.patch('/v1/modules/installations/:installationId/update-policy', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as Record<string, unknown> | null) ?? {}
+      const mode = ['automaticStable', 'followChannel', 'lockedVersion', 'manual'].includes(String(body.mode)) ? body.mode as any : undefined
+      const channel = ['stable', 'beta', 'rc', 'dev'].includes(String(body.channel)) ? body.channel as any : undefined
+      const lockedVersion = body.lockedVersion === null || typeof body.lockedVersion === 'string' ? body.lockedVersion as string | null : undefined
+      return reply.send(successEnvelope(await distribution.setUpdatePolicy(
+        auth.accountId,
+        String((request.params as {installationId?: string}).installationId ?? ''),
+        {mode, channel, lockedVersion},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Update policy change failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/update', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -658,6 +785,7 @@ export async function registerModuleRoutes(
             approvedPermissionIncrease: body.approvedPermissionIncrease === true,
             approvedPermissions: Array.isArray(body.approvedPermissions) ? body.approvedPermissions.filter((permission: unknown): permission is string => typeof permission === 'string') : undefined,
             acknowledgeDowngradeRisk: body.acknowledgeDowngradeRisk === true,
+            expectedDescriptorRevision: typeof body.expectedDescriptorRevision === 'string' ? body.expectedDescriptorRevision : undefined,
             ...parseTrustOptions({hostVersion: body.hostVersion, platform: body.platform}),
             idempotencyKey: idempotencyKey(request, body),
           }),
@@ -666,6 +794,34 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Update failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/rollback', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as Record<string, unknown> | null) ?? {}
+      const currentPlan = await distribution.updatePlan(auth.accountId, canonicalModuleParam(request), null, distributionContext(body))
+      const requestedVersion = typeof body.version === 'string' && body.version.trim() ? body.version.trim() : null
+      const candidate = currentPlan.rollbackCandidateReleaseId
+        ? await distribution.releaseDescriptorById(currentPlan.rollbackCandidateReleaseId, distributionContext(body))
+        : null
+      if (!candidate || (requestedVersion && requestedVersion !== candidate.version)) {
+        throw moduleError('VALIDATION_FAILED', 'No eligible trusted rollback target matches the request')
+      }
+      const expected = typeof body.expectedDescriptorRevision === 'string' ? body.expectedDescriptorRevision : ''
+      if (!expected || expected !== currentPlan.expectedDescriptorRevision) throw moduleError('REVISION_CONFLICT', 'Installation descriptor changed; refresh the rollback plan')
+      return reply.code(202).send(successEnvelope(await updates.update(auth.accountId, canonicalModuleParam(request), {
+        version: candidate.version,
+        approvedPermissions: [],
+        acknowledgeDowngradeRisk: true,
+        expectedDescriptorRevision: expected,
+        ...parseTrustOptions({hostVersion: body.hostVersion, platform: body.platform}),
+        idempotencyKey: idempotencyKey(request, body),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Rollback failed')
     }
   })
 
@@ -890,11 +1046,12 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
       return reply.code(201).send(successEnvelope(await records.create(
         auth.accountId,
         params.moduleId,
         params.collection,
-        (request.body as any) ?? {},
+        withRecordMutationId(body, request),
         {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
       ), request.id))
     } catch (error) {
@@ -1061,12 +1218,13 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
       return reply.send(successEnvelope(await records.patch(
         auth.accountId,
         params.moduleId,
         params.collection,
         params.recordId,
-        (request.body as any) ?? {},
+        withRecordMutationId(body, request),
         {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
       ), request.id))
     } catch (error) {
@@ -1079,12 +1237,13 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
       return reply.send(successEnvelope(await records.delete(
         auth.accountId,
         params.moduleId,
         params.collection,
         params.recordId,
-        (request.body as any) ?? {},
+        withRecordMutationId(body, request),
         {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
       ), request.id))
     } catch (error) {
@@ -1097,12 +1256,13 @@ export async function registerModuleRoutes(
     if (!auth) return
     const params = request.params as any
     try {
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
       return reply.send(successEnvelope(await records.restore(
         auth.accountId,
         params.moduleId,
         params.collection,
         params.recordId,
-        (request.body as any) ?? {},
+        withRecordMutationId(body, request),
         {actorId: actorIdForAccount(auth.accountId), requestId: request.id},
       ), request.id))
     } catch (error) {
@@ -1545,6 +1705,18 @@ function idempotencyKey(request: FastifyRequest, body: unknown): string {
   return String(fromHeader ?? fromBody ?? '').trim()
 }
 
+/**
+ * MP02 made mutation identities mandatory for OCC/idempotent record writes.
+ * Preserve older callers by using the request identity when they have not yet
+ * supplied a stable mutation/idempotency key; capable clients still get exact
+ * retry semantics by sending either field.
+ */
+function withRecordMutationId(body: Record<string, unknown>, request: FastifyRequest) {
+  const supplied = stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body)
+  const requestIdentity = String(request.id).replace(/[^A-Za-z0-9._:-]/g, '.')
+  return {...body, mutationId: supplied || `request:${requestIdentity}`}
+}
+
 function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery {
   const reserved = new Set(['cursor', 'limit', 'sort', 'direction', 'q', 'folder', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo', 'recordState'])
   const filters: Record<string, unknown> = {}
@@ -1587,6 +1759,88 @@ function stringOrUndefined(value: unknown): string | undefined {
 
 function modulePlatform(value: unknown): 'ios' | 'android' | 'web' | 'desktop' | 'server' {
   return value === 'ios' || value === 'android' || value === 'web' || value === 'desktop' || value === 'server' ? value : 'web'
+}
+
+function distributionContext(value: unknown): DistributionHostContext {
+  const input = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+  const trust = parseTrustOptions(input)
+  let rawCapabilities: unknown = input.hostCapabilities
+  if (typeof rawCapabilities === 'string' && rawCapabilities.trim().startsWith('[')) {
+    try {
+      rawCapabilities = JSON.parse(rawCapabilities)
+    } catch {
+      throw moduleError('VALIDATION_FAILED', 'hostCapabilities must be valid JSON')
+    }
+  }
+  let hostCapabilities: HostCapabilityDescriptor[] | null = null
+  if (rawCapabilities !== undefined) {
+    if (!Array.isArray(rawCapabilities)) throw moduleError('VALIDATION_FAILED', 'hostCapabilities must be an array')
+    hostCapabilities = rawCapabilities.map((item, index) => {
+      const validated = validateHostCapabilityDescriptor(item)
+      if (!validated.valid || !validated.value) {
+        throw moduleError('VALIDATION_FAILED', `hostCapabilities[${index}] is invalid: ${validated.issues.map(issue => issue.code).join(', ')}`)
+      }
+      return validated.value
+    })
+  }
+  return {
+    ...trust,
+    moduleSdkVersion: typeof input.moduleSdkVersion === 'string' && input.moduleSdkVersion.trim() ? input.moduleSdkVersion.trim() : null,
+    productUiContractVersion: typeof input.productUiContractVersion === 'string' && input.productUiContractVersion.trim() ? input.productUiContractVersion.trim() : null,
+    hostCapabilities,
+  }
+}
+
+function sendArtifactBytes(
+  request: FastifyRequest,
+  reply: FastifyReply,
+  artifact: {
+    sha256: string
+    media_type: string
+    byte_size: number
+    bytes: Buffer
+    filename: string
+    access_class: 'public' | 'installation'
+    kind: string
+  },
+) {
+  const etag = `"sha256-${artifact.sha256}"`
+  reply
+    .header('ETag', etag)
+    .header('Accept-Ranges', 'bytes')
+    .header('Cache-Control', artifact.access_class === 'public' ? 'public, max-age=31536000, immutable' : 'private, max-age=31536000, immutable')
+    .header('X-Content-Type-Options', 'nosniff')
+    .header('X-Modula-Artifact-Sha256', artifact.sha256)
+    .header('Content-Disposition', `${['asset', 'icon', 'cover', 'screenshot'].includes(artifact.kind) ? 'inline' : 'attachment'}; filename="${artifact.filename}"`)
+    .type(artifact.media_type)
+  if (request.headers['if-none-match'] === etag && !request.headers.range) return reply.code(304).send()
+  const range = request.headers.range
+  const ifRange = request.headers['if-range']
+  if (range && (!ifRange || ifRange === etag)) {
+    const parsed = parseSingleRange(range, artifact.byte_size)
+    if (!parsed) return reply.header('Content-Range', `bytes */${artifact.byte_size}`).code(416).send()
+    const bytes = artifact.bytes.subarray(parsed.start, parsed.end + 1)
+    return reply
+      .header('Content-Range', `bytes ${parsed.start}-${parsed.end}/${artifact.byte_size}`)
+      .header('Content-Length', String(bytes.length))
+      .code(206)
+      .send(bytes)
+  }
+  return reply.header('Content-Length', String(artifact.byte_size)).send(artifact.bytes)
+}
+
+function parseSingleRange(value: string, size: number): {start: number; end: number} | null {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(value.trim())
+  if (!match || (!match[1] && !match[2]) || size <= 0) return null
+  if (!match[1]) {
+    const suffix = Number(match[2])
+    if (!Number.isSafeInteger(suffix) || suffix <= 0) return null
+    return {start: Math.max(0, size - suffix), end: size - 1}
+  }
+  const start = Number(match[1])
+  const end = match[2] ? Number(match[2]) : size - 1
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || start >= size || end < start) return null
+  return {start, end: Math.min(end, size - 1)}
 }
 
 function actorIdForAccount(accountId: string): string {

@@ -27,6 +27,8 @@ export class GreenfieldMpsIngestService {
     schemas?: MpsSchemaArtifact[]
     /** Verified bytes of declared presentation assets (paths relative to the product root). */
     assets?: Array<{path: string; bytes: Buffer}>
+    /** True only when every supplied byte was extracted from the verified release package. */
+    distributionVerified?: boolean
   }) {
     const result = ingestProductManifest({filename: input.filename, bytes: input.bytes})
     if (!result.ok || !result.product) {
@@ -60,6 +62,9 @@ export class GreenfieldMpsIngestService {
       throw moduleError('VALIDATION_FAILED', 'frontend.mode none cannot ingest a frontend artifact')
     }
     const assetBytes = verifyPresentationAssetBytes(product.presentationAssets, input.assets ?? [])
+    const frontendBytes = input.frontend
+      ? Buffer.isBuffer(input.frontend.bytes) ? input.frontend.bytes : Buffer.from(input.frontend.bytes)
+      : null
     if (input.releaseId) await assertSignedDigestsMatch(this.db, input.releaseId, manifestSha256, product.frontendArtifact?.sha256 ?? null)
     const recordCollections = input.releaseId
       ? projectMpsRecordCollections({
@@ -86,6 +91,21 @@ export class GreenfieldMpsIngestService {
         throw moduleError('CONFLICT', `Product release ${product.productId}@${product.version} is already bound to another registry release`)
       }
       if (assetBytes.length) await storeAssetBlobs(this.db, assetBytes)
+      if (input.releaseId && input.distributionVerified === true) {
+        await storeDistributionArtifacts(this.db, {
+          releaseId: input.releaseId,
+          productId: product.productId,
+          version: product.version,
+          frontend: product.frontendArtifact && frontendBytes ? {
+            path: product.frontendArtifact.path,
+            sha256: product.frontendArtifact.sha256,
+            mediaType: product.frontendArtifact.mediaType,
+            bytes: frontendBytes,
+          } : null,
+          schemas: input.schemas ?? [],
+          assets: assetBytes.map(asset => ({...asset, role: product.presentationAssets.find(item => item.path === asset.path)?.role ?? 'product.background'})),
+        })
+      }
       if (input.releaseId) {
         await this.db.transaction().execute(async trx => {
           if (!existing.release_id) {
@@ -221,6 +241,21 @@ export class GreenfieldMpsIngestService {
         }))).execute()
       }
       if (assetBytes.length) await storeAssetBlobs(trx, assetBytes)
+      if (input.releaseId && input.distributionVerified === true) {
+        await storeDistributionArtifacts(trx, {
+          releaseId: input.releaseId,
+          productId: product.productId,
+          version: product.version,
+          frontend: product.frontendArtifact && frontendBytes ? {
+            path: product.frontendArtifact.path,
+            sha256: product.frontendArtifact.sha256,
+            mediaType: product.frontendArtifact.mediaType,
+            bytes: frontendBytes,
+          } : null,
+          schemas: input.schemas ?? [],
+          assets: assetBytes.map(asset => ({...asset, role: product.presentationAssets.find(item => item.path === asset.path)?.role ?? 'product.background'})),
+        })
+      }
 
       const privacy = product.privacy
       if (privacy) {
@@ -389,6 +424,96 @@ async function storeAssetBlobs(db: any, assets: VerifiedAssetBytes[]) {
       .onConflict((oc: any) => oc.column('sha256').doNothing())
       .execute()
   }
+}
+
+async function storeDistributionArtifacts(db: any, input: {
+  releaseId: string
+  productId: string
+  version: string
+  frontend: {path: string; sha256: string; mediaType: string; bytes: Buffer} | null
+  schemas: MpsSchemaArtifact[]
+  assets: Array<VerifiedAssetBytes & {role: string}>
+}) {
+  const now = new Date()
+  const artifacts: Array<{
+    artifactId: string
+    kind: 'frontend' | 'schema' | 'asset' | 'icon' | 'cover' | 'screenshot'
+    sha256: string
+    filename: string
+    mediaType: string
+    bytes: Buffer
+    access: 'public' | 'installation'
+    required: boolean
+  }> = []
+  if (input.frontend) {
+    artifacts.push({
+      artifactId: `release:${input.releaseId}:frontend`,
+      kind: 'frontend',
+      sha256: input.frontend.sha256,
+      filename: safeFilename(input.frontend.path, 'frontend.json'),
+      mediaType: input.frontend.mediaType,
+      bytes: input.frontend.bytes,
+      access: 'installation',
+      required: true,
+    })
+  }
+  for (const schema of input.schemas) {
+    const bytes = Buffer.isBuffer(schema.bytes) ? schema.bytes : Buffer.from(schema.bytes)
+    const digest = createHash('sha256').update(bytes).digest('hex')
+    artifacts.push({
+      artifactId: `release:${input.releaseId}:schema:${digest}`,
+      kind: 'schema',
+      sha256: digest,
+      filename: safeFilename(schema.path, 'schema.json'),
+      mediaType: 'application/schema+json',
+      bytes,
+      access: 'installation',
+      required: true,
+    })
+  }
+  for (const asset of input.assets) {
+    const kind = asset.role === 'product.icon'
+      ? 'icon'
+      : asset.role === 'product.cover' || asset.role === 'product.hero'
+        ? 'cover'
+        : asset.role === 'product.screenshot'
+          ? 'screenshot'
+          : 'asset'
+    artifacts.push({
+      artifactId: `release:${input.releaseId}:${kind}:${asset.sha256}`,
+      kind,
+      sha256: asset.sha256,
+      filename: safeFilename(asset.path, `${kind}-${asset.sha256.slice(0, 12)}`),
+      mediaType: asset.mediaType,
+      bytes: asset.bytes,
+      access: 'public',
+      required: false,
+    })
+  }
+  for (const artifact of artifacts) {
+    await db.insertInto('greenfield_release_asset_blobs').values({
+      sha256: artifact.sha256,
+      media_type: artifact.mediaType,
+      byte_size: artifact.bytes.length,
+      bytes: artifact.bytes,
+      created_at: now,
+    }).onConflict((oc: any) => oc.column('sha256').doNothing()).execute()
+    await db.insertInto('greenfield_release_artifacts').values({
+      artifact_id: artifact.artifactId,
+      release_id: input.releaseId,
+      kind: artifact.kind,
+      sha256: artifact.sha256,
+      filename: artifact.filename,
+      access_class: artifact.access,
+      required_for_offline_launch: artifact.required,
+      created_at: now,
+    }).onConflict((oc: any) => oc.column('artifact_id').doNothing()).execute()
+  }
+}
+
+function safeFilename(path: string, fallback: string): string {
+  const value = path.replace(/^.*[/\\]/, '').replace(/[^A-Za-z0-9._-]/g, '-')
+  return value && value !== '.' && value !== '..' ? value : fallback
 }
 
 function isSafeRelativePath(path: string) {

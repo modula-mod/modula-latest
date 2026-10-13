@@ -51,21 +51,21 @@ export type FixtureProduct = {
 }
 
 /** The MPS reference module re-identified so each test owns an isolated product. */
-export function fixtureProduct(productId: string, version = '0.1.0', mutate?: (mps: Record<string, any>) => void): FixtureProduct {
+export function fixtureProduct(productId: string, version = '0.1.0', mutate?: (mps: Record<string, any>, frontend: Record<string, any>) => void): FixtureProduct {
   const mps = JSON.parse(readFileSync(join(fixtureRoot, 'modula.product.json'), 'utf8'))
   const frontendPath: string = mps.frontend.artifact.path
   const frontendJson = JSON.parse(readFileSync(join(fixtureRoot, frontendPath), 'utf8'))
   frontendJson.productId = productId
   frontendJson.releaseVersion = version
-  const frontendBytes = Buffer.from(`${JSON.stringify(frontendJson, null, 2)}\n`)
   mps.identity.id = productId
   mps.identity.version = version
   delete mps.identity.aliases
   delete mps.family
   mps.relationships = []
+  mutate?.(mps, frontendJson)
+  const frontendBytes = Buffer.from(`${JSON.stringify(frontendJson, null, 2)}\n`)
   mps.frontend.artifact.sha256 = sha256(frontendBytes)
   mps.release = {...(mps.release ?? {}), provenance: {...(mps.release?.provenance ?? {}), frontendSha256: sha256(frontendBytes)}}
-  mutate?.(mps)
   const assets = collectAssetPaths(mps).map(path => ({path, bytes: readFileSync(join(fixtureRoot, path))}))
   return {
     productId,

@@ -1,4 +1,5 @@
 export * from './install-preview.js'
+export * from './distribution.js'
 export * from './installation.js'
 export * from './provenance.js'
 export * from './publisher.js'
