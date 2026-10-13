@@ -1,7 +1,9 @@
 import {generateKeyPairSync, randomUUID, sign} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
+import {sql} from 'kysely'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
+import {createDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleUpdateService} from '../src/modules/update-service.js'
@@ -11,6 +13,7 @@ import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, st
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount, sha256} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
@@ -26,6 +29,21 @@ describeIfDb('retrospective publisher release signatures', () => {
   const verifiedPackages = new Map<string, VerifiedGithubRelease>()
   const fetchVerified = vi.spyOn(GreenfieldGithubReleaseSyncService.prototype, 'fetchVerified')
   let serial = 0
+
+  async function tamperPublishedRelease(releaseId: string, releaseSha256: string) {
+    const privilegedUrl = new URL(adminDatabaseUrl ?? databaseUrl!)
+    privilegedUrl.pathname = new URL(databaseUrl!).pathname
+    const privilegedDb = createDb(privilegedUrl.toString())
+    try {
+      await privilegedDb.transaction().execute(async trx => {
+        await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+        await trx.updateTable('greenfield_module_releases')
+          .set({release_sha256: releaseSha256}).where('release_id', '=', releaseId).execute()
+      })
+    } finally {
+      await privilegedDb.destroy()
+    }
+  }
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!, '4071')
@@ -203,8 +221,7 @@ describeIfDb('retrospective publisher release signatures', () => {
     expect(projectionMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
     await db.updateTable('greenfield_module_release_signatures')
       .set({statement: signatureRow.statement}).where('signature_id', '=', signatureRow.signature_id).execute()
-    await db.updateTable('greenfield_module_releases')
-      .set({release_sha256: sha256('different release bytes')}).where('release_id', '=', release.releaseId).execute()
+    await tamperPublishedRelease(release.releaseId, sha256('different release bytes'))
     const releaseMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
     expect(releaseMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
   })

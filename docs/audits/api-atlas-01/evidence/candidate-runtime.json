@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-12T13:29:28.579Z",
+  "capturedAt": "2026-10-13T19:59:02.985Z",
   "source": {
-    "branch": "phase-module-platform-02",
-    "headAtCapture": "6232a965907ba99cf62682c007482cc2059ae419",
+    "branch": "phase-module-distribution-03",
+    "headAtCapture": "49208113a5065abee038d5d589928b092a72f728",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "31515241d2108a2acc88ed342cfd802f01593b41be56fef7966365185f98c08b"
+    "apiSourceSha256": "cd46a5f8997951bd58bd098836513f1a6f7c359d0ca81f0e7e15d0f99efc42ce"
   },
   "runtimeRoutes": [
     {
@@ -643,6 +643,24 @@
     },
     {
       "method": "GET",
+      "url": "/v1/admin/registry/artifacts/orphans",
+      "path": "/v1/admin/registry/artifacts/orphans",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/registry/artifacts/orphans",
+      "path": "/v1/admin/registry/artifacts/orphans",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/registry/modules/:moduleId/versions",
       "path": "/v1/registry/modules/:moduleId/versions",
       "prefix": "",
@@ -708,6 +726,42 @@
       "method": "HEAD",
       "url": "/v1/registry/releases/:releaseId/artifact",
       "path": "/v1/registry/releases/:releaseId/artifact",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/releases/:releaseId/descriptor",
+      "path": "/v1/registry/releases/:releaseId/descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/releases/:releaseId/descriptor",
+      "path": "/v1/registry/releases/:releaseId/descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/artifacts/:sha256",
+      "path": "/v1/registry/artifacts/:sha256",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/artifacts/:sha256",
+      "path": "/v1/registry/artifacts/:sha256",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -985,6 +1039,15 @@
     },
     {
       "method": "POST",
+      "url": "/v1/modules/:moduleId/install-plan",
+      "path": "/v1/modules/:moduleId/install-plan",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
       "url": "/v1/modules/:moduleId/install",
       "path": "/v1/modules/:moduleId/install",
       "prefix": "",
@@ -1005,6 +1068,42 @@
       "method": "HEAD",
       "url": "/v1/modules/:moduleId/install-descriptor",
       "path": "/v1/modules/:moduleId/install-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/installation-descriptor",
+      "path": "/v1/modules/:moduleId/installation-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/installation-descriptor",
+      "path": "/v1/modules/:moduleId/installation-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/updates",
+      "path": "/v1/modules/updates",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/updates",
+      "path": "/v1/modules/updates",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -1057,8 +1156,35 @@
     },
     {
       "method": "POST",
+      "url": "/v1/modules/:moduleId/update-plan",
+      "path": "/v1/modules/:moduleId/update-plan",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/installations/:installationId/update-policy",
+      "path": "/v1/modules/installations/:installationId/update-policy",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
       "url": "/v1/modules/:moduleId/update",
       "path": "/v1/modules/:moduleId/update",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/rollback",
+      "path": "/v1/modules/:moduleId/rollback",
       "prefix": "",
       "schema": null,
       "config": null,

@@ -11,6 +11,10 @@ import {GreenfieldGithubReleaseSyncService, type GithubRelease, type GithubRelea
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, fixtureProduct, fixtureRoot, registerAccount, sha256} from './helpers/registry-fixtures.js'
+import {createDb as createWorkerDb} from '../../greenfield-worker/src/database.js'
+import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
+import {handleModuleInstall} from '../../greenfield-worker/src/modules/installation-handler.js'
+import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -59,16 +63,19 @@ class FakeSource implements GithubReleaseSource {
 function buildRelease(productId: string, version: string, options: {
   mutateFiles?: (files: Record<string, Buffer>) => void
   mutateProvenance?: (provenance: Record<string, unknown>) => void
+  mutateProduct?: (mps: Record<string, any>, frontend: Record<string, any>) => void
+  manifestOverrides?: Parameters<typeof adapterManifest>[2]
   legacy?: Record<string, unknown> | null
   sign?: {keyId: string; privateKey: ReturnType<typeof generateKeyPairSync>['privateKey']}
 } = {}): Built {
   const tag = `${productId}-v${version}`
   const packageFile = `${productId}-${version}.tgz`
-  const product = fixtureProduct(productId, version, mps => {
+  const product = fixtureProduct(productId, version, (mps, frontend) => {
     mps.source = {...(mps.source ?? {}), provider: 'github', repository: REPOSITORY}
     mps.publisher = {...(mps.publisher ?? {}), id: 'modula'}
+    options.mutateProduct?.(mps, frontend)
   })
-  const manifest = adapterManifest(productId, version)
+  const manifest = adapterManifest(productId, version, options.manifestOverrides)
   const files: Record<string, Buffer> = {
     'modula.product.json': Buffer.from(product.mpsBytes),
     'module.manifest.json': Buffer.from(JSON.stringify(manifest, null, 2)),
@@ -111,6 +118,12 @@ describe('release tarball reader', () => {
     const evil = gzipSync(Buffer.concat([tarEntry('../escape.txt', Buffer.from('x')), Buffer.alloc(1024)]))
     expect(() => readTarGz(evil, {maxUncompressedBytes: 1_000_000})).toThrow(/unsafe/)
     expect(() => readTarGz(Buffer.from('not gzip'), {maxUncompressedBytes: 1_000_000})).toThrow(/gzip/)
+  })
+
+  it('rejects native payload names and executable binary signatures', () => {
+    expect(() => readTarGz(tgz({'native/addon.dylib': Buffer.from('not-native')}), {maxUncompressedBytes: 1_000_000})).toThrow(/forbidden native payload/)
+    expect(() => readTarGz(tgz({'native/addon.bin': Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0x02])}), {maxUncompressedBytes: 1_000_000})).toThrow(/native executable bytes/)
+    expect(() => readTarGz(tgz({'native/addon.bin': Buffer.from([0x4d, 0x5a, 0x90, 0x00])}), {maxUncompressedBytes: 1_000_000})).toThrow(/native executable bytes/)
   })
 })
 
@@ -161,8 +174,9 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     expect(media.statusCode).toBe(200)
     expect(sha256(media.rawPayload)).toBe(icon.sha256)
     const artifact = await app.inject({method: 'GET', url: `/v1/registry/releases/${encodeURIComponent(data.registryReleaseId)}/artifact`})
-    expect(artifact.statusCode, artifact.body).toBe(200)
-    expect(sha256(artifact.rawPayload)).toBe(sha256(built.packageBytes))
+    expect(artifact.statusCode).toBe(404)
+    const stored = await db.selectFrom('greenfield_release_asset_blobs').select(['bytes']).where('sha256', '=', sha256(built.packageBytes)).executeTakeFirstOrThrow()
+    expect(sha256(stored.bytes)).toBe(sha256(built.packageBytes))
 
     const again = await service.sync({repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false})
     expect(again).toMatchObject({mode: 'APPLIED', action: 'backfill', releaseState: 'published'})
@@ -183,6 +197,277 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     expect(result).toMatchObject({signed: true, releaseState: 'published'})
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${built.productId}`})
     expect(detail.json().data.registryTrust.signature).toMatchObject({state: 'verified', keyId})
+
+    const releaseId = (result as {releaseId: string}).releaseId
+    const descriptor = await app.inject({method: 'GET', url: `/v1/registry/releases/${releaseId}/descriptor?hostVersion=1.0.0&platform=ios`})
+    expect(descriptor.statusCode, descriptor.body).toBe(200)
+    expect(descriptor.json().data).toMatchObject({
+      moduleId: built.productId,
+      version: '1.0.0',
+      releaseId,
+      channel: 'stable',
+      packageDigest: sha256(built.packageBytes),
+      signature: {algorithm: 'Ed25519', keyId, signaturePayloadVersion: 1},
+      trust: {verified: true, signatureState: 'verified', signerRevoked: false},
+      moduleSdk: {min: '2.1.0'},
+      productUiContract: '1.0.0',
+    })
+    const packageArtifact = descriptor.json().data.artifacts.find((artifact: any) => artifact.kind === 'module-package')
+    expect(packageArtifact).toMatchObject({digest: sha256(built.packageBytes), size: built.packageBytes.length, immutable: true, requiredForOfflineLaunch: true, access: 'installation', download: {authorization: 'bearer', range: true}})
+    expect(descriptor.json().data.artifacts).toEqual(expect.arrayContaining([
+      expect.objectContaining({kind: 'frontend', requiredForOfflineLaunch: true}),
+      expect.objectContaining({kind: 'schema', requiredForOfflineLaunch: true}),
+    ]))
+
+    const account = await registerAccount(app, `distribution-${suffix}@example.com`, `dist${suffix}`, db)
+    const plan = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/install-plan`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {version: '1.0.0', platform: 'ios'},
+    })
+    expect(plan.statusCode, plan.body).toBe(200)
+    expect(plan.json().data).toMatchObject({allowed: true, permissionReviewRequired: false})
+    const installed = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/install`,
+      headers: {authorization: `Bearer ${account.token}`, 'idempotency-key': `distribution-install-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(installed.statusCode, installed.body).toBe(202)
+    expect(installed.json().data).toMatchObject({distributionReady: true, installationDescriptor: {moduleId: built.productId, currentRelease: {releaseId}}})
+
+    const installationDescriptor = await app.inject({method: 'GET', url: `/v1/modules/${built.productId}/installation-descriptor`, headers: {authorization: `Bearer ${account.token}`}})
+    expect(installationDescriptor.statusCode, installationDescriptor.body).toBe(200)
+    const descriptorEtag = installationDescriptor.headers.etag!
+    const unchanged = await app.inject({method: 'GET', url: `/v1/modules/${built.productId}/installation-descriptor`, headers: {authorization: `Bearer ${account.token}`, 'if-none-match': descriptorEtag}})
+    expect(unchanged.statusCode).toBe(304)
+
+    const beta = buildRelease(built.productId, '1.1.0-beta.1', {
+      sign: {keyId, privateKey: keys.privateKey},
+      mutateProduct: (mps, frontend) => {
+        mps.release = {...mps.release, channel: 'beta'}
+        frontend.capabilities = {optional: [{id: 'ui.graph', version: '1', fallback: {id: 'ui.list', version: '1'}}]}
+      },
+      manifestOverrides: {permissions: [{permission: 'search:index', risk: 'medium', reason: 'Synthetic permission delta'}] as any},
+    })
+    await new GreenfieldGithubReleaseSyncService(db, beta.source).sync({repository: REPOSITORY, releaseTag: beta.tag, publish: true, dryRun: false})
+    const stablePlan = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
+    })
+    expect(stablePlan.statusCode, stablePlan.body).toBe(200)
+    expect(stablePlan.json().data).toMatchObject({targetRelease: null, blockers: [{code: 'TARGET_NOT_FOUND'}]})
+    const betaPlan = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
+      headers: {authorization: `Bearer ${account.token}`},
+      payload: {version: '1.1.0-beta.1', platform: 'ios', hostCapabilities: []},
+    })
+    expect(betaPlan.statusCode, betaPlan.body).toBe(200)
+    expect(betaPlan.json().data).toMatchObject({
+      targetRelease: {version: '1.1.0-beta.1', channel: 'beta'},
+      compatibility: {compatible: true},
+      permissionDelta: {added: ['search:index'], removed: [], reviewRequired: true},
+      permissionReviewRequired: true,
+    })
+    expect(betaPlan.json().data.blockers).toEqual(expect.arrayContaining([expect.objectContaining({code: 'PERMISSION_REVIEW_REQUIRED'})]))
+    const installationId = installed.json().data.installationId
+    const followBeta = await app.inject({
+      method: 'PATCH', url: `/v1/modules/installations/${installationId}/update-policy`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {mode: 'followChannel', channel: 'beta'},
+    })
+    expect(followBeta.statusCode, followBeta.body).toBe(200)
+    const followedPlan = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
+    })
+    expect(followedPlan.json().data.targetRelease.version).toBe('1.1.0-beta.1')
+    const lock = await app.inject({
+      method: 'PATCH', url: `/v1/modules/installations/${installationId}/update-policy`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {mode: 'lockedVersion', lockedVersion: '1.0.0'},
+    })
+    expect(lock.statusCode, lock.body).toBe(200)
+    const lockedPlan = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
+    })
+    expect(lockedPlan.json().data.targetRelease).toBeNull()
+
+    await app.inject({
+      method: 'PATCH', url: `/v1/modules/installations/${installationId}/update-policy`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {mode: 'automaticStable'},
+    })
+    const future = buildRelease(built.productId, '2.0.0', {
+      sign: {keyId, privateKey: keys.privateKey},
+      mutateProduct: (_mps, frontend) => { frontend.capabilities = {required: ['ui.graph@1']} },
+    })
+    const futureResult = await new GreenfieldGithubReleaseSyncService(db, future.source).sync({repository: REPOSITORY, releaseTag: future.tag, publish: true, dryRun: false})
+    const incompatible = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
+    })
+    expect(incompatible.statusCode, incompatible.body).toBe(200)
+    expect(incompatible.json().data).toMatchObject({
+      targetRelease: {version: '2.0.0', channel: 'stable'},
+      allowed: false,
+      compatibility: {compatible: false, reasons: [expect.objectContaining({code: 'CAPABILITY_UNAVAILABLE', capability: 'ui.graph', required: '1'})]},
+    })
+    const hub = await app.inject({method: 'GET', url: '/v1/registry/products?productKind=all&limit=100'})
+    const hubItem = hub.json().data.items.find((item: any) => item.moduleId === built.productId)
+    expect(hubItem).toMatchObject({latestVersion: '2.0.0', releaseChannel: 'stable', releaseSizeBytes: future.packageBytes.length})
+    const futureReleaseId = (futureResult as {releaseId: string}).releaseId
+    const futureDescriptor = await app.inject({method: 'GET', url: `/v1/registry/releases/${futureReleaseId}/descriptor`})
+    const futurePackage = futureDescriptor.json().data.artifacts.find((artifact: any) => artifact.kind === 'module-package')
+    await new GreenfieldModuleReleaseService(db).revokeRelease(futureReleaseId, 'synthetic failed rollout')
+    const revokedDescriptor = await app.inject({method: 'GET', url: `/v1/registry/releases/${futureReleaseId}/descriptor`})
+    expect(revokedDescriptor.statusCode, revokedDescriptor.body).toBe(200)
+    expect(revokedDescriptor.json().data).toMatchObject({revoked: true, trust: {verified: false}})
+    const afterReleaseRevocation = await app.inject({
+      method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
+      headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
+    })
+    expect(afterReleaseRevocation.json().data).toMatchObject({targetRelease: null, blockers: [{code: 'TARGET_NOT_FOUND'}]})
+    const hubAfterRevocation = await app.inject({method: 'GET', url: '/v1/registry/products?productKind=all&limit=100'})
+    expect(hubAfterRevocation.json().data.items.find((item: any) => item.moduleId === built.productId))
+      .toMatchObject({latestVersion: '1.0.0', releaseChannel: 'stable'})
+    const revokedArtifact = await app.inject({
+      method: 'GET', url: new URL(futurePackage.download.pathOrUrl).pathname,
+      headers: {authorization: `Bearer ${account.token}`},
+    })
+    expect(revokedArtifact.statusCode).toBe(404)
+
+    const anonymous = await app.inject({method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname})
+    expect(anonymous.statusCode).toBe(404)
+    const firstChunk = await app.inject({
+      method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
+      headers: {authorization: `Bearer ${account.token}`, range: 'bytes=0-99'},
+    })
+    expect(firstChunk.statusCode, firstChunk.body).toBe(206)
+    expect(firstChunk.headers).toMatchObject({
+      'accept-ranges': 'bytes',
+      'content-range': `bytes 0-99/${built.packageBytes.length}`,
+      'content-length': '100',
+      etag: `"sha256-${sha256(built.packageBytes)}"`,
+    })
+    expect(firstChunk.rawPayload).toEqual(built.packageBytes.subarray(0, 100))
+    const rest = await app.inject({
+      method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
+      headers: {authorization: `Bearer ${account.token}`, range: 'bytes=100-'},
+    })
+    expect(rest.statusCode).toBe(206)
+    expect(sha256(Buffer.concat([firstChunk.rawPayload, rest.rawPayload]))).toBe(packageArtifact.digest)
+    const legacyDownload = await app.inject({
+      method: 'GET', url: `/v1/registry/releases/${encodeURIComponent(releaseId)}/artifact`,
+      headers: {authorization: `Bearer ${account.token}`, range: 'bytes=0-9'},
+    })
+    expect(legacyDownload.statusCode).toBe(206)
+    expect(legacyDownload.headers.deprecation).toBe('true')
+    expect(legacyDownload.rawPayload).toEqual(built.packageBytes.subarray(0, 10))
+    const foreign = await registerAccount(app, `distribution-foreign-${suffix}@example.com`, `distx${suffix}`, db)
+    const foreignArtifact = await app.inject({
+      method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
+      headers: {authorization: `Bearer ${foreign.token}`},
+    })
+    expect(foreignArtifact.statusCode).toBe(404)
+    const corrupted = Buffer.from(built.packageBytes)
+    corrupted[0] = corrupted[0]! ^ 0xff
+    expect(sha256(corrupted)).not.toBe(packageArtifact.digest)
+
+    await expect(db.updateTable('greenfield_module_releases').set({release_channel: 'beta'}).where('release_id', '=', releaseId).execute())
+      .rejects.toThrow(/published release facts are immutable/)
+    await expect(db.deleteFrom('greenfield_module_releases').where('release_id', '=', releaseId).execute())
+      .rejects.toThrow(/published releases are immutable/)
+
+    await new GreenfieldPublisherSigningKeyService(db).revoke('modula', keyId, 'synthetic signer revocation', null)
+    const afterRevocation = await app.inject({
+      method: 'GET', url: `/v1/modules/${built.productId}/installation-descriptor`,
+      headers: {authorization: `Bearer ${account.token}`, 'if-none-match': descriptorEtag},
+    })
+    expect(afterRevocation.statusCode, afterRevocation.body).toBe(200)
+    expect(afterRevocation.json().data).toMatchObject({
+      launchEligible: false,
+      currentRelease: {trust: {verified: false, signerRevoked: true, signatureState: 'revokedKey'}},
+    })
+    expect(afterRevocation.headers.etag).not.toBe(descriptorEtag)
+    const feed = await app.inject({method: 'GET', url: '/v1/modules/updates', headers: {authorization: `Bearer ${account.token}`}})
+    expect(feed.statusCode, feed.body).toBe(200)
+    expect(feed.json().data.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        moduleId: built.productId,
+        descriptorRevision: afterRevocation.json().data.descriptorRevision,
+        currentTrust: {verified: false, signerRevoked: true, releaseRevoked: false},
+      }),
+    ]))
+    const afterRevocationDownload = await app.inject({
+      method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
+      headers: {authorization: `Bearer ${account.token}`},
+    })
+    expect(afterRevocationDownload.statusCode).toBe(404)
+  })
+
+  it('performs a governed rollback to the advertised trusted release', async () => {
+    const keys = generateKeyPairSync('ed25519')
+    const keyId = `rollback-${suffix}`
+    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    const moduleId = nextId()
+    const first = buildRelease(moduleId, '1.0.0', {sign: {keyId, privateKey: keys.privateKey}})
+    const second = buildRelease(moduleId, '1.1.0', {sign: {keyId, privateKey: keys.privateKey}})
+    const firstResult = await new GreenfieldGithubReleaseSyncService(db, first.source).sync({repository: REPOSITORY, releaseTag: first.tag, publish: true, dryRun: false})
+    const secondResult = await new GreenfieldGithubReleaseSyncService(db, second.source).sync({repository: REPOSITORY, releaseTag: second.tag, publish: true, dryRun: false})
+    const account = await registerAccount(app, `rollback-${suffix}@example.com`, `rollback${suffix}`, db)
+    const headers = {authorization: `Bearer ${account.token}`}
+    const install = await app.inject({
+      method: 'POST', url: `/v1/modules/${moduleId}/install`,
+      headers: {...headers, 'idempotency-key': `rollback-install-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(install.statusCode, install.body).toBe(202)
+    const installationId = install.json().data.installationId
+    const workerDb = createWorkerDb(databaseUrl!)
+    try {
+      await handleModuleInstall(workerDb, loadWorkerConfig(), {
+        planId: install.json().data.planId,
+        installationId,
+        releaseId: (firstResult as {releaseId: string}).releaseId,
+        moduleId,
+        accountId: account.accountId,
+      })
+      const update = await app.inject({
+        method: 'POST', url: `/v1/modules/${moduleId}/update`,
+        headers: {...headers, 'idempotency-key': `rollback-forward-${suffix}`},
+        payload: {version: '1.1.0', approvedPermissions: [], platform: 'ios'},
+      })
+      expect(update.statusCode, update.body).toBe(202)
+      await handleModuleUpdate(workerDb, loadWorkerConfig(), {
+        planId: update.json().data.planId,
+        installationId,
+        targetReleaseId: (secondResult as {releaseId: string}).releaseId,
+        previousStatus: 'installedDisabled',
+        moduleId,
+        accountId: account.accountId,
+      })
+      const plan = await app.inject({method: 'POST', url: `/v1/modules/${moduleId}/update-plan`, headers, payload: {platform: 'ios'}})
+      expect(plan.statusCode, plan.body).toBe(200)
+      expect(plan.json().data).toMatchObject({
+        currentRelease: {version: '1.1.0'},
+        rollbackCandidateReleaseId: (firstResult as {releaseId: string}).releaseId,
+      })
+      const rollback = await app.inject({
+        method: 'POST', url: `/v1/modules/${moduleId}/rollback`,
+        headers: {...headers, 'idempotency-key': `rollback-back-${suffix}`},
+        payload: {version: '1.0.0', expectedDescriptorRevision: plan.json().data.expectedDescriptorRevision, platform: 'ios'},
+      })
+      expect(rollback.statusCode, rollback.body).toBe(202)
+      await handleModuleUpdate(workerDb, loadWorkerConfig(), {
+        planId: rollback.json().data.planId,
+        installationId,
+        targetReleaseId: (firstResult as {releaseId: string}).releaseId,
+        previousStatus: 'installedDisabled',
+        moduleId,
+        accountId: account.accountId,
+      })
+      const current = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/installation-descriptor`, headers})
+      expect(current.json().data.currentRelease.version).toBe('1.0.0')
+    } finally {
+      await workerDb.destroy()
+    }
   })
 
   it.each([

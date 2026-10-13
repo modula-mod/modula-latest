@@ -1,8 +1,10 @@
 import {generateKeyPairSync, randomBytes, randomUUID, sign, type KeyObject} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {sql} from 'kysely'
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
+import {createDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldRegistryTrustService} from '../src/modules/registry-trust-service.js'
@@ -11,6 +13,7 @@ import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, pa
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
@@ -57,6 +60,21 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
   const primaryKeyId = `modula-test-${suffix}-a`
   let n = 0
   const nextId = () => `digital.modula.signed-${suffix}-${++n}`
+
+  async function tamperPublishedRelease(releaseId: string, releaseSha256: string) {
+    const privilegedUrl = new URL(adminDatabaseUrl ?? databaseUrl!)
+    privilegedUrl.pathname = new URL(databaseUrl!).pathname
+    const privilegedDb = createDb(privilegedUrl.toString())
+    try {
+      await privilegedDb.transaction().execute(async trx => {
+        await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+        await trx.updateTable('greenfield_module_releases')
+          .set({release_sha256: releaseSha256}).where('release_id', '=', releaseId).execute()
+      })
+    } finally {
+      await privilegedDb.destroy()
+    }
+  }
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
@@ -189,8 +207,7 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     const {manifest, evidence} = signedImport(id)
     const imported = await releases.importPendingReview(manifest, evidence)
     await releases.publishRelease(id, '1.0.0')
-    await db.updateTable('greenfield_module_releases').set({release_sha256: sha256(`altered-${suffix}`)})
-      .where('release_id', '=', imported.releaseId).execute()
+    await tamperPublishedRelease(imported.releaseId, sha256(`altered-${suffix}`))
     await expect(releases.verifyRelease(id, '1.0.0')).rejects.toThrow(/signature invalid/)
     const response = await app.inject({method: 'POST', url: `/v1/modules/${id}/install`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `digest-mismatch-${suffix}`},

@@ -5,6 +5,7 @@ import {dirname, join, resolve} from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {sql} from 'kysely'
+import pg from 'pg'
 import {
   GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION,
   createDefaultModuleSectionVersions,
@@ -27,6 +28,7 @@ import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-han
 import {handleModuleUninstall} from '../../greenfield-worker/src/modules/uninstall-handler.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const referenceModuleRoot = resolve(workspaceRoot, 'fixtures/modules/standard2-reference')
@@ -289,23 +291,39 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
     }
   })
 
-  it('rolls the Standard 2 runtime migration down and back up on the isolated database', async () => {
-    const rolledDown: string[] = []
-    while (!rolledDown.includes('027_phase7e_module_runtime_2')) {
-      const down = await migrateDown(databaseUrl!)
-      expect(down).not.toBeNull()
-      rolledDown.push(down!)
+  it.skipIf(!adminDatabaseUrl)('rolls the Standard 2 runtime migration down and back up on an isolated database', async () => {
+    const databaseName = `modula_runtime2_migration_${randomUUID().replaceAll('-', '').slice(0, 12)}`
+    const isolatedUrl = new URL(databaseUrl!)
+    isolatedUrl.pathname = `/${databaseName}`
+    const admin = new pg.Pool({connectionString: adminDatabaseUrl!})
+    try {
+      await admin.query(`CREATE DATABASE "${databaseName}"`)
+      await migrateUp(isolatedUrl.toString())
+      const rolledDown: string[] = []
+      while (!rolledDown.includes('027_phase7e_module_runtime_2')) {
+        const down = await migrateDown(isolatedUrl.toString())
+        expect(down).not.toBeNull()
+        rolledDown.push(down!)
+      }
+      const isolated = new pg.Client({connectionString: isolatedUrl.toString()})
+      await isolated.connect()
+      try {
+        const removed = await isolated.query(
+          `SELECT table_name FROM information_schema.tables
+           WHERE table_schema = 'public' AND table_name = 'greenfield_module_service_invocations'`,
+        )
+        expect(removed.rows).toHaveLength(0)
+      } finally {
+        await isolated.end()
+      }
+      const up = await migrateUp(isolatedUrl.toString())
+      expect(up).toEqual(expect.arrayContaining(['027_phase7e_module_runtime_2']))
+    } finally {
+      await admin.query('SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1', [databaseName])
+      await admin.query(`DROP DATABASE IF EXISTS "${databaseName}"`)
+      await admin.end()
     }
-    const removed = await (db as any)
-      .selectFrom('information_schema.tables')
-      .select('table_name')
-      .where('table_schema', '=', 'public')
-      .where('table_name', '=', 'greenfield_module_service_invocations')
-      .execute()
-    expect(removed).toHaveLength(0)
-    const up = await migrateUp(databaseUrl!)
-    expect(up).toEqual(expect.arrayContaining(['027_phase7e_module_runtime_2']))
-  })
+  }, 120_000)
 
   async function importRuntimeFixtures() {
     const provider = await seedInstalledRelease(accountId, fixtureManifest('digital.modula.reference-provider', '1.0.0', {

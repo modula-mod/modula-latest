@@ -41,11 +41,38 @@ export function readTarGz(bytes: Buffer, limits: {maxUncompressedBytes: number; 
     if (type === '5') continue
     if (type !== '0' && type !== '7') throw new TarGzError(`Release package contains a non-regular entry: ${path}`)
     const normalized = safePath(path)
+    assertPortableModulePayload(normalized, data)
     if (entries.has(normalized)) throw new TarGzError(`Release package contains a duplicate entry: ${normalized}`)
     entries.set(normalized, Buffer.from(data))
     if (entries.size > maxEntries) throw new TarGzError('Release package contains too many entries')
   }
   return entries
+}
+
+const NATIVE_SUFFIXES = [
+  '.dylib', '.so', '.dll', '.exe', '.framework', '.xcframework', '.a', '.o',
+  '.node', '.wasm', '.apk', '.aab', '.ipa', '.jar', '.class',
+]
+
+/** Downloaded modules are declarative/JavaScript packages, never native code. */
+function assertPortableModulePayload(path: string, bytes: Buffer): void {
+  const lower = path.toLowerCase()
+  if (NATIVE_SUFFIXES.some(suffix => lower.endsWith(suffix) || lower.includes(`${suffix}/`))) {
+    throw new TarGzError(`Release package contains a forbidden native payload: ${path}`)
+  }
+  if (bytes.length >= 4) {
+    const magic = bytes.subarray(0, 4)
+    const elf = magic.equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46]))
+    const macho = [
+      [0xfe, 0xed, 0xfa, 0xce], [0xce, 0xfa, 0xed, 0xfe],
+      [0xfe, 0xed, 0xfa, 0xcf], [0xcf, 0xfa, 0xed, 0xfe],
+      [0xca, 0xfe, 0xba, 0xbe], [0xbe, 0xba, 0xfe, 0xca],
+    ].some(value => magic.equals(Buffer.from(value)))
+    const portableExecutable = bytes[0] === 0x4d && bytes[1] === 0x5a
+    if (elf || macho || portableExecutable) {
+      throw new TarGzError(`Release package contains native executable bytes: ${path}`)
+    }
+  }
 }
 
 function safePath(path: string): string {

@@ -251,7 +251,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       payload: {expectedRevision: 1, data: {title: 'stale'}},
     })
     expect(stale.statusCode).toBe(409)
-    expect(stale.json().error.code).toBe('NOTE_REVISION_CONFLICT')
+    expect(stale.json().error.code).toBe('REVISION_CONFLICT')
 
     const duplicate = await app.inject({
       method: 'POST',
@@ -262,8 +262,9 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     expect(duplicate.statusCode).toBe(200)
     expect(duplicate.json().data.result.revision).toBe(1)
 
-    const moved = await runAction('digital.modula.vault-notes.actions.note.move', {recordId: note.record_id, expectedRevision: 2, folderId: folder.record_id})
-    expect(moved.result.data.folderId).toBe(folder.record_id)
+    const folderReference = recordReference('folder', folder.record_id)
+    const moved = await runAction('digital.modula.vault-notes.actions.note.move', {recordId: note.record_id, expectedRevision: 2, folderId: folderReference})
+    expect(moved.result.data.folderId).toEqual(folderReference)
     const pinned = await runAction('digital.modula.vault-notes.actions.note.pin', {recordId: note.record_id, expectedRevision: 3, pinned: true})
     expect(pinned.result.data.pinned).toBe(true)
     const favourited = await runAction('digital.modula.vault-notes.actions.note.favourite', {recordId: note.record_id, expectedRevision: 4, favourite: true})
@@ -296,9 +297,9 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: `/v1/modules/${moduleId}/records/note/${note.record_id}/restore`,
       headers: {authorization: `Bearer ${token}`},
-      payload: {expectedRevision: 7},
+      payload: {expectedRevision: 7, sourceRevision: 6},
     })
-    expect(restore.statusCode).toBe(200)
+    expect(restore.statusCode, restore.body).toBe(200)
     await drainSearchDeliveries(16)
     await expectSearch(`saved phrase ${suffix}`, note.record_id, true)
 
@@ -745,7 +746,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       headers: {authorization: `Bearer ${token}`},
       payload: {data},
     })
-    expect(response.statusCode).toBe(201)
+    expect(response.statusCode, response.body).toBe(201)
     return response.json().data
   }
 
@@ -772,10 +773,10 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
   }
 
   async function expectSearch(query: string, recordId: string, present: boolean) {
-    const result = await search.search({query, entityTypes: ['note']}, {actorId: null, accountId, capabilities: [], requestId: `req-vault-search-${randomUUID()}`, correlationId: `corr-vault-search-${randomUUID()}`})
-    expect(result.results.some(item => item.entityId === recordId)).toBe(present)
-    const other = await search.search({query, entityTypes: ['note']}, {actorId: null, accountId: otherAccountId, capabilities: [], requestId: `req-vault-search-other-${randomUUID()}`, correlationId: `corr-vault-search-other-${randomUUID()}`})
-    expect(other.results.some(item => item.entityId === recordId)).toBe(false)
+    const result = await search.search({query, entityTypes: ['note', 'module-record']}, {actorId: null, accountId, capabilities: [], requestId: `req-vault-search-${randomUUID()}`, correlationId: `corr-vault-search-${randomUUID()}`})
+    expect(result.results.some(item => item.entityId === recordId || record(item.metadata).recordId === recordId)).toBe(present)
+    const other = await search.search({query, entityTypes: ['note', 'module-record']}, {actorId: null, accountId: otherAccountId, capabilities: [], requestId: `req-vault-search-other-${randomUUID()}`, correlationId: `corr-vault-search-other-${randomUUID()}`})
+    expect(other.results.some(item => item.entityId === recordId || record(item.metadata).recordId === recordId)).toBe(false)
   }
 
   async function drainSearchDeliveries(max = 12): Promise<void> {
@@ -953,7 +954,7 @@ function noteData(input: {title: string; text: string; folderId?: string; tagIds
     title: input.title,
     document: {schemaVersion: '1.0.0', blocks: [{id: `block-${randomUUID()}`, type: 'paragraph', text: input.text, marks: []}]},
     plainTextProjection: input.text,
-    folderId: input.folderId,
+    folderId: input.folderId ? recordReference('folder', input.folderId) : undefined,
     tagIds: input.tagIds ?? [],
     pinned: false,
     favourite: false,
@@ -961,6 +962,10 @@ function noteData(input: {title: string; text: string; folderId?: string; tagIds
     source: {sourceType: 'manual', capturedAt: new Date().toISOString(), title: 'Manual source'},
     dataSchemaVersion: '1.0.0',
   }
+}
+
+function recordReference(recordType: string, recordId: string) {
+  return {record: {moduleId, recordType, recordId}}
 }
 
 function readJson(path: string) {

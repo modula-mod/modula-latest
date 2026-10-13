@@ -263,7 +263,10 @@ async function seedRuntime(db: ModulaDb) {
   await db.insertInto('greenfield_module_record_collections').values({collection_id: `gai01-collection-${suffix}`, release_id: releaseId, module_id: moduleId, collection: 'note', schema_ref: 'schemas/note.json', default_visibility: 'private', fields: jsonb(fields), searchable_fields: jsonb(['title', 'plainTextProjection']), filterable_fields: jsonb(['pinned', 'archived']), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now}).execute()
   const records = new GreenfieldModuleRecordService(db, developmentTrust)
   for (let index = 0; index < 7; index += 1) {
-    await records.create(accountA, moduleId, 'note', {data: {title: `Acceptance ${index}`, document: {type: 'doc', content: []}, plainTextProjection: `Note ${index}`, tagIds: [], pinned: false, favourite: false, archived: false, dataSchemaVersion: '1.0.0'}})
+    await records.create(accountA, moduleId, 'note', {
+      data: {title: `Acceptance ${index}`, document: {type: 'doc', content: []}, plainTextProjection: `Note ${index}`, tagIds: [], pinned: false, favourite: false, archived: false, dataSchemaVersion: '1.0.0'},
+      mutationId: `gai01-seed:${suffix}:${index}`,
+    })
   }
 }
 

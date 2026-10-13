@@ -188,11 +188,16 @@ describeIfDb('Phase 7E unified search platform', () => {
   })
 
   async function drainSearchDeliveries(max = 8): Promise<void> {
-    const attempts = Math.max(max, 250)
+    // This suite shares the canonical integration database with earlier files,
+    // which may leave a legitimate delivery backlog. Drain it completely so
+    // assertions are bound to the event just published rather than an
+    // arbitrary fixed position in that backlog.
+    const attempts = Math.max(max, 10_000)
     for (let i = 0; i < attempts; i += 1) {
       const worked = await processOneEventDelivery(workerDb, workerConfig())
       if (!worked) return
     }
+    throw new Error(`Search delivery backlog exceeded ${attempts} events`)
   }
 
   async function documentVersion(entityType: string, entityId: string): Promise<number> {

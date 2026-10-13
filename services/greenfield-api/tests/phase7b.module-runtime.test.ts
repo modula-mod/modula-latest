@@ -383,7 +383,7 @@ function noteCollection(): GreenfieldModuleCollectionDefinition {
       {fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true},
       {fieldId: 'body', name: 'body', type: 'multilineText', label: 'Body'},
       {fieldId: 'tags', name: 'tags', type: 'tags', label: 'Tags'},
-      {fieldId: 'folderId', name: 'folderId', type: 'recordReference', label: 'Folder'},
+      {fieldId: 'folderId', name: 'folderId', type: 'text', label: 'Folder'},
       {fieldId: 'sourceUri', name: 'sourceUri', type: 'url', label: 'Source'},
     ],
     searchableFields: ['title', 'body', 'tags', 'sourceUri'],

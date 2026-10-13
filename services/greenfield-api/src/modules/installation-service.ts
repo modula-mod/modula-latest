@@ -240,6 +240,9 @@ export class GreenfieldModuleInstallationService {
       ...preview.permissions.map(permission => permission.permission),
       ...allRuntimePermissionKeys(release.manifest),
     ])).sort()
+    if (declaredPermissions.length > 0 && input.approvedPermissions === undefined) {
+      throw moduleError('PERMISSION_REVIEW_REQUIRED', `Review permissions for ${canonicalId}@${release.version} before installation`)
+    }
     const grantedPermissions = Array.from(new Set(input.approvedPermissions ?? []))
       .filter(permission => declaredPermissions.includes(permission))
       .sort()

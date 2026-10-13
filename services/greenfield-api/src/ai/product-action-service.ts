@@ -267,6 +267,7 @@ export class GreenfieldAIProductActionService {
     const updated = await this.records.patch(accountId, moduleId, 'note', recordId, {
       data: patch,
       expectedRevision,
+      mutationId: productRequestId(accountId, moduleId, execution.action_id, idempotencyKey),
       changeSource: 'ai-assisted',
       versionMetadata: {
         changeSource: 'ai-assisted',

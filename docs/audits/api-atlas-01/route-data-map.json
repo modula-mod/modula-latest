@@ -1270,6 +1270,23 @@
       "services/greenfield-api/src/product-standard/ingest-service.ts#ingest"
     ]
   },
+  "GET /v1/admin/registry/artifacts/orphans": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_module_releases",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_presentation_assets"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#orphanArtifactReport",
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount"
+    ]
+  },
   "POST /v1/admin/registry/modules/import": {
     "reads": [
       "greenfield_accounts",
@@ -1483,8 +1500,10 @@
       "greenfield_accounts"
     ],
     "writes": [
+      "greenfield_module_releases",
       "greenfield_module_sync_failures",
       "greenfield_module_sync_runs",
+      "greenfield_release_artifacts",
       "greenfield_release_asset_blobs"
     ],
     "emits": [],
@@ -4631,14 +4650,19 @@
       "greenfield_extension_runtime_projection",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
+      "greenfield_module_release_signatures",
       "greenfield_module_releases",
-      "greenfield_publishers"
+      "greenfield_publishers",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
     ],
     "writes": [
       "greenfield_extension_installations",
       "greenfield_extension_lifecycle_events",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
+      "objects",
       "plan",
       "to"
     ],
@@ -4646,6 +4670,10 @@
     "jobs": [],
     "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
@@ -4675,6 +4703,26 @@
       "services/greenfield-api/src/modules/installation-service.ts#listInstalled"
     ]
   },
+  "POST /v1/modules/:moduleId/install-plan": {
+    "reads": [
+      "greenfield_module_release_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "objects"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installPlan",
+      "services/greenfield-api/src/modules/distribution-service.ts#latestEligibleRelease",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor"
+    ]
+  },
   "POST /v1/modules/:moduleId/install-preview": {
     "reads": [
       "greenfield_publishers"
@@ -4686,6 +4734,28 @@
     "evidence": [
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#installPreview"
+    ]
+  },
+  "GET /v1/modules/:moduleId/installation-descriptor": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_release_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "objects"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor"
     ]
   },
   "POST /v1/modules/:moduleId/permissions/review": {
@@ -5248,6 +5318,40 @@
       "services/greenfield-api/src/modules/record-service.ts#syncSigningKey"
     ]
   },
+  "POST /v1/modules/:moduleId/rollback": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_install_plans",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "greenfield_module_install_plans",
+      "greenfield_module_permission_reviews",
+      "objects",
+      "plan",
+      "policy"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
+      "services/greenfield-api/src/modules/distribution-service.ts#resolveUpdateTarget",
+      "services/greenfield-api/src/modules/distribution-service.ts#rollbackCandidate",
+      "services/greenfield-api/src/modules/distribution-service.ts#updatePlan",
+      "services/greenfield-api/src/modules/update-service.ts#planKey",
+      "services/greenfield-api/src/modules/update-service.ts#update",
+      "services/greenfield-api/src/modules/update-service.ts#updateInternal"
+    ]
+  },
   "GET /v1/modules/:moduleId/runtime": {
     "reads": [
       "greenfield_extension_installations",
@@ -5385,7 +5489,8 @@
     "writes": [
       "failed",
       "greenfield_module_install_plans",
-      "greenfield_module_permission_reviews"
+      "greenfield_module_permission_reviews",
+      "plan"
     ],
     "emits": [],
     "jobs": [],
@@ -5394,6 +5499,32 @@
       "services/greenfield-api/src/modules/update-service.ts#planKey",
       "services/greenfield-api/src/modules/update-service.ts#update",
       "services/greenfield-api/src/modules/update-service.ts#updateInternal"
+    ]
+  },
+  "POST /v1/modules/:moduleId/update-plan": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_release_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "objects",
+      "plan",
+      "policy"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#resolveUpdateTarget",
+      "services/greenfield-api/src/modules/distribution-service.ts#rollbackCandidate",
+      "services/greenfield-api/src/modules/distribution-service.ts#updatePlan"
     ]
   },
   "POST /v1/modules/:moduleId/version-preview": {
@@ -5462,6 +5593,32 @@
       "services/greenfield-api/src/modules/contribution-service.ts#list"
     ]
   },
+  "PATCH /v1/modules/installations/:installationId/update-policy": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "greenfield_extension_installations",
+      "objects",
+      "policy"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#setUpdatePolicy"
+    ]
+  },
   "GET /v1/modules/installed": {
     "reads": [
       "greenfield_extension_installations",
@@ -5491,6 +5648,36 @@
     "evidence": [
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#listInstalled"
+    ]
+  },
+  "GET /v1/modules/updates": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_module_versions",
+      "greenfield_mps_ingestions",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "feed"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#feedReleaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#loadUpdateFeedFacts",
+      "services/greenfield-api/src/modules/distribution-service.ts#updateFeed"
     ]
   },
   "GET /v1/notifications": {
@@ -6322,12 +6509,27 @@
       "services/greenfield-api/src/domains/discovery/repository.ts#listReels"
     ]
   },
+  "GET /v1/registry/artifacts/:sha256": {
+    "reads": [
+      "greenfield_module_releases",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#readArtifact"
+    ]
+  },
   "GET /v1/registry/modules": {
     "reads": [
       "greenfield_extension_catalogue",
       "greenfield_module_releases",
       "greenfield_module_versions",
-      "greenfield_publishers"
+      "greenfield_publishers",
+      "greenfield_release_asset_blobs"
     ],
     "writes": [],
     "emits": [],
@@ -6408,7 +6610,8 @@
       "greenfield_extension_catalogue",
       "greenfield_module_releases",
       "greenfield_module_versions",
-      "greenfield_publishers"
+      "greenfield_publishers",
+      "greenfield_release_asset_blobs"
     ],
     "writes": [],
     "emits": [],
@@ -6480,6 +6683,7 @@
     "reads": [
       "greenfield_module_releases",
       "greenfield_module_sources",
+      "greenfield_release_artifacts",
       "greenfield_release_asset_blobs"
     ],
     "writes": [],
@@ -6487,6 +6691,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#readArtifact",
       "services/greenfield-api/src/modules/registry-presentation-service.ts#readReleaseArtifact"
     ]
   },
@@ -6502,6 +6707,26 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/registry-presentation-service.ts#readAsset"
+    ]
+  },
+  "GET /v1/registry/releases/:releaseId/descriptor": {
+    "reads": [
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "objects"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById"
     ]
   },
   "POST /v1/reports": {

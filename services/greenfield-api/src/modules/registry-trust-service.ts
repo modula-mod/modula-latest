@@ -1,4 +1,4 @@
-import {isSemver, satisfiesSemverRange} from '@modula/greenfield-module-manifest'
+import {compareSemver, isSemver, satisfiesSemverRange} from '@modula/greenfield-module-manifest'
 import type {ModulaDb} from '../database/client.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
 import {moduleError} from './module-errors.js'
@@ -216,7 +216,7 @@ export function productProjection(ingestion: {manifest: unknown; manifest_sha256
   }
 }
 
-function signatureState(rows: Array<{
+export function signatureState(rows: Array<{
   signature_key_id: string; algorithm: string; verified_at: Date | null; revoked_at: Date | null;
   verification_state?: string | null; public_key_fingerprint?: string | null; verification_detail?: string | null;
   statement?: unknown; signing_key_publisher_id?: string | null; signing_key_state?: string | null; signing_key_revoked_at?: Date | null;
@@ -297,13 +297,9 @@ function stringOrNull(value: unknown): string | null {
 }
 
 function versionIsNewer(candidate: string, current: string): boolean {
-  const parse = (value: string) => value.split(/[.-]/).map(part => Number.parseInt(part, 10) || 0)
-  const left = parse(candidate)
-  const right = parse(current)
-  for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
-    const a = left[index] ?? 0
-    const b = right[index] ?? 0
-    if (a !== b) return a > b
+  try {
+    return compareSemver(candidate, current) > 0
+  } catch {
+    return false
   }
-  return false
 }

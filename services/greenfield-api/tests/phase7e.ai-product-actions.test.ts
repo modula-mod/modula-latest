@@ -66,7 +66,7 @@ describeIfDb('Phase 7E AI product actions', () => {
   })
 
   it('keeps Vault Notes usable without AI grants and blocks product AI until review grants them', async () => {
-    const note = await records.create(accountId, moduleId, 'note', {data: noteData('No AI grant', `private setup phrase ${suffix}`)})
+    const note = await records.create(accountId, moduleId, 'note', {data: noteData('No AI grant', `private setup phrase ${suffix}`), mutationId: `ai-note-no-grant:${suffix}`})
     expect(note.revision).toBe(1)
 
     await expect(productActions.execute(accountId, moduleId, 'vault-notes.ai.suggest-title', {
@@ -83,7 +83,7 @@ describeIfDb('Phase 7E AI product actions', () => {
 
   it('executes, previews and explicitly applies a declared action without leaking note content into audits or events', async () => {
     const phrase = `private leak sentinel ${suffix}`
-    const note = await records.create(accountId, moduleId, 'note', {data: noteData('AI title source', phrase)})
+    const note = await records.create(accountId, moduleId, 'note', {data: noteData('AI title source', phrase), mutationId: `ai-note-title:${suffix}`})
     const execution = await productActions.execute(accountId, moduleId, 'vault-notes.ai.suggest-title', {
       recordId: note.record_id,
       expectedRevision: note.revision,
@@ -118,17 +118,13 @@ describeIfDb('Phase 7E AI product actions', () => {
     })).rejects.toMatchObject({code: 'AI_RESULT_ALREADY_APPLIED'})
 
     const version = await db
-      .selectFrom('greenfield_module_record_versions')
+      .selectFrom('greenfield_module_record_revisions')
       .selectAll()
       .where('record_id', '=', note.record_id)
-      .where('next_revision', '=', 2)
+      .where('revision', '=', 2)
       .executeTakeFirstOrThrow()
-    expect(version.change_source).toBe('ai-assisted')
-    expect(version.metadata).toMatchObject({
-      aiActionId: 'vault-notes.ai.suggest-title',
-      promptId: 'vault-notes.suggest-title.v1',
-      promptVersion: '1.0.0',
-    })
+    expect(version).toMatchObject({operation: 'update', base_revision: 1})
+    expect(version.mutation_id).toMatch(/^ai-product-/)
 
     const eventPayloads = await db
       .selectFrom('greenfield_domain_events')
@@ -149,7 +145,7 @@ describeIfDb('Phase 7E AI product actions', () => {
   })
 
   it('rejects stale AI application after a normal note edit changes the source revision', async () => {
-    const note = await records.create(accountId, moduleId, 'note', {data: noteData('Stale source', `stale source phrase ${suffix}`)})
+    const note = await records.create(accountId, moduleId, 'note', {data: noteData('Stale source', `stale source phrase ${suffix}`), mutationId: `ai-note-stale:${suffix}`})
     const execution = await productActions.execute(accountId, moduleId, 'vault-notes.ai.suggest-title', {
       recordId: note.record_id,
       expectedRevision: note.revision,
@@ -158,6 +154,7 @@ describeIfDb('Phase 7E AI product actions', () => {
     await records.patch(accountId, moduleId, 'note', note.record_id, {
       data: {title: 'Manual edit', updatedAt: new Date().toISOString()},
       expectedRevision: note.revision,
+      mutationId: `ai-note-stale-edit:${suffix}`,
     })
     await expect(productActions.apply(accountId, moduleId, execution.executionId, {
       recordId: note.record_id,

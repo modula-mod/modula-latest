@@ -29,8 +29,8 @@ export const GITHUB_SYNC_LIMITS = {
   maxPackageBytes: 50 * 1024 * 1024,
   maxUncompressedBytes: 200 * 1024 * 1024,
   maxProvenanceBytes: 256 * 1024,
-  /** Package bytes above this are verified but not stored (blob table limit). */
-  maxStoredPackageBytes: 25 * 1024 * 1024,
+  /** Every accepted package must be retained for immutable distribution. */
+  maxStoredPackageBytes: 50 * 1024 * 1024,
 }
 
 const DOWNLOAD_HOSTS = new Set(['api.github.com', 'github.com', 'objects.githubusercontent.com', 'release-assets.githubusercontent.com', 'github-releases.githubusercontent.com'])
@@ -272,8 +272,7 @@ export class GreenfieldGithubReleaseSyncService {
       let release = existing ?? await releases.importPendingReview(verified.manifest, verified.evidence)
       if (release.releaseState === 'quarantined' || release.releaseState === 'revoked') throw moduleError('FORBIDDEN', `Release is ${release.releaseState}; sync will not change it`)
       if (release.releaseState === 'pendingReview') release = await releases.verifyRelease(verified.productId, verified.version)
-      if (input.publish && release.releaseState === 'verified') release = await releases.publishRelease(verified.productId, verified.version)
-      await this.storePackageBlob(verified)
+      await this.storePackageBlob(release.releaseId, verified)
       const ingested = await new GreenfieldMpsIngestService(this.db).ingest({
         filename: 'modula.product.json',
         bytes: verified.mpsBytes,
@@ -281,9 +280,17 @@ export class GreenfieldGithubReleaseSyncService {
         frontend: verified.frontend,
         schemas: verified.schemas,
         assets: verified.assets,
+        distributionVerified: true,
       })
       if (!ingested || ingested.productId !== verified.productId || ingested.version !== verified.version) throw moduleError('VALIDATION_FAILED', 'MPS ingest did not persist the release')
-      const summary = {...base, releaseId: release.releaseId, releaseState: release.releaseState, packageStored: verified.packageBytes.length <= GITHUB_SYNC_LIMITS.maxStoredPackageBytes, assetsStored: verified.assets.length}
+      const channel = releaseChannelFromMps(verified.mpsBytes)
+      if (release.releaseState === 'published' || release.releaseState === 'superseded') {
+        if (release.releaseChannel !== channel) throw moduleError('CONFLICT', 'Published release channel is immutable')
+      } else {
+        await this.db.updateTable('greenfield_module_releases').set({release_channel: channel}).where('release_id', '=', release.releaseId).execute()
+      }
+      if (input.publish && release.releaseState === 'verified') release = await releases.publishRelease(verified.productId, verified.version)
+      const summary = {...base, releaseId: release.releaseId, releaseState: release.releaseState, releaseChannel: channel, packageStored: true, assetsStored: verified.assets.length}
       await this.db.updateTable('greenfield_module_sync_runs').set({status: 'completed', completed_at: new Date(), summary: JSON.stringify(summary)}).where('sync_run_id', '=', runId).execute()
       return {mode: 'APPLIED' as const, syncRunId: runId, ...summary}
     } catch (error) {
@@ -297,16 +304,41 @@ export class GreenfieldGithubReleaseSyncService {
     }
   }
 
-  private async storePackageBlob(verified: VerifiedGithubRelease) {
-    if (verified.packageBytes.length > GITHUB_SYNC_LIMITS.maxStoredPackageBytes) return
-    await this.db.insertInto('greenfield_release_asset_blobs').values({
-      sha256: verified.packageSha256,
-      media_type: 'application/gzip',
-      byte_size: verified.packageBytes.length,
-      bytes: verified.packageBytes,
-      created_at: new Date(),
-    } as never).onConflict(oc => oc.column('sha256').doNothing()).execute()
+  private async storePackageBlob(releaseId: string, verified: VerifiedGithubRelease) {
+    if (verified.packageBytes.length > GITHUB_SYNC_LIMITS.maxStoredPackageBytes) {
+      throw moduleError('VALIDATION_FAILED', 'Verified package exceeds the immutable distribution store limit')
+    }
+    await this.db.transaction().execute(async trx => {
+      await trx.insertInto('greenfield_release_asset_blobs').values({
+        sha256: verified.packageSha256,
+        media_type: 'application/gzip',
+        byte_size: verified.packageBytes.length,
+        bytes: verified.packageBytes,
+        created_at: new Date(),
+      } as never).onConflict(oc => oc.column('sha256').doNothing()).execute()
+      await trx.insertInto('greenfield_release_artifacts').values({
+        artifact_id: `release:${releaseId}:module-package`,
+        release_id: releaseId,
+        kind: 'module-package',
+        sha256: verified.packageSha256,
+        filename: safeArtifactFilename(verified.packageFile),
+        access_class: 'installation',
+        required_for_offline_launch: true,
+        created_at: new Date(),
+      }).onConflict(oc => oc.column('artifact_id').doNothing()).execute()
+    })
   }
+}
+
+function releaseChannelFromMps(bytes: Buffer): 'stable' | 'beta' | 'rc' | 'dev' {
+  const raw = parseJson(bytes, 'modula.product.json') as Record<string, any>
+  const channel = raw.release?.channel
+  return channel === 'beta' || channel === 'rc' || channel === 'dev' ? channel : 'stable'
+}
+
+function safeArtifactFilename(value: string): string {
+  const filename = value.replace(/^.*[/\\]/, '').replace(/[^A-Za-z0-9._-]/g, '-')
+  return filename && filename !== '.' && filename !== '..' ? filename : 'module-package.tar.gz'
 }
 
 type Provenance = {

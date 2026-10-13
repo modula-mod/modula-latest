@@ -33,6 +33,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
   const folderId = `vault-folder-${suffix}`
   const noteId = `vault-note-${suffix}`
   const recordType = `alpha-note-${suffix}`
+  const moduleId = `audit.module.alpha-${suffix}`
 
   beforeAll(async () => {
     await migrateUp(testDatabaseUrl!)
@@ -74,11 +75,21 @@ describeLive('MP02 generic module record search projector (live database)', () =
     const now = new Date()
     await db.insertInto('greenfield_accounts').values({account_id: accountId, primary_handle: `vaultwrk${suffix}`.slice(0, 24), status: 'active', created_at: now, updated_at: now}).execute()
     await db.insertInto('actors').values({id: actorId, account_id: accountId, kind: 'person', created_at: now, updated_at: now, deleted_at: null, version: 1}).execute()
-    const release = await db.selectFrom('greenfield_module_releases').select('release_id').limit(1).executeTakeFirstOrThrow()
+    const publisherId = `alpha-search-publisher-${suffix}`
+    const extensionId = `alpha-search-extension-${suffix}`
+    const extensionVersionId = `alpha-search-extension-version-${suffix}`
+    const moduleVersionId = `alpha-search-module-version-${suffix}`
+    const releaseId = `alpha-search-release-${suffix}`
+    const manifest = {permissions: [], contributions: {}}
+    await db.insertInto('greenfield_publishers').values({publisher_id: publisherId, display_name: 'Alpha Search Fixture', website: null, status: 'verified', trust_level: 'firstParty', created_at: now, updated_at: now, verified_at: now, suspended_at: null, revoked_at: null}).execute()
+    await db.insertInto('greenfield_extensions').values({extension_id: extensionId, slug: moduleId, publisher_account_id: null, status: 'published', created_at: now, updated_at: now}).execute()
+    await db.insertInto('greenfield_extension_versions').values({extension_version_id: extensionVersionId, extension_id: extensionId, version: '1.0.0', manifest, status: 'published', created_at: now}).execute()
+    await db.insertInto('greenfield_module_versions').values({module_version_id: moduleVersionId, extension_version_id: extensionVersionId, module_id: moduleId, version: '1.0.0', publisher_id: publisherId, manifest, status: 'published', created_at: now, updated_at: now}).execute()
+    await db.insertInto('greenfield_module_releases').values({release_id: releaseId, module_version_id: moduleVersionId, extension_id: extensionId, extension_version_id: extensionVersionId, module_id: moduleId, version: '1.0.0', publisher_id: publisherId, release_state: 'published', source_repository: 'modula-mod/worker-search-fixture', source_commit: 'a'.repeat(40), manifest_path: 'module.manifest.json', manifest_sha256: 'b'.repeat(64), release_sha256: 'c'.repeat(64), signature_key_id: null, signature: null, compatibility: {}, license_status: 'firstParty', trust_level: 'firstParty', product_kind: 'module', extension_product: {}, published_at: now, quarantined_at: null, revoked_at: null, superseded_at: null, created_at: now, updated_at: now}).execute()
     await db.insertInto('greenfield_module_record_collections').values({
       collection_id: `alpha-search-collection-${suffix}`,
-      release_id: release.release_id,
-      module_id: 'audit.module.alpha',
+      release_id: releaseId,
+      module_id: moduleId,
       collection: recordType,
       schema_ref: 'schemas/alpha-note.schema.json',
       default_visibility: 'private',
@@ -105,7 +116,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
         {
           record_id: folderId,
           account_id: accountId,
-          module_id: 'audit.module.alpha',
+          module_id: moduleId,
           installation_id: null,
           collection: 'folder',
           schema_ref: 'schemas/folder.schema.json',
@@ -123,7 +134,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
         {
           record_id: noteId,
           account_id: accountId,
-          module_id: 'audit.module.alpha',
+          module_id: moduleId,
           installation_id: null,
           collection: recordType,
           schema_ref: 'schemas/alpha-note.schema.json',
@@ -173,7 +184,7 @@ describeLive('MP02 generic module record search projector (live database)', () =
       visibility: 'account',
       classification: 'private',
       payload: {
-        moduleId: 'audit.module.alpha',
+        moduleId,
         recordType,
         recordId: aggregateId,
         operation,

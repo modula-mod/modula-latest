@@ -9,11 +9,18 @@ export type GreenfieldRegistryModuleSummary = {
   publisherId: string
   publisherName: string
   latestVersion: string | null
+  registryReleaseId?: string | null
+  releaseChannel?: 'stable' | 'beta' | 'rc' | 'dev' | null
+  releaseSizeBytes?: number | null
   trustLevel: string
   licenseStatus: string
   status: GreenfieldModuleReleaseStatus | 'planned' | 'inactive' | 'unavailable'
   installable: boolean
   platforms: GreenfieldModulePlatform[]
+  permissionRequirements?: Array<{permission: string; reason?: string; risk?: string}>
+  compatibility?: Record<string, unknown>
+  presentation?: unknown
+  trustSummary?: unknown
   standard?: GreenfieldRegistryStandardMetadata
   betaClassification?: GreenfieldModuleBetaClassification
   installability?: GreenfieldModuleInstallabilityProjection

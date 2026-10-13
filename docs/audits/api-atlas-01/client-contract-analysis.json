@@ -827,7 +827,8 @@
       "raw": "/v1/modules/${encodeURIComponent(moduleId)}/views/${encodeURIComponent(viewId)}",
       "normalized": "/v1/modules/:param/views/:param",
       "matchedRoutes": [
-        "GET /v1/modules/:moduleId/views/:viewId"
+        "GET /v1/modules/:moduleId/views/:viewId",
+        "PATCH /v1/modules/installations/:installationId/update-policy"
       ],
       "status": "matched"
     },
@@ -850,7 +851,8 @@
       "matchedRoutes": [
         "GET /v1/modules/:moduleId/records/:collection",
         "POST /v1/modules/:moduleId/records/:collection",
-        "GET /v1/modules/:moduleId/records/sync"
+        "GET /v1/modules/:moduleId/records/sync",
+        "PATCH /v1/modules/installations/:installationId/update-policy"
       ],
       "status": "matched"
     },
@@ -876,7 +878,8 @@
       "matchedRoutes": [
         "GET /v1/modules/:moduleId/records/:collection",
         "POST /v1/modules/:moduleId/records/:collection",
-        "GET /v1/modules/:moduleId/records/sync"
+        "GET /v1/modules/:moduleId/records/sync",
+        "PATCH /v1/modules/installations/:installationId/update-policy"
       ],
       "status": "matched"
     },
@@ -934,7 +937,8 @@
       "raw": "/v1/modules/${encodeURIComponent(moduleId)}/actions/${encodeURIComponent(actionId)}",
       "normalized": "/v1/modules/:param/actions/:param",
       "matchedRoutes": [
-        "POST /v1/modules/:moduleId/actions/:actionId"
+        "POST /v1/modules/:moduleId/actions/:actionId",
+        "PATCH /v1/modules/installations/:installationId/update-policy"
       ],
       "status": "matched"
     },

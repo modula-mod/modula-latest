@@ -150,8 +150,8 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
     expect(await installedVersion()).toEqual({version: '1.0.0', status: 'enabled'})
 
     const refused = await switchTo('1.1.0')
-    expect(refused.statusCode).toBe(400)
-    expect(refused.body).toContain('PERMISSION_CONSENT_REQUIRED')
+    expect(refused.statusCode).toBe(403)
+    expect(refused.body).toContain('PERMISSION_REVIEW_REQUIRED')
 
     const accepted = await switchTo('1.1.0', {approvedPermissions: ['search:index'], hostVersion: '1.3.0'}, `upgrade-${suffix}`)
     expect(accepted.statusCode, accepted.body).toBe(202)
@@ -258,7 +258,8 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
 
   it('still honours the legacy consent flag for a high-risk upgrade', async () => {
     const refused = await switchTo('1.2.0')
-    expect(refused.statusCode).toBe(400)
+    expect(refused.statusCode).toBe(403)
+    expect(refused.body).toContain('PERMISSION_REVIEW_REQUIRED')
     const accepted = await switchTo('1.2.0', {approvedPermissionIncrease: true})
     expect(accepted.statusCode, accepted.body).toBe(202)
     expect(accepted.json().data.descriptor.permissions.granted).toEqual(expect.arrayContaining(['functions:register', 'search:index']))
