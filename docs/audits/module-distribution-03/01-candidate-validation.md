@@ -1,7 +1,7 @@
 # MODULE-DISTRIBUTION-03 candidate validation
 
-Date: 2026-10-13  
-Branch: `phase-module-distribution-03`  
+Date: 2026-10-13
+Branch: `phase-module-distribution-03`
 Base: `c6c907549a95c53f612d72fe89638e8222a97c69`
 
 ## Database and migration

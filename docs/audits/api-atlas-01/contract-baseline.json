@@ -4581,6 +4581,60 @@
       "sourceContractSha256": "6d6c16c9ad506f497be22a240954d124b637f562556ae917761bd87b571a6808"
     },
     {
+      "id": "GET /v1/admin/registry/artifacts/orphans",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "9c9d0651d3c9c32bd36681f0f7da612561efb9ba2738a2a37834610661367fd8"
+    },
+    {
       "id": "POST /v1/admin/registry/modules/import",
       "authorization": {
         "visibility": "ADMIN",
@@ -8546,7 +8600,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "b29d345aaf9941f34ae99ee18efc5d13010e22ced269da427cd53468758a8908"
+      "sourceContractSha256": "2d1fffca5193c5b3e210dcf1fbd73d9d3e31004667533984064a21ea2b95df4f"
     },
     {
       "id": "DELETE /v1/backend/products/:productId/records/:collection/:recordId",
@@ -16095,7 +16149,7 @@
           "any) ?? {}"
         ],
         "explicitFastifySchema": false,
-        "manualValidationObserved": true,
+        "manualValidationObserved": false,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -16167,6 +16221,62 @@
       "sourceContractSha256": "a975cbbd41897436ac537aaa6f88bbe2b0f4df60ef2a0cb7a62e5dded96fcc37"
     },
     {
+      "id": "POST /v1/modules/:moduleId/install-plan",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "Record<string, unknown> | null) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "86effecb05f6fee02eb0551031eb110793886191c5417af0efb9d34f8692083b"
+    },
+    {
       "id": "POST /v1/modules/:moduleId/install-preview",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -16221,6 +16331,60 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "sourceContractSha256": "9df92806e007da2b2ee8d892ea7efba26b31ed345c40a8dd8f2dd4a89999296d"
+    },
+    {
+      "id": "GET /v1/modules/:moduleId/installation-descriptor",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "1541765c28407eb2fdd5c9bb8b806b5790bc82be180c94fc9e65dc55349cb275"
     },
     {
       "id": "POST /v1/modules/:moduleId/permissions/review",
@@ -16660,7 +16824,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {},"
+          "Record<string, unknown> | undefined) ?? {}"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -16678,7 +16842,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "cf55bde1305f64bcc016276243106fe1c24da5d8adc0071e69adeef87676a811"
+      "sourceContractSha256": "6ac6a732ffee2211173ff305ce00e959d2b7215c345bad4b4964ae5b3a77d929"
     },
     {
       "id": "DELETE /v1/modules/:moduleId/records/:collection/:recordId",
@@ -16718,7 +16882,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {},"
+          "Record<string, unknown> | undefined) ?? {}"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -16736,7 +16900,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "682eab7b730446f5325bf7c581d739ebd145dc729c2d69dda7f361d9c6040062"
+      "sourceContractSha256": "43e70399accb5681026a28f9ec94f089c82fc38e1ac308dac6a372cddbc5df75"
     },
     {
       "id": "GET /v1/modules/:moduleId/records/:collection/:recordId",
@@ -16832,7 +16996,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {},"
+          "Record<string, unknown> | undefined) ?? {}"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -16850,7 +17014,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "061fb59742e33def67983d447b8dcd33a6c8c1b3600c46679fbb80ea4a03e0bb"
+      "sourceContractSha256": "9064f794814a45a75d3a96f003c5bbb109a5f2c6d01f04b5983eda7bb51a2cf8"
     },
     {
       "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/media",
@@ -17292,7 +17456,7 @@
         ],
         "query": [],
         "body": [
-          "any) ?? {},"
+          "Record<string, unknown> | undefined) ?? {}"
         ],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
@@ -17310,7 +17474,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "d790550da870176c1f72c3c84736a75413e1248c3f7e1c7657a55b38b7640fd3"
+      "sourceContractSha256": "ecef1759375b7df0c692ad77bdab22fef7bb33bf9b526ee24a4be86fd2514c6c"
     },
     {
       "id": "GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
@@ -17765,6 +17929,62 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "sourceContractSha256": "5ef403159653b420f080053a78ad7fcb96437e4362b4d3d0b1c6e43683f53f5f"
+    },
+    {
+      "id": "POST /v1/modules/:moduleId/rollback",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "Record<string, unknown> | null) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "3c7b01d680a4ad00e08a3576852b035fd0c2d13be5418e7ca3cfe1bef1c8c501"
     },
     {
       "id": "GET /v1/modules/:moduleId/runtime",
@@ -18267,6 +18487,62 @@
       "sourceContractSha256": "f2e63e144f9927ee5f8d59f415b5c6630d1e728563a23156f7f7c40284dec919"
     },
     {
+      "id": "POST /v1/modules/:moduleId/update-plan",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "Record<string, unknown> | null) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "2e302a6ee02bd2db0af0544b8b532b33487893efdbdc8da4710e00fa77e4dc6b"
+    },
+    {
       "id": "POST /v1/modules/:moduleId/version-preview",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -18543,6 +18819,64 @@
       "sourceContractSha256": "a6f8dae2ac96ffe523de87ea49ded82364e8c04e95d6923871ee11cd64fab5d6"
     },
     {
+      "id": "PATCH /v1/modules/installations/:installationId/update-policy",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": true,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{installationId?: string}).installationId ?? ''),"
+        ],
+        "query": [],
+        "body": [
+          "Record<string, unknown> | null) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "221e8c6ba4073d5ff6172ee83928cfa305b97e6e8d78f2fb1dc9187382be5786"
+    },
+    {
       "id": "GET /v1/modules/installed",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -18649,6 +18983,60 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "sourceContractSha256": "55eb0f069a624f035a8e151861dbf4b1b97ccefcb8be9a93f48a834a0c2c4ed7"
+    },
+    {
+      "id": "GET /v1/modules/updates",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "9d33a9ca7617ee3614233c5c00324dcd6f345c299bd5af54c500759fcc6a17fb"
     },
     {
       "id": "GET /v1/notifications",
@@ -21116,6 +21504,62 @@
       "sourceContractSha256": "a23e426eba980635cdb0f0b440c03082f45d659f77df07956cebafe76ad5e811"
     },
     {
+      "id": "GET /v1/registry/artifacts/:sha256",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": true,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [
+          "{sha256?: string}).sha256 ?? '')"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "5c9a1e1f4d83e3155a593cf6f6a0113e4a0ccd434c4aedd542983cee6e4d5522"
+    },
+    {
       "id": "GET /v1/registry/modules",
       "authorization": {
         "visibility": "PUBLIC",
@@ -21676,7 +22120,7 @@
       "authorization": {
         "visibility": "PUBLIC",
         "anonymousAllowed": true,
-        "optionalSession": false,
+        "optionalSession": true,
         "sessionRequired": false,
         "sessionKind": "none",
         "serviceAssertionRequired": false,
@@ -21725,7 +22169,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "b88d27bb588b14787774bfc4d39f417aea4802f63a6ce995d6a5945bec430d96"
+      "sourceContractSha256": "5a2862cc29a977aaa41702599182cc74a4d4cf839d5cced120a68b9732991049"
     },
     {
       "id": "GET /v1/registry/releases/:releaseId/assets/:assetId",
@@ -21782,6 +22226,62 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "sourceContractSha256": "fca487f0a5a2af8a3660f16a28aec6e8258cbd493ed27a306fb9cd39f49a1eb7"
+    },
+    {
+      "id": "GET /v1/registry/releases/:releaseId/descriptor",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [
+          "{releaseId?: string}).releaseId ?? '')"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "772a3c6dd1aff0b8a6bd577a01c993ef16fa5dd1e528f02ecbc361fa26786bca"
     },
     {
       "id": "POST /v1/reports",

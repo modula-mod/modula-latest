@@ -1,9 +1,9 @@
 # MODULE-DISTRIBUTION-03 preimplementation audit matrix
 
-Date: 2026-10-13  
-Repository: `modula-mod/modula-latest`  
-Branch: `phase-module-distribution-03`  
-Baseline: `c6c907549a95c53f612d72fe89638e8222a97c69`  
+Date: 2026-10-13
+Repository: `modula-mod/modula-latest`
+Branch: `phase-module-distribution-03`
+Baseline: `c6c907549a95c53f612d72fe89638e8222a97c69`
 Production migration: `071_module_record_search_projection`
 
 This is an observation-first audit of the accepted MODULE-PLATFORM-02 baseline. It records the state before MODULE-DISTRIBUTION-03 implementation. `PARTIAL` means a real implementation exists but does not yet satisfy the distribution protocol; `SPECIAL-CASED` means the behavior is tied to a legacy or fixture path rather than a generic module contract.

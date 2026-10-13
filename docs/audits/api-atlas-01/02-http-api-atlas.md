@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-10T22:02:13.369Z
-Route evidence: local-candidate-runtime captured 2026-10-12T13:29:28.579Z for branch `phase-module-platform-02`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-13T19:59:02.985Z for branch `phase-module-distribution-03`; this does not claim deployment.
 
-- Runtime method routes: 616
-- Application routes: 437
-- Automatically generated HEAD routes: 178
+- Runtime method routes: 630
+- Application routes: 446
+- Automatically generated HEAD routes: 183
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `616 = 437 application + 179 framework-derived`
+- Reconciliation: `630 = 446 application + 184 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,10 +17,10 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 437 |
+| yes | yes | not yet | candidate-registered | 446 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 179 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 184 |
 
 ## Error contract
 
@@ -115,20 +115,21 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | GET | `/v1/admin/ops/search/health` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2474` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/ops/search/projections` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2507` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2527` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:173` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1350` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1450` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1455` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1466` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/suspend` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1447` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1444` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/publish` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1434` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/quarantine` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1437` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1440` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/signature` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1397` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1394` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/sync` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1363` | candidate-registered-not-production-probed |
-| Admin | GET | `/v1/admin/registry/sync-runs` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1383` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:177` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/registry/artifacts/orphans` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:212` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1510` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1610` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1615` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1626` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/suspend` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1607` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1604` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/publish` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1594` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/quarantine` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1597` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1600` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/signature` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1557` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1554` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/sync` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1523` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/registry/sync-runs` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1543` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/ai/executions/:executionId` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:119` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/ai/executions/:executionId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:155` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/ai/executions/:executionId/stream` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:130` | candidate-registered-not-production-probed |
@@ -168,34 +169,34 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Authentication | POST | `/v1/auth/totp/enroll` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:624` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/totp/verify` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:639` | candidate-registered-not-production-probed |
 | Module Runtime | GET | `/v1/backend/products/:productId/accounts/:accountId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:81` | candidate-registered-not-production-probed |
-| Module Runtime | GET | `/v1/backend/products/:productId/accounts/:accountId/entitlements` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:320` | candidate-registered-not-production-probed |
+| Module Runtime | GET | `/v1/backend/products/:productId/accounts/:accountId/entitlements` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:321` | candidate-registered-not-production-probed |
 | Module Runtime | POST | `/v1/backend/products/:productId/capabilities/check` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:115` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/data-request-domains/:domainId/complete` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:380` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/data-requests/claim` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:369` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/entitlements/check` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:330` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/events` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:237` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/data-request-domains/:domainId/complete` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:381` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/data-requests/claim` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:370` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/entitlements/check` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:331` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/events` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:238` | candidate-registered-not-production-probed |
 | Module Runtime | GET | `/v1/backend/products/:productId/identity/context` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:65` | candidate-registered-not-production-probed |
 | Module Runtime | GET | `/v1/backend/products/:productId/installations/:installationId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:101` | candidate-registered-not-production-probed |
 | Module Runtime | GET | `/v1/backend/products/:productId/installations/:installationId/capabilities` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:108` | candidate-registered-not-production-probed |
-| Module Runtime | GET | `/v1/backend/products/:productId/installations/:installationId/resources` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:186` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/jobs` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:248` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/cancel` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:311` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/fail` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:287` | candidate-registered-not-production-probed |
-| Module Runtime | GET | `/v1/backend/products/:productId/jobs/:jobId/result` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:303` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/start` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:268` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/succeed` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:277` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/jobs/claim` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:259` | candidate-registered-not-production-probed |
+| Module Runtime | GET | `/v1/backend/products/:productId/installations/:installationId/resources` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:187` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/jobs` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:249` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/cancel` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:312` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/fail` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:288` | candidate-registered-not-production-probed |
+| Module Runtime | GET | `/v1/backend/products/:productId/jobs/:jobId/result` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:304` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/start` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:269` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/jobs/:jobId/succeed` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:278` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/jobs/claim` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:260` | candidate-registered-not-production-probed |
 | Module Runtime | GET | `/v1/backend/products/:productId/records/:collection` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:126` | candidate-registered-not-production-probed |
 | Module Runtime | POST | `/v1/backend/products/:productId/records/:collection` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:150` | candidate-registered-not-production-probed |
-| Module Runtime | DELETE | `/v1/backend/products/:productId/records/:collection/:recordId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:174` | candidate-registered-not-production-probed |
+| Module Runtime | DELETE | `/v1/backend/products/:productId/records/:collection/:recordId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:175` | candidate-registered-not-production-probed |
 | Module Runtime | GET | `/v1/backend/products/:productId/records/:collection/:recordId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:141` | candidate-registered-not-production-probed |
-| Module Runtime | PUT | `/v1/backend/products/:productId/records/:collection/:recordId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:162` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/resources` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:208` | candidate-registered-not-production-probed |
-| Module Runtime | GET | `/v1/backend/products/:productId/resources/:resourceId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:200` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/resources/:resourceId/migrations` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:228` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/resources/:resourceId/schemas` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:219` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/secrets/lease` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:352` | candidate-registered-not-production-probed |
-| Module Runtime | POST | `/v1/backend/products/:productId/usage` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:341` | candidate-registered-not-production-probed |
+| Module Runtime | PUT | `/v1/backend/products/:productId/records/:collection/:recordId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:163` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/resources` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:209` | candidate-registered-not-production-probed |
+| Module Runtime | GET | `/v1/backend/products/:productId/resources/:resourceId` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:201` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/resources/:resourceId/migrations` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:229` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/resources/:resourceId/schemas` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:220` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/secrets/lease` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:353` | candidate-registered-not-production-probed |
+| Module Runtime | POST | `/v1/backend/products/:productId/usage` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:342` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/board/layout` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1067` | candidate-registered-not-production-probed |
 | Account | PATCH | `/v1/board/layout` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1077` | candidate-registered-not-production-probed |
 | Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:172` | candidate-registered-not-production-probed |
@@ -249,12 +250,12 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Modules | DELETE | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1229` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1217` | candidate-registered-not-production-probed |
 | Modules | PATCH | `/v1/extensions/:extensionId/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1239` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/extensions/:extensionProductId/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:326` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/capabilities/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:336` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/fail` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:402` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:348` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/extensions/:extensionProductId/inspector` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:439` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:419` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/extensions/:extensionProductId/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:361` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/capabilities/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:371` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/fail` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:437` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:383` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/extensions/:extensionProductId/inspector` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:474` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:454` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions/catalogue` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1200` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions/installed` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1212` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/feed/home` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1467` | candidate-registered-not-production-probed |
@@ -292,82 +293,88 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Media | GET | `/v1/media/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2151` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:133` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/meta` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:274` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:311` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1250` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:346` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1410` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/modules` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1438` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/actions/:actionId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1124` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/actions/:actionId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1284` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/modules/:moduleId/ai/actions/:actionId/executions` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:62` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/modules/:moduleId/ai/executions/:executionId/apply` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:78` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/modules/:moduleId/ai/requests` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:94` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/backend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1288` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1321` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/discover` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1299` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/events` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1332` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1310` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/webhooks/modula` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1341` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:460` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:475` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/data-resources/:resourceId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:490` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/migrations` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:504` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/schemas` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:520` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:611` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:601` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/export` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1267` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/frontend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:764` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/functions/:functionId/:version/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1145` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1278` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/host-function-executors` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1164` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/host-function-executors/:executorId/requests` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1177` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/host-function-requests/:requestId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1188` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1212` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/complete` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1199` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:696` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:568` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/install-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:590` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/install-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:557` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/permissions/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:672` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:851` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:806` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:840` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId/record` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:829` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:817` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:877` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:888` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1077` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:905` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1059` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:927` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:938` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:971` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:960` | candidate-registered-not-production-probed |
-| Modules | PUT | `/v1/modules/:moduleId/records/:collection/:recordId/media/order` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:949` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/permanent` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1113` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1024` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/restore` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1095` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/reverse-references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1042` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:982` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1007` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/current` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:996` | candidate-registered-not-production-probed |
-| Sharing | POST | `/v1/modules/:moduleId/records/:collection/:recordId/shares` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:916` | candidate-registered-not-production-probed |
-| Sharing | GET | `/v1/modules/:moduleId/records/shares/owned` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:795` | candidate-registered-not-production-probed |
-| Sharing | GET | `/v1/modules/:moduleId/records/shares/received` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:785` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/sync` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:862` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/runtime` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:450` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/runtime-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1223` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/runtime-credentials/:credentialId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1237` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/services/:serviceId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:536` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:728` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:738` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/settings-schema` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:718` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/uninstall-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:686` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/update` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:649` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/version-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:635` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/versions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:623` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/views` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:754` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/views/:viewId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:774` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/contributions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:748` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/installed` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:297` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/installed/:moduleId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:303` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/backend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1448` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1481` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/discover` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1459` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/events` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1492` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1470` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/webhooks/modula` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1501` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:495` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:510` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/data-resources/:resourceId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:525` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/migrations` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:539` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/schemas` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:555` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:703` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:693` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/export` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1427` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/frontend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:920` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/functions/:functionId/:version/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1305` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1438` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/host-function-executors` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1324` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/host-function-executors/:executorId/requests` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1337` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/host-function-requests/:requestId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1348` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1372` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/complete` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1359` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:852` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:620` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/install-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:654` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:603` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/install-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:592` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/installation-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:665` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/permissions/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:828` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1007` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:962` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:996` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId/record` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:985` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:973` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1033` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1044` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1235` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1062` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1216` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1084` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1095` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1128` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1117` | candidate-registered-not-production-probed |
+| Modules | PUT | `/v1/modules/:moduleId/records/:collection/:recordId/media/order` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1106` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/permanent` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1273` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1181` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/restore` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1254` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/reverse-references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1199` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1139` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1164` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/current` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1153` | candidate-registered-not-production-probed |
+| Sharing | POST | `/v1/modules/:moduleId/records/:collection/:recordId/shares` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1073` | candidate-registered-not-production-probed |
+| Sharing | GET | `/v1/modules/:moduleId/records/shares/owned` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:951` | candidate-registered-not-production-probed |
+| Sharing | GET | `/v1/modules/:moduleId/records/shares/received` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:941` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/sync` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1018` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/rollback` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:800` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/runtime` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:485` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/runtime-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1383` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/runtime-credentials/:credentialId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1397` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/services/:serviceId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:571` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:884` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:894` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/settings-schema` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:874` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/uninstall-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:842` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/update` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:776` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/update-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:741` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/version-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:727` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/versions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:715` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/views` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:910` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/views/:viewId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:930` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/contributions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:904` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/installations/:installationId/update-policy` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:758` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/installed` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:332` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/installed/:moduleId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:338` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/updates` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:679` | candidate-registered-not-production-probed |
 | Activity | GET | `/v1/notifications` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2004` | candidate-registered-not-production-probed |
 | Activity | POST | `/v1/notifications/:notificationId/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2019` | candidate-registered-not-production-probed |
 | Activity | POST | `/v1/notifications/read-all` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2028` | candidate-registered-not-production-probed |
@@ -389,8 +396,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Posts | DELETE | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1587` | candidate-registered-not-production-probed |
 | Posts | POST | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1587` | candidate-registered-not-production-probed |
 | Sharing | POST | `/v1/posts/:postId/share` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1624` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:149` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:161` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:153` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:165` | candidate-registered-not-production-probed |
 | Profile | GET | `/v1/profiles/:handle` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1643` | candidate-registered-not-production-probed |
 | Social | GET | `/v1/profiles/:handle/followers` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1667` | candidate-registered-not-production-probed |
 | Social | GET | `/v1/profiles/:handle/following` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1683` | candidate-registered-not-production-probed |
@@ -411,18 +418,20 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Modules | PUT | `/v1/providers/:capabilityRole/default` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:32` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/providers/:capabilityRole/resolve` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:30` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/reels` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2188` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:104` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:122` | candidate-registered-not-production-probed |
-| Modules | PUT | `/v1/registry/modules/:moduleId/rating` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:278` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:208` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules/:moduleId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:217` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/products` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:113` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:131` | candidate-registered-not-production-probed |
-| Social | GET | `/v1/registry/products/:productId/relationships` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:140` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:290` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/publishers/:publisherId/signing-keys` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:227` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/releases/:releaseId/artifact` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:237` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/releases/:releaseId/assets/:assetId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:256` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/artifacts/:sha256` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:278` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:108` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:126` | candidate-registered-not-production-probed |
+| Modules | PUT | `/v1/registry/modules/:moduleId/rating` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:313` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:223` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules/:moduleId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:232` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/products` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:117` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:135` | candidate-registered-not-production-probed |
+| Social | GET | `/v1/registry/products/:productId/relationships` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:144` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:325` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/publishers/:publisherId/signing-keys` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:242` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/releases/:releaseId/artifact` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:252` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/releases/:releaseId/assets/:assetId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:291` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/releases/:releaseId/descriptor` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:266` | candidate-registered-not-production-probed |
 | Moderation | POST | `/v1/reports` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1915` | candidate-registered-not-production-probed |
 | Moderation | GET | `/v1/reports/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1928` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/repositories/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1088` | candidate-registered-not-production-probed |
@@ -3641,7 +3650,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/product-standard/ingest`
 - Public URL: `https://api.modula.digital/v1/admin/product-standard/ingest`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:173`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:177`
 - Handler: inline
 - Controller/service calls: `filename.trim`, `mpsIngest.ingest`, `publishers.requireAdminAccount`, `releaseId.trim`
 - Authentication: greenfield bearer access session
@@ -3673,6 +3682,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/admin/registry/artifacts/orphans</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: GET
+- Effective route: `/v1/admin/registry/artifacts/orphans`
+- Public URL: `https://api.modula.digital/v1/admin/registry/artifacts/orphans`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:212`
+- Handler: inline
+- Controller/service calls: `distribution.orphanArtifactReport`, `publishers.requireAdminAccount`
+- Authentication: greenfield bearer access session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_module_releases`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_presentation_assets`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>POST /v1/admin/registry/modules/import</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Admin
@@ -3680,7 +3728,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/modules/import`
 - Public URL: `https://api.modula.digital/v1/admin/registry/modules/import`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1350`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1510`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `releases.importPendingReview`
 - Authentication: greenfield bearer access session
@@ -3719,7 +3767,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1450`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1610`
 - Handler: inline
 - Controller/service calls: `publishers.revokePublisher`
 - Authentication: greenfield bearer access session
@@ -3758,7 +3806,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/signing-keys`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/signing-keys`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1455`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1615`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.register`
 - Authentication: greenfield bearer access session
@@ -3797,7 +3845,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1466`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1626`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.revoke`
 - Authentication: greenfield bearer access session
@@ -3836,7 +3884,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/suspend`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/suspend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1447`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1607`
 - Handler: inline
 - Controller/service calls: `publishers.suspendPublisher`
 - Authentication: greenfield bearer access session
@@ -3875,7 +3923,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/verify`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1444`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1604`
 - Handler: inline
 - Controller/service calls: `publishers.verifyPublisher`
 - Authentication: greenfield bearer access session
@@ -3914,7 +3962,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/publish`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/publish`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1434`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1594`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: greenfield bearer access session
@@ -3953,7 +4001,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/quarantine`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/quarantine`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1437`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1597`
 - Handler: inline
 - Controller/service calls: `releases.quarantineRelease`
 - Authentication: greenfield bearer access session
@@ -3992,7 +4040,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1440`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1600`
 - Handler: inline
 - Controller/service calls: `releases.revokeRelease`
 - Authentication: greenfield bearer access session
@@ -4031,7 +4079,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/signature`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/signature`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1397`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1557`
 - Handler: inline
 - Controller/service calls: `githubSync.fetchVerified`, `publishers.requireAdminAccount`, `releases.attachPublishedSignature`, `releases.getReleaseById`
 - Authentication: greenfield bearer access session
@@ -4070,7 +4118,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/verify`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1394`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1554`
 - Handler: inline
 - Controller/service calls: `releases.verifyReleaseFromId`
 - Authentication: greenfield bearer access session
@@ -4109,7 +4157,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/sync`
 - Public URL: `https://api.modula.digital/v1/admin/registry/sync`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1363`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1523`
 - Handler: inline
 - Controller/service calls: `githubSync.sync`, `publishers.requireAdminAccount`
 - Authentication: greenfield bearer access session
@@ -4126,7 +4174,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_accounts`
-- Database writes: `greenfield_module_sync_failures`, `greenfield_module_sync_runs`, `greenfield_release_asset_blobs`
+- Database writes: `greenfield_module_releases`, `greenfield_module_sync_failures`, `greenfield_module_sync_runs`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
 - Jobs produced: none observed
@@ -4148,7 +4196,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/sync-runs`
 - Public URL: `https://api.modula.digital/v1/admin/registry/sync-runs`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1383`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1543`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`, `publishers.requireAdminAccount`
 - Authentication: greenfield bearer access session
@@ -5708,7 +5756,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/accounts/:accountId/entitlements`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/accounts/:accountId/entitlements`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:320`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:321`
 - Handler: inline
 - Controller/service calls: `entitlements.listAccount`
 - Authentication: signed service assertion
@@ -5786,7 +5834,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/data-request-domains/:domainId/complete`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/data-request-domains/:domainId/complete`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:380`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:381`
 - Handler: inline
 - Controller/service calls: `accountData.completeServiceDomain`
 - Authentication: signed service assertion
@@ -5825,7 +5873,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/data-requests/claim`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/data-requests/claim`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:369`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:370`
 - Handler: inline
 - Controller/service calls: `accountData.claimServiceDomains`
 - Authentication: signed service assertion
@@ -5864,7 +5912,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/entitlements/check`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/entitlements/check`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:330`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:331`
 - Handler: inline
 - Controller/service calls: `entitlements.check`
 - Authentication: signed service assertion
@@ -5903,7 +5951,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/events`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/events`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:237`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:238`
 - Handler: inline
 - Controller/service calls: `eventJobs.publishEvent`
 - Authentication: signed service assertion
@@ -6059,7 +6107,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/installations/:installationId/resources`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/installations/:installationId/resources`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:186`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:187`
 - Handler: inline
 - Controller/service calls: `ledger.list`
 - Authentication: signed service assertion
@@ -6098,7 +6146,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:248`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:249`
 - Handler: inline
 - Controller/service calls: `eventJobs.enqueueJob`
 - Authentication: signed service assertion
@@ -6137,7 +6185,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs/:jobId/cancel`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs/:jobId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:311`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:312`
 - Handler: inline
 - Controller/service calls: `eventJobs.cancelJob`
 - Authentication: signed service assertion
@@ -6176,7 +6224,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs/:jobId/fail`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs/:jobId/fail`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:287`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:288`
 - Handler: inline
 - Controller/service calls: `eventJobs.failJob`
 - Authentication: signed service assertion
@@ -6215,7 +6263,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs/:jobId/result`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs/:jobId/result`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:303`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:304`
 - Handler: inline
 - Controller/service calls: `eventJobs.jobResult`
 - Authentication: signed service assertion
@@ -6254,7 +6302,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs/:jobId/start`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs/:jobId/start`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:268`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:269`
 - Handler: inline
 - Controller/service calls: `eventJobs.startJob`
 - Authentication: signed service assertion
@@ -6293,7 +6341,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs/:jobId/succeed`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs/:jobId/succeed`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:277`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:278`
 - Handler: inline
 - Controller/service calls: `eventJobs.succeedJob`
 - Authentication: signed service assertion
@@ -6332,7 +6380,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/jobs/claim`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/jobs/claim`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:259`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:260`
 - Handler: inline
 - Controller/service calls: `eventJobs.claimJobs`
 - Authentication: signed service assertion
@@ -6449,7 +6497,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:174`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:175`
 - Handler: inline
 - Controller/service calls: `records.delete`
 - Authentication: signed service assertion
@@ -6527,7 +6575,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:162`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:163`
 - Handler: inline
 - Controller/service calls: `records.patch`
 - Authentication: signed service assertion
@@ -6566,7 +6614,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/resources`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/resources`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:208`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:209`
 - Handler: inline
 - Controller/service calls: `ledger.register`
 - Authentication: signed service assertion
@@ -6605,7 +6653,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/resources/:resourceId`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/resources/:resourceId`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:200`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:201`
 - Handler: inline
 - Controller/service calls: `ledger.get`
 - Authentication: signed service assertion
@@ -6644,7 +6692,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/resources/:resourceId/migrations`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/resources/:resourceId/migrations`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:228`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:229`
 - Handler: inline
 - Controller/service calls: `ledger.recordMigration`
 - Authentication: signed service assertion
@@ -6683,7 +6731,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/resources/:resourceId/schemas`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/resources/:resourceId/schemas`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:219`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:220`
 - Handler: inline
 - Controller/service calls: `ledger.declareSchemaVersion`
 - Authentication: signed service assertion
@@ -6722,7 +6770,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/secrets/lease`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/secrets/lease`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:352`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:353`
 - Handler: inline
 - Controller/service calls: `credentialBroker.lease`
 - Authentication: signed service assertion
@@ -6761,7 +6809,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/backend/products/:productId/usage`
 - Public URL: `https://api.modula.digital/v1/backend/products/:productId/usage`
 - API version: v1
-- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:341`
+- Source file: `services/greenfield-api/src/backend-fabric/routes.ts:342`
 - Handler: inline
 - Controller/service calls: `entitlements.recordUsage`
 - Authentication: signed service assertion
@@ -8867,7 +8915,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/capabilities`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/capabilities`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:326`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:361`
 - Handler: inline
 - Controller/service calls: `extensionFabric.declaredCapabilities`
 - Authentication: greenfield bearer access session
@@ -8906,7 +8954,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/capabilities/review`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/capabilities/review`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:336`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:371`
 - Handler: inline
 - Controller/service calls: `approvedCapabilities.filter`, `extensionFabric.reviewCapabilities`
 - Authentication: greenfield bearer access session
@@ -8945,7 +8993,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/contributions/:contributionId/fail`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/contributions/:contributionId/fail`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:402`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:437`
 - Handler: inline
 - Controller/service calls: `extensionFabric.failContribution`
 - Authentication: greenfield bearer access session
@@ -8984,7 +9032,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/contributions/:contributionId/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:348`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:383`
 - Handler: inline
 - Controller/service calls: `backendGateway.canHandle`, `backendGateway.executeAction`, `extensionAi.canHandle`, `extensionAi.execute`, `extensionFabric.assertInvocation`, `requiredCapabilities.filter`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -9023,7 +9071,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/inspector`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/inspector`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:439`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:474`
 - Handler: inline
 - Controller/service calls: `extensionFabric.developerInspector`
 - Authentication: greenfield bearer access session
@@ -9062,7 +9110,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/jobs`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:419`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:454`
 - Handler: inline
 - Controller/service calls: `extensionFabric.enqueueJob`
 - Authentication: greenfield bearer access session
@@ -10544,7 +10592,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/module-host/:targetProductId/composition`
 - Public URL: `https://api.modula.digital/v1/module-host/:targetProductId/composition`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:311`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:346`
 - Handler: inline
 - Controller/service calls: `extensionFabric.composeHost`
 - Authentication: greenfield bearer access session
@@ -10583,7 +10631,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/module-runtime/actions/:targetModuleId/:actionId/:version`
 - Public URL: `https://api.modula.digital/v1/module-runtime/actions/:targetModuleId/:actionId/:version`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1250`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1410`
 - Handler: inline
 - Controller/service calls: `interModuleActions.request`
 - Authentication: module backend bearer token plus HMAC signature
@@ -10645,7 +10693,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10661,7 +10709,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/actions/:actionId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/actions/:actionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1124`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1284`
 - Handler: inline
 - Controller/service calls: `actions.execute`
 - Authentication: greenfield bearer access session
@@ -10684,7 +10732,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10723,7 +10771,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `AI provider fabric`
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10762,7 +10810,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `AI provider fabric`
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10801,7 +10849,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `AI provider fabric`
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10817,7 +10865,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1288`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1448`
 - Handler: inline
 - Controller/service calls: `backendHealth.diagnostics`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -10840,7 +10888,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10856,7 +10904,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/disable`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1321`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1481`
 - Handler: inline
 - Controller/service calls: `backendLifecycle.disable`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -10879,7 +10927,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10895,7 +10943,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/discover`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/discover`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1299`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1459`
 - Handler: inline
 - Controller/service calls: `backendDiscovery.discover`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -10918,7 +10966,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10934,7 +10982,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/events`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/events`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1332`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1492`
 - Handler: inline
 - Controller/service calls: `backendEvents.ingest`
 - Authentication: module backend bearer token plus HMAC signature
@@ -10957,7 +11005,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10973,7 +11021,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/health`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/health`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1310`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1470`
 - Handler: inline
 - Controller/service calls: `backendHealth.check`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -10996,7 +11044,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11012,7 +11060,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/webhooks/modula`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/webhooks/modula`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1341`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1501`
 - Handler: inline
 - Controller/service calls: `backendWebhooks.receive`
 - Authentication: module backend bearer token plus HMAC signature
@@ -11035,7 +11083,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11051,7 +11099,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:460`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:495`
 - Handler: inline
 - Controller/service calls: `dataLedger.list`
 - Authentication: greenfield bearer access session
@@ -11074,7 +11122,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11090,7 +11138,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:475`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:510`
 - Handler: inline
 - Controller/service calls: `dataLedger.register`
 - Authentication: greenfield bearer access session
@@ -11113,7 +11161,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11129,7 +11177,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources/:resourceId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources/:resourceId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:490`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:525`
 - Handler: inline
 - Controller/service calls: `dataLedger.get`
 - Authentication: greenfield bearer access session
@@ -11152,7 +11200,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11168,7 +11216,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources/:resourceId/migrations`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources/:resourceId/migrations`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:504`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:539`
 - Handler: inline
 - Controller/service calls: `dataLedger.recordMigration`
 - Authentication: greenfield bearer access session
@@ -11191,7 +11239,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11207,7 +11255,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources/:resourceId/schemas`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources/:resourceId/schemas`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:520`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:555`
 - Handler: inline
 - Controller/service calls: `dataLedger.declareSchemaVersion`
 - Authentication: greenfield bearer access session
@@ -11230,7 +11278,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11246,7 +11294,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/disable`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:611`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:703`
 - Handler: inline
 - Controller/service calls: `installations.disable`
 - Authentication: greenfield bearer access session
@@ -11269,7 +11317,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11285,7 +11333,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/enable`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/enable`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:601`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:693`
 - Handler: inline
 - Controller/service calls: `installations.enable`
 - Authentication: greenfield bearer access session
@@ -11308,7 +11356,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11324,7 +11372,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/export`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/export`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1267`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1427`
 - Handler: inline
 - Controller/service calls: `exports.create`
 - Authentication: greenfield bearer access session
@@ -11347,7 +11395,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11363,7 +11411,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/frontend`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/frontend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:764`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:920`
 - Handler: inline
 - Controller/service calls: `productFrontends.resolve`
 - Authentication: greenfield bearer access session
@@ -11386,7 +11434,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11402,7 +11450,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/functions/:functionId/:version/invoke`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/functions/:functionId/:version/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1145`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1305`
 - Handler: inline
 - Controller/service calls: `governedFunctions.invoke`
 - Authentication: greenfield bearer access session
@@ -11425,7 +11473,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11441,7 +11489,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/health`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/health`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1278`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1438`
 - Handler: inline
 - Controller/service calls: `health.get`
 - Authentication: greenfield bearer access session
@@ -11464,7 +11512,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11480,7 +11528,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-executors`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-executors`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1164`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1324`
 - Handler: inline
 - Controller/service calls: `governedFunctions.registerHostExecutor`
 - Authentication: greenfield bearer access session
@@ -11503,7 +11551,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11519,7 +11567,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-executors/:executorId/requests`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-executors/:executorId/requests`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1177`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1337`
 - Handler: inline
 - Controller/service calls: `governedFunctions.pendingHostRequests`
 - Authentication: greenfield bearer access session
@@ -11542,7 +11590,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11558,7 +11606,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-requests/:requestId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-requests/:requestId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1188`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1348`
 - Handler: inline
 - Controller/service calls: `governedFunctions.getHostRequest`
 - Authentication: greenfield bearer access session
@@ -11581,7 +11629,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11597,7 +11645,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-requests/:requestId/cancel`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-requests/:requestId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1212`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1372`
 - Handler: inline
 - Controller/service calls: `governedFunctions.cancelHostRequest`
 - Authentication: greenfield bearer access session
@@ -11620,7 +11668,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11636,7 +11684,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-requests/:requestId/complete`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-requests/:requestId/complete`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1199`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1359`
 - Handler: inline
 - Controller/service calls: `governedFunctions.completeHostRequest`
 - Authentication: greenfield bearer access session
@@ -11659,7 +11707,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11675,7 +11723,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:696`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:852`
 - Handler: inline
 - Controller/service calls: `uninstall.uninstall`
 - Authentication: greenfield bearer access session
@@ -11698,7 +11746,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11714,9 +11762,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:568`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:620`
 - Handler: inline
-- Controller/service calls: `installations.install`, `version.trim`
+- Controller/service calls: `distribution.installationDescriptor`, `installations.install`, `version.trim`
 - Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
@@ -11730,14 +11778,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `500`
-- Database reads: `greenfield_extension_installations`, `greenfield_extension_runtime_projection`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `greenfield_module_releases`, `greenfield_publishers`
-- Database writes: `greenfield_extension_installations`, `greenfield_extension_lifecycle_events`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `plan`, `to`
+- Database reads: `greenfield_extension_installations`, `greenfield_extension_runtime_projection`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_publishers`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `greenfield_extension_installations`, `greenfield_extension_lifecycle_events`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `objects`, `plan`, `to`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11753,7 +11801,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install-descriptor`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install-descriptor`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:590`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:654`
 - Handler: inline
 - Controller/service calls: `installations.getInstallDescriptor`
 - Authentication: greenfield bearer access session
@@ -11776,7 +11824,46 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/modules/:moduleId/install-plan</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: POST
+- Effective route: `/v1/modules/:moduleId/install-plan`
+- Public URL: `https://api.modula.digital/v1/modules/:moduleId/install-plan`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:603`
+- Handler: inline
+- Controller/service calls: `distribution.installPlan`, `version.trim`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: `Record<string, unknown> | null) ?? {}`
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `greenfield_module_release_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `objects`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11792,7 +11879,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install-preview`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install-preview`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:557`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:592`
 - Handler: inline
 - Controller/service calls: `installations.installPreview`
 - Authentication: greenfield bearer access session
@@ -11815,7 +11902,46 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/modules/:moduleId/installation-descriptor</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: GET
+- Effective route: `/v1/modules/:moduleId/installation-descriptor`
+- Public URL: `https://api.modula.digital/v1/modules/:moduleId/installation-descriptor`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:665`
+- Handler: inline
+- Controller/service calls: `distribution.installationDescriptor`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `304`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_extension_installations`, `greenfield_module_permission_reviews`, `greenfield_module_release_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `objects`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11831,7 +11957,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/permissions/review`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/permissions/review`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:672`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:828`
 - Handler: inline
 - Controller/service calls: `approvedPermissions.filter`, `installations.reviewPermissions`
 - Authentication: greenfield bearer access session
@@ -11854,7 +11980,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11870,7 +11996,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:851`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1007`
 - Handler: inline
 - Controller/service calls: `recordSharing.revoke`
 - Authentication: greenfield bearer access session
@@ -11893,7 +12019,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11909,7 +12035,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:806`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:962`
 - Handler: inline
 - Controller/service calls: `recordSharing.read`
 - Authentication: greenfield bearer access session
@@ -11932,7 +12058,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11948,7 +12074,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:840`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:996`
 - Handler: inline
 - Controller/service calls: `recordSharing.update`
 - Authentication: greenfield bearer access session
@@ -11971,7 +12097,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11987,7 +12113,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId/record`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId/record`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:829`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:985`
 - Handler: inline
 - Controller/service calls: `recordSharing.edit`
 - Authentication: greenfield bearer access session
@@ -12010,7 +12136,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12026,7 +12152,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId/revisions`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId/revisions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:817`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:973`
 - Handler: inline
 - Controller/service calls: `recordSharing.history`
 - Authentication: greenfield bearer access session
@@ -12049,7 +12175,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12065,7 +12191,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:877`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1033`
 - Handler: inline
 - Controller/service calls: `records.list`
 - Authentication: greenfield bearer access session
@@ -12088,7 +12214,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12104,7 +12230,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:888`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1044`
 - Handler: inline
 - Controller/service calls: `records.create`
 - Authentication: greenfield bearer access session
@@ -12115,7 +12241,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Rate limit: none registered
 - Request params: `any`
 - Request query: none observed
-- Request body: `any) ?? {},`
+- Request body: `Record<string, unknown> | undefined) ?? {}`
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
@@ -12127,7 +12253,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12143,7 +12269,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1077`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1235`
 - Handler: inline
 - Controller/service calls: `records.delete`
 - Authentication: greenfield bearer access session
@@ -12154,7 +12280,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Rate limit: none registered
 - Request params: `any`
 - Request query: none observed
-- Request body: `any) ?? {},`
+- Request body: `Record<string, unknown> | undefined) ?? {}`
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
@@ -12166,7 +12292,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12182,7 +12308,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:905`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1062`
 - Handler: inline
 - Controller/service calls: `records.get`
 - Authentication: greenfield bearer access session
@@ -12205,7 +12331,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12221,7 +12347,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1059`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1216`
 - Handler: inline
 - Controller/service calls: `records.patch`
 - Authentication: greenfield bearer access session
@@ -12232,7 +12358,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Rate limit: none registered
 - Request params: `any`
 - Request query: none observed
-- Request body: `any) ?? {},`
+- Request body: `Record<string, unknown> | undefined) ?? {}`
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
@@ -12244,7 +12370,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12260,7 +12386,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:927`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1084`
 - Handler: inline
 - Controller/service calls: `mediaBindings.list`
 - Authentication: greenfield bearer access session
@@ -12283,7 +12409,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12299,7 +12425,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:938`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1095`
 - Handler: inline
 - Controller/service calls: `mediaBindings.bind`
 - Authentication: greenfield bearer access session
@@ -12322,7 +12448,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12338,7 +12464,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:971`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1128`
 - Handler: inline
 - Controller/service calls: `mediaBindings.unbind`
 - Authentication: greenfield bearer access session
@@ -12361,7 +12487,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12377,7 +12503,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:960`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1117`
 - Handler: inline
 - Controller/service calls: `mediaBindings.updateMetadata`
 - Authentication: greenfield bearer access session
@@ -12400,7 +12526,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12416,7 +12542,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media/order`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media/order`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:949`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1106`
 - Handler: inline
 - Controller/service calls: `mediaBindings.reorder`
 - Authentication: greenfield bearer access session
@@ -12439,7 +12565,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12455,7 +12581,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/permanent`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/permanent`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1113`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1273`
 - Handler: inline
 - Controller/service calls: `records.purge`
 - Authentication: greenfield bearer access session
@@ -12478,7 +12604,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12494,7 +12620,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/references`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/references`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1024`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1181`
 - Handler: inline
 - Controller/service calls: `records.forwardReferences`
 - Authentication: greenfield bearer access session
@@ -12517,7 +12643,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12533,7 +12659,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/restore`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/restore`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1095`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1254`
 - Handler: inline
 - Controller/service calls: `records.restore`
 - Authentication: greenfield bearer access session
@@ -12544,7 +12670,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Rate limit: none registered
 - Request params: `any`
 - Request query: none observed
-- Request body: `any) ?? {},`
+- Request body: `Record<string, unknown> | undefined) ?? {}`
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
@@ -12556,7 +12682,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12572,7 +12698,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/reverse-references`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/reverse-references`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1042`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1199`
 - Handler: inline
 - Controller/service calls: `records.reverseReferences`
 - Authentication: greenfield bearer access session
@@ -12595,7 +12721,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12611,7 +12737,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/revisions`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:982`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1139`
 - Handler: inline
 - Controller/service calls: `records.listRevisions`
 - Authentication: greenfield bearer access session
@@ -12634,7 +12760,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12650,7 +12776,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1007`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1164`
 - Handler: inline
 - Controller/service calls: `records.getRevision`
 - Authentication: greenfield bearer access session
@@ -12673,7 +12799,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12689,7 +12815,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/revisions/current`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions/current`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:996`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1153`
 - Handler: inline
 - Controller/service calls: `records.currentRevision`
 - Authentication: greenfield bearer access session
@@ -12712,7 +12838,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12728,7 +12854,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/shares`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/shares`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:916`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1073`
 - Handler: inline
 - Controller/service calls: `recordSharing.create`
 - Authentication: greenfield bearer access session
@@ -12751,7 +12877,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12767,7 +12893,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/shares/owned`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/shares/owned`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:795`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:951`
 - Handler: inline
 - Controller/service calls: `recordSharing.listOwned`
 - Authentication: greenfield bearer access session
@@ -12790,7 +12916,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12806,7 +12932,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/shares/received`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/shares/received`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:785`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:941`
 - Handler: inline
 - Controller/service calls: `recordSharing.listReceived`
 - Authentication: greenfield bearer access session
@@ -12829,7 +12955,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12845,7 +12971,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/sync`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/sync`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:862`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1018`
 - Handler: inline
 - Controller/service calls: `records.sync`
 - Authentication: greenfield bearer access session
@@ -12868,7 +12994,46 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/modules/:moduleId/rollback</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: POST
+- Effective route: `/v1/modules/:moduleId/rollback`
+- Public URL: `https://api.modula.digital/v1/modules/:moduleId/rollback`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:800`
+- Handler: inline
+- Controller/service calls: `distribution.releaseDescriptorById`, `distribution.updatePlan`, `updates.update`, `version.trim`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: `Record<string, unknown> | null) ?? {}`
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `202`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `greenfield_extension_installations`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `objects`, `plan`, `policy`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12884,7 +13049,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/runtime`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/runtime`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:450`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:485`
 - Handler: inline
 - Controller/service calls: `runtime2.runtimeSummary`
 - Authentication: greenfield bearer access session
@@ -12907,7 +13072,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12923,7 +13088,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/runtime-credentials`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/runtime-credentials`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1223`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1383`
 - Handler: inline
 - Controller/service calls: `interModuleActions.issueRuntimeCredential`
 - Authentication: greenfield bearer access session
@@ -12946,7 +13111,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12962,7 +13127,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/runtime-credentials/:credentialId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/runtime-credentials/:credentialId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1237`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1397`
 - Handler: inline
 - Controller/service calls: `interModuleActions.revokeRuntimeCredential`
 - Authentication: greenfield bearer access session
@@ -12985,7 +13150,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13001,7 +13166,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/services/:serviceId/invoke`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/services/:serviceId/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:536`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:571`
 - Handler: inline
 - Controller/service calls: `runtime2.invokeService`
 - Authentication: greenfield bearer access session
@@ -13024,7 +13189,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13040,7 +13205,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/settings`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/settings`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:728`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:884`
 - Handler: inline
 - Controller/service calls: `settings.get`
 - Authentication: greenfield bearer access session
@@ -13063,7 +13228,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13079,7 +13244,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/settings`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/settings`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:738`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:894`
 - Handler: inline
 - Controller/service calls: `settings.patch`
 - Authentication: greenfield bearer access session
@@ -13102,7 +13267,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13118,7 +13283,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/settings-schema`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/settings-schema`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:718`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:874`
 - Handler: inline
 - Controller/service calls: `settings.schema`
 - Authentication: greenfield bearer access session
@@ -13141,7 +13306,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13157,7 +13322,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/uninstall-preview`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/uninstall-preview`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:686`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:842`
 - Handler: inline
 - Controller/service calls: `uninstall.preview`
 - Authentication: greenfield bearer access session
@@ -13180,7 +13345,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13196,7 +13361,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/update`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/update`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:649`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:776`
 - Handler: inline
 - Controller/service calls: `approvedPermissions.filter`, `updates.update`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -13213,13 +13378,52 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_module_install_plans`
-- Database writes: `failed`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`
+- Database writes: `failed`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `plan`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/modules/:moduleId/update-plan</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: POST
+- Effective route: `/v1/modules/:moduleId/update-plan`
+- Public URL: `https://api.modula.digital/v1/modules/:moduleId/update-plan`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:741`
+- Handler: inline
+- Controller/service calls: `distribution.updatePlan`, `version.trim`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: `Record<string, unknown> | null) ?? {}`
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `greenfield_extension_installations`, `greenfield_module_permission_reviews`, `greenfield_module_release_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `objects`, `plan`, `policy`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13235,7 +13439,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/version-preview`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/version-preview`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:635`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:727`
 - Handler: inline
 - Controller/service calls: `updates.preview`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -13258,7 +13462,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13274,7 +13478,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/versions`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/versions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:623`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:715`
 - Handler: inline
 - Controller/service calls: `updates.versions`
 - Authentication: greenfield bearer access session
@@ -13297,7 +13501,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13313,7 +13517,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/views`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/views`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:754`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:910`
 - Handler: inline
 - Controller/service calls: `views.listViews`
 - Authentication: greenfield bearer access session
@@ -13336,7 +13540,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13352,7 +13556,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/views/:viewId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/views/:viewId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:774`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:930`
 - Handler: inline
 - Controller/service calls: `views.getView`
 - Authentication: greenfield bearer access session
@@ -13375,7 +13579,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`, `src/data/repositories/api/ApiToolsRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-data-ledger.mjs`, `scripts/verify-greenfield-mps-v1.mjs`, `scripts/verify-phase7b-module-runtime.mjs`, `scripts/verify-phase7e-ai-product-actions.mjs`, `scripts/verify-phase7e-ai-provider-runtime.mjs`, `scripts/verify-phase7e-ai-security.mjs`, `scripts/verify-phase7e-module-backend-auth.mjs`, `scripts/verify-phase7e-module-backend-discovery.mjs`, `scripts/verify-phase7e-module-backend-health.mjs`, `scripts/verify-phase7e-vault-notes-ai-integration.mjs`, `scripts/verify-phase7e-vault-notes-host.mjs`, `scripts/verify-phase7e-vault-notes-lifecycle.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/module-settings-permissions.test.ts`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-api/tests/permission-reconciliation.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.install-descriptor.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -13391,7 +13595,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/contributions`
 - Public URL: `https://api.modula.digital/v1/modules/contributions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:748`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:904`
 - Handler: inline
 - Controller/service calls: `contributions.list`
 - Authentication: greenfield bearer access session
@@ -13423,6 +13627,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>PATCH /v1/modules/installations/:installationId/update-policy</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: PATCH
+- Effective route: `/v1/modules/installations/:installationId/update-policy`
+- Public URL: `https://api.modula.digital/v1/modules/installations/:installationId/update-policy`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:758`
+- Handler: inline
+- Controller/service calls: `distribution.setUpdatePolicy`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{installationId?: string}).installationId ?? ''),`
+- Request query: none observed
+- Request body: `Record<string, unknown> | null) ?? {}`
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `greenfield_extension_installations`, `greenfield_module_permission_reviews`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `greenfield_extension_installations`, `objects`, `policy`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/modules/installed</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Modules
@@ -13430,7 +13673,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/installed`
 - Public URL: `https://api.modula.digital/v1/modules/installed`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:297`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:332`
 - Handler: inline
 - Controller/service calls: `installations.listInstalled`
 - Authentication: greenfield bearer access session
@@ -13469,7 +13712,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/installed/:moduleId`
 - Public URL: `https://api.modula.digital/v1/modules/installed/:moduleId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:303`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:338`
 - Handler: inline
 - Controller/service calls: `installations.getInstalled`
 - Authentication: greenfield bearer access session
@@ -13493,6 +13736,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
 - Tests: `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/modules/updates</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: GET
+- Effective route: `/v1/modules/updates`
+- Public URL: `https://api.modula.digital/v1/modules/updates`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:679`
+- Handler: inline
+- Controller/service calls: `distribution.updateFeed`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `304`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_extension_installations`, `greenfield_module_permission_reviews`, `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `feed`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14327,7 +14609,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/product-standard/products/:productId`
 - Public URL: `https://api.modula.digital/v1/product-standard/products/:productId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:149`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:153`
 - Handler: inline
 - Controller/service calls: `mpsIngest.getLatest`
 - Authentication: none
@@ -14366,7 +14648,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/product-standard/products/:productId/versions/:version`
 - Public URL: `https://api.modula.digital/v1/product-standard/products/:productId/versions/:version`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:161`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:165`
 - Handler: inline
 - Controller/service calls: `mpsIngest.get`
 - Authentication: none
@@ -15178,6 +15460,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/registry/artifacts/:sha256</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: GET
+- Effective route: `/v1/registry/artifacts/:sha256`
+- Public URL: `https://api.modula.digital/v1/registry/artifacts/:sha256`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:278`
+- Handler: inline
+- Controller/service calls: `distribution.readArtifact`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{sha256?: string}).sha256 ?? '')`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_module_releases`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/registry/modules</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Modules
@@ -15185,7 +15506,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules`
 - Public URL: `https://api.modula.digital/v1/registry/modules`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:104`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:108`
 - Handler: inline
 - Controller/service calls: `registry.listModules`
 - Authentication: none
@@ -15201,7 +15522,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
-- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publishers`
+- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publishers`, `greenfield_release_asset_blobs`
 - Database writes: none observed
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
@@ -15224,7 +15545,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:122`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:126`
 - Handler: inline
 - Controller/service calls: `registry.getModule`
 - Authentication: none
@@ -15263,7 +15584,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId/rating`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId/rating`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:278`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:313`
 - Handler: inline
 - Controller/service calls: `marketplace.submitRating`
 - Authentication: greenfield bearer access session
@@ -15302,7 +15623,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId/versions`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId/versions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:208`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:223`
 - Handler: inline
 - Controller/service calls: `registry.listVersions`
 - Authentication: none
@@ -15341,7 +15662,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId/versions/:version`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId/versions/:version`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:217`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:232`
 - Handler: inline
 - Controller/service calls: `registry.getVersionDetail`
 - Authentication: none
@@ -15380,7 +15701,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/products`
 - Public URL: `https://api.modula.digital/v1/registry/products`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:113`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:117`
 - Handler: inline
 - Controller/service calls: `registry.listModules`
 - Authentication: none
@@ -15396,14 +15717,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
-- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publishers`
+- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publishers`, `greenfield_release_asset_blobs`
 - Database writes: none observed
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15419,7 +15740,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/products/:productId`
 - Public URL: `https://api.modula.digital/v1/registry/products/:productId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:131`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:135`
 - Handler: inline
 - Controller/service calls: `registry.getModule`
 - Authentication: none
@@ -15442,7 +15763,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15458,7 +15779,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/products/:productId/relationships`
 - Public URL: `https://api.modula.digital/v1/registry/products/:productId/relationships`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:140`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:144`
 - Handler: inline
 - Controller/service calls: `extensionFabric.relationships`
 - Authentication: none
@@ -15481,7 +15802,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15497,7 +15818,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/publishers/:publisherId`
 - Public URL: `https://api.modula.digital/v1/registry/publishers/:publisherId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:290`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:325`
 - Handler: inline
 - Controller/service calls: `publishers.getPublisher`
 - Authentication: none
@@ -15536,7 +15857,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/publishers/:publisherId/signing-keys`
 - Public URL: `https://api.modula.digital/v1/registry/publishers/:publisherId/signing-keys`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:227`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:242`
 - Handler: inline
 - Controller/service calls: `signingKeys.listForPublisher`
 - Authentication: none
@@ -15575,9 +15896,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/releases/:releaseId/artifact`
 - Public URL: `https://api.modula.digital/v1/registry/releases/:releaseId/artifact`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:237`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:252`
 - Handler: inline
-- Controller/service calls: `presentation.readReleaseArtifact`
+- Controller/service calls: `distribution.readArtifact`, `presentation.readReleaseArtifact`
 - Authentication: none
 - Authorization: PUBLIC
 - Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
@@ -15591,9 +15912,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
-- Database reads: `greenfield_module_releases`, `greenfield_module_sources`, `greenfield_release_asset_blobs`
+- Database reads: `greenfield_module_releases`, `greenfield_module_sources`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
 - Database writes: none observed
-- Storage: `host bind mount: /var/lib/modula/greenfield-media`, `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
@@ -15614,7 +15935,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/releases/:releaseId/assets/:assetId`
 - Public URL: `https://api.modula.digital/v1/registry/releases/:releaseId/assets/:assetId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:256`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:291`
 - Handler: inline
 - Controller/service calls: `presentation.readAsset`
 - Authentication: none
@@ -15640,6 +15961,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (404)
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/registry/releases/:releaseId/descriptor</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Modules
+- Method: GET
+- Effective route: `/v1/registry/releases/:releaseId/descriptor`
+- Public URL: `https://api.modula.digital/v1/registry/releases/:releaseId/descriptor`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:266`
+- Handler: inline
+- Controller/service calls: `distribution.releaseDescriptorById`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{releaseId?: string}).releaseId ?? '')`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database writes: `objects`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
 - Status: candidate-registered-not-production-probed
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 

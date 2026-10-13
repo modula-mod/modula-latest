@@ -318,63 +318,63 @@
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 243,
+      "line": 267,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const placeholder = await this.db"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 249,
+      "line": 273,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 250,
+      "line": 274,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 251,
+      "line": 275,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 256,
+      "line": 280,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "name: placeholder.name,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 257,
+      "line": 281,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "description: placeholder.description,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 258,
+      "line": 282,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "publisher: {publisherId: 'modula', displayName: placeholder.publisher},"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 261,
+      "line": 285,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "trust: placeholder.trust,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 265,
+      "line": 289,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: manifest,"
@@ -836,7 +836,7 @@
     },
     {
       "file": "packages/greenfield-module-manifest/src/compatibility.ts",
-      "line": 35,
+      "line": 47,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!left || !right) throw new Error('Invalid semantic version')"
@@ -850,7 +850,7 @@
     },
     {
       "file": "packages/greenfield-module-registry-contracts/src/registry.ts",
-      "line": 25,
+      "line": 32,
       "marker": "PLACEHOLDER",
       "classification": "possible-runtime-placeholder",
       "excerpt": "| 'PLACEHOLDER'"
@@ -2329,63 +2329,63 @@
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 243,
+      "line": 267,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const placeholder = await this.db"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 249,
+      "line": 273,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 250,
+      "line": 274,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 251,
+      "line": 275,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 256,
+      "line": 280,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "name: placeholder.name,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 257,
+      "line": 281,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "description: placeholder.description,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 258,
+      "line": 282,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "publisher: {publisherId: 'modula', displayName: placeholder.publisher},"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 261,
+      "line": 285,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "trust: placeholder.trust,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 265,
+      "line": 289,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: manifest,"
@@ -2847,7 +2847,7 @@
     },
     {
       "file": "packages/greenfield-module-manifest/src/compatibility.ts",
-      "line": 35,
+      "line": 47,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!left || !right) throw new Error('Invalid semantic version')"
@@ -2861,7 +2861,7 @@
     },
     {
       "file": "packages/greenfield-module-registry-contracts/src/registry.ts",
-      "line": 25,
+      "line": 32,
       "marker": "PLACEHOLDER",
       "classification": "possible-runtime-placeholder",
       "excerpt": "| 'PLACEHOLDER'"
