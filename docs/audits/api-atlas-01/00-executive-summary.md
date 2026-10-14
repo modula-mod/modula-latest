@@ -17,7 +17,7 @@ Routes with request schemas: 8
 Routes with response schemas: 0
 Routes with automated tests: 371
 Routes live-probed: 26 unique routes
-Routes with known callers: 239
+Routes with known callers: 237
 Database tables: 306
 Workers: 1 GreenField worker
 Queues: PostgreSQL outbox plus background job tables

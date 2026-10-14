@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-14T01:40:03.842Z",
+  "capturedAt": "2026-10-14T01:44:00.529Z",
   "source": {
     "branch": "phase-module-distribution-03-etag-fix",
-    "headAtCapture": "5f5305bdf9ccf0ef5b7ba93a9c804f32686715dc",
+    "headAtCapture": "606907f9c2c0e71a4de8bda9b4d0d34945fe0f58",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "287b889ae9a31624d09d03165d13c8b39b727cb3d5fe3841211c0f7b378adbbf"
   },
