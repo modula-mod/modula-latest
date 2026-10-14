@@ -4,7 +4,9 @@ const files = [
   'ops/nginx/api.modula.digital.conf',
   'ops/nginx/api.modula.digital.greenfield.conf',
 ]
-const immutableRoute = 'location ~ ^/v1/registry/(?:artifacts/[0-9a-f]{64}|releases/[^/]+/assets/[^/]+)$ {'
+// Nginx requires a regular expression containing `{64}` to be quoted so the
+// quantifier is not parsed as configuration-block syntax.
+const immutableRoute = 'location ~ "^/v1/registry/(?:artifacts/[0-9a-f]{64}|releases/[^/]+/assets/[^/]+)$" {'
 
 for (const file of files) {
   const source = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8')
