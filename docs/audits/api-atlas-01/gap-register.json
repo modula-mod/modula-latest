@@ -1013,7 +1013,7 @@
       "domain": "database",
       "type": "orphan table",
       "severity": "P3",
-      "title": "13 tables have no API/worker source reference",
+      "title": "14 tables have no API/worker source reference",
       "evidence": [
         "04-database-api-map.md"
       ],

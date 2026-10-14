@@ -56,7 +56,7 @@ flowchart TD
 ## Versions and migration truth
 
 - Applied migrations: 67; latest `067_legacy_duplicate_installation_versions` at 2026-10-10T09:09:10.219911+00:00.
-- Git up migrations: 72; latest `072_module_distribution_protocol.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
+- Git up migrations: 73; latest `073_backup_sequence_acl_defaults.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
 - Production runtime routes: 575; excluded automatic production framework routes: 166. Candidate route counts, when present, are reported only in the HTTP atlas and do not alter deployment truth.
 
 ## Safe configuration

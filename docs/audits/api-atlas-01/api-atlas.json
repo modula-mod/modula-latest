@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase-module-distribution-03",
+      "branch": "phase-module-distribution-03-backup-fix",
       "sourceSha256": "cd46a5f8997951bd58bd098836513f1a6f7c359d0ca81f0e7e15d0f99efc42ce",
-      "capturedAt": "2026-10-13T19:59:02.985Z",
+      "capturedAt": "2026-10-14T01:04:49.316Z",
       "routeCount": 630
     },
     "status": "PASS"
@@ -60709,6 +60709,29 @@
         "reconciled_at"
       ],
       "migrationIntroduced": "053_greenfield_backend_v1_backup_acl_reconciliation.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_backup_sequence_acl_reconciliation",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield backup sequence acl reconciliation",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "073_backup_sequence_acl_defaults.sql",
       "sourceReads": [],
       "sourceWrites": [],
       "jobReads": [],
