@@ -301,6 +301,9 @@ importers:
 
   packages/greenfield-module-manifest:
     dependencies:
+      '@modula/greenfield-contracts':
+        specifier: workspace:*
+        version: link:../greenfield-contracts
       '@modula/module-standard':
         specifier: file:../../../modula-mod/modula-module-standard/packages/module-standard
         version: file:../modula-mod/modula-module-standard/packages/module-standard
