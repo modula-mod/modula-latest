@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase-module-distribution-03-etag-fix",
+      "branch": "phase-module-distribution-03-cache-header-fix",
       "sourceSha256": "287b889ae9a31624d09d03165d13c8b39b727cb3d5fe3841211c0f7b378adbbf",
-      "capturedAt": "2026-10-14T01:44:00.529Z",
+      "capturedAt": "2026-10-14T08:45:04.887Z",
       "routeCount": 630
     },
     "status": "PASS"
