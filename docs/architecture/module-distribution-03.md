@@ -35,7 +35,7 @@ The v1 Ed25519 statement remains `modula.publisher-release.v1` (`schemaVersion: 
 
 The old release-ID artifact route is retained as an authenticated, deprecated alias and advertises the digest route as its successor. It no longer makes executable bytes public.
 
-Artifact responses use a registry-controlled MIME type, exact `Content-Length`, `X-Content-Type-Options: nosniff`, SHA-256 `ETag`, digest header, safe content disposition, and immutable caching. Public artwork uses `public`; installation artifacts use `private`. Single byte ranges return `206` and `Content-Range`; invalid/multiple/out-of-bounds ranges return `416`. A client may resume with `Range` and `If-Range`; without a matching ETag it restarts from the full response.
+Artifact responses use a registry-controlled MIME type, exact `Content-Length`, `X-Content-Type-Options: nosniff`, SHA-256 `ETag`, digest header, safe content disposition, and immutable caching. Public artwork uses `public`; installation artifacts use `private`. The source-controlled production nginx location preserves that API-owned policy for both digest-addressed artifacts and release artwork instead of appending the catch-all `no-store` header. Single byte ranges return `206` and `Content-Range`; invalid/multiple/out-of-bounds ranges return `416`. A client may resume with `Range` and `If-Range`; without a matching ETag it restarts from the full response.
 
 ## Publication and ingestion
 

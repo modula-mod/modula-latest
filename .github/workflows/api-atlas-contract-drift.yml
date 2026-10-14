@@ -6,6 +6,7 @@ on:
       - 'services/greenfield-api/**'
       - 'services/greenfield-worker/**'
       - 'apps/**'
+      - 'ops/**'
       - 'packages/**'
       - 'tools/api-atlas/**'
       - 'scripts/**'
@@ -110,6 +111,8 @@ jobs:
         run: CI=true pnpm build:web
       - name: Vault runtime special-case gate
         run: CI=true pnpm verify:mp02b-vault-special-cases
+      - name: Module distribution immutable cache edge contract
+        run: CI=true pnpm verify:module-distribution-nginx
       - name: Trust bootstrap CLI typecheck
         run: >-
           pnpm --filter @modula/greenfield-api exec tsc --noEmit --module NodeNext

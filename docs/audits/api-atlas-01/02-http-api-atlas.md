@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-10T22:02:13.369Z
-Route evidence: local-candidate-runtime captured 2026-10-14T01:44:00.529Z for branch `phase-module-distribution-03-etag-fix`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-14T08:45:04.887Z for branch `phase-module-distribution-03-cache-header-fix`; this does not claim deployment.
 
 - Runtime method routes: 630
 - Application routes: 446
