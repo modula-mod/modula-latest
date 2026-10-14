@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-14T01:04:49.316Z",
+  "capturedAt": "2026-10-14T01:40:03.842Z",
   "source": {
-    "branch": "phase-module-distribution-03-backup-fix",
-    "headAtCapture": "a211ae7d886d4f776d564c3ea96912569624dc33",
+    "branch": "phase-module-distribution-03-etag-fix",
+    "headAtCapture": "5f5305bdf9ccf0ef5b7ba93a9c804f32686715dc",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "cd46a5f8997951bd58bd098836513f1a6f7c359d0ca81f0e7e15d0f99efc42ce"
+    "apiSourceSha256": "287b889ae9a31624d09d03165d13c8b39b727cb3d5fe3841211c0f7b378adbbf"
   },
   "runtimeRoutes": [
     {

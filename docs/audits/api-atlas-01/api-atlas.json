@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase-module-distribution-03-backup-fix",
-      "sourceSha256": "cd46a5f8997951bd58bd098836513f1a6f7c359d0ca81f0e7e15d0f99efc42ce",
-      "capturedAt": "2026-10-14T01:04:49.316Z",
+      "branch": "phase-module-distribution-03-etag-fix",
+      "sourceSha256": "287b889ae9a31624d09d03165d13c8b39b727cb3d5fe3841211c0f7b378adbbf",
+      "capturedAt": "2026-10-14T01:40:03.842Z",
       "routeCount": 630
     },
     "status": "PASS"
@@ -2029,7 +2029,8 @@
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
@@ -2483,7 +2484,8 @@
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
@@ -2627,7 +2629,8 @@
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
@@ -9764,7 +9767,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 177
+        "line": 195
       },
       "handler": "inline",
       "controllerServices": [
@@ -9888,7 +9891,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 212
+        "line": 230
       },
       "handler": "inline",
       "controllerServices": [
@@ -9993,7 +9996,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1510
+        "line": 1528
       },
       "handler": "inline",
       "controllerServices": [
@@ -10117,7 +10120,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1610
+        "line": 1628
       },
       "handler": "inline",
       "controllerServices": [
@@ -10222,7 +10225,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1615
+        "line": 1633
       },
       "handler": "inline",
       "controllerServices": [
@@ -10333,7 +10336,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1626
+        "line": 1644
       },
       "handler": "inline",
       "controllerServices": [
@@ -10445,7 +10448,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1607
+        "line": 1625
       },
       "handler": "inline",
       "controllerServices": [
@@ -10549,7 +10552,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1604
+        "line": 1622
       },
       "handler": "inline",
       "controllerServices": [
@@ -10653,7 +10656,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1594
+        "line": 1612
       },
       "handler": "inline",
       "controllerServices": [],
@@ -10752,7 +10755,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1597
+        "line": 1615
       },
       "handler": "inline",
       "controllerServices": [
@@ -10863,7 +10866,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1600
+        "line": 1618
       },
       "handler": "inline",
       "controllerServices": [
@@ -10973,7 +10976,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1557
+        "line": 1575
       },
       "handler": "inline",
       "controllerServices": [
@@ -11098,7 +11101,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1554
+        "line": 1572
       },
       "handler": "inline",
       "controllerServices": [
@@ -11219,7 +11222,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1523
+        "line": 1541
       },
       "handler": "inline",
       "controllerServices": [
@@ -11336,7 +11339,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1543
+        "line": 1561
       },
       "handler": "inline",
       "controllerServices": [
@@ -24589,7 +24592,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 361
+        "line": 379
       },
       "handler": "inline",
       "controllerServices": [
@@ -24700,7 +24703,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 371
+        "line": 389
       },
       "handler": "inline",
       "controllerServices": [
@@ -24822,7 +24825,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 437
+        "line": 455
       },
       "handler": "inline",
       "controllerServices": [
@@ -24938,7 +24941,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 383
+        "line": 401
       },
       "handler": "inline",
       "controllerServices": [
@@ -25072,7 +25075,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 474
+        "line": 492
       },
       "handler": "inline",
       "controllerServices": [
@@ -25186,7 +25189,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 454
+        "line": 472
       },
       "handler": "inline",
       "controllerServices": [
@@ -29163,7 +29166,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 346
+        "line": 364
       },
       "handler": "inline",
       "controllerServices": [
@@ -29277,7 +29280,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1410
+        "line": 1428
       },
       "handler": "inline",
       "controllerServices": [
@@ -29470,6 +29473,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -29527,7 +29531,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1284
+        "line": 1302
       },
       "handler": "inline",
       "controllerServices": [
@@ -29622,6 +29626,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -29779,6 +29784,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -29937,6 +29943,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30095,6 +30102,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30152,7 +30160,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1448
+        "line": 1466
       },
       "handler": "inline",
       "controllerServices": [
@@ -30237,6 +30245,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30294,7 +30303,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1481
+        "line": 1499
       },
       "handler": "inline",
       "controllerServices": [
@@ -30382,6 +30391,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30439,7 +30449,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1459
+        "line": 1477
       },
       "handler": "inline",
       "controllerServices": [
@@ -30530,6 +30540,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30587,7 +30598,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1492
+        "line": 1510
       },
       "handler": "inline",
       "controllerServices": [
@@ -30668,6 +30679,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30725,7 +30737,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1470
+        "line": 1488
       },
       "handler": "inline",
       "controllerServices": [
@@ -30812,6 +30824,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30869,7 +30882,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1501
+        "line": 1519
       },
       "handler": "inline",
       "controllerServices": [
@@ -30950,6 +30963,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31007,7 +31021,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 495
+        "line": 513
       },
       "handler": "inline",
       "controllerServices": [
@@ -31096,6 +31110,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31153,7 +31168,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 510
+        "line": 528
       },
       "handler": "inline",
       "controllerServices": [
@@ -31246,6 +31261,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31303,7 +31319,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 525
+        "line": 543
       },
       "handler": "inline",
       "controllerServices": [
@@ -31391,6 +31407,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31448,7 +31465,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 539
+        "line": 557
       },
       "handler": "inline",
       "controllerServices": [
@@ -31546,6 +31563,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31603,7 +31621,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 555
+        "line": 573
       },
       "handler": "inline",
       "controllerServices": [
@@ -31698,6 +31716,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31755,7 +31774,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 703
+        "line": 721
       },
       "handler": "inline",
       "controllerServices": [
@@ -31849,6 +31868,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31906,7 +31926,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 693
+        "line": 711
       },
       "handler": "inline",
       "controllerServices": [
@@ -32001,6 +32021,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32058,7 +32079,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1427
+        "line": 1445
       },
       "handler": "inline",
       "controllerServices": [
@@ -32147,6 +32168,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32204,7 +32226,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 920
+        "line": 938
       },
       "handler": "inline",
       "controllerServices": [
@@ -32286,6 +32308,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32343,7 +32366,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1305
+        "line": 1323
       },
       "handler": "inline",
       "controllerServices": [
@@ -32450,6 +32473,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32507,7 +32531,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1438
+        "line": 1456
       },
       "handler": "inline",
       "controllerServices": [
@@ -32598,6 +32622,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32655,7 +32680,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1324
+        "line": 1342
       },
       "handler": "inline",
       "controllerServices": [
@@ -32742,6 +32767,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32799,7 +32825,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1337
+        "line": 1355
       },
       "handler": "inline",
       "controllerServices": [
@@ -32889,6 +32915,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32946,7 +32973,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1348
+        "line": 1366
       },
       "handler": "inline",
       "controllerServices": [
@@ -33036,6 +33063,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33093,7 +33121,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1372
+        "line": 1390
       },
       "handler": "inline",
       "controllerServices": [
@@ -33184,6 +33212,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33241,7 +33270,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1359
+        "line": 1377
       },
       "handler": "inline",
       "controllerServices": [
@@ -33340,6 +33369,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33397,7 +33427,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 852
+        "line": 870
       },
       "handler": "inline",
       "controllerServices": [
@@ -33486,6 +33516,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33543,7 +33574,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 620
+        "line": 638
       },
       "handler": "inline",
       "controllerServices": [
@@ -33657,6 +33688,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33714,7 +33746,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 654
+        "line": 672
       },
       "handler": "inline",
       "controllerServices": [
@@ -33803,6 +33835,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33860,7 +33893,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 603
+        "line": 621
       },
       "handler": "inline",
       "controllerServices": [
@@ -33954,6 +33987,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34011,7 +34045,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 592
+        "line": 610
       },
       "handler": "inline",
       "controllerServices": [
@@ -34097,6 +34131,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34154,7 +34189,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 665
+        "line": 683
       },
       "handler": "inline",
       "controllerServices": [
@@ -34245,6 +34280,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34302,7 +34338,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 828
+        "line": 846
       },
       "handler": "inline",
       "controllerServices": [
@@ -34397,6 +34433,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34454,7 +34491,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1007
+        "line": 1025
       },
       "handler": "inline",
       "controllerServices": [
@@ -34547,6 +34584,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34604,7 +34642,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 962
+        "line": 980
       },
       "handler": "inline",
       "controllerServices": [
@@ -34689,6 +34727,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34746,7 +34785,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 996
+        "line": 1014
       },
       "handler": "inline",
       "controllerServices": [
@@ -34842,6 +34881,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34899,7 +34939,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 985
+        "line": 1003
       },
       "handler": "inline",
       "controllerServices": [
@@ -34989,6 +35029,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35046,7 +35087,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 973
+        "line": 991
       },
       "handler": "inline",
       "controllerServices": [
@@ -35134,6 +35175,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35191,7 +35233,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1033
+        "line": 1051
       },
       "handler": "inline",
       "controllerServices": [
@@ -35277,6 +35319,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35334,7 +35377,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1044
+        "line": 1062
       },
       "handler": "inline",
       "controllerServices": [
@@ -35445,6 +35488,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35502,7 +35546,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1235
+        "line": 1253
       },
       "handler": "inline",
       "controllerServices": [
@@ -35610,6 +35654,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35667,7 +35712,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1062
+        "line": 1080
       },
       "handler": "inline",
       "controllerServices": [
@@ -35752,6 +35797,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35809,7 +35855,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1216
+        "line": 1234
       },
       "handler": "inline",
       "controllerServices": [
@@ -35921,6 +35967,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35978,7 +36025,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1084
+        "line": 1102
       },
       "handler": "inline",
       "controllerServices": [
@@ -36065,6 +36112,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36122,7 +36170,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1095
+        "line": 1113
       },
       "handler": "inline",
       "controllerServices": [
@@ -36224,6 +36272,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36281,7 +36330,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1128
+        "line": 1146
       },
       "handler": "inline",
       "controllerServices": [
@@ -36378,6 +36427,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36435,7 +36485,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1117
+        "line": 1135
       },
       "handler": "inline",
       "controllerServices": [
@@ -36534,6 +36584,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36591,7 +36642,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1106
+        "line": 1124
       },
       "handler": "inline",
       "controllerServices": [
@@ -36690,6 +36741,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36747,7 +36799,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1273
+        "line": 1291
       },
       "handler": "inline",
       "controllerServices": [
@@ -36846,6 +36898,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36903,7 +36956,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1181
+        "line": 1199
       },
       "handler": "inline",
       "controllerServices": [
@@ -36993,6 +37046,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37050,7 +37104,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1254
+        "line": 1272
       },
       "handler": "inline",
       "controllerServices": [
@@ -37162,6 +37216,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37219,7 +37274,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1199
+        "line": 1217
       },
       "handler": "inline",
       "controllerServices": [
@@ -37309,6 +37364,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37366,7 +37422,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1139
+        "line": 1157
       },
       "handler": "inline",
       "controllerServices": [
@@ -37455,6 +37511,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37512,7 +37569,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1164
+        "line": 1182
       },
       "handler": "inline",
       "controllerServices": [
@@ -37599,6 +37656,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37656,7 +37714,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1153
+        "line": 1171
       },
       "handler": "inline",
       "controllerServices": [
@@ -37742,6 +37800,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37799,7 +37858,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1073
+        "line": 1091
       },
       "handler": "inline",
       "controllerServices": [
@@ -37896,6 +37955,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -37953,7 +38013,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 951
+        "line": 969
       },
       "handler": "inline",
       "controllerServices": [
@@ -38037,6 +38097,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38094,7 +38155,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 941
+        "line": 959
       },
       "handler": "inline",
       "controllerServices": [
@@ -38176,6 +38237,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38233,7 +38295,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1018
+        "line": 1036
       },
       "handler": "inline",
       "controllerServices": [
@@ -38327,6 +38389,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38384,7 +38447,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 800
+        "line": 818
       },
       "handler": "inline",
       "controllerServices": [
@@ -38494,6 +38557,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38551,7 +38615,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 485
+        "line": 503
       },
       "handler": "inline",
       "controllerServices": [
@@ -38643,6 +38707,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38700,7 +38765,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1383
+        "line": 1401
       },
       "handler": "inline",
       "controllerServices": [
@@ -38787,6 +38852,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38844,7 +38910,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1397
+        "line": 1415
       },
       "handler": "inline",
       "controllerServices": [
@@ -38929,6 +38995,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -38986,7 +39053,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 571
+        "line": 589
       },
       "handler": "inline",
       "controllerServices": [
@@ -39086,6 +39153,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -39143,7 +39211,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 884
+        "line": 902
       },
       "handler": "inline",
       "controllerServices": [
@@ -39225,6 +39293,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -39282,7 +39351,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 894
+        "line": 912
       },
       "handler": "inline",
       "controllerServices": [
@@ -39373,6 +39442,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -39430,7 +39500,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 874
+        "line": 892
       },
       "handler": "inline",
       "controllerServices": [
@@ -39511,6 +39581,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -39568,7 +39639,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 842
+        "line": 860
       },
       "handler": "inline",
       "controllerServices": [
@@ -39654,6 +39725,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -39711,7 +39783,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 776
+        "line": 794
       },
       "handler": "inline",
       "controllerServices": [
@@ -39805,6 +39877,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -39862,7 +39935,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 741
+        "line": 759
       },
       "handler": "inline",
       "controllerServices": [
@@ -39962,6 +40035,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -40019,7 +40093,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 727
+        "line": 745
       },
       "handler": "inline",
       "controllerServices": [
@@ -40103,6 +40177,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -40160,7 +40235,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 715
+        "line": 733
       },
       "handler": "inline",
       "controllerServices": [
@@ -40239,6 +40314,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -40296,7 +40372,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 910
+        "line": 928
       },
       "handler": "inline",
       "controllerServices": [
@@ -40381,6 +40457,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -40438,7 +40515,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 930
+        "line": 948
       },
       "handler": "inline",
       "controllerServices": [
@@ -40525,6 +40602,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -40582,7 +40660,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 904
+        "line": 922
       },
       "handler": "inline",
       "controllerServices": [
@@ -40687,7 +40765,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 758
+        "line": 776
       },
       "handler": "inline",
       "controllerServices": [
@@ -40783,7 +40861,9 @@
       "externalIntegrations": [],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
+        ],
         "tests": [
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
         ]
@@ -40807,7 +40887,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 332
+        "line": 350
       },
       "handler": "inline",
       "controllerServices": [
@@ -40928,7 +41008,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 338
+        "line": 356
       },
       "handler": "inline",
       "controllerServices": [
@@ -41036,7 +41116,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 679
+        "line": 697
       },
       "handler": "inline",
       "controllerServices": [
@@ -41130,7 +41210,9 @@
       "externalIntegrations": [],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
+        ],
         "tests": [
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
         ]
@@ -43878,7 +43960,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 153
+        "line": 171
       },
       "handler": "inline",
       "controllerServices": [
@@ -43986,7 +44068,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 165
+        "line": 183
       },
       "handler": "inline",
       "controllerServices": [
@@ -46558,7 +46640,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 278
+        "line": 296
       },
       "handler": "inline",
       "controllerServices": [
@@ -46661,7 +46743,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 108
+        "line": 126
       },
       "handler": "inline",
       "controllerServices": [
@@ -46745,7 +46827,8 @@
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
@@ -46792,7 +46875,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 126
+        "line": 144
       },
       "handler": "inline",
       "controllerServices": [
@@ -46877,7 +46960,8 @@
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
@@ -46924,7 +47008,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 313
+        "line": 331
       },
       "handler": "inline",
       "controllerServices": [
@@ -47012,7 +47096,8 @@
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
@@ -47045,7 +47130,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 223
+        "line": 241
       },
       "handler": "inline",
       "controllerServices": [
@@ -47124,7 +47209,8 @@
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
@@ -47171,7 +47257,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 232
+        "line": 250
       },
       "handler": "inline",
       "controllerServices": [
@@ -47256,7 +47342,8 @@
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
@@ -47303,7 +47390,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 117
+        "line": 135
       },
       "handler": "inline",
       "controllerServices": [
@@ -47414,7 +47501,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 135
+        "line": 153
       },
       "handler": "inline",
       "controllerServices": [
@@ -47528,7 +47615,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 144
+        "line": 162
       },
       "handler": "inline",
       "controllerServices": [
@@ -47635,7 +47722,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 325
+        "line": 343
       },
       "handler": "inline",
       "controllerServices": [
@@ -47734,7 +47821,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 242
+        "line": 260
       },
       "handler": "inline",
       "controllerServices": [
@@ -47834,7 +47921,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 252
+        "line": 270
       },
       "handler": "inline",
       "controllerServices": [
@@ -47917,6 +48004,7 @@
       "callers": {
         "clients": [],
         "server": [
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts",
           "services/greenfield-api/src/modules/registry-presentation-service.ts"
         ],
@@ -47958,7 +48046,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 291
+        "line": 309
       },
       "handler": "inline",
       "controllerServices": [
@@ -48039,6 +48127,7 @@
       "callers": {
         "clients": [],
         "server": [
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts",
           "services/greenfield-api/src/modules/registry-presentation-service.ts"
         ],
@@ -48080,7 +48169,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 266
+        "line": 284
       },
       "handler": "inline",
       "controllerServices": [
@@ -48166,6 +48255,7 @@
       "callers": {
         "clients": [],
         "server": [
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts",
           "services/greenfield-api/src/modules/registry-presentation-service.ts"
         ],
@@ -50383,6 +50473,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/security/session.ts"
         ],
         "tests": [
@@ -50524,6 +50615,7 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts",
           "services/greenfield-api/src/security/session.ts"
         ],
         "tests": [
@@ -53316,7 +53408,8 @@
       "callers": {
         "clients": [],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/scripts/module-distribution-03-production-acceptance.local.ts"
         ],
         "tests": [
           "scripts/verify-greenfield-backend-v1.mjs",
