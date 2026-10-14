@@ -18,6 +18,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@modula/greenfield-contracts": "workspace:*",
     "@modula/module-standard": "file:../../../modula-mod/modula-module-standard/packages/module-standard",
     "@modula/module-validator": "file:../../../modula-mod/modula-module-standard/packages/module-validator"
   },
