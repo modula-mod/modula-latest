@@ -16384,7 +16384,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "1541765c28407eb2fdd5c9bb8b806b5790bc82be180c94fc9e65dc55349cb275"
+      "sourceContractSha256": "80340c9496573725a666b81dd08141974abdae5cc1c7f6b52100fcf821428fd5"
     },
     {
       "id": "POST /v1/modules/:moduleId/permissions/review",
@@ -19036,7 +19036,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "9d33a9ca7617ee3614233c5c00324dcd6f345c299bd5af54c500759fcc6a17fb"
+      "sourceContractSha256": "82d831d84cd78b69a7220506c58819845b06c3c90990fc9864fd652c5a20d1d1"
     },
     {
       "id": "GET /v1/notifications",
@@ -22225,7 +22225,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "fca487f0a5a2af8a3660f16a28aec6e8258cbd493ed27a306fb9cd39f49a1eb7"
+      "sourceContractSha256": "f7722eeb22b092e22468c7ae3ac00a3cc71e5ff5ca4c58044a2b0181ce47eefa"
     },
     {
       "id": "GET /v1/registry/releases/:releaseId/descriptor",

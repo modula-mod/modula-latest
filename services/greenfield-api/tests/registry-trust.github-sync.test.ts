@@ -239,6 +239,8 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const descriptorEtag = installationDescriptor.headers.etag!
     const unchanged = await app.inject({method: 'GET', url: `/v1/modules/${built.productId}/installation-descriptor`, headers: {authorization: `Bearer ${account.token}`, 'if-none-match': descriptorEtag}})
     expect(unchanged.statusCode).toBe(304)
+    const weakUnchanged = await app.inject({method: 'GET', url: `/v1/modules/${built.productId}/installation-descriptor`, headers: {authorization: `Bearer ${account.token}`, 'if-none-match': `W/${descriptorEtag}`}})
+    expect(weakUnchanged.statusCode).toBe(304)
 
     const beta = buildRelease(built.productId, '1.1.0-beta.1', {
       sign: {keyId, privateKey: keys.privateKey},
@@ -347,6 +349,11 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       etag: `"sha256-${sha256(built.packageBytes)}"`,
     })
     expect(firstChunk.rawPayload).toEqual(built.packageBytes.subarray(0, 100))
+    const weakArtifactNotModified = await app.inject({
+      method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
+      headers: {authorization: `Bearer ${account.token}`, 'if-none-match': `W/${firstChunk.headers.etag}`},
+    })
+    expect(weakArtifactNotModified.statusCode).toBe(304)
     const rest = await app.inject({
       method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
       headers: {authorization: `Bearer ${account.token}`, range: 'bytes=100-'},
@@ -395,6 +402,11 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
         currentTrust: {verified: false, signerRevoked: true, releaseRevoked: false},
       }),
     ]))
+    const weakFeedUnchanged = await app.inject({
+      method: 'GET', url: '/v1/modules/updates',
+      headers: {authorization: `Bearer ${account.token}`, 'if-none-match': `W/${feed.headers.etag}`},
+    })
+    expect(weakFeedUnchanged.statusCode).toBe(304)
     const afterRevocationDownload = await app.inject({
       method: 'GET', url: new URL(packageArtifact.download.pathOrUrl).pathname,
       headers: {authorization: `Bearer ${account.token}`},

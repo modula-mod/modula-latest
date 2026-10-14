@@ -95,6 +95,8 @@ describeIfDb('registry trust pipeline: immutable release media', () => {
     expect(sha256(asset.rawPayload)).toBe(detail.presentation.cover.sha256)
     const notModified = await app.inject({method: 'GET', url: path, headers: {'if-none-match': asset.headers.etag as string}})
     expect(notModified.statusCode).toBe(304)
+    const weakNotModified = await app.inject({method: 'GET', url: path, headers: {'if-none-match': `W/${asset.headers.etag as string}`}})
+    expect(weakNotModified.statusCode).toBe(304)
     const svg = await app.inject({method: 'GET', url: new URL(detail.presentation.icon.url).pathname})
     expect(svg.headers['content-security-policy']).toContain('sandbox')
   })
