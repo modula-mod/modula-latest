@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-13T19:59:02.985Z",
+  "capturedAt": "2026-10-14T01:04:49.316Z",
   "source": {
-    "branch": "phase-module-distribution-03",
-    "headAtCapture": "49208113a5065abee038d5d589928b092a72f728",
+    "branch": "phase-module-distribution-03-backup-fix",
+    "headAtCapture": "a211ae7d886d4f776d564c3ea96912569624dc33",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "cd46a5f8997951bd58bd098836513f1a6f7c359d0ca81f0e7e15d0f99efc42ce"
   },

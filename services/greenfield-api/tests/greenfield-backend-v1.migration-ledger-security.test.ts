@@ -72,10 +72,50 @@ describeIfDb('Greenfield Backend V1 migration ledger security', () => {
     expect(coverage.rows).toEqual([{missing_select: 0, writable_tables: 0}])
   })
 
+  it('gives the dedicated backup role durable read-only sequence coverage', async () => {
+    const coverage = await sql<{
+      missing_select: number
+      writable_sequences: number
+      default_select: boolean
+    }>`
+      SELECT
+        count(*) FILTER (
+          WHERE NOT has_sequence_privilege(
+            'modula_backup',
+            format('%I.%I', namespace.nspname, relation.relname),
+            'SELECT'
+          )
+        )::int AS missing_select,
+        count(*) FILTER (
+          WHERE has_sequence_privilege(
+            'modula_backup',
+            format('%I.%I', namespace.nspname, relation.relname),
+            'USAGE,UPDATE'
+          )
+        )::int AS writable_sequences,
+        EXISTS (
+          SELECT 1
+          FROM pg_default_acl default_acl
+          CROSS JOIN LATERAL aclexplode(default_acl.defaclacl) privilege
+          WHERE default_acl.defaclrole = 'modula_migrator'::regrole
+            AND default_acl.defaclnamespace = 'public'::regnamespace
+            AND default_acl.defaclobjtype = 'S'
+            AND privilege.grantee = 'modula_backup'::regrole
+            AND privilege.privilege_type = 'SELECT'
+        ) AS default_select
+      FROM pg_class relation
+      JOIN pg_namespace namespace ON namespace.oid = relation.relnamespace
+      WHERE namespace.nspname = 'public'
+        AND relation.relkind = 'S'
+    `.execute(db)
+
+    expect(coverage.rows).toEqual([{missing_select: 0, writable_sequences: 0, default_select: true}])
+  })
+
   it('retains the exact migration ledger and schema version', async () => {
     const version = await db.selectFrom('schema_metadata').select('value').where('key', '=', 'schema_version').executeTakeFirstOrThrow()
     const latest = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(db)
-    expect(version.value).toBe('072')
-    expect(latest.rows[0]?.id).toBe('072_module_distribution_protocol')
+    expect(version.value).toBe('073')
+    expect(latest.rows[0]?.id).toBe('073_backup_sequence_acl_defaults')
   })
 })

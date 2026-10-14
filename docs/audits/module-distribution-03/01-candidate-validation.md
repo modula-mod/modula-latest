@@ -12,6 +12,14 @@ Base: `c6c907549a95c53f612d72fe89638e8222a97c69`
 - Production contained pre-existing orphan `audit.module.*` children that prevented a direct constraint restore. The disposable clone removed only those invalid orphan children before restoring constraints; production was not changed.
 - Distribution backfill dry-run, apply, and idempotent re-apply passed for the stored Vault 1.7/1.8 packages. Each release reached 12 artifact rows, eight required for offline launch.
 
+### Pre-deploy backup follow-up
+
+- The established legacy backup command was rejected as deployment evidence after restore proved that its fallback URL selected a stale migration-021 database rather than production.
+- The accepted exact production archive is `/var/backups/modula/greenfield/module-distribution-03/20261013T201620Z/modula-production-pre-072.dump`, SHA-256 `d4dd20a6c1964a18ef9697a13e41b017abdd37056ed21e46102d9bc6d0079fa4`.
+- A disposable PostgreSQL 16 restore proved migration 071, 17 releases, 27 installations, 105 permission reviews, and 488 validated foreign keys. The backup-specific guarded restore removed only 44 release-child and one publisher-namespace row belonging to already-absent `audit.module` fixtures before recreating constraints; live production was not mutated.
+- A dedicated-role dump exposed that sequences created after migration 053 lacked `modula_backup` `SELECT`. Migration `073_backup_sequence_acl_defaults` reconciles current sequences, installs the future default ACL, records prior state for exact down migration, and is covered by an actual `pg_dump` CI gate.
+- Fresh `001 -> 073`, `073 -> 072 -> 073`, production-shaped `071 -> 073`, and dedicated-role logical dump verification pass. The production-shaped upgrade preserved 17 releases, 27 installations, and 105 permission reviews with zero unreadable sequences.
+
 ## Test and build gates
 
 - Full API: 82/82 files passed; 456 tests passed, one explicitly skipped.

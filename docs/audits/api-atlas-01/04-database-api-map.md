@@ -1,14 +1,14 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `067_legacy_duplicate_installation_versions`; 67 applied migrations. Git contains 72 ordered up migrations, latest `072_module_distribution_protocol.sql`.
+Production PostgreSQL: 16.9; schema migration `067_legacy_duplicate_installation_versions`; 67 applied migrations. Git contains 73 ordered up migrations, latest `073_backup_sequence_acl_defaults.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 305
+- Production tables: 306
 - Tables with API/worker source references: 292
-- Orphan candidates requiring manual confirmation: 13
+- Orphan candidates requiring manual confirmation: 14
 - Write-only candidates: 36
 - Read-only candidates: 23
 
@@ -875,6 +875,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `reconciled_at`
 - Migration introduced: `053_greenfield_backend_v1_backup_acl_reconciliation.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
+### `greenfield_backup_sequence_acl_reconciliation`
+
+- Purpose: application state for greenfield backup sequence acl reconciliation
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `073_backup_sequence_acl_defaults.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: none observed
@@ -5203,6 +5220,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ## Orphan candidates
 
 - `greenfield_backup_acl_reconciliation`
+- `greenfield_backup_sequence_acl_reconciliation`
 - `greenfield_checkpoints`
 - `greenfield_connection_sync_state`
 - `greenfield_connector_providers`

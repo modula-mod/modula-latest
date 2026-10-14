@@ -208,6 +208,13 @@ jobs:
           tests/legacy-installation-data-migration.test.ts
           tests/phase7e.vault-notes-search-projector.test.ts
           --maxWorkers=1 --no-file-parallelism
+      - name: Dedicated backup role logical dump
+        env:
+          PGPASSWORD: modula_ci_backup
+        run: >-
+          pg_dump --format=custom --no-owner --no-privileges
+          --dbname postgresql://modula_backup@127.0.0.1:5432/modula_test
+          --file /tmp/modula-backup-role-validation.dump
       - name: Pre-write MP02 migration down and reapply proof
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
