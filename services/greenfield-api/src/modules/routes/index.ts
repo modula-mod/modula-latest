@@ -52,6 +52,24 @@ function canonicalModuleParam(request: FastifyRequest): string {
   return resolveCanonicalModuleId(String((request.params as {moduleId?: string}).moduleId ?? ''))
 }
 
+/**
+ * If-None-Match uses weak comparison for GET/HEAD validators. Proxies and CDNs
+ * may legally forward a strong origin ETag as W/"...", so raw equality would
+ * turn an unchanged representation into a 200 response at the public edge.
+ */
+function ifNoneMatch(value: string | string[] | undefined, etag: string): boolean {
+  const expected = withoutWeakPrefix(etag)
+  const candidates = Array.isArray(value) ? value : value?.split(',') ?? []
+  return candidates.some(candidate => {
+    const normalized = candidate.trim()
+    return normalized === '*' || withoutWeakPrefix(normalized) === expected
+  })
+}
+
+function withoutWeakPrefix(value: string): string {
+  return value.startsWith('W/') ? value.slice(2) : value
+}
+
 export async function registerModuleRoutes(
   app: FastifyInstance,
   db: ModulaDb,
@@ -303,7 +321,7 @@ export async function registerModuleRoutes(
         .header('Content-Disposition', 'inline')
         .header('X-Modula-Asset-Sha256', asset.sha256)
         .header('X-Modula-Development-Asset', asset.developmentAsset ? 'true' : 'false')
-      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      if (ifNoneMatch(request.headers['if-none-match'], etag)) return reply.code(304).send()
       return reply.type(asset.mediaType).send(asset.bytes)
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Release asset lookup failed')
@@ -669,7 +687,7 @@ export async function registerModuleRoutes(
       const descriptor = await distribution.installationDescriptor(auth.accountId, canonicalModuleParam(request), distributionContext(request.query))
       const etag = `"descriptor-${descriptor.descriptorRevision}"`
       reply.header('ETag', etag).header('Cache-Control', 'private, no-cache, must-revalidate')
-      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      if (ifNoneMatch(request.headers['if-none-match'], etag)) return reply.code(304).send()
       return reply.send(successEnvelope(descriptor, request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Installation descriptor lookup failed')
@@ -683,7 +701,7 @@ export async function registerModuleRoutes(
       const feed = await distribution.updateFeed(auth.accountId, distributionContext(request.query))
       const etag = `"updates-${feed.revision}"`
       reply.header('ETag', etag).header('Cache-Control', 'private, no-cache, must-revalidate')
-      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      if (ifNoneMatch(request.headers['if-none-match'], etag)) return reply.code(304).send()
       return reply.send(successEnvelope(feed, request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module update feed failed')
@@ -1813,7 +1831,7 @@ function sendArtifactBytes(
     .header('X-Modula-Artifact-Sha256', artifact.sha256)
     .header('Content-Disposition', `${['asset', 'icon', 'cover', 'screenshot'].includes(artifact.kind) ? 'inline' : 'attachment'}; filename="${artifact.filename}"`)
     .type(artifact.media_type)
-  if (request.headers['if-none-match'] === etag && !request.headers.range) return reply.code(304).send()
+  if (ifNoneMatch(request.headers['if-none-match'], etag) && !request.headers.range) return reply.code(304).send()
   const range = request.headers.range
   const ifRange = request.headers['if-range']
   if (range && (!ifRange || ifRange === etag)) {
