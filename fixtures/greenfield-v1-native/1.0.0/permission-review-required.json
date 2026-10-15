@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "error": {
+    "code": "PERMISSION_REVIEW_REQUIRED",
+    "message": "Module permission review is required",
+    "requestId": "native-fixture-request-1",
+    "retryable": false
+  },
+  "meta": {"requestId": "native-fixture-request-1", "serverTime": "2026-10-14T00:00:00.000Z"}
+}

@@ -454,10 +454,10 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Evidence: `scripts/verify-greenfield-backend-v1.mjs:98`, `evidence/production-snapshot.json#/databaseSchema/appliedMigrations`
 - Affected routes: none/architectural
 - Affected files: `scripts/verify-greenfield-backend-v1.mjs`
-- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 067_legacy_duplicate_installation_versions; it cannot truthfully serve as the current acceptance command.
+- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 073_backup_sequence_acl_defaults; it cannot truthfully serve as the current acceptance command.
 - Recommended fix: Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.
 - Dependencies: verification ownership
-- Verification: The canonical verifier must pass on reviewed current main at 067_legacy_duplicate_installation_versions without weakening exact-SHA production checks.
+- Verification: The canonical verifier must pass on reviewed current main at 073_backup_sequence_acl_defaults without weakening exact-SHA production checks.
 
 ## API-ATLAS-GAP-037 — P3 — 14 tables have no API/worker source reference
 

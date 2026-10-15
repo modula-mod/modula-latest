@@ -1,0 +1,17 @@
+{
+  "request": {
+    "targetModuleId": "example.modula.tasks",
+    "actionId": "create-task",
+    "version": "1.0.0",
+    "mutationId": "native-fixture-action-1",
+    "input": {"title": "Review architecture"},
+    "lineage": {"correlationId": "native-fixture-correlation-1", "modules": ["example.modula.notes"], "actionCount": 0, "startedAt": "2026-10-14T00:00:00.000Z"}
+  },
+  "result": {
+    "idempotent": false,
+    "requestId": "019f0000-0000-7000-8000-000000000008",
+    "status": "completed",
+    "result": {"recordId": "task-review-architecture", "revision": 1},
+    "lineage": {"correlationId": "native-fixture-correlation-1", "modules": ["example.modula.notes", "example.modula.tasks"], "actionCount": 1, "startedAt": "2026-10-14T00:00:00.000Z"}
+  }
+}

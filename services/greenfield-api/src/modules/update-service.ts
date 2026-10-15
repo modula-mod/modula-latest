@@ -54,8 +54,15 @@ export class GreenfieldModuleUpdateService {
   async preview(accountId: string, moduleId: string, input: {version?: string} & VersionSwitchOptions) {
     const installed = await new GreenfieldModuleInstallationService(this.db, this.config).getInstalled(accountId, moduleId)
     if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    let targetVersion = input.version
+    if (!targetVersion) {
+      const plan = await new GreenfieldModuleDistributionService(this.db, this.config)
+        .updatePlan(accountId, moduleId, null, input)
+      targetVersion = plan.targetRelease?.version
+      if (!targetVersion) throw moduleError('VALIDATION_FAILED', 'TARGET_NOT_FOUND: No eligible release matches the installation update policy')
+    }
     const {incompatibleExtensions: _ignored, projectedGrants: _grants, ...evaluation} = await new GreenfieldModuleVersionSwitchService(this.db, this.config)
-      .evaluate(accountId, installed, input.version, input)
+      .evaluate(accountId, installed, targetVersion, input)
     return evaluation
   }
 
@@ -104,15 +111,21 @@ export class GreenfieldModuleUpdateService {
       }
     }
 
+    let currentPlan: Awaited<ReturnType<GreenfieldModuleDistributionService['updatePlan']>> | null = null
+    if (!input.version || input.expectedDescriptorRevision) {
+      currentPlan = await new GreenfieldModuleDistributionService(this.db, this.config)
+        .updatePlan(accountId, installed.moduleId, input.version ?? null, input)
+    }
     if (input.expectedDescriptorRevision) {
-      const current = await new GreenfieldModuleDistributionService(this.db, this.config)
-        .installationDescriptor(accountId, installed.moduleId, input)
-      if (current.descriptorRevision !== input.expectedDescriptorRevision) {
+      if (currentPlan!.expectedDescriptorRevision !== input.expectedDescriptorRevision) {
         throw moduleError('REVISION_CONFLICT', 'Installation descriptor changed after the update plan was issued')
       }
     }
 
-    const evaluation = await new GreenfieldModuleVersionSwitchService(this.db, this.config).evaluate(accountId, installed, input.version, {
+    const targetVersion = input.version ?? currentPlan?.targetRelease?.version
+    if (!targetVersion) throw moduleError('VALIDATION_FAILED', 'TARGET_NOT_FOUND: No eligible release matches the installation update policy')
+
+    const evaluation = await new GreenfieldModuleVersionSwitchService(this.db, this.config).evaluate(accountId, installed, targetVersion, {
       ...input,
       retainReviewedGrantsOnly: legacyTrustMigration,
     })

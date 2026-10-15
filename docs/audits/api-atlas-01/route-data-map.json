@@ -4122,6 +4122,7 @@
     "evidence": [
       "services/greenfield-api/src/modules/inter-module-action-service.ts#authenticateRuntimeCredential",
       "services/greenfield-api/src/modules/inter-module-action-service.ts#dispatchTarget",
+      "services/greenfield-api/src/modules/inter-module-action-service.ts#enforceSourceRate",
       "services/greenfield-api/src/modules/inter-module-action-service.ts#recordFailure",
       "services/greenfield-api/src/modules/inter-module-action-service.ts#request",
       "services/greenfield-api/src/modules/inter-module-action-service.ts#resolveAction"
@@ -5490,7 +5491,8 @@
       "failed",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
-      "plan"
+      "plan",
+      "policy"
     ],
     "emits": [],
     "jobs": [],
@@ -5529,7 +5531,9 @@
   },
   "POST /v1/modules/:moduleId/version-preview": {
     "reads": [],
-    "writes": [],
+    "writes": [
+      "policy"
+    ],
     "emits": [],
     "jobs": [],
     "confidence": "partial-static",

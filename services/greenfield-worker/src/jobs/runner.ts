@@ -26,10 +26,12 @@ import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
 import {claimNextJob, completeJob, deadLetterJob, markJobRunning, scheduleRetry} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
 import {computeNextAvailableAt} from './retry.js'
+import {metrics} from '../observability/metrics.js'
 
 export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): Promise<boolean> {
   const job = await claimNextJob(db, config.workerId, config.leaseDurationMs)
   if (!job) return false
+  metrics.increment('jobsClaimed')
 
   try {
     await markJobRunning(db, job.id, config.workerId)
@@ -188,16 +190,19 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
           })
       }
     })(), job.timeout_ms)
-    await completeJob(db, job.id)
+    await completeJob(db, job.id, config.workerId)
+    metrics.increment('jobsCompleted')
   } catch (error: unknown) {
     const code = errorCodeFor(error)
     const message = messageFor(error)
     const permanent = isPermanentFailure(error)
     const exhausted = job.attempt_count >= job.maximum_attempts
     if (permanent || exhausted) {
-      await deadLetterJob(db, job, code, message, permanent)
+      await deadLetterJob(db, job, config.workerId, code, message, permanent)
+      metrics.increment('jobsDeadLettered')
     } else {
-      await scheduleRetry(db, job.id, computeNextAvailableAt(job.attempt_count + 1), code, message)
+      await scheduleRetry(db, job.id, config.workerId, computeNextAvailableAt(job.attempt_count + 1), code, message)
+      metrics.increment('jobsRetried')
     }
   }
   return true

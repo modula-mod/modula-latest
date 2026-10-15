@@ -148,6 +148,12 @@ export type ModuleCatalogueItem = {
   category: ProductHubCategory
   trustLevel: string
   latestVersion: string | null
+  latestStableVersion?: string | null
+  newestPublishedVersion?: string | null
+  newestPublishedChannel?: 'stable' | 'beta' | 'rc' | 'dev' | null
+  releaseChannel?: 'stable' | 'beta' | 'rc' | 'dev' | null
+  installedVersion?: string | null
+  installedReleaseChannel?: 'stable' | 'beta' | 'rc' | 'dev' | null
   compatibility: string
   installable: boolean
   installationState: ModuleInstallationState
@@ -188,6 +194,7 @@ export type InstalledModule = {
   installationId: string
   moduleId: string
   version: string
+  releaseChannel?: 'stable' | 'beta' | 'rc' | 'dev'
   status: string
   publisherName?: string
   name?: string

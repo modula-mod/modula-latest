@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "capturedAt": "2026-10-10T22:02:13.369Z",
+    "capturedAt": "2026-10-14T15:33:43.469Z",
     "status": "PASS"
   },
   "gaps": [
@@ -997,12 +997,12 @@
       "affectedFiles": [
         "scripts/verify-greenfield-backend-v1.mjs"
       ],
-      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 067_legacy_duplicate_installation_versions; it cannot truthfully serve as the current acceptance command.",
+      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 073_backup_sequence_acl_defaults; it cannot truthfully serve as the current acceptance command.",
       "recommendedFix": "Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.",
       "dependencies": [
         "verification ownership"
       ],
-      "verification": "The canonical verifier must pass on reviewed current main at 067_legacy_duplicate_installation_versions without weakening exact-SHA production checks.",
+      "verification": "The canonical verifier must pass on reviewed current main at 073_backup_sequence_acl_defaults without weakening exact-SHA production checks.",
       "remediation": {
         "status": "OPEN",
         "evidence": []

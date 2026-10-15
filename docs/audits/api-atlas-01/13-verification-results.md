@@ -27,6 +27,6 @@ An initial direct API typecheck before building workspace packages failed on unr
 
 ## Deliberate exclusions
 
-- `verify:greenfield-backend-v1` was not used as the acceptance signal because `scripts/verify-greenfield-backend-v1.mjs:98` hard-codes production schema 055 while observed production is at `067_legacy_duplicate_installation_versions`. That stale verifier is recorded as a P2 gap rather than bypassed.
+- `verify:greenfield-backend-v1` was not used as the acceptance signal because `scripts/verify-greenfield-backend-v1.mjs:98` hard-codes production schema 055 while observed production is at `073_backup_sequence_acl_defaults`. That stale verifier is recorded as a P2 gap rather than bypassed.
 - Database-backed suites use a disposable database, not production. Production writes are limited to reserved audit identities and marker-scoped fixtures with recorded cleanup.
 - No load test or nginx edit occurred. Product defects documented as expected failures were not remediated in this baseline phase.

@@ -27,9 +27,9 @@
 
 ## Actual production boot
 
-- Image: `modula-greenfield-api:50dfc12045be639ad65acb95d2b4e94ea864ed42`
-- Image ID: `sha256:2ff3363eb9ad68dd569710013adddf38a2d241e7c5b56075bc6daaaaee9c04dc`
-- Revision: `50dfc12045be639ad65acb95d2b4e94ea864ed42`
+- Image: `modula-greenfield-api:f05d03c237c62d1b0946a760610d1155f02a8520`
+- Image ID: `sha256:3df5e56b10feb215d8cbe73d58328cf0f937e91b30e35e7f7bc6887e24a67983`
+- Revision: `f05d03c237c62d1b0946a760610d1155f02a8520`
 - Command: `docker-entrypoint.sh node services/greenfield-api/dist/main.js`
 - Working directory: `/app`
 - Host binding: loopback `127.0.0.1:4020 -> container 4020`

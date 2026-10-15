@@ -103,8 +103,8 @@ export async function markJobRunning(
   if (!row) throw Object.assign(new Error('Job lease is no longer owned by this worker'), {code: 'JOB_LEASE_LOST'})
 }
 
-export async function completeJob(db: ModulaWorkerDb, jobId: string, now: Date = new Date()): Promise<void> {
-  await db
+export async function completeJob(db: ModulaWorkerDb, jobId: string, workerId: string, now: Date = new Date()): Promise<void> {
+  const row = await db
     .updateTable('background_jobs')
     .set({
       status: 'SUCCEEDED',
@@ -119,18 +119,22 @@ export async function completeJob(db: ModulaWorkerDb, jobId: string, now: Date =
     })
     .where('id', '=', jobId)
     .where('status', '=', 'RUNNING')
-    .execute()
+    .where('lease_owner', '=', workerId)
+    .returning('id')
+    .executeTakeFirst()
+  assertLeaseTransition(row, jobId, workerId)
 }
 
 export async function scheduleRetry(
   db: ModulaWorkerDb,
   jobId: string,
+  workerId: string,
   availableAt: Date,
   errorCode: string,
   lastError: string,
   now: Date = new Date(),
 ): Promise<void> {
-  await db
+  const row = await db
     .updateTable('background_jobs')
     .set({
       status: 'RETRYING',
@@ -143,19 +147,24 @@ export async function scheduleRetry(
       updated_at: now,
     })
     .where('id', '=', jobId)
-    .execute()
+    .where('status', '=', 'RUNNING')
+    .where('lease_owner', '=', workerId)
+    .returning('id')
+    .executeTakeFirst()
+  assertLeaseTransition(row, jobId, workerId)
 }
 
 export async function deadLetterJob(
   db: ModulaWorkerDb,
   job: ClaimedJob,
+  workerId: string,
   errorCode: string,
   errorMessage: string,
   permanent: boolean,
   now: Date = new Date(),
 ): Promise<void> {
   await db.transaction().execute(async trx => {
-    await trx
+    const row = await trx
       .updateTable('background_jobs')
       .set({
         status: permanent ? 'FAILED' : 'DEAD_LETTER',
@@ -169,10 +178,24 @@ export async function deadLetterJob(
         updated_at: now,
       })
       .where('id', '=', job.id)
-      .execute()
+      .where('status', '=', 'RUNNING')
+      .where('lease_owner', '=', workerId)
+      .returning('id')
+      .executeTakeFirst()
+
+    assertLeaseTransition(row, job.id, workerId)
 
     await insertRedactedFailure(trx, job, errorCode, errorMessage, permanent, now)
   })
+}
+
+function assertLeaseTransition(row: {id: string} | undefined, jobId: string, workerId: string): void {
+  if (!row) {
+    throw Object.assign(new Error(`Job lease is no longer owned by worker ${workerId}`), {
+      code: 'JOB_LEASE_LOST',
+      jobId,
+    })
+  }
 }
 
 type JobTransaction = Transaction<Database>

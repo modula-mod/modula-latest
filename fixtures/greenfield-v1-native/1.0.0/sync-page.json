@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "changes": [{
+    "sequence": 101,
+    "moduleId": "example.modula.notes",
+    "recordType": "note",
+    "recordId": "note-architecture",
+    "revision": 4,
+    "operation": "update",
+    "deleted": false,
+    "changeKind": "content"
+  }],
+  "nextCursor": "fixture.signed.cursor",
+  "hasMore": false,
+  "retentionBoundary": 1
+}

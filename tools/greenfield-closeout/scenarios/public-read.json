@@ -1,0 +1,7 @@
+[
+  {"name": "live", "method": "GET", "path": "/v1/health/live", "accept": [200]},
+  {"name": "ready", "method": "GET", "path": "/v1/health/ready", "accept": [200]},
+  {"name": "meta", "method": "GET", "path": "/v1/meta", "accept": [200]},
+  {"name": "status", "method": "GET", "path": "/v1/status", "accept": [200]},
+  {"name": "public-feed", "method": "GET", "path": "/v1/feed/home?limit=20", "accept": [200]}
+]

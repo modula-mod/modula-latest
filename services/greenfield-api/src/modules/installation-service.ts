@@ -76,6 +76,7 @@ export class GreenfieldModuleInstallationService {
         'greenfield_module_releases.release_id',
         'greenfield_module_releases.module_id',
         'greenfield_module_releases.version',
+        'greenfield_module_releases.release_channel',
         'greenfield_module_releases.extension_version_id',
         'greenfield_module_releases.product_kind',
       ])
@@ -107,6 +108,7 @@ export class GreenfieldModuleInstallationService {
       status: row.status as GreenfieldModuleInstallationStatus,
       moduleId: resolveCanonicalModuleId(row.module_id),
       version: row.version,
+      releaseChannel: row.release_channel ?? 'stable',
       extensionVersionId: row.extension_version_id,
       grantedPermissions: arrayOfStrings(review?.granted_permissions),
       permissionReviewRequired: !review,

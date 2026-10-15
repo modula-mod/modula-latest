@@ -45,6 +45,17 @@ export function nextAvailableAt(attemptCount: number, now = Date.now()): Date {
   return computeNextAvailableAt(attemptCount + 1, new Date(now))
 }
 
+/** Exponential, jittered backoff for a database or other worker-loop outage. */
+export function infrastructureBackoffMs(
+  failureCount: number,
+  maximumMs: number,
+  random: () => number = Math.random,
+): number {
+  const boundedFailureCount = Math.max(1, Math.min(16, Math.floor(failureCount)))
+  const base = Math.min(maximumMs, 1_000 * 2 ** (boundedFailureCount - 1))
+  return Math.min(maximumMs, Math.max(250, Math.round(base * (0.8 + random() * 0.4))))
+}
+
 import {isPermanentErrorCode} from './errors.js'
 
 export function isPermanentError(code: string): boolean {

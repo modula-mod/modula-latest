@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url'
 import pg from 'pg'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const MIGRATION_ADVISORY_LOCK_KEY = 7_314_202_610_14
 
 export type MigrationRecord = {
   id: string
@@ -39,6 +40,9 @@ export async function migrateUp(connectionString: string, migrationsDir?: string
   const applied: string[] = []
   try {
     await client.query('BEGIN')
+    // A transaction-scoped advisory lock serializes every migration runner,
+    // including operators using different checkouts of the same database.
+    await client.query('SELECT pg_advisory_xact_lock($1)', [MIGRATION_ADVISORY_LOCK_KEY])
     await ensureMigrationsTable(client)
     const {rows} = await client.query<MigrationRecord>('SELECT id, name, applied_at FROM schema_migrations ORDER BY id')
     const done = new Set(rows.map(r => r.id))
@@ -60,16 +64,20 @@ export async function migrateUp(connectionString: string, migrationsDir?: string
   }
 }
 
-export async function migrateStatus(connectionString: string, migrationsDir?: string): Promise<{applied: string[]; pending: string[]}> {
+export async function migrateStatus(connectionString: string, migrationsDir?: string): Promise<{applied: string[]; pending: string[]; unknown: string[]}> {
   const pool = new pg.Pool({connectionString})
   const client = await pool.connect()
   try {
-    await ensureMigrationsTable(client)
-    const {rows} = await client.query<MigrationRecord>('SELECT id FROM schema_migrations ORDER BY id')
-    const applied = rows.map(r => r.id)
+    const files = await listMigrationFiles(migrationsDir)
+    const exists = await client.query<{name: string | null}>("SELECT to_regclass('public.schema_migrations')::text AS name")
+    const applied = exists.rows[0]?.name
+      ? (await client.query<MigrationRecord>('SELECT id FROM schema_migrations ORDER BY id')).rows.map(r => r.id)
+      : []
     const done = new Set(applied)
-    const pending = (await listMigrationFiles(migrationsDir)).map(m => m.id).filter(id => !done.has(id))
-    return {applied, pending}
+    const source = new Set(files.map(migration => migration.id))
+    const pending = files.map(migration => migration.id).filter(id => !done.has(id))
+    const unknown = applied.filter(id => !source.has(id))
+    return {applied, pending, unknown}
   } finally {
     client.release()
     await pool.end()
@@ -81,6 +89,7 @@ export async function migrateDown(connectionString: string, migrationsDir?: stri
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
+    await client.query('SELECT pg_advisory_xact_lock($1)', [MIGRATION_ADVISORY_LOCK_KEY])
     await ensureMigrationsTable(client)
     const {rows} = await client.query<MigrationRecord>('SELECT id, name FROM schema_migrations ORDER BY id DESC LIMIT 1')
     if (rows.length === 0) {

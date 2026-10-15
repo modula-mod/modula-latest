@@ -33,6 +33,9 @@ const envSchema = z.object({
     .optional()
     .transform(v => v === 'true'),
   MODULA_REQUEST_BODY_LIMIT_BYTES: z.coerce.number().int().positive().default(4_194_304),
+  MODULA_EXPECTED_MIGRATION: z.string().regex(/^\d{3}_[a-z0-9_]+$/).optional(),
+  MODULA_MIN_STORAGE_FREE_BYTES: z.coerce.number().int().nonnegative().default(1_073_741_824),
+  MODULA_API_SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).default(30_000),
   MODULA_SEARCH_QUERY_MAX_CHARS: z.coerce.number().int().positive().default(500),
   MODULA_SEARCH_DEFAULT_LIMIT: z.coerce.number().int().positive().default(20),
   MODULA_SEARCH_MAX_LIMIT: z.coerce.number().int().positive().default(100),
@@ -151,6 +154,9 @@ export type AppConfig = {
   productionWritesEnabled: boolean
   apiDocumentationEnabled: boolean
   requestBodyLimitBytes: number
+  expectedMigration: string | null
+  minStorageFreeBytes: number
+  shutdownTimeoutMs: number
   searchQueryMaxChars: number
   searchDefaultLimit: number
   searchMaxLimit: number
@@ -429,6 +435,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     productionWritesEnabled,
     apiDocumentationEnabled: Boolean(raw.MODULA_API_DOCUMENTATION_ENABLED),
     requestBodyLimitBytes: raw.MODULA_REQUEST_BODY_LIMIT_BYTES,
+    expectedMigration: raw.MODULA_EXPECTED_MIGRATION ?? null,
+    minStorageFreeBytes: raw.MODULA_MIN_STORAGE_FREE_BYTES,
+    shutdownTimeoutMs: raw.MODULA_API_SHUTDOWN_TIMEOUT_MS,
     searchQueryMaxChars: raw.MODULA_SEARCH_QUERY_MAX_CHARS,
     searchDefaultLimit: raw.MODULA_SEARCH_DEFAULT_LIMIT,
     searchMaxLimit: raw.MODULA_SEARCH_MAX_LIMIT,

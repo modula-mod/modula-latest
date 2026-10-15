@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "planId": "019f0000-0000-7000-8000-000000000002",
+  "moduleId": "example.modula.notes",
+  "targetVersion": "2.0.0-rc.2",
+  "allowed": true,
+  "blockedReasonCodes": [],
+  "permissionReviewRequired": true,
+  "permissions": {"requested": ["settings:read"], "highRiskIncrease": false},
+  "compatibility": {"compatible": true, "reasons": []},
+  "artifacts": {"packageRequired": true, "frontendRequired": true}
+}

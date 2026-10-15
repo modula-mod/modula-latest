@@ -10,14 +10,14 @@ The generic host is real: `src/features/modules/runtime/module-host.tsx:16` fetc
 
 | Surface | Observed production truth |
 | --- | --- |
-| Releases | 17 total; 12 published; 7/12 published unsigned |
-| Signing | 3 publisher keys, 8 signatures, 17 integrity rows |
-| Artifacts | 2/17 release package blobs; 6 total release asset blobs |
+| Releases | 41 total; 12 published; 7/12 published unsigned |
+| Signing | 11 publisher keys, 34 signatures, 43 integrity rows |
+| Artifacts | 26/41 release package blobs; 38 total release asset blobs |
 | Artwork | 10/17 retrievable; 17 development-only |
 | Frontends | 8 verified: declarative=4, host-contribution=4 |
-| Install plans | 49 total; 19 carry descriptor and digest |
-| Installations | failed=1, enabled=13, removed=5, disabled=2, uninstalled=3, installedDisabled=2 |
-| Permissions | 15 active installations; 2 without a review row |
+| Install plans | 83 total; 53 carry descriptor and digest |
+| Installations | failed=1, enabled=11, removed=17, disabled=1, uninstalled=3, installedDisabled=2 |
+| Permissions | 12 active installations; 1 without a review row |
 | Ingestion | 0 sources (0 enabled); GitHub automation disabled; historical runs {"completed":2} |
 
 ## Release integrity and trust
@@ -30,7 +30,7 @@ The generic host is real: `src/features/modules/runtime/module-host.tsx:16` fetc
 
 The descriptor service (`install-descriptor-service.ts:14`, `:77`) returns module/publisher/installation IDs, release/version/state, manifest, package artifact digest/ref, verified frontend digest/mode/ref, requested/granted permissions, compatibility, trust, issue time and descriptor digest. Production keys exactly match that contract.
 
-Historical `removed` and `uninstalled` rows are excluded by centralized active-status logic (`installation-status.ts:1`) and runtime access checks. No stale historical row bug was reproduced. 2 active production installations have no permission review; the fail-closed runtime gives them zero implicit grants and requires explicit review for privileged operations.
+Historical `removed` and `uninstalled` rows are excluded by centralized active-status logic (`installation-status.ts:1`) and runtime access checks. No stale historical row bug was reproduced. 1 active production installations have no permission review; the fail-closed runtime gives them zero implicit grants and requires explicit review for privileged operations.
 
 ### Missing permission-review inventory
 
@@ -39,7 +39,6 @@ This inventory excludes account and installation identifiers. It records only th
 | Module ID | Requested permission classes | Requested permissions | Review row present | Effective authorization source |
 | --- | --- | --- | --- | --- |
 | `digital.modula.vault-notes.ai` | ai, notes | ai.context.private, ai.request, notes.actions.contribute, notes.editor.contribute, notes.read | false | no recorded grants (fail closed) |
-| `digital.modula.vault-notes.voice` | media, notes, transcription | media.audio.capture, media.audio.playback, notes.actions.contribute, notes.attachments.create, notes.attachments.read, notes.editor.contribute, notes.update, transcription.request | false | no recorded grants (fail closed) |
 
 ## Runtime, records and functions
 

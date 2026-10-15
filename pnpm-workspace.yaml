@@ -5,6 +5,13 @@ packages:
 
 overrides:
   expo-constants: ~57.0.14
+  # @atproto-labs/fetch-node currently permits undici 6.x. Keep its backend
+  # transport on the patched 6.x line until that dependency advances.
+  undici@6: 6.29.1
+  # Fastify's permitted transitive ranges otherwise retain vulnerable copies.
+  find-my-way: 9.10.0
+  fast-uri@3: 3.1.8
+  fast-uri@4: 4.2.2
 
 allowBuilds:
   '@shopify/react-native-skia': true

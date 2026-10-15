@@ -29,7 +29,7 @@ import {ModuleBackendHealthService as GreenfieldModuleBackendHealthService} from
 import {ModuleBackendLifecycleService} from '../backend/lifecycle-service.js'
 import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
-import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {resolveCanonicalModuleId, type GreenfieldInterModuleActionLineage} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldPublisherSigningKeyService} from '../release-signing.js'
 import {loadRegisteredIdentityAliases} from '../identity-aliases.js'
@@ -1427,7 +1427,7 @@ export async function registerModuleRoutes(
 
   app.post('/v1/module-runtime/actions/:targetModuleId/:actionId/:version', routeConfig.writeConfig, async (request, reply) => {
     const params = request.params as {targetModuleId: string; actionId: string; version: string}
-    const body = (request.body as {input?: unknown; mutationId?: string} | null) ?? {}
+    const body = (request.body as {input?: unknown; mutationId?: string; lineage?: GreenfieldInterModuleActionLineage} | null) ?? {}
     try {
       const credential = signatureHeader(request, 'x-modula-runtime-credential')
       if (!credential) throw moduleError('UNAUTHENTICATED', 'Module runtime credential is required')
@@ -1435,7 +1435,7 @@ export async function registerModuleRoutes(
         credential,
         {targetModuleId: params.targetModuleId, actionId: params.actionId, version: params.version},
         body.input ?? {},
-        {mutationId: stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body), requestId: request.id},
+        {mutationId: stringOrUndefined(body.mutationId) ?? idempotencyKey(request, body), requestId: request.id, lineage: body.lineage},
       ), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Inter-module action failed')
@@ -1866,6 +1866,7 @@ function actorIdForAccount(accountId: string): string {
 }
 
 function sendError(reply: FastifyReply, code: any, message: string, requestId: string) {
+  if (code === 'RATE_LIMITED' && !reply.hasHeader('Retry-After')) reply.header('Retry-After', '60')
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
 }
 
@@ -1874,7 +1875,7 @@ function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fall
   if (typeof code === 'string' && code.startsWith('AI_')) {
     return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))
   }
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'MODULE_PERMISSION_DENIED', 'INSTALLATION_DISABLED', 'UNTRUSTED_RELEASE', 'CONFLICT', 'REVISION_CONFLICT', 'MUTATION_REUSE_CONFLICT', 'NOTE_REVISION_CONFLICT', 'INVALID_CURSOR', 'FUNCTION_NOT_AVAILABLE', 'CAPABILITY_UNAVAILABLE', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'MODULE_PERMISSION_DENIED', 'INSTALLATION_DISABLED', 'UNTRUSTED_RELEASE', 'RELEASE_REVOKED', 'SIGNER_REVOKED', 'ARTIFACT_DIGEST_MISMATCH', 'HOST_VERSION_TOO_OLD', 'CONFLICT', 'REVISION_CONFLICT', 'MUTATION_REUSE_CONFLICT', 'NOTE_REVISION_CONFLICT', 'INVALID_CURSOR', 'FUNCTION_NOT_AVAILABLE', 'CAPABILITY_UNAVAILABLE', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED', 'RATE_LIMITED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)
