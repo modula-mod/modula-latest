@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 446 application / 630 runtime method routes
-Route evidence: production-runtime at production revision f05d03c237c62d1b0946a760610d1155f02a8520
+Route evidence: local-candidate-runtime for feature branch greenfield-v1-atlas-main-evidence; not deployed
 Public routes: 76
 Authenticated routes: 276
 Admin/internal routes: 94
@@ -55,10 +55,10 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 | Moderation | 2 | 0 | 0 | 0 | 0 |
 | Operations | 6 | 0 | 0 | 0 | 0 |
 
-## Production conclusions
+## Candidate and production conclusions
 
 - The running API and worker are the same OCI revision, `f05d03c237c62d1b0946a760610d1155f02a8520`; that revision exactly matches captured `origin/main`.
-- Source/runtime reconciliation is exact: 630 = 446 application routes + 184 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
+- Candidate source/runtime reconciliation is exact: 630 = 446 application routes + 184 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
 - API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-14T09:08:53.627Z",
+  "capturedAt": "2026-10-16T13:41:39.032Z",
   "source": {
-    "branch": "phase-module-distribution-03-nginx-regex-fix",
-    "headAtCapture": "0f8ccde7cc2e403e5e7ebbf3626223f35a94a0e3",
+    "branch": "greenfield-v1-atlas-main-evidence",
+    "headAtCapture": "1e4146d36a45fea50e3665a733bbeb16bf250db1",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "287b889ae9a31624d09d03165d13c8b39b727cb3d5fe3841211c0f7b378adbbf"
+    "apiSourceSha256": "e03f8edb27637c768d09765e83887156427251cac0f8af6520e451fef52e04c7"
   },
   "runtimeRoutes": [
     {
