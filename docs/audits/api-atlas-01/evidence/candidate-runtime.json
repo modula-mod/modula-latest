@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-16T13:41:39.032Z",
+  "capturedAt": "2026-10-16T14:01:10.064Z",
   "source": {
-    "branch": "greenfield-v1-atlas-main-evidence",
-    "headAtCapture": "1e4146d36a45fea50e3665a733bbeb16bf250db1",
+    "branch": "greenfield-v1-deploy-runner-path",
+    "headAtCapture": "be27c06207873b8c89b7427649ec9d71c480950d",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "e03f8edb27637c768d09765e83887156427251cac0f8af6520e451fef52e04c7"
   },
