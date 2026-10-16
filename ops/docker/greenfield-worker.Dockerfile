@@ -41,16 +41,16 @@ RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/greenfield-schema-registry build \
  && pnpm --filter @modula/dimon-contracts build \
  && pnpm --filter @modula/greenfield-worker build
+RUN pnpm --config.inject-workspace-packages=true --filter @modula/greenfield-worker deploy --prod /prod/worker
 
 FROM node:24.18.0-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
-RUN groupadd --system modula && useradd --system --gid modula --create-home modula \
- && corepack enable && corepack prepare pnpm@11.11.0 --activate
-COPY --from=build --chown=modula:modula /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build --chown=modula:modula /app/node_modules ./node_modules
-COPY --from=build --chown=modula:modula /app/packages ./packages
-COPY --from=build --chown=modula:modula /app/services/greenfield-worker ./services/greenfield-worker
-COPY --from=build --chown=modula:modula /modula-mod /modula-mod
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/* /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+ && groupadd --system modula \
+ && useradd --system --gid modula --create-home modula
+COPY --from=build --chown=modula:modula /prod/worker ./
 USER modula
-CMD ["node", "services/greenfield-worker/dist/main.js"]
+CMD ["node", "dist/main.js"]

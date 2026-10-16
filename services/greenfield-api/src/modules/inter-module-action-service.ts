@@ -1,6 +1,10 @@
 import {
   interModuleRequestCapability,
+  GREENFIELD_ACTION_MAX_COUNT,
+  GREENFIELD_ACTION_MAX_DEPTH,
+  GREENFIELD_ACTION_MAX_RUNTIME_MS,
   type GreenfieldInterModuleActionIdentity,
+  type GreenfieldInterModuleActionLineage,
   type GreenfieldJsonSchema,
 } from '@modula/greenfield-contracts'
 import type {GreenfieldModuleInterModuleActionContribution} from '@modula/greenfield-module-manifest'
@@ -70,11 +74,13 @@ export class GreenfieldInterModuleActionService {
     credential: string,
     identity: GreenfieldInterModuleActionIdentity,
     input: unknown,
-    options: {mutationId?: string; requestId?: string} = {},
+    options: {mutationId?: string; requestId?: string; lineage?: GreenfieldInterModuleActionLineage} = {},
   ) {
     const source = await this.authenticateRuntimeCredential(credential)
     const target = await this.access.resolve(source.accountId, identity.targetModuleId, {requireEnabled: true})
     const action = await this.resolveAction(target, identity.actionId, identity.version)
+    const lineage = advanceActionLineage(options.lineage, source.moduleId, target.moduleId)
+    await this.enforceSourceRate(source)
     this.access.enforceCapability(source, interModuleRequestCapability(target.moduleId, action.actionId, action.version))
     if (!action.allowedSourceModules.includes(source.moduleId)) throw moduleError('MODULE_PERMISSION_DENIED', 'Target policy does not allow this source module')
     for (const capability of action.requiredCapabilities) this.access.enforceCapability(target, capability)
@@ -124,10 +130,13 @@ export class GreenfieldInterModuleActionService {
             .where('mutation_id', '=', mutationId).executeTakeFirstOrThrow()
           if (previous.payload_hash !== payloadHash) throw moduleError('MUTATION_REUSE_CONFLICT', 'Mutation ID was reused with a different inter-module payload')
           if (previous.status !== 'completed') throw moduleError('CONFLICT', 'Inter-module action is already in progress or previously failed')
-          return {idempotent: true, requestId: previous.request_id, status: 'completed', result: previous.result}
+          return {idempotent: true, requestId: previous.request_id, status: 'completed', result: previous.result, lineage}
         }
 
         const result = await this.dispatchTarget(trx, source, target, action, input, mutationId, requestId)
+        if (Date.now() - Date.parse(lineage.startedAt) > GREENFIELD_ACTION_MAX_RUNTIME_MS) {
+          throw moduleError('CAPABILITY_UNAVAILABLE', 'Inter-module action execution budget was exceeded')
+        }
         assertGovernedSchemaValue(action.outputSchema, result, 'output')
         await this.failureHooks.afterTargetWrite?.()
         const completedAt = new Date()
@@ -140,12 +149,22 @@ export class GreenfieldInterModuleActionService {
           targetReleaseId: target.releaseId, actionId: action.actionId, actionVersion: action.version,
           requestIdentity: mutationId, success: true,
         }, {type: 'interModuleAction', id: requestId}, {accountId: source.accountId, requestId: options.requestId})
-        return {idempotent: false, requestId, status: 'completed', result}
+        return {idempotent: false, requestId, status: 'completed', result, lineage}
       })
     } catch (error) {
       await this.recordFailure(source, target, action, mutationId, payloadHash, Date.now() - started, errorCode(error), options.requestId)
       throw error
     }
+  }
+
+  private async enforceSourceRate(source: GreenfieldModuleRuntimeContext): Promise<void> {
+    const row = await this.db.selectFrom('greenfield_inter_module_action_requests')
+      .select(({fn}) => fn.countAll<number>().as('count'))
+      .where('account_id', '=', source.accountId)
+      .where('source_installation_id', '=', source.installationId)
+      .where('created_at', '>=', new Date(Date.now() - 60_000))
+      .executeTakeFirstOrThrow()
+    if (Number(row.count) >= 120) throw moduleError('RATE_LIMITED', 'Inter-module action rate limit exceeded')
   }
 
   private async authenticateRuntimeCredential(credential: string): Promise<GreenfieldModuleRuntimeContext> {
@@ -248,6 +267,36 @@ export class GreenfieldInterModuleActionService {
       if (!isUniqueViolation(failure)) throw failure
     })
   }
+}
+
+export function advanceActionLineage(
+  supplied: GreenfieldInterModuleActionLineage | undefined,
+  sourceModuleId: string,
+  targetModuleId: string,
+  now = new Date(),
+): GreenfieldInterModuleActionLineage {
+  const correlationId = supplied ? requireIdentity(supplied.correlationId, 'lineage.correlationId') : uuidv7()
+  const modules = supplied?.modules ?? [sourceModuleId]
+  if (!Array.isArray(modules) || modules.length === 0 || modules.length > GREENFIELD_ACTION_MAX_DEPTH) {
+    throw moduleError('VALIDATION_FAILED', 'Inter-module action lineage depth is invalid')
+  }
+  if (modules.some(moduleId => !boundedIdentity(moduleId))) throw moduleError('VALIDATION_FAILED', 'Inter-module action lineage contains an invalid module ID')
+  if (modules.at(-1) !== sourceModuleId) throw moduleError('VALIDATION_FAILED', 'Inter-module action lineage does not end at the source module')
+  if (new Set(modules).size !== modules.length || modules.includes(targetModuleId)) {
+    throw moduleError('CAPABILITY_UNAVAILABLE', 'Inter-module action cycle detected')
+  }
+  const expectedCount = modules.length - 1
+  if (supplied && supplied.actionCount !== expectedCount) throw moduleError('VALIDATION_FAILED', 'Inter-module action lineage count is invalid')
+  const actionCount = expectedCount + 1
+  if (actionCount > GREENFIELD_ACTION_MAX_COUNT || modules.length + 1 > GREENFIELD_ACTION_MAX_DEPTH + 1) {
+    throw moduleError('CAPABILITY_UNAVAILABLE', 'Inter-module action execution budget was exceeded')
+  }
+  const startedAt = supplied?.startedAt ?? now.toISOString()
+  const started = Date.parse(startedAt)
+  if (!Number.isFinite(started) || started > now.getTime() + 5_000 || now.getTime() - started > GREENFIELD_ACTION_MAX_RUNTIME_MS) {
+    throw moduleError('CAPABILITY_UNAVAILABLE', 'Inter-module action execution budget was exceeded')
+  }
+  return {correlationId, modules: [...modules, targetModuleId], actionCount, startedAt: new Date(started).toISOString()}
 }
 
 function isActionDeclaration(value: GreenfieldModuleInterModuleActionContribution): boolean {

@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "1.0.0",
+  "compatible": false,
+  "reasons": [{"code": "HOST_VERSION_TOO_OLD", "message": "Host 1.0.0 does not satisfy >=1.1.0", "required": ">=1.1.0", "actual": "1.0.0"}],
+  "requiredCapabilities": ["ui.rich-document-editor@1.0.0"]
+}

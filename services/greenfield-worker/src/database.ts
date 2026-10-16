@@ -1075,12 +1075,15 @@ export interface Database {
 export type ModulaWorkerDb = Kysely<Database>
 export type WorkerDb = ModulaWorkerDb
 
-export function createDb(connectionString: string): ModulaWorkerDb {
+export function createDb(connectionString: string, onPoolError?: (error: Error) => void): ModulaWorkerDb {
   const pool = new pg.Pool({
     connectionString,
     max: 5,
     application_name: 'modula-worker',
   })
+  // A PostgreSQL restart invalidates idle pooled clients. Consume that event so
+  // the worker loop can reconnect with bounded backoff instead of exiting.
+  pool.on('error', error => onPoolError?.(error))
   return new Kysely<Database>({
     dialect: new PostgresDialect({pool}),
   })

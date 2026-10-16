@@ -1,7 +1,7 @@
 {
   "metadata": {
     "status": "PASS",
-    "capturedAt": "2026-10-10T22:02:13.369Z"
+    "capturedAt": "2026-10-14T15:33:43.469Z"
   },
   "routes": [
     {
@@ -14540,7 +14540,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "7012a7b5b8073f55bc5e12f7c02377df56ad2a84be828dab32777610f450c1b0"
+      "sourceContractSha256": "8a50a41da023f31f6d62aa1cfd252f31e08721ee77474438e9aa824023888711"
     },
     {
       "id": "GET /v1/modules",

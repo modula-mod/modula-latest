@@ -189,6 +189,7 @@ export class GreenfieldModuleRegistryService {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const releases = await this.listVersions(canonicalId)
     if (releases.length > 0) {
+      const newestPublished = releases.find(item => item.releaseState === 'published') ?? null
       const latest = releases.find(item => item.releaseState === 'published' && item.releaseChannel === 'stable')
         ?? releases.find(item => item.releaseChannel === 'stable')
         ?? releases[0]!
@@ -221,6 +222,9 @@ export class GreenfieldModuleRegistryService {
         description: latest.manifest.description,
         publisher: latest.manifest.publisher,
         latestVersion: latest.version,
+        latestStableVersion: latest.releaseChannel === 'stable' ? latest.version : null,
+        newestPublishedVersion: newestPublished?.version ?? null,
+        newestPublishedChannel: newestPublished?.releaseChannel ?? null,
         releaseChannel: latest.releaseChannel,
         status: latest.releaseState,
         trust: latest.trustLevel,

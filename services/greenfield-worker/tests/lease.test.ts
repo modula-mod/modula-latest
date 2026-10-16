@@ -1,7 +1,7 @@
 import {randomUUID} from 'node:crypto'
 import {readFileSync} from 'node:fs'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
-import {claimNextJob, reapExpiredLeases} from '../src/jobs/claim.js'
+import {claimNextJob, completeJob, markJobRunning, reapExpiredLeases} from '../src/jobs/claim.js'
 import {createDb, type ModulaWorkerDb} from '../src/database.js'
 
 describe('lease exclusivity', () => {
@@ -132,5 +132,46 @@ describeLive('lease exclusivity (live database)', () => {
     expect(failure.payload).toEqual({})
     expect(failure.payload_fingerprint).toMatch(/^sha256:[a-f0-9]{64}$/)
     expect(failure.error_message).not.toContain('must-not-survive')
+  })
+
+  it('reclaims a crashed worker lease and fences the stale worker from completion', async () => {
+    const jobId = `test-crash-reclaim-${randomUUID()}`
+    jobIds.push(jobId)
+    await db
+      .insertInto('background_jobs')
+      .values({
+        id: jobId,
+        job_type: 'audit.checkpoint',
+        payload: {probe: 'crash-reclaim'} as never,
+        status: 'QUEUED',
+        action: 'audit.checkpoint',
+        trace_id: jobId,
+        priority: -1_000,
+        available_at: new Date(0),
+        attempt_count: 0,
+        maximum_attempts: 5,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .execute()
+
+    const first = await claimNextJob(db, 'crashed-worker', 1)
+    expect(first?.id).toBe(jobId)
+    await markJobRunning(db, jobId, 'crashed-worker')
+    await new Promise(resolve => setTimeout(resolve, 5))
+    expect(await reapExpiredLeases(db)).toBeGreaterThanOrEqual(1)
+
+    const reclaimed = await claimNextJob(db, 'recovery-worker', 60_000)
+    expect(reclaimed?.id).toBe(jobId)
+    await markJobRunning(db, jobId, 'recovery-worker')
+    await expect(completeJob(db, jobId, 'crashed-worker')).rejects.toMatchObject({code: 'JOB_LEASE_LOST'})
+    await completeJob(db, jobId, 'recovery-worker')
+
+    const final = await db
+      .selectFrom('background_jobs')
+      .select(['status', 'attempt_count', 'lease_owner', 'lease_expires_at'])
+      .where('id', '=', jobId)
+      .executeTakeFirstOrThrow()
+    expect(final).toMatchObject({status: 'SUCCEEDED', attempt_count: 2, lease_owner: null, lease_expires_at: null})
   })
 })

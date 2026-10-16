@@ -140,7 +140,8 @@ export class GreenfieldModuleVersionSwitchService {
   async evaluate(accountId: string, installed: GreenfieldModuleInstallationRow, targetVersion: string | null | undefined, options: VersionSwitchEvaluationOptions = {}): Promise<VersionSwitchEvaluation> {
     const canonicalId = resolveCanonicalModuleId(installed.moduleId)
     const current = await this.registry.getVersion(canonicalId, installed.version)
-    const target = targetVersion ? await this.registry.getVersion(canonicalId, targetVersion) : await this.registry.latestPublished(canonicalId)
+    if (!targetVersion) throw moduleError('VALIDATION_FAILED', 'A target version is required after applying the installation update policy')
+    const target = await this.registry.getVersion(canonicalId, targetVersion)
     const latestPublished = (await this.registry.listVersions(canonicalId)).find(release => release.releaseState === 'published')?.version ?? null
     const trust = await this.trust.forRelease(target, this.trustOptions(options), latestPublished)
     const direction = directionOf(current.version, target.version)

@@ -107,6 +107,32 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     expect(invalid.statusCode).toBe(400)
   })
 
+  it('distinguishes the latest stable release from the newest published prerelease', async () => {
+    const channelProductId = `digital.modula.channels-${suffix}`
+    const service = new GreenfieldModuleReleaseService(db)
+    for (const [version, channel] of [['1.2.0', 'stable'], ['1.8.0', 'beta']] as const) {
+      const manifest = adapterManifest(channelProductId, version)
+      const pending = await service.importPendingReview(manifest, evidenceFor(manifest))
+      await db.updateTable('greenfield_module_releases')
+        .set({release_channel: channel})
+        .where('release_id', '=', pending.releaseId)
+        .execute()
+      const release = await service.publishRelease(channelProductId, version)
+      const product = fixtureProduct(channelProductId, version, mps => { mps.release.channel = channel })
+      await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: release.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
+    }
+
+    const response = await app.inject({method: 'GET', url: `/v1/registry/modules/${channelProductId}`})
+    expect(response.statusCode, response.body).toBe(200)
+    expect(response.json().data).toMatchObject({
+      latestVersion: '1.2.0',
+      latestStableVersion: '1.2.0',
+      releaseChannel: 'stable',
+      newestPublishedVersion: '1.8.0',
+      newestPublishedChannel: 'beta',
+    })
+  })
+
   it('exposes an unsigned published release as untrusted and refuses install preview', async () => {
     const catalogue = await app.inject({method: 'GET', url: `/v1/registry/modules?q=${encodeURIComponent(productId)}`})
     expect(catalogue.statusCode, catalogue.body).toBe(200)

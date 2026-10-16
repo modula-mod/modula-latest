@@ -13,6 +13,8 @@ const envSchema = z.object({
   MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS: z.coerce.number().int().positive().default(2_000),
   MODULA_WORKER_OUTBOX_BATCH_SIZE: z.coerce.number().int().positive().default(50),
   MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  MODULA_WORKER_DATABASE_BACKOFF_MAX_MS: z.coerce.number().int().min(1_000).max(300_000).default(60_000),
+  MODULA_WORKER_SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).default(30_000),
   MODULA_WORKER_INGEST_INTERVAL_MS: z.coerce.number().int().positive().default(60_000),
   MODULA_WORKER_INGEST_ENABLED: z
     .string()
@@ -84,6 +86,8 @@ export type WorkerConfig = {
   outboxDrainIntervalMs: number
   outboxBatchSize: number
   eventSubscriberTimeoutMs: number
+  databaseBackoffMaxMs: number
+  shutdownTimeoutMs: number
   ingestIntervalMs: number
   ingestEnabled: boolean
   mailTransport: 'disabled' | 'log' | 'smtp'
@@ -193,6 +197,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     outboxDrainIntervalMs: raw.MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS,
     outboxBatchSize: raw.MODULA_WORKER_OUTBOX_BATCH_SIZE,
     eventSubscriberTimeoutMs: raw.MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS,
+    databaseBackoffMaxMs: raw.MODULA_WORKER_DATABASE_BACKOFF_MAX_MS,
+    shutdownTimeoutMs: raw.MODULA_WORKER_SHUTDOWN_TIMEOUT_MS,
     ingestIntervalMs: raw.MODULA_WORKER_INGEST_INTERVAL_MS,
     ingestEnabled: Boolean(raw.MODULA_WORKER_INGEST_ENABLED),
     mailTransport,

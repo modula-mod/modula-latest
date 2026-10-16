@@ -1,0 +1,18 @@
+{
+  "api": {
+    "CRITICAL": 9,
+    "HIGH": 117,
+    "LOW": 88,
+    "MEDIUM": 138,
+    "UNKNOWN": 4
+  },
+  "worker": {
+    "CRITICAL": 9,
+    "HIGH": 117,
+    "LOW": 88,
+    "MEDIUM": 138,
+    "UNKNOWN": 4
+  },
+  "apiSecrets": 0,
+  "workerSecrets": 0
+}

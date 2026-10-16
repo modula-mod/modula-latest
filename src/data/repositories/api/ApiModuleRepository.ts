@@ -164,7 +164,7 @@ export class ApiModuleRepository implements ModuleRepository {
       if (!item) return null
       if (!options.includeInstalled) return item
       const installed = await this.listInstalled()
-      return {...item, installationState: applyInstalledState(item, installed.find(row => row.moduleId === moduleId)).installationState}
+      return applyInstalledState(item, installed.find(row => row.moduleId === moduleId)) as ModuleDetail
     })
   }
 
@@ -414,6 +414,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
   const moduleId = String(row.moduleId ?? row.module_id ?? row.slug ?? 'unknown')
   const status = String(row.status ?? 'published')
   const latestVersion = typeof row.latestVersion === 'string' ? row.latestVersion : typeof row.version === 'string' ? row.version : null
+  const releaseChannel = moduleReleaseChannel(row.releaseChannel ?? row.release_channel)
   const manifest = isRecord(row.manifest) ? row.manifest : {}
   const installability = decodeInstallability(row.installability, {
     moduleId,
@@ -444,6 +445,10 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     category: categoryFor(moduleId, String(row.description ?? '')),
     trustLevel: String(row.trustLevel ?? row.trust ?? 'untrustedManifest'),
     latestVersion,
+    latestStableVersion: typeof row.latestStableVersion === 'string' ? row.latestStableVersion : releaseChannel === 'stable' ? latestVersion : null,
+    newestPublishedVersion: typeof row.newestPublishedVersion === 'string' ? row.newestPublishedVersion : latestVersion,
+    newestPublishedChannel: moduleReleaseChannel(row.newestPublishedChannel) ?? releaseChannel,
+    releaseChannel,
     compatibility: Array.isArray(row.platforms) ? `Platforms ${row.platforms.join(', ')}` : 'Compatible',
     installable,
     installationState,
@@ -580,6 +585,7 @@ function decodeInstalledModule(value: unknown): InstalledModule {
     installationId: String(row.installationId ?? row.installation_id ?? ''),
     moduleId: String(row.moduleId ?? row.module_id ?? ''),
     version: String(row.version ?? '0.0.0'),
+    releaseChannel: moduleReleaseChannel(row.releaseChannel ?? row.release_channel) ?? undefined,
     status: String(row.status ?? 'installed'),
     publisherName: typeof row.publisherName === 'string' ? row.publisherName : undefined,
     name: typeof row.name === 'string' ? row.name : undefined,
@@ -1154,7 +1160,8 @@ function applyInstalledState(item: ModuleCatalogueItem, installed?: InstalledMod
   return {
     ...item,
     installationState: state,
-    latestVersion: installed.version || item.latestVersion,
+    installedVersion: installed.version,
+    installedReleaseChannel: installed.releaseChannel ?? null,
     installability: {
       ...(item.installability ?? {
         moduleId: item.moduleId,
@@ -1168,6 +1175,10 @@ function applyInstalledState(item: ModuleCatalogueItem, installed?: InstalledMod
       reason: state === 'enabled' ? 'Enabled' : state === 'disabled' ? 'Disabled' : 'Installed',
     },
   }
+}
+
+function moduleReleaseChannel(value: unknown): ModuleCatalogueItem['releaseChannel'] {
+  return value === 'stable' || value === 'beta' || value === 'rc' || value === 'dev' ? value : null
 }
 
 function filterCatalogue(items: ModuleCatalogueItem[], input: {q?: string; category?: ProductHubCategory}) {

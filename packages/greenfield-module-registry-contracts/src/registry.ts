@@ -9,6 +9,11 @@ export type GreenfieldRegistryModuleSummary = {
   publisherId: string
   publisherName: string
   latestVersion: string | null
+  /** Explicit stable-channel alias; latestVersion remains for v1 compatibility. */
+  latestStableVersion?: string | null
+  /** Newest published release across stable, beta, rc and dev channels. */
+  newestPublishedVersion?: string | null
+  newestPublishedChannel?: 'stable' | 'beta' | 'rc' | 'dev' | null
   registryReleaseId?: string | null
   releaseChannel?: 'stable' | 'beta' | 'rc' | 'dev' | null
   releaseSizeBytes?: number | null

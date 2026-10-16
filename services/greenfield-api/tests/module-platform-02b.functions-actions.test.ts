@@ -13,12 +13,23 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import type {Database} from '../src/database/types.js'
-import {GreenfieldInterModuleActionService} from '../src/modules/inter-module-action-service.js'
+import {advanceActionLineage, GreenfieldInterModuleActionService} from '../src/modules/inter-module-action-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
+
+describe('inter-module action lineage budgets', () => {
+  it('detects cycles and refuses stale or forged chains', () => {
+    const startedAt = new Date('2026-10-14T12:00:00.000Z')
+    const first = advanceActionLineage(undefined, 'test.modula.alpha', 'test.modula.beta', startedAt)
+    expect(first).toMatchObject({modules: ['test.modula.alpha', 'test.modula.beta'], actionCount: 1})
+    expect(() => advanceActionLineage(first, 'test.modula.beta', 'test.modula.alpha', startedAt)).toThrow(/cycle detected/)
+    expect(() => advanceActionLineage({...first, actionCount: 0}, 'test.modula.beta', 'test.modula.gamma', startedAt)).toThrow(/count is invalid/)
+    expect(() => advanceActionLineage(first, 'test.modula.beta', 'test.modula.gamma', new Date(startedAt.getTime() + 30_001))).toThrow(/budget was exceeded/)
+  })
+})
 
 describeIf('MODULE-PLATFORM-02B governed functions and inter-module actions', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']

@@ -1,0 +1,11 @@
+{
+  "capturedAt": "2026-10-15T20:35:00Z",
+  "repositoryPrivateKeyBlocks": 0,
+  "productionConfigurationPrivateKeyBlocks": 0,
+  "productionStoragePrivateKeyBlocks": 0,
+  "apiImageSecretFindings": 0,
+  "workerImageSecretFindings": 0,
+  "offlineReleaseSignerPresent": false,
+  "runtimeAssertionSignerPresent": true,
+  "note": "The online backend assertion-signing credential is not the offline Ed25519 release-signing key; no credential value was emitted."
+}

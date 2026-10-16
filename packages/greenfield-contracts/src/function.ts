@@ -66,6 +66,18 @@ export type GreenfieldInterModuleActionIdentity = {
   version: string
 }
 
+export const GREENFIELD_ACTION_MAX_DEPTH = 8
+export const GREENFIELD_ACTION_MAX_COUNT = 16
+export const GREENFIELD_ACTION_MAX_RUNTIME_MS = 30_000
+
+/** Lineage supplied by the host when one governed action causes another. */
+export type GreenfieldInterModuleActionLineage = {
+  correlationId: string
+  modules: string[]
+  actionCount: number
+  startedAt: string
+}
+
 /** Canonical reviewed capability a source module must request for a target action. */
 export function interModuleRequestCapability(targetModuleId: string, actionId: string, version: string): string {
   return `module.action:request:${targetModuleId}:${actionId}:${version}`

@@ -4,14 +4,14 @@
 
 - Backend: host filesystem bind at `/var/lib/modula/greenfield-media` mounted read/write into the API container.
 - Durability: survives container replacement, but no replicated object store, CDN origin, storage health check or host-loss recovery proof was discovered.
-- Inventory: 57 files / 28852215 bytes. No file contents or user metadata were copied into the atlas.
+- Inventory: 60 files / 29931163 bytes. No file contents or user metadata were copied into the atlas.
 
 | Class | Files | Bytes | API family |
 | --- | --- | --- | --- |
-| attachments | 25 | 19921070 | `/v1/attachments/*` |
+| attachments | 27 | 20824057 | `/v1/attachments/*` |
 | posts | 13 | 887529 | `/v1/posts`, `/v1/media/*` |
 | profiles | 3 | 1224761 | `/v1/profiles/*/(avatar|cover)` |
-| stories | 16 | 6818855 | `/v1/stories`, `/v1/media/stories/*` |
+| stories | 17 | 6994816 | `/v1/stories`, `/v1/media/stories/*` |
 
 ## Canonical attachment lifecycle
 
@@ -22,7 +22,7 @@
 5. `GET /v1/attachments/:attachmentId/content` resolves public/private/owner access and streams the file through nginx.
 6. Delete/cleanup support exists in the service, but no production scheduler invokes orphan cleanup.
 
-Current attachment states: ready=25, failed=1, created=2, expired=1. Ready linkage: 16/25 linked, 9 orphan candidates.
+Current attachment states: ready=27, failed=1, created=2, expired=1. Ready linkage: 16/27 linked, 11 orphan candidates.
 
 ## Media-class disposition
 
@@ -31,8 +31,8 @@ Current attachment states: ready=25, failed=1, created=2, expired=1. Ready linka
 | Avatar/cover | canonical attachment bytes or external URL | profile_media (cover=1, avatar=1) | canonical attachment URL is policy-checked; PATCH also accepts public HTTPS URL | binding removal does not establish object garbage collection |
 | Post attachments | attachment store | post_content (pdf=2, audio=1, image=8, video=2, document=1) | viewer visibility follows post plus attachment policy | soft post deletion; orphan cleanup unscheduled |
 | Legacy post image | posts directory | post_media count=16 | `/v1/media/:mediaFile`; public path follows post policy | 13/16 active rows have a URL; 20 MiB app limit conflicts with 1 MiB nginx default |
-| Stories | stories directory | story_items count=16 | `/v1/media/stories/:mediaFile` with story visibility | 16 inactive/deleted rows and 16 files remain |
-| Module packages | PostgreSQL release blob/ref metadata | 2/17 release blobs | public artifact route when blob is available; digest checked | immutable metadata, incomplete byte coverage |
+| Stories | stories directory | story_items count=17 | `/v1/media/stories/:mediaFile` with story visibility | 17 inactive/deleted rows and 17 files remain |
+| Module packages | PostgreSQL release blob/ref metadata | 26/41 release blobs | public artifact route when blob is available; digest checked | immutable metadata, incomplete byte coverage |
 | Module artwork | PostgreSQL blobs plus presentation metadata | 10/17 blobs | public immutable cache route; unavailable metadata returns 404 | all 17 are marked development assets |
 
 ## Confirmed gaps

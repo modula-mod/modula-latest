@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0.0",
+  "capabilities": [
+    {"id": "ui.rich-document-editor", "version": "1.0.0", "available": true},
+    {"id": "ui.revision-browser", "version": "1.0.0", "available": true},
+    {"id": "intelligence.local", "version": "1.0.0", "available": false, "reason": "CAPABILITY_UNAVAILABLE"}
+  ]
+}

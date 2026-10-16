@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "shareId": "019f0000-0000-7000-8000-000000000006",
+  "moduleId": "example.modula.notes",
+  "recordType": "note",
+  "recordId": "note-architecture",
+  "ownerAccountId": "019f0000-0000-7000-8000-000000000009",
+  "recipientAccountId": "019f0000-0000-7000-8000-000000000007",
+  "permission": "read",
+  "expiresAt": "2026-11-14T00:00:00.000Z",
+  "revokedAt": null,
+  "visibilityLostAt": null
+}

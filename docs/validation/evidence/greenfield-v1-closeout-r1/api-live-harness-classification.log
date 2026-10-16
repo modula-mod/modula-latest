@@ -1,0 +1,9 @@
+
+ RUN  v3.2.7 /root/modula-worktrees/greenfield-v1-closeout-final/services/greenfield-api
+
+ ✓ tests/n4-foryou-private-author.test.ts (2 tests) 78ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:28:36
+   Duration  251ms (transform 37ms, setup 0ms, collect 16ms, tests 78ms, environment 0ms, prepare 45ms)

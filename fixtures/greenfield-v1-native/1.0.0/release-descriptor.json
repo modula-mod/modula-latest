@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "releaseId": "module-release:example.modula.notes:2.0.0-rc.2",
+  "moduleId": "example.modula.notes",
+  "version": "2.0.0-rc.2",
+  "channel": "candidate",
+  "publicationState": "published",
+  "revoked": false,
+  "digests": {
+    "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "packageSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "frontendSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "signer": {"keyId": "example-preview-key", "state": "active"},
+  "provenance": {"repository": "example.invalid/modula/notes", "sourceSha": "dddddddddddddddddddddddddddddddddddddddd"}
+}

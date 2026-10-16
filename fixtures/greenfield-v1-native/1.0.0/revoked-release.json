@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "releaseId": "module-release:example.modula.notes:1.9.0",
+  "moduleId": "example.modula.notes",
+  "version": "1.9.0",
+  "revoked": true,
+  "revocation": {"code": "RELEASE_REVOKED", "reason": "Synthetic compromise drill", "revokedAt": "2026-10-14T00:00:00.000Z"},
+  "installAllowed": false,
+  "updateAllowed": false,
+  "artifactAuthorization": false
+}

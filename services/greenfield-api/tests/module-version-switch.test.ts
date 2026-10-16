@@ -51,13 +51,25 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
 
   const permission = (name: string, risk = 'medium') => ({permission: name, risk, reason: `Fixture ${name}`})
 
-  async function publish(version: string, permissions: string[], schemas: Array<{collection: string; version?: string}> = [], state: 'published' | 'superseded' = 'published') {
+  async function publish(
+    version: string,
+    permissions: string[],
+    schemas: Array<{collection: string; version?: string}> = [],
+    state: 'published' | 'superseded' = 'published',
+    channel: 'stable' | 'beta' | 'rc' | 'dev' = 'stable',
+  ) {
     const service = new GreenfieldModuleReleaseService(db)
     const manifest = adapterManifest(moduleId, version, {
       permissions: permissions.map(name => permission(name, name === 'functions:register' ? 'high' : 'medium')) as any,
       contributions: {schemas: schemas.map(item => ({id: `${moduleId}.schemas.${item.collection}`, title: item.collection, schemaRef: `schemas/${item.collection}.json`, collection: item.collection, defaultVisibility: 'private', ...(item.version ? {version: item.version} : {})}))} as any,
     })
-    await service.importPendingReview(manifest, evidenceFor(manifest))
+    const pending = await service.importPendingReview(manifest, evidenceFor(manifest))
+    if (channel !== 'stable') {
+      await db.updateTable('greenfield_module_releases')
+        .set({release_channel: channel})
+        .where('release_id', '=', pending.releaseId)
+        .execute()
+    }
     const release = await service.publishRelease(moduleId, version)
     const product = fixtureProduct(moduleId, version)
     await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: release.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
@@ -121,6 +133,12 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
   })
 
   it('lists registry versions relative to the installation with trust and compatibility', async () => {
+    const installed = await app.inject({method: 'GET', url: '/v1/modules/installed', headers: auth()})
+    expect(installed.statusCode, installed.body).toBe(200)
+    expect(installed.json().data).toEqual(expect.arrayContaining([
+      expect.objectContaining({moduleId, version: '1.0.0', releaseChannel: 'stable'}),
+    ]))
+
     const response = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/versions?platform=ios&hostVersion=1.3.0`, headers: auth()})
     expect(response.statusCode, response.body).toBe(200)
     const data = response.json().data
@@ -264,6 +282,23 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
     expect(accepted.statusCode, accepted.body).toBe(202)
     expect(accepted.json().data.descriptor.permissions.granted).toEqual(expect.arrayContaining(['functions:register', 'search:index']))
     await completeSwitch(accepted)
+    expect(await installedVersion()).toEqual({version: '1.2.0', status: 'enabled'})
+  })
+
+  it('honours the installation policy when no target version is supplied and never crosses into beta', async () => {
+    await publish('2.0.0-beta.1', base, [{collection: 'note', version: '2.0.0'}, {collection: 'tag'}], 'published', 'beta')
+
+    const update = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/update`,
+      headers: {...auth(), 'idempotency-key': `policy-default-${suffix}`},
+      payload: {platform: 'ios'},
+    })
+    // These legacy fixtures intentionally have no immutable package inventory,
+    // so policy planning fails closed before target selection. The old path
+    // skipped the plan and would have queued the newer beta release here.
+    expect(update.statusCode, update.body).toBe(404)
+    expect(update.body).toContain('complete immutable package artifact')
     expect(await installedVersion()).toEqual({version: '1.2.0', status: 'enabled'})
   })
 })

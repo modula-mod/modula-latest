@@ -1,0 +1,681 @@
+Scope: all 24 workspace projects
+✓ Lockfile passes supply-chain policies (verified 5h ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +7
++++++++
+Progress: resolved 7, reused 7, downloaded 0, added 7, done
+
+Done in 1.2s using pnpm v11.11.0
+$ node scripts/verify-greenfield-v1-contract-freeze.mjs
+fixture checksum installation-descriptor.json                            PASS  803a2c2dfc09cb9a14dec83e7b045c5fbe18aa4ca55a1614a5ea6d908f4f984a
+installation-descriptor.json schemaVersion                               PASS  required
+installation-descriptor.json installationId                              PASS  required
+installation-descriptor.json moduleId                                    PASS  required
+installation-descriptor.json version                                     PASS  required
+installation-descriptor.json status                                      PASS  required
+installation-descriptor.json releaseId                                   PASS  required
+installation-descriptor.json permissionReviewRequired                    PASS  required
+installation-descriptor.json permissions.granted                         PASS  required
+installation-descriptor.json trust.verified                              PASS  required
+installation-descriptor.json compatibility.reasons                       PASS  required
+fixture checksum release-descriptor.json                                 PASS  a88b9493fb18b5e00556cd0aae5df724926b0cd231a164d706e4f11b323859b8
+release-descriptor.json schemaVersion                                    PASS  required
+release-descriptor.json releaseId                                        PASS  required
+release-descriptor.json moduleId                                         PASS  required
+release-descriptor.json version                                          PASS  required
+release-descriptor.json publicationState                                 PASS  required
+release-descriptor.json revoked                                          PASS  required
+release-descriptor.json digests.manifestSha256                           PASS  required
+release-descriptor.json digests.packageSha256                            PASS  required
+release-descriptor.json digests.frontendSha256                           PASS  required
+release-descriptor.json signer.state                                     PASS  required
+release-descriptor.json provenance.sourceSha                             PASS  required
+fixture checksum install-plan.json                                       PASS  6eb0a456dce4172e3f32602cd7af803023674f0de23561afbd2f79eb9302b9d4
+install-plan.json schemaVersion                                          PASS  required
+install-plan.json planId                                                 PASS  required
+install-plan.json moduleId                                               PASS  required
+install-plan.json targetVersion                                          PASS  required
+install-plan.json allowed                                                PASS  required
+install-plan.json blockedReasonCodes                                     PASS  required
+install-plan.json permissionReviewRequired                               PASS  required
+install-plan.json permissions.requested                                  PASS  required
+install-plan.json compatibility.reasons                                  PASS  required
+fixture checksum update-plan.json                                        PASS  219219ff9e1c161b213156ebbef87f66ece22319a4df0e997ff6ea5223eebbaa
+update-plan.json schemaVersion                                           PASS  required
+update-plan.json installationId                                          PASS  required
+update-plan.json fromVersion                                             PASS  required
+update-plan.json toVersion                                               PASS  required
+update-plan.json allowed                                                 PASS  required
+update-plan.json blockedReasonCodes                                      PASS  required
+update-plan.json permissionDelta.added                                   PASS  required
+update-plan.json permissionDelta.removed                                 PASS  required
+update-plan.json permissionDelta.reviewRequired                          PASS  required
+update-plan.json rollback.available                                      PASS  required
+fixture checksum permission-review-required.json                         PASS  27107db5ca5e34379798c9fa1719e34bf5ab91f347fce329501efd13044fbb29
+permission-review-required.json ok                                       PASS  required
+permission-review-required.json error.code                               PASS  required
+permission-review-required.json error.message                            PASS  required
+permission-review-required.json error.requestId                          PASS  required
+permission-review-required.json error.retryable                          PASS  required
+permission-review-required.json meta.requestId                           PASS  required
+fixture checksum host-incompatibility.json                               PASS  70e3fbf53d61d121cc33bcf9409dd64cfe934ca19ef111a655548b419e12fe9b
+host-incompatibility.json schemaVersion                                  PASS  required
+host-incompatibility.json compatible                                     PASS  required
+host-incompatibility.json reasons                                        PASS  required
+host-incompatibility.json requiredCapabilities                           PASS  required
+fixture checksum revoked-release.json                                    PASS  4afce4f7983ab8849c2d45215955b5e31bfa7a91a8ffd3bfbac01d22e818a39b
+revoked-release.json schemaVersion                                       PASS  required
+revoked-release.json releaseId                                           PASS  required
+revoked-release.json revoked                                             PASS  required
+revoked-release.json revocation.code                                     PASS  required
+revoked-release.json installAllowed                                      PASS  required
+revoked-release.json updateAllowed                                       PASS  required
+revoked-release.json artifactAuthorization                               PASS  required
+fixture checksum sync-page.json                                          PASS  d727d1be93e321b637d30af1adc556d5d307974788ae508d6015c518fee4edf1
+sync-page.json schemaVersion                                             PASS  required
+sync-page.json changes                                                   PASS  required
+sync-page.json nextCursor                                                PASS  required
+sync-page.json hasMore                                                   PASS  required
+sync-page.json retentionBoundary                                         PASS  required
+fixture checksum media-binding.json                                      PASS  2005463d5fc0c79836fa55e86f75d886aa1b7e95abef7902f0cc1c98cc8a0088
+media-binding.json schemaVersion                                         PASS  required
+media-binding.json bindingId                                             PASS  required
+media-binding.json moduleId                                              PASS  required
+media-binding.json recordType                                            PASS  required
+media-binding.json recordId                                              PASS  required
+media-binding.json assetId                                               PASS  required
+media-binding.json authorized                                            PASS  required
+fixture checksum share.json                                              PASS  7c6014388134dc0277ee27abdc3867fc2338633d204a0cfbfe8cdac7cf0b5c05
+share.json schemaVersion                                                 PASS  required
+share.json shareId                                                       PASS  required
+share.json ownerAccountId                                                PASS  required
+share.json recipientAccountId                                            PASS  required
+share.json permission                                                    PASS  required
+share.json expiresAt                                                     PASS  required
+share.json revokedAt                                                     PASS  required
+share.json visibilityLostAt                                              PASS  required
+fixture checksum function-invocation.json                                PASS  20406cb441f2449de0e3912e1eead83c220e032b0f4e09c173f6b3db69ea82ae
+function-invocation.json schemaVersion                                   PASS  required
+function-invocation.json functionId                                      PASS  required
+function-invocation.json version                                         PASS  required
+function-invocation.json mutationId                                      PASS  required
+function-invocation.json idempotent                                      PASS  required
+function-invocation.json status                                          PASS  required
+function-invocation.json executionMode                                   PASS  required
+function-invocation.json output                                          PASS  required
+fixture checksum action-request-result.json                              PASS  8c4512a42bf1e905da975cc76bc8500f380a9dc66064fae9dce3ccd4b0af6085
+action-request-result.json request.targetModuleId                        PASS  required
+action-request-result.json request.actionId                              PASS  required
+action-request-result.json request.mutationId                            PASS  required
+action-request-result.json request.lineage.correlationId                 PASS  required
+action-request-result.json result.status                                 PASS  required
+action-request-result.json result.lineage.modules                        PASS  required
+action-request-result.json result.lineage.actionCount                    PASS  required
+fixture checksum host-capability.json                                    PASS  f55049aaebe1c9ab7fd98854d04cb670efb04d7217cccde35f5f82fbda921958
+host-capability.json schemaVersion                                       PASS  required
+host-capability.json capabilities                                        PASS  required
+fixture set exact                                                        PASS  13 JSON fixtures
+contract authentication                                                  PASS  documented
+contract module identity                                                 PASS  documented
+contract release trust                                                   PASS  documented
+contract permission request                                              PASS  documented
+contract records                                                         PASS  documented
+contract references                                                      PASS  documented
+contract history                                                         PASS  documented
+contract sync                                                            PASS  documented
+contract media                                                           PASS  documented
+contract sharing                                                         PASS  documented
+contract settings                                                        PASS  documented
+contract functions                                                       PASS  documented
+contract actions                                                         PASS  documented
+contract search                                                          PASS  documented
+contract intelligence                                                    PASS  documented
+contract Product UI                                                      PASS  documented
+contract Host capability                                                 PASS  documented
+contract Distribution                                                    PASS  documented
+contract Install/update                                                  PASS  documented
+contract Artifact authorization                                          PASS  documented
+contract Compatibility                                                   PASS  documented
+contract revocation                                                      PASS  documented
+contract Rollback                                                        PASS  documented
+policy No public behavior may silently change                            PASS  frozen
+policy Additive optional fields                                          PASS  frozen
+policy Deprecations require                                              PASS  frozen
+error PERMISSION_REVIEW_REQUIRED                                         PASS  typed and mapped
+error MODULE_PERMISSION_DENIED                                           PASS  typed and mapped
+error INSTALLATION_DISABLED                                              PASS  typed and mapped
+error UNTRUSTED_RELEASE                                                  PASS  typed and mapped
+error REVISION_CONFLICT                                                  PASS  typed and mapped
+error MUTATION_REUSE_CONFLICT                                            PASS  typed and mapped
+error INVALID_CURSOR                                                     PASS  typed and mapped
+error FUNCTION_NOT_AVAILABLE                                             PASS  typed and mapped
+error CAPABILITY_UNAVAILABLE                                             PASS  typed and mapped
+error HOST_VERSION_TOO_OLD                                               PASS  typed and mapped
+error RELEASE_REVOKED                                                    PASS  typed and mapped
+error SIGNER_REVOKED                                                     PASS  typed and mapped
+error ARTIFACT_DIGEST_MISMATCH                                           PASS  typed and mapped
+error RATE_LIMITED                                                       PASS  typed and mapped
+bounded error alias                                                      PASS  canonicalized
+
+GREENFIELD V1 CONTRACT FREEZE
+PASS
+$ node scripts/verify-greenfield-v1-permissions.mjs
+declared permission settings:read                                                        PASS  known
+declared permission settings:write                                                       PASS  known
+declared permission events:subscribe                                                     PASS  known
+declared permission search:index                                                         PASS  known
+declared permission ai.request                                                           PASS  known
+declared permission ai.context.private                                                   PASS  known
+dynamic permission RECORD_PERMISSION_PATTERN                                             PASS  validated
+dynamic permission MEDIA_PERMISSION_PATTERN                                              PASS  validated
+dynamic permission SHARING_PERMISSION_PATTERN                                            PASS  validated
+dynamic permission FUNCTION_INVOKE_PATTERN                                               PASS  validated
+dynamic permission INTER_MODULE_ACTION_REQUEST_PATTERN                                   PASS  validated
+dynamic permission NETWORK_REQUEST_PATTERN                                               PASS  validated
+dynamic permission PRODUCT_CAPABILITY_PATTERN                                            PASS  validated
+runtime enforcement collectionPermission                                                 PASS  present
+runtime enforcement mediaPermission                                                      PASS  present
+runtime enforcement sharingPermission                                                    PASS  present
+runtime permission review fail closed                                                    PASS  present
+function invoke enforcement                                                              PASS  present
+action request enforcement                                                               PASS  present
+templates/modula-module/modula.module.json records:module.com.example.modula-module.item:read PASS  manifest request supported
+permission-bearing manifests inventoried                                                 PASS  1 manifests / 1 requests
+
+GREENFIELD V1 PERMISSION INVENTORY
+PASS
+$ vitest run
+
+ RUN  v3.2.7 /root/modula-worktrees/greenfield-v1-closeout-final/packages/greenfield-module-sdk
+
+ ✓ tests/intelligence-broker.test.ts (8 tests) 7ms
+ ✓ tests/sdk.test.ts (3 tests) 4ms
+
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+   Start at  21:28:13
+   Duration  445ms (transform 155ms, setup 0ms, collect 222ms, tests 11ms, environment 0ms, prepare 120ms)
+
+$ vitest run
+
+ RUN  v3.2.7 /root/modula-worktrees/greenfield-v1-closeout-final/packages/greenfield-module-ui-contracts
+
+ ✓ tests/ui-contracts.test.ts (5 tests) 5ms
+ ✓ tests/product-ui.test.ts (8 tests) 6ms
+
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+   Start at  21:28:14
+   Duration  333ms (transform 111ms, setup 0ms, collect 184ms, tests 11ms, environment 0ms, prepare 111ms)
+
+$ vitest run
+
+ RUN  v3.2.7 /root/modula-worktrees/greenfield-v1-closeout-final/packages/intelligence-governance
+
+ ✓ tests/governance.test.ts (14 tests) 7ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  21:28:15
+   Duration  289ms (transform 56ms, setup 0ms, collect 71ms, tests 7ms, environment 0ms, prepare 61ms)
+
+$ tsc -p tsconfig.json --noEmit
+$ tsc -p tsconfig.json --noEmit
+$ pnpm --filter @modula/avatar-contracts build && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && pnpm --filter @modula/intelligence-core build && pnpm --filter @modula/intelligence-contracts build && pnpm --filter @modula/intelligence-governance build && tsc --noEmit && pnpm --filter @modula/avatar-contracts --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/intelligence-core --filter @modula/intelligence-contracts --filter @modula/intelligence-governance --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+Scope: 16 of 24 workspace projects
+packages/avatar-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/intelligence-core typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck: Done
+packages/intelligence-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/avatar-contracts typecheck: Done
+packages/greenfield-connector-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck: Done
+packages/greenfield-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/intelligence-core typecheck: Done
+packages/dimon-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/intelligence-contracts typecheck: Done
+packages/greenfield-mcp typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck: Done
+packages/modula-cli typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-contracts typecheck: Done
+packages/dimon-contracts typecheck: Done
+packages/greenfield-mcp typecheck: Done
+packages/modula-cli typecheck: Done
+packages/greenfield-module-manifest typecheck$ tsc -p tsconfig.json --noEmit
+packages/intelligence-governance typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-runtime typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-protocol typecheck$ tsc -p tsconfig.json --noEmit
+packages/intelligence-governance typecheck: Done
+packages/greenfield-protocol typecheck: Done
+packages/greenfield-runtime typecheck: Done
+packages/greenfield-module-manifest typecheck: Done
+.../greenfield-module-registry-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-sdk typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck: Done
+packages/greenfield-module-sdk typecheck: Done
+$ expo lint -- --max-warnings=0
+$ pnpm build:web-contracts
+$ pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ EXPO_PUBLIC_APP_ENV=production EXPO_PUBLIC_DATA_SOURCE=remote EXPO_PUBLIC_API_URL=https://api.modula.digital sh -c 'expo export --platform web && node scripts/write-web-version.mjs'
+Using src/app as the root directory for Expo Router.
+Starting Metro Bundler
+
+Static rendering is enabled. Learn more: https://docs.expo.dev/router/web/static-rendering/
+| (node:2588633) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:2588633) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:2588633) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+λ Bundled 2081ms node_modules/.pnpm/@expo+router-server@57.0.7_@expo+metro-runtime@57.0.13_expo-constants@57.0.14_expo-font_2211de86c3be7121913bcaa6f1d6d4fd/node_modules/@expo/router-server/node/render.js (2979 modules)
+Web Bundled 2564ms node_modules/.pnpm/expo-router@57.0.16_0eb42dc839de98da1a63a8684da76b73/node_modules/expo-router/entry.js (3106 modules)
+
+› web bundles (3):
+_expo/static/css/web-d32ccf2904ce0067491f063663d5d8d5.css (107KB)
+_expo/static/js/web/entry-8d42059c7cd0b437d6abf908a6f5eea7.js (5.4MB)
+_expo/static/js/web/LocalAuthentication-35c1244cdf1582cca6c71ddcade025b3.js (3.1KB)
+
+› Static routes (186):
+/saved (62KB)
+/share (61KB)
+/teams (106KB)
+/terms (70KB)
+/ (index) (75KB)
+/drafts (65KB)
+/report (66KB)
+/create (67KB)
+/compose (61KB)
+/modules (68KB)
+/privacy (72KB)
+/recover (67KB)
+/sign-in (66KB)
+/welcome (73KB)
+/_sitemap (57KB)
+/register (64KB)
+/reactions (69KB)
+/whats-new (65KB)
+/hub (75KB)
+/+not-found (61KB)
+/onboarding (68KB)
+/help (69KB)
+/profile/os (92KB)
+/board (105KB)
+/lists (68KB)
+/product/aki (64KB)
+/product/nft (106KB)
+/reels (66KB)
+/verify-email (71KB)
+/(tabs) (75KB)
+/product/gaia (98KB)
+/profile/edit (65KB)
+/share-profile (61KB)
+/(tabs)/create (67KB)
+/profile (69KB)
+/creator (70KB)
+/discover/live (79KB)
+/oauth/atproto (67KB)
+/post/[postId] (70KB)
+/product/atlas (1.6MB)
+/product/focus (90KB)
+/product/forge (111KB)
+/product (71KB)
+/product/start (113KB)
+/settings/data (79KB)
+/settings/help (77KB)
+/create-account (64KB)
+/(auth)/recover (67KB)
+/reset-password (70KB)
+/(auth)/sign-in (66KB)
+/(auth)/welcome (73KB)
+/activity (72KB)
+/discover (78KB)
+/discover/feeds (64KB)
+/discover/media (68KB)
+/help/shortcuts (73KB)
+/lists/[listId] (68KB)
+/messages (64KB)
+/product/[slug] (68KB)
+/product/agents (87KB)
+/product/kaizen (86KB)
+/product/ledger (84KB)
+/product/search (73KB)
+/product/themes (88KB)
+/settings/about (75KB)
+/settings/dimon (101KB)
+/settings (105KB)
+/stories/create (72KB)
+/forgot-password (67KB)
+/(auth)/register (64KB)
+/product/creator (82KB)
+/product/foundry (64KB)
+/product/sandbox (79KB)
+/product/widgets (126KB)
+/profile/preview (65KB)
+/reels/algorithm (79KB)
+/settings/motion (71KB)
+/(tabs)/hub (75KB)
+/account/switcher (70KB)
+/creator/insights (71KB)
+/discover/inspire (64KB)
+/help/[articleId] (68KB)
+/product/commands (99KB)
+/product/governor (64KB)
+/product/presence (88KB)
+/profile/[handle] (65KB)
+/settings/account (69KB)
+/settings/blocked (70KB)
+/settings/content (78KB)
+/settings/privacy (84KB)
+/(auth)/onboarding (68KB)
+/collections (69KB)
+/communities (89KB)
+/marketplace (71KB)
+/module/[moduleId] (64KB)
+/product/customize (115KB)
+/product/developer (82KB)
+/product/ownership (86KB)
+/product/saved-hub (76KB)
+/profile/customize (65KB)
+/settings/app-lock (92KB)
+/settings/language (78KB)
+/settings/security (96KB)
+/stories/[groupId] (66KB)
+/discover/interests (64KB)
+/product/day-agenda (72KB)
+/product/design-lab (90KB)
+/product/gaia-atlas (78KB)
+/product/quiet-send (64KB)
+/(auth)/verify-email (71KB)
+/messages/[threadId] (69KB)
+/product/automations (112KB)
+/product/chat-assist (96KB)
+/product/communities (89KB)
+/product/layout-home (95KB)
+/product/layout-tabs (98KB)
+/product/merge-feeds (82KB)
+/product/permissions (95KB)
+/product/quiet-inbox (73KB)
+/settings/appearance (104KB)
+/settings/mute-words (70KB)
+/(tabs)/profile (69KB)
+/creator/monetization (69KB)
+/product/claims-graph (64KB)
+/product/inner-circle (70KB)
+/product/integrations (98KB)
+/product/motion-prefs (72KB)
+/settings/marketplace (79KB)
+/(auth)/create-account (64KB)
+/(auth)/reset-password (70KB)
+/(tabs)/activity (72KB)
+/(tabs)/discover (78KB)
+/communities/[topicId] (68KB)
+/product/glass-privacy (76KB)
+/settings/inner-circle (70KB)
+/settings/account/mail (70KB)
+/(auth)/forgot-password (67KB)
+/marketplace/[moduleId] (66KB)
+/product/chrome-density (72KB)
+/product/circuit-memory (84KB)
+/product/layout-profile (99KB)
+/settings/notifications (88KB)
+/settings/account/email (69KB)
+/settings/modules (74KB)
+/post/[postId]/analytics (64KB)
+/product/feature-control (90KB)
+/product/layout-activity (90KB)
+/product/layout-discover (109KB)
+/product/reactions-prefs (73KB)
+/product/scheduled-posts (71KB)
+/product/status-composer (73KB)
+/settings/appearance-lab (157KB)
+/settings/account/export (74KB)
+/settings/account/handle (72KB)
+/product/commands-palette (76KB)
+/product/module-standards (92KB)
+/settings/app-lock-unlock (65KB)
+/settings/developer (69KB)
+/product/automations-inbox (72KB)
+/settings/account/password (75KB)
+/settings/account/sessions (73KB)
+/settings/extensions (99KB)
+/collections/[collectionId] (68KB)
+/product/share-destinations (76KB)
+/product/surface-playground (73KB)
+/product/intelligence (91KB)
+/profile/[handle]/followers (69KB)
+/profile/[handle]/following (69KB)
+/settings/connections (79KB)
+/settings/developer/session (71KB)
+/module/[moduleId]/[...path] (64KB)
+/product/intelligence/[slug] (65KB)
+/settings/modules/[moduleId] (70KB)
+/settings/accessibility (97KB)
+/settings/connections/atproto (69KB)
+/marketplace/seller/[sellerId] (64KB)
+/settings/developer/data-runtime (69KB)
+/settings/display-and-text (82KB)
+/settings/developer/modula-ui-lab (69KB)
+/settings/developer/expo-ui (69KB)
+/settings/extensions/[extensionId] (69KB)
+/settings/developer/expo-ui/[section] (69KB)
+/settings/developer/local-intelligence (66KB)
+/settings/developer/expo-ui/playground (69KB)
+/settings/display-and-text/larger-text (74KB)
+/settings/developer/pvp-native-experiments (69KB)
+
+Exported: dist
+Something prevented Expo from exiting, forcefully exiting now.
+web_version_marker_ok 44b3a36f57daf46fca7443315dd71903ccd0db6c files=219
+$ node scripts/verify-mp02b-vault-special-cases.mjs
+MP02B Vault special-case gate: PASS (15 bounded files, 26 canonical-ID occurrences, 0 generic runtime branches)
+$ node scripts/verify-module-distribution-nginx.mjs
+MODULE-DISTRIBUTION-03 nginx immutable cache contract: PASS
+$ node tools/api-atlas/verify.mjs
+PASS required artifact README.md
+PASS required artifact 00-executive-summary.md
+PASS required artifact 00-production-truth.md
+PASS required artifact 01-application-boot-map.md
+PASS required artifact 02-http-api-atlas.md
+PASS required artifact 03-auth-permissions-matrix.md
+PASS required artifact 04-database-api-map.md
+PASS required artifact 05-media-storage-map.md
+PASS required artifact 06-module-platform-map.md
+PASS required artifact 07-intelligence-api-map.md
+PASS required artifact 08-events-workers-jobs.md
+PASS required artifact 09-client-capability-coverage.md
+PASS required artifact 10-live-probe-results.md
+PASS required artifact 11-gap-register.md
+PASS required artifact 12-remediation-roadmap.md
+PASS required artifact api-atlas.json
+PASS required artifact api-atlas.csv
+PASS required artifact 13-verification-results.md
+PASS required artifact route-data-map.json
+PASS required artifact contract-baseline.json
+PASS required artifact worker-job-map.json
+PASS required artifact gap-register.json
+PASS required artifact openapi.generated.yaml
+PASS required artifact request-flow.mmd
+PASS required artifact module-flow.mmd
+PASS required artifact intelligence-flow.mmd
+PASS required artifact media-flow.mmd
+PASS required artifact event-flow.mmd
+PASS required artifact client-contract-analysis.json
+PASS required artifact evidence/production-snapshot.json
+PASS required artifact evidence/candidate-runtime.json
+PASS required artifact evidence/live-probes.json
+PASS required artifact evidence/source-sweep.json
+PASS required artifact evidence/authenticated-acceptance.json
+PASS required artifact evidence/api-baseline-02-closeout.json
+PASS deterministic output
+PASS generator does not drop prior artifacts
+PASS api-atlas.json parses
+PASS gap-register.json parses
+PASS route-data-map.json parses
+PASS production snapshot parses
+PASS candidate runtime parses
+PASS live probes parse
+PASS client contract analysis parses
+PASS OpenAPI YAML parses as JSON-compatible YAML
+PASS authenticated acceptance parses
+PASS baseline closeout parses
+PASS contract baseline parses
+PASS worker job map parses
+PASS runtime route equation
+PASS every application route mapped
+PASS no source-only route
+PASS no duplicate source route
+PASS route count matches selected runtime evidence
+PASS production runtime remains separately identified
+PASS unique route IDs
+PASS effective prefixes resolved
+PASS every route has source evidence
+PASS every route has auth classification
+PASS every route has ownership disposition
+PASS every route is represented in route-data map
+PASS OpenAPI operation count
+PASS candidate evidence kind
+PASS candidate evidence schema
+PASS candidate evidence does not claim production
+PASS gap IDs unique
+PASS gap schema complete
+PASS gap severities valid
+PASS gap remediation states valid
+PASS safe probe suite passed
+PASS literal client calls reconciled
+PASS contract baseline covers every route
+PASS worker jobs mapped
+PASS authenticated acceptance excludes secrets
+PASS authenticated acceptance complete for PASS
+PASS authenticated cleanup complete for PASS
+PASS controlled acceptance complete for PASS
+PASS atlas JSON status PASS
+PASS gap register status PASS
+PASS CSV parses with stable columns
+PASS CSV route count
+PASS Mermaid sanity request-flow.mmd
+PASS Mermaid sanity module-flow.mmd
+PASS Mermaid sanity intelligence-flow.mmd
+PASS Mermaid sanity media-flow.mmd
+PASS Mermaid sanity event-flow.mmd
+PASS secret scan database URL
+PASS secret scan bearer token
+PASS secret scan JWT
+PASS secret scan private key
+PASS secret scan cookie value
+PASS secret scan secret assignment
+API atlas verification: 92/92 checks passed.
+$ node tools/api-atlas/secrets.mjs
+PASS required artifact README.md
+PASS required artifact 00-executive-summary.md
+PASS required artifact 00-production-truth.md
+PASS required artifact 01-application-boot-map.md
+PASS required artifact 02-http-api-atlas.md
+PASS required artifact 03-auth-permissions-matrix.md
+PASS required artifact 04-database-api-map.md
+PASS required artifact 05-media-storage-map.md
+PASS required artifact 06-module-platform-map.md
+PASS required artifact 07-intelligence-api-map.md
+PASS required artifact 08-events-workers-jobs.md
+PASS required artifact 09-client-capability-coverage.md
+PASS required artifact 10-live-probe-results.md
+PASS required artifact 11-gap-register.md
+PASS required artifact 12-remediation-roadmap.md
+PASS required artifact api-atlas.json
+PASS required artifact api-atlas.csv
+PASS required artifact 13-verification-results.md
+PASS required artifact route-data-map.json
+PASS required artifact contract-baseline.json
+PASS required artifact worker-job-map.json
+PASS required artifact gap-register.json
+PASS required artifact openapi.generated.yaml
+PASS required artifact request-flow.mmd
+PASS required artifact module-flow.mmd
+PASS required artifact intelligence-flow.mmd
+PASS required artifact media-flow.mmd
+PASS required artifact event-flow.mmd
+PASS required artifact client-contract-analysis.json
+PASS required artifact evidence/production-snapshot.json
+PASS required artifact evidence/candidate-runtime.json
+PASS required artifact evidence/live-probes.json
+PASS required artifact evidence/source-sweep.json
+PASS required artifact evidence/authenticated-acceptance.json
+PASS required artifact evidence/api-baseline-02-closeout.json
+PASS deterministic output
+PASS generator does not drop prior artifacts
+PASS api-atlas.json parses
+PASS gap-register.json parses
+PASS route-data-map.json parses
+PASS production snapshot parses
+PASS candidate runtime parses
+PASS live probes parse
+PASS client contract analysis parses
+PASS OpenAPI YAML parses as JSON-compatible YAML
+PASS authenticated acceptance parses
+PASS baseline closeout parses
+PASS contract baseline parses
+PASS worker job map parses
+PASS runtime route equation
+PASS every application route mapped
+PASS no source-only route
+PASS no duplicate source route
+PASS route count matches selected runtime evidence
+PASS production runtime remains separately identified
+PASS unique route IDs
+PASS effective prefixes resolved
+PASS every route has source evidence
+PASS every route has auth classification
+PASS every route has ownership disposition
+PASS every route is represented in route-data map
+PASS OpenAPI operation count
+PASS candidate evidence kind
+PASS candidate evidence schema
+PASS candidate evidence does not claim production
+PASS gap IDs unique
+PASS gap schema complete
+PASS gap severities valid
+PASS gap remediation states valid
+PASS safe probe suite passed
+PASS literal client calls reconciled
+PASS contract baseline covers every route
+PASS worker jobs mapped
+PASS authenticated acceptance excludes secrets
+PASS authenticated acceptance complete for PASS
+PASS authenticated cleanup complete for PASS
+PASS controlled acceptance complete for PASS
+PASS atlas JSON status PASS
+PASS gap register status PASS
+PASS CSV parses with stable columns
+PASS CSV route count
+PASS Mermaid sanity request-flow.mmd
+PASS Mermaid sanity module-flow.mmd
+PASS Mermaid sanity intelligence-flow.mmd
+PASS Mermaid sanity media-flow.mmd
+PASS Mermaid sanity event-flow.mmd
+PASS secret scan database URL
+PASS secret scan bearer token
+PASS secret scan JWT
+PASS secret scan private key
+PASS secret scan cookie value
+PASS secret scan secret assignment
+API atlas verification: 92/92 checks passed.

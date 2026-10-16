@@ -3,6 +3,7 @@ import {StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
+import type {ModuleDetail} from '@/data/repositories/contracts'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
 import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery, useModuleRelationshipsQuery, useModuleRuntimeQuery} from '@/features/modules/hooks'
 import {safeModuleId} from '@/features/modules/validation/module-route'
@@ -179,7 +180,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 <ModuleStatusPill state={module.priceState} />
               </View>
               <AppText variant="caption" colour="textSecondary">
-                {module.publisherName} · Version {module.latestVersion ?? 'unknown'} · {module.installationState === 'enabled' ? 'Enabled' : module.installationState}
+                {module.publisherName} · Installed {module.installedVersion ?? 'unknown'}{module.installedReleaseChannel ? ` (${module.installedReleaseChannel})` : ''} · {module.installationState === 'enabled' ? 'Enabled' : module.installationState}
               </AppText>
               <AppText variant="caption" colour="textSecondary">
                 Health is isolated to this module host. Failed contributions render as unavailable cards instead of breaking Modula.
@@ -307,10 +308,10 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
           <SettingsSection title="Version">
             <SettingsLinkRow
               row={{
-                title: module.latestVersion ? `Version ${module.latestVersion}` : 'Version unavailable',
-                description: module.compatibility,
+                title: module.installedVersion ? `Installed ${module.installedVersion}` : 'Installed version unavailable',
+                description: versionDescription(module),
                 icon: 'info',
-                value: module.installationState === 'updateAvailable' ? 'Update' : 'Current',
+                value: module.installedReleaseChannel ? formatLabel(module.installedReleaseChannel) : module.installationState === 'updateAvailable' ? 'Update' : 'Current',
                 onPress: () => void transition('update'),
               }}
               last
@@ -465,6 +466,16 @@ function formatDiagnosticCounts(value: unknown, suffix: string) {
 
 function formatLabel(value: string) {
   return value.replace(/-/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase())
+}
+
+function versionDescription(module: ModuleDetail) {
+  const parts = [
+    module.latestStableVersion ? `Latest stable ${module.latestStableVersion}` : null,
+    module.newestPublishedVersion
+      ? `Newest published ${module.newestPublishedVersion}${module.newestPublishedChannel ? ` (${module.newestPublishedChannel})` : ''}`
+      : null,
+  ].filter((value): value is string => Boolean(value))
+  return parts.length ? parts.join(' · ') : module.compatibility
 }
 
 function groupSummary(rows: Record<string, unknown>[], key: string) {

@@ -30,22 +30,22 @@ jobs:
       run:
         working-directory: modula-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: modula-latest
           # Production evidence may be pinned to an accepted ancestor with
           # unchanged API source; shallow history cannot prove that ancestry.
           fetch-depth: 0
       - name: Check out pinned Module Standard dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: modula-mod/modula-module-standard
           ref: eebf12c7df0583a5051fc584170f7f3a9f6d946c
           path: modula-mod/modula-module-standard
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: 11.11.0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -62,25 +62,25 @@ jobs:
       run:
         working-directory: modula-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: modula-latest
       - name: Check out pinned Module Standard dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: modula-mod/modula-module-standard
           ref: eebf12c7df0583a5051fc584170f7f3a9f6d946c
           path: modula-mod/modula-module-standard
       - name: Check out canonical Vault Notes test fixture
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: modula-mod/modula-vault-notes
           ref: c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce
           path: modula-mod/modula-vault-notes
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: 11.11.0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -89,6 +89,12 @@ jobs:
         working-directory: modula-mod/modula-module-standard
         run: pnpm install --frozen-lockfile && pnpm build
       - run: pnpm install --frozen-lockfile
+      - name: GreenField v1 frozen contract snapshots
+        run: CI=true pnpm verify:greenfield-v1-contract-freeze
+      - name: GreenField v1 permission declaration and enforcement inventory
+        run: CI=true pnpm verify:greenfield-v1-permissions
+      - name: GreenField v1 deployment and backup safety contract
+        run: CI=true pnpm verify:greenfield-v1-deploy-safety
       - name: API tests
         run: CI=true pnpm api:test
       - name: Worker tests
@@ -145,19 +151,19 @@ jobs:
       run:
         working-directory: modula-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: modula-latest
       - name: Check out pinned Module Standard dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: modula-mod/modula-module-standard
           ref: eebf12c7df0583a5051fc584170f7f3a9f6d946c
           path: modula-mod/modula-module-standard
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: 11.11.0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.18.0
           cache: pnpm

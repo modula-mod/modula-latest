@@ -1,13 +1,13 @@
 # GREENFIELD API ATLAS
 
-Production SHA: `50dfc12045be639ad65acb95d2b4e94ea864ed42`
-Production migration: `067_legacy_duplicate_installation_versions`
+Production SHA: `f05d03c237c62d1b0946a760610d1155f02a8520`
+Production migration: `073_backup_sequence_acl_defaults`
 API service: `modula-production-greenfield-api-1` (healthy)
 Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no Docker healthcheck)
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 446 application / 630 runtime method routes
-Route evidence: local-candidate-runtime for feature branch phase-module-distribution-03-nginx-regex-fix; not deployed
+Route evidence: production-runtime at production revision f05d03c237c62d1b0946a760610d1155f02a8520
 Public routes: 76
 Authenticated routes: 276
 Admin/internal routes: 94
@@ -55,10 +55,10 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 | Moderation | 2 | 0 | 0 | 0 | 0 |
 | Operations | 6 | 0 | 0 | 0 | 0 |
 
-## Candidate and production conclusions
+## Production conclusions
 
-- The running API and worker are the same OCI revision, `50dfc12045be639ad65acb95d2b4e94ea864ed42`; that revision exactly matches captured `origin/main`.
-- Candidate source/runtime reconciliation is exact: 630 = 446 application routes + 184 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 575 runtime method routes on 50dfc12045be639ad65acb95d2b4e94ea864ed42.
+- The running API and worker are the same OCI revision, `f05d03c237c62d1b0946a760610d1155f02a8520`; that revision exactly matches captured `origin/main`.
+- Source/runtime reconciliation is exact: 630 = 446 application routes + 184 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
 - API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 

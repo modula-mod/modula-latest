@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "functionId": "summarize",
+  "version": "1.0.0",
+  "mutationId": "native-fixture-function-1",
+  "idempotent": false,
+  "status": "completed",
+  "executionMode": "server",
+  "output": {"summary": "A bounded synthetic result."}
+}

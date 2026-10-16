@@ -1,6 +1,6 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `067_legacy_duplicate_installation_versions`; 67 applied migrations. Git contains 73 ordered up migrations, latest `073_backup_sequence_acl_defaults.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 74 ordered up migrations, latest `074_greenfield_v1_query_indexes.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
@@ -884,13 +884,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_backup_sequence_acl_reconciliation`
 
 - Purpose: application state for greenfield backup sequence acl reconciliation
-- Primary key: none observed
+- Primary key: `record_identity`
 - Foreign keys: none
 - Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
+- Indexes: `greenfield_backup_sequence_acl_reconciliation_pkey`
 - Unique constraints: none observed
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `reconciled_at`
 - Migration introduced: `073_backup_sequence_acl_defaults.sql`
 - Routes reading: none observed
 - Routes writing: none observed
@@ -2261,13 +2261,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_function_implementations`
 
 - Purpose: application state for greenfield function implementations
-- Primary key: none observed
-- Foreign keys: none
+- Primary key: `implementation_id`
+- Foreign keys: `release_id -> greenfield_module_releases.release_id`
 - Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Indexes: `greenfield_function_implement_release_id_function_id_functi_key`, `greenfield_function_implementations_pkey`
+- Unique constraints: `greenfield_function_implement_release_id_function_id_functi_key(release_id,function_id,function_version,execution_mode)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `updated_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`
 - Routes writing: none observed
@@ -2278,13 +2278,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_function_invocations`
 
 - Purpose: application state for greenfield function invocations
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `invocation_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`, `module_id`
+- Indexes: `greenfield_function_invocatio_account_id_installation_id_fu_key`, `greenfield_function_invocations_ledger_idx`, `greenfield_function_invocations_pkey`
+- Unique constraints: `greenfield_function_invocatio_account_id_installation_id_fu_key(account_id,installation_id,function_id,function_version,request_identity)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `completed_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `POST /v1/modules/:moduleId/host-function-requests/:requestId/complete`
 - Routes writing: `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`, `GET /v1/modules/:moduleId/host-function-executors/:executorId/requests`, `GET /v1/modules/:moduleId/host-function-requests/:requestId`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/cancel`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/complete`
@@ -2312,13 +2312,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_function_mutations`
 
 - Purpose: application state for greenfield function mutations
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `mutation_row_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`
+- Indexes: `greenfield_function_mutations_account_id_installation_id_fu_key`, `greenfield_function_mutations_pkey`
+- Unique constraints: `greenfield_function_mutations_account_id_installation_id_fu_key(account_id,installation_id,function_id,function_version,mutation_id)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `completed_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`
 - Routes writing: `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/complete`
@@ -2380,13 +2380,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_host_function_executors`
 
 - Purpose: application state for greenfield host function executors
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
+- Primary key: `executor_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`, `installation_id -> greenfield_extension_installations.installation_id`, `release_id -> greenfield_module_releases.release_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`
+- Indexes: `greenfield_host_function_executors_available_idx`, `greenfield_host_function_executors_pkey`
 - Unique constraints: none observed
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `expires_at`, `created_at`, `updated_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`, `GET /v1/modules/:moduleId/host-function-executors/:executorId/requests`
 - Routes writing: `POST /v1/modules/:moduleId/host-function-executors`
@@ -2397,13 +2397,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_host_function_requests`
 
 - Purpose: application state for greenfield host function requests
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
+- Primary key: `request_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`, `executor_id -> greenfield_host_function_executors.executor_id`, `invocation_id -> greenfield_function_invocations.invocation_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`, `module_id`
+- Indexes: `greenfield_host_function_requests_dispatch_idx`, `greenfield_host_function_requests_pkey`
 - Unique constraints: none observed
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `deadline_at`, `created_at`, `updated_at`, `completed_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `GET /v1/modules/:moduleId/host-function-executors/:executorId/requests`, `GET /v1/modules/:moduleId/host-function-requests/:requestId`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/cancel`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/complete`
 - Routes writing: `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`, `GET /v1/modules/:moduleId/host-function-executors/:executorId/requests`, `GET /v1/modules/:moduleId/host-function-requests/:requestId`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/cancel`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/complete`
@@ -2414,13 +2414,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_inter_module_action_requests`
 
 - Purpose: application state for greenfield inter module action requests
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `request_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`
+- Ownership/workspace/user/module columns: `account_id`, `source_installation_id`, `source_module_id`, `target_installation_id`, `target_module_id`
+- Indexes: `greenfield_inter_module_actio_account_id_source_installatio_key`, `greenfield_inter_module_action_requests_ledger_idx`, `greenfield_inter_module_action_requests_pkey`
+- Unique constraints: `greenfield_inter_module_actio_account_id_source_installatio_key(account_id,source_installation_id,target_installation_id,action_id,action_version,mutation_id)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `completed_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `POST /v1/module-runtime/actions/:targetModuleId/:actionId/:version`
 - Routes writing: `POST /v1/module-runtime/actions/:targetModuleId/:actionId/:version`
@@ -2907,13 +2907,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_record_changes`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
+- Primary key: `change_sequence`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`, `owner_account_id -> greenfield_accounts.account_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`, `module_id`, `owner_account_id`
+- Indexes: `greenfield_module_record_changes_owner_idx`, `greenfield_module_record_changes_pkey`, `greenfield_module_record_changes_sync_idx`
 - Unique constraints: none observed
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`
 - Migration introduced: `068_module_platform_records.sql`
 - Routes reading: `GET /v1/modules/:moduleId/records/sync`
 - Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `GET /v1/modules/:moduleId/records/sync`
@@ -2958,13 +2958,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_record_media_bindings`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `binding_id`
+- Foreign keys: `record_owner_account_id -> greenfield_accounts.account_id`, `asset_owner_account_id -> greenfield_accounts.account_id`, `source_installation_id -> greenfield_extension_installations.installation_id`, `asset_id -> attachments.attachment_id`
+- Ownership/workspace/user/module columns: `record_owner_account_id`, `module_id`, `asset_owner_account_id`, `source_installation_id`
+- Indexes: `greenfield_module_record_media_asset_idx`, `greenfield_module_record_media_asset_unique`, `greenfield_module_record_media_bindings_pkey`, `greenfield_module_record_media_order_unique`, `greenfield_module_record_media_record_idx`
+- Unique constraints: `greenfield_module_record_media_asset_unique(record_owner_account_id,module_id,record_type,record_id,asset_id)`, `greenfield_module_record_media_order_unique(record_owner_account_id,module_id,record_type,record_id,order_index)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `updated_at`
 - Migration introduced: `069_module_platform_media_sharing.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/modules/:moduleId/records/:collection/:recordId/media`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`
 - Routes writing: `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`
@@ -2975,13 +2975,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_record_mutations`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `mutation_row_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`, `installation_id -> greenfield_extension_installations.installation_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`, `module_id`
+- Indexes: `greenfield_module_record_muta_account_id_installation_id_mu_key`, `greenfield_module_record_mutations_pkey`, `greenfield_module_record_mutations_record_idx`
+- Unique constraints: `greenfield_module_record_muta_account_id_installation_id_mu_key(account_id,installation_id,mutation_id)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `completed_at`
 - Migration introduced: `068_module_platform_records.sql`
 - Routes reading: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
 - Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
@@ -2992,13 +2992,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_record_references`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `reference_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`, `source_installation_id -> greenfield_extension_installations.installation_id`
+- Ownership/workspace/user/module columns: `account_id`, `source_installation_id`, `source_module_id`, `target_module_id`
+- Indexes: `greenfield_module_record_refe_account_id_source_module_id_s_key`, `greenfield_module_record_references_pkey`, `greenfield_module_record_references_source_idx`, `greenfield_module_record_references_target_idx`
+- Unique constraints: `greenfield_module_record_refe_account_id_source_module_id_s_key(account_id,source_module_id,source_record_type,source_record_id,field_path,ordinal)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`
 - Migration introduced: `068_module_platform_records.sql`
 - Routes reading: `GET /v1/modules/:moduleId/records/:collection/:recordId/references`, `GET /v1/modules/:moduleId/records/:collection/:recordId/reverse-references`
 - Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
@@ -3009,13 +3009,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_record_revisions`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `revision_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`, `module_id`, `actor_id`
+- Indexes: `greenfield_module_record_revi_account_id_module_id_record_t_key`, `greenfield_module_record_revisions_pkey`, `greenfield_module_record_revisions_record_idx`
+- Unique constraints: `greenfield_module_record_revi_account_id_module_id_record_t_key(account_id,module_id,record_type,record_id,revision)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`
 - Migration introduced: `068_module_platform_records.sql`
 - Routes reading: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `GET /v1/modules/:moduleId/record-shares/:shareId/revisions`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `GET /v1/modules/:moduleId/records/:collection/:recordId/revisions`, `GET /v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision`
 - Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
@@ -3026,13 +3026,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_record_shares`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `share_id`
+- Foreign keys: `owner_account_id -> greenfield_accounts.account_id`, `recipient_account_id -> greenfield_accounts.account_id`, `source_installation_id -> greenfield_extension_installations.installation_id`
+- Ownership/workspace/user/module columns: `owner_account_id`, `recipient_account_id`, `source_installation_id`, `module_id`
+- Indexes: `greenfield_module_record_shar_owner_account_id_source_insta_key`, `greenfield_module_record_shares_active_recipient_idx`, `greenfield_module_record_shares_owner_idx`, `greenfield_module_record_shares_pkey`, `greenfield_module_record_shares_recipient_idx`
+- Unique constraints: `greenfield_module_record_shar_owner_account_id_source_insta_key(owner_account_id,source_installation_id,mutation_id)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `updated_at`, `expires_at`, `revoked_at`, `visibility_lost_at`
 - Migration introduced: `069_module_platform_media_sharing.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `GET /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId/record`, `GET /v1/modules/:moduleId/record-shares/:shareId/revisions`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `GET /v1/modules/:moduleId/records/shares/owned`, `GET /v1/modules/:moduleId/records/shares/received`, `GET /v1/modules/:moduleId/records/sync`
 - Routes writing: `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `GET /v1/modules/:moduleId/records/sync`
@@ -3162,13 +3162,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_module_runtime_credentials`
 
 - Purpose: module registry/runtime state
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `credential_id`
+- Foreign keys: `account_id -> greenfield_accounts.account_id`, `installation_id -> greenfield_extension_installations.installation_id`, `release_id -> greenfield_module_releases.release_id`
+- Ownership/workspace/user/module columns: `account_id`, `installation_id`, `module_id`
+- Indexes: `greenfield_module_runtime_credentials_credential_hash_key`, `greenfield_module_runtime_credentials_lookup_idx`, `greenfield_module_runtime_credentials_pkey`
+- Unique constraints: `greenfield_module_runtime_credentials_credential_hash_key(credential_hash)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `expires_at`, `revoked_at`, `created_at`
 - Migration introduced: `070_module_platform_functions_actions.sql`
 - Routes reading: `POST /v1/module-runtime/actions/:targetModuleId/:actionId/:version`
 - Routes writing: `POST /v1/modules/:moduleId/runtime-credentials`, `DELETE /v1/modules/:moduleId/runtime-credentials/:credentialId`
@@ -3859,13 +3859,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `greenfield_release_artifacts`
 
 - Purpose: module release artifact state
-- Primary key: none observed
-- Foreign keys: none
+- Primary key: `artifact_id`
+- Foreign keys: `release_id -> greenfield_module_releases.release_id`, `sha256 -> greenfield_release_asset_blobs.sha256`
 - Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Indexes: `greenfield_release_artifacts_digest_idx`, `greenfield_release_artifacts_pkey`, `greenfield_release_artifacts_release_id_kind_sha256_filenam_key`, `greenfield_release_artifacts_release_idx`
+- Unique constraints: `greenfield_release_artifacts_release_id_kind_sha256_filenam_key(release_id,kind,sha256,filename)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`
 - Migration introduced: `072_module_distribution_protocol.sql`
 - Routes reading: `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `GET /v1/modules/:moduleId/installation-descriptor`, `POST /v1/modules/:moduleId/rollback`, `POST /v1/modules/:moduleId/update-plan`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/updates`, `GET /v1/registry/artifacts/:sha256`, `GET /v1/registry/releases/:releaseId/artifact`, `GET /v1/registry/releases/:releaseId/descriptor`
 - Routes writing: `POST /v1/admin/registry/sync`

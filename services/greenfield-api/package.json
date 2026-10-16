@@ -29,7 +29,8 @@
     "registry:trust-cutover-gate": "tsx scripts/trust-cutover-gate.ts",
     "permissions:reconcile": "tsx scripts/reconcile-module-permissions.ts",
     "ops:api-fix-01d-crypto-acceptance": "tsx scripts/api-fix-01d-crypto-acceptance.ts",
-    "ops:replay-reaction-dead-letters": "tsx scripts/replay-reaction-dead-letters.ts"
+    "ops:replay-reaction-dead-letters": "tsx scripts/replay-reaction-dead-letters.ts",
+    "ops:closeout-terminal-jobs": "tsx scripts/closeout-terminal-jobs.ts"
   },
   "dependencies": {
     "@atproto/oauth-client-node": "^0.3.2",
@@ -55,7 +56,7 @@
     "@modula/protocol-contracts": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
     "@simplewebauthn/server": "^13.3.2",
-    "fastify": "^5.4.0",
+    "fastify": "^5.12.7",
     "jose": "^6.2.8",
     "kysely": "^0.28.2",
     "otplib": "^13.4.1",

@@ -31,7 +31,7 @@
     "uninstall": {"dataPolicy": "retain", "requiresConfirmation": true}
   },
   "permissions": [
-    {"id": "records:item:read", "reason": "Read account-owned item records.", "required": true, "risk": "low", "policyMode": "observe"}
+    {"id": "records:module.com.example.modula-module.item:read", "reason": "Read account-owned item records.", "required": true, "risk": "low", "policyMode": "observe"}
   ],
   "capabilities": [
     {"id": "records", "required": true, "reason": "Store module records."},
@@ -55,7 +55,7 @@
     }
   ],
   "views": [
-    {"id": "com.example.modula-module.view.collection", "type": "collection", "title": "Example Items", "recordId": "com.example.modula-module.record.item", "permissions": ["records:item:read"], "layout": {"kind": "list", "primaryField": "title"}}
+    {"id": "com.example.modula-module.view.collection", "type": "collection", "title": "Example Items", "recordId": "com.example.modula-module.record.item", "permissions": ["records:module.com.example.modula-module.item:read"], "layout": {"kind": "list", "primaryField": "title"}}
   ],
   "actions": [
     {"id": "com.example.modula-module.action.create-item", "title": "Create Item", "functionId": "com.example.modula-module.function.create-item", "permissions": [], "confirmationPolicy": {"required": false, "policyMode": "observe"}, "sideEffects": ["record.create"], "audit": {"event": "item.create-requested", "includeInput": false}}

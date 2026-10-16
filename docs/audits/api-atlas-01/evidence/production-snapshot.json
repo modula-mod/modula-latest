@@ -1,24 +1,24 @@
 {
-  "capturedAt": "2026-10-10T22:02:13.369Z",
+  "capturedAt": "2026-10-14T15:33:43.469Z",
   "hostname": "core.modula.digital",
   "os": "Ubuntu 24.04.4 LTS",
   "kernel": "Linux 6.8.0-137-generic",
   "architecture": "x86_64",
-  "uptime": "up 8 weeks, 6 days, 23 hours, 19 minutes",
+  "uptime": "up 9 weeks, 3 days, 16 hours, 51 minutes",
   "repository": {
     "canonicalPath": "/root/modula-latest",
     "origin": "https://github.com/modula-mod/modula-latest.git",
     "branch": "main",
-    "head": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
-    "status": "## main...origin/main",
-    "trackedChanges": "",
+    "head": "f05d03c237c62d1b0946a760610d1155f02a8520",
+    "status": "## main...origin/main\n M docs/audits/api-atlas-01/00-executive-summary.md\n M docs/audits/api-atlas-01/00-production-truth.md\n M docs/audits/api-atlas-01/01-application-boot-map.md\n M docs/audits/api-atlas-01/02-http-api-atlas.md\n M docs/audits/api-atlas-01/03-auth-permissions-matrix.md\n M docs/audits/api-atlas-01/04-database-api-map.md\n M docs/audits/api-atlas-01/11-gap-register.md\n M docs/audits/api-atlas-01/13-verification-results.md\n M docs/audits/api-atlas-01/README.md\n M docs/audits/api-atlas-01/api-atlas.csv\n M docs/audits/api-atlas-01/api-atlas.json\n M docs/audits/api-atlas-01/client-contract-analysis.json\n M docs/audits/api-atlas-01/contract-baseline.json\n M docs/audits/api-atlas-01/gap-register.json\n M docs/audits/api-atlas-01/openapi.generated.yaml\n M docs/audits/api-atlas-01/route-data-flow.mmd\n M docs/audits/api-atlas-01/route-data-map.json",
+    "trackedChanges": "M\tdocs/audits/api-atlas-01/00-executive-summary.md\nM\tdocs/audits/api-atlas-01/00-production-truth.md\nM\tdocs/audits/api-atlas-01/01-application-boot-map.md\nM\tdocs/audits/api-atlas-01/02-http-api-atlas.md\nM\tdocs/audits/api-atlas-01/03-auth-permissions-matrix.md\nM\tdocs/audits/api-atlas-01/04-database-api-map.md\nM\tdocs/audits/api-atlas-01/11-gap-register.md\nM\tdocs/audits/api-atlas-01/13-verification-results.md\nM\tdocs/audits/api-atlas-01/README.md\nM\tdocs/audits/api-atlas-01/api-atlas.csv\nM\tdocs/audits/api-atlas-01/api-atlas.json\nM\tdocs/audits/api-atlas-01/client-contract-analysis.json\nM\tdocs/audits/api-atlas-01/contract-baseline.json\nM\tdocs/audits/api-atlas-01/gap-register.json\nM\tdocs/audits/api-atlas-01/openapi.generated.yaml\nM\tdocs/audits/api-atlas-01/route-data-flow.mmd\nM\tdocs/audits/api-atlas-01/route-data-map.json",
     "untrackedFiles": "",
-    "originMain": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
-    "auditPath": "/root/modula-latest",
-    "auditBranch": "main",
-    "auditHeadAtCapture": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
+    "originMain": "f05d03c237c62d1b0946a760610d1155f02a8520",
+    "auditPath": "/root/modula-worktrees/greenfield-v1-closeout-final",
+    "auditBranch": "phase-greenfield-v1-closeout-final",
+    "auditHeadAtCapture": "f05d03c237c62d1b0946a760610d1155f02a8520",
     "tagsAtCanonicalHead": [],
-    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-242-g50dfc12"
+    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-295-gf05d03c-dirty"
   },
   "versions": {
     "hostNode": "v24.15.0",
@@ -30,16 +30,16 @@
   "containers": {
     "api": {
       "name": "modula-production-greenfield-api-1",
-      "imageId": "sha256:2ff3363eb9ad68dd569710013adddf38a2d241e7c5b56075bc6daaaaee9c04dc",
-      "image": "modula-greenfield-api:50dfc12045be639ad65acb95d2b4e94ea864ed42",
-      "created": "2026-10-10T17:14:20.317689282Z",
-      "startedAt": "2026-10-10T17:14:21.129131409Z",
+      "imageId": "sha256:3df5e56b10feb215d8cbe73d58328cf0f937e91b30e35e7f7bc6887e24a67983",
+      "image": "modula-greenfield-api:f05d03c237c62d1b0946a760610d1155f02a8520",
+      "created": "2026-10-14T14:59:12.109622031Z",
+      "startedAt": "2026-10-14T14:59:12.362954059Z",
       "status": "running",
       "health": "healthy",
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-api/dist/main.js",
       "workingDir": "/app",
-      "revision": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
+      "revision": "f05d03c237c62d1b0946a760610d1155f02a8520",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {
@@ -127,16 +127,16 @@
     },
     "worker": {
       "name": "modula-production-greenfield-worker-1",
-      "imageId": "sha256:ab59f0ae499b48e63aaebb17173f8f109cbedb095495852443351b6d340206f4",
-      "image": "modula-greenfield-worker:50dfc12045be639ad65acb95d2b4e94ea864ed42",
-      "created": "2026-10-10T17:14:20.986533173Z",
-      "startedAt": "2026-10-10T17:14:36.787318583Z",
+      "imageId": "sha256:13677d3d121095757af84d960c1e1a2e036b52aefa5c826a0ecb7ce929b8febf",
+      "image": "modula-greenfield-worker:f05d03c237c62d1b0946a760610d1155f02a8520",
+      "created": "2026-10-14T14:53:47.87504411Z",
+      "startedAt": "2026-10-14T14:53:48.046314609Z",
       "status": "running",
       "health": null,
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-worker/dist/main.js",
       "workingDir": "/app",
-      "revision": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
+      "revision": "f05d03c237c62d1b0946a760610d1155f02a8520",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {},
@@ -302,9 +302,9 @@
         "BACKEND_FABRIC_ENABLED": "false",
         "BACKEND_FABRIC_ENVIRONMENT": "production",
         "BACKEND_FABRIC_CONTRACT_VERSION": "1.0",
-        "MODULA_RELEASE_SHA": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
-        "MODULA_WORKER_RELEASE_SHA": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
-        "MODULA_RELEASE_BUILT_AT": "2026-10-10T17:12:40Z"
+        "MODULA_RELEASE_SHA": "f05d03c237c62d1b0946a760610d1155f02a8520",
+        "MODULA_WORKER_RELEASE_SHA": "f05d03c237c62d1b0946a760610d1155f02a8520",
+        "MODULA_RELEASE_BUILT_AT": "2026-10-14T09:36:18Z"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -339,7 +339,7 @@
         "GREENFIELD_MODULE_GITHUB_SYNC_ENABLED": "false",
         "GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED": "false",
         "GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED": "false",
-        "MODULA_RELEASE_SHA": "50dfc12045be639ad65acb95d2b4e94ea864ed42"
+        "MODULA_RELEASE_SHA": "f05d03c237c62d1b0946a760610d1155f02a8520"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -360,51 +360,102 @@
     "tls": [
       "subject=CN = modula.digital",
       "issuer=C = US, O = Google Trust Services, CN = WE1",
-      "notBefore=Aug 13 15:00:45 2026 GMT",
-      "notAfter=Nov 11 16:00:39 2026 GMT",
-      "sha256 Fingerprint=9E:D4:DC:9D:4C:02:56:C8:E3:1C:0E:9E:30:16:24:F7:C5:EB:D3:4F:40:F3:EE:0A:7F:6D:01:28:8A:9E:AD:BB"
+      "notBefore=Oct 11 16:31:41 2026 GMT",
+      "notAfter=Jan  9 17:29:24 2027 GMT",
+      "sha256 Fingerprint=86:27:EC:00:58:D7:EF:CD:6A:F7:A3:AC:13:54:84:43:0D:D9:4C:C6:E5:D2:B8:0F:F8:BC:FE:35:52:05:42:D9"
     ]
   },
   "nginx": {
     "path": "/etc/nginx/conf.d/api.modula.digital.greenfield.conf",
-    "sha256": "8fbed6189f4bb1113ea61467ebb4adc3c777a92c93d2d30597393e1acebf0535",
-    "content": "server {\n    listen 87.106.40.136:443 ssl;\n    listen [2a02:2479:68:e400::]:443 ssl;\n    http2 on;\n    server_name api.modula.digital;\n\n    ssl_certificate     /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.pem;\n    ssl_certificate_key /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.key;\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    server_tokens off;\n    client_max_body_size 1m;\n    proxy_connect_timeout 10s;\n    proxy_send_timeout 60s;\n    proxy_read_timeout 60s;\n\n    add_header X-Content-Type-Options nosniff always;\n    add_header X-Frame-Options DENY always;\n    add_header Referrer-Policy no-referrer always;\n\n    location / {\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    # Immutable registry release media (icon/cover/screenshots). The API sends\n    # \"Cache-Control: public, max-age=31536000, immutable\" plus a sha256 ETag; do not\n    # override it with no-store. Server-level security headers still apply.\n    location ~ ^/v1/registry/releases/[^/]+/assets/[^/]+$ {\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location = /v1/stories {\n        client_max_body_size 25m;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location ~ ^/v1/attachments/uploads/[0-9a-fA-F-]+/content$ {\n        client_max_body_size 101m;\n        proxy_request_buffering off;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n}\n"
+    "sha256": "37ee1e4d2184e5d9d248c2fa2abe4d0108498a0a94a7ad44273eba250c6f19d0",
+    "content": "server {\n    listen 87.106.40.136:443 ssl;\n    listen [2a02:2479:68:e400::]:443 ssl;\n    http2 on;\n    server_name api.modula.digital;\n\n    ssl_certificate     /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.pem;\n    ssl_certificate_key /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.key;\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    server_tokens off;\n    client_max_body_size 1m;\n    proxy_connect_timeout 10s;\n    proxy_send_timeout 60s;\n    proxy_read_timeout 60s;\n\n    add_header X-Content-Type-Options nosniff always;\n    add_header X-Frame-Options DENY always;\n    add_header Referrer-Policy no-referrer always;\n\n    location / {\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    # Immutable registry bytes own their cache policy in the API. Public\n    # artwork remains public/immutable; installation artifacts remain private\n    # and immutable. Neither may inherit the catch-all no-store directive.\n    location ~ \"^/v1/registry/(?:artifacts/[0-9a-f]{64}|releases/[^/]+/assets/[^/]+)$\" {\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location = /v1/stories {\n        client_max_body_size 25m;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location ~ ^/v1/attachments/uploads/[0-9a-fA-F-]+/content$ {\n        client_max_body_size 101m;\n        proxy_request_buffering off;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n}\n"
   },
   "hostProcesses": {
     "docker": [
       {
         "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-10 18:14:20 +0100 BST",
-        "ID": "82a0a81403dd",
-        "Image": "modula-greenfield-worker:50dfc12045be639ad65acb95d2b4e94ea864ed42",
-        "Labels": "com.docker.compose.config-hash=cb340c325dfbdb44651f1dc7dffcf819ea97140a5e85c47ad9a940b1528ea591,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:ab59f0ae499b48e63aaebb17173f8f109cbedb095495852443351b6d340206f4,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=067_legacy_duplicate_installation_versions,org.opencontainers.image.created=2026-10-10T17:12:40Z,org.opencontainers.image.revision=50dfc12045be639ad65acb95d2b4e94ea864ed42,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=50dfc12045be639ad65acb95d2b4e94ea864ed42",
-        "LocalVolumes": "0",
-        "Mounts": "",
-        "Names": "modula-production-greenfield-worker-1",
-        "Networks": "modula-production_greenfield_internal",
-        "Platform": null,
-        "Ports": "",
-        "RunningFor": "5 hours ago",
-        "Size": "0B (virtual 2.5GB)",
-        "State": "running",
-        "Status": "Up 5 hours"
-      },
-      {
-        "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-10 18:14:20 +0100 BST",
-        "ID": "3c6373a85937",
-        "Image": "modula-greenfield-api:50dfc12045be639ad65acb95d2b4e94ea864ed42",
-        "Labels": "com.docker.compose.config-hash=766910273ffff883b3019716b381dda297a9d29e11e15f28c95a0733773c2cd6,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:2ff3363eb9ad68dd569710013adddf38a2d241e7c5b56075bc6daaaaee9c04dc,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=067_legacy_duplicate_installation_versions,org.opencontainers.image.created=2026-10-10T17:12:40Z,org.opencontainers.image.revision=50dfc12045be639ad65acb95d2b4e94ea864ed42,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=50dfc12045be639ad65acb95d2b4e94ea864ed42",
+        "CreatedAt": "2026-10-14 15:59:12 +0100 BST",
+        "ID": "24fbb7eddcc6",
+        "Image": "modula-greenfield-api:f05d03c237c62d1b0946a760610d1155f02a8520",
+        "Labels": "com.docker.compose.config-hash=173a0f89635d516d10fc0852f92d32dd87dd4a8c49aae2d8642bbad70a5078ae,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:3df5e56b10feb215d8cbe73d58328cf0f937e91b30e35e7f7bc6887e24a67983,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=073_backup_sequence_acl_defaults,org.opencontainers.image.created=2026-10-14T09:36:18Z,org.opencontainers.image.revision=f05d03c237c62d1b0946a760610d1155f02a8520,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=module-distribution-03-20261014T093618Z",
         "LocalVolumes": "0",
         "Mounts": "/var/lib/modul…",
         "Names": "modula-production-greenfield-api-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "127.0.0.1:4020->4020/tcp",
-        "RunningFor": "5 hours ago",
+        "RunningFor": "34 minutes ago",
         "Size": "0B (virtual 2.52GB)",
         "State": "running",
-        "Status": "Up 5 hours (healthy)"
+        "Status": "Up 34 minutes (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-14 15:53:47 +0100 BST",
+        "ID": "8a122922290c",
+        "Image": "modula-greenfield-worker:f05d03c237c62d1b0946a760610d1155f02a8520",
+        "Labels": "com.docker.compose.config-hash=7089977467539b6c14c3f0ba6c2bccaffe932ad18082929d674030ba9bd74616,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:13677d3d121095757af84d960c1e1a2e036b52aefa5c826a0ecb7ce929b8febf,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=073_backup_sequence_acl_defaults,org.opencontainers.image.created=2026-10-14T09:36:18Z,org.opencontainers.image.revision=f05d03c237c62d1b0946a760610d1155f02a8520,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=module-distribution-03-20261014T093618Z",
+        "LocalVolumes": "0",
+        "Mounts": "",
+        "Names": "modula-production-greenfield-worker-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "",
+        "RunningFor": "39 minutes ago",
+        "Size": "0B (virtual 2.5GB)",
+        "State": "running",
+        "Status": "Up 39 minutes"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-12 08:42:21 +0100 BST",
+        "ID": "43df52119e30",
+        "Image": "postgres:16-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "52d005da1c8859…",
+        "Names": "modula-mp02b-functions-db",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55440->5432/tcp",
+        "RunningFor": "2 days ago",
+        "Size": "63B (virtual 294MB)",
+        "State": "running",
+        "Status": "Up 2 days"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-12 08:36:15 +0100 BST",
+        "ID": "e9d0cef5431c",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "2c1d2b7a4a785a…",
+        "Names": "mp02b-integration-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55432->5432/tcp",
+        "RunningFor": "2 days ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 2 days"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-11 21:53:43 +0100 BST",
+        "ID": "2923c746025d",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "d118508b678dd6…",
+        "Names": "mp02b-migration-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "5432/tcp",
+        "RunningFor": "2 days ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 2 days"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -418,10 +469,10 @@
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "5432/tcp",
-        "RunningFor": "13 hours ago",
+        "RunningFor": "4 days ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 13 hours (healthy)"
+        "Status": "Up 4 days (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -435,10 +486,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55499->5432/tcp",
-        "RunningFor": "8 days ago",
+        "RunningFor": "11 days ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 8 days"
+        "Status": "Up 11 days"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -452,10 +503,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55498->5432/tcp",
-        "RunningFor": "8 days ago",
+        "RunningFor": "11 days ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 8 days"
+        "Status": "Up 11 days"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -469,10 +520,10 @@
         "Networks": "modula-final-closure-recovery",
         "Platform": null,
         "Ports": "5432/tcp",
-        "RunningFor": "5 weeks ago",
+        "RunningFor": "6 weeks ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 5 weeks (healthy)"
+        "Status": "Up 6 weeks (healthy)"
       },
       {
         "Command": "\"/usr/local/bin/dock…\"",
@@ -503,10 +554,10 @@
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "4030/tcp",
-        "RunningFor": "6 weeks ago",
+        "RunningFor": "7 weeks ago",
         "Size": "0B (virtual 190MB)",
         "State": "running",
-        "Status": "Up 6 weeks (healthy)"
+        "Status": "Up 7 weeks (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -520,10 +571,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55438->5432/tcp",
-        "RunningFor": "6 weeks ago",
+        "RunningFor": "7 weeks ago",
         "Size": "1.31MB (virtual 277MB)",
         "State": "running",
-        "Status": "Up 6 weeks (healthy)"
+        "Status": "Up 7 weeks (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -537,10 +588,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55437->5432/tcp",
-        "RunningFor": "8 weeks ago",
+        "RunningFor": "2 months ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 8 weeks"
+        "Status": "Up 2 months"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -554,10 +605,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55436->5432/tcp",
-        "RunningFor": "8 weeks ago",
+        "RunningFor": "2 months ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 8 weeks"
+        "Status": "Up 2 months"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -617,7 +668,7 @@
         "Image": "postgres:16.9-alpine",
         "Labels": "com.docker.compose.config-hash=2086878c8a83b6f05b37516d5aed1564df25871572aae2e8703c0be0e302a010,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:dca9c7aa70c71caf8bcc48c8ec40658c1fdf2d1e4e8d26bc27d4d18e030d779a,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/home/andrei/modula-latest/ops/docker/compose.preview.yml,com.docker.compose.project.working_dir=/home/andrei/modula-latest/ops/docker,com.docker.compose.project=modula-preview,com.docker.compose.replace=greenfield-postgres-1,com.docker.compose.service=greenfield-postgres,com.docker.compose.version=2.40.3",
         "LocalVolumes": "1",
-        "Mounts": "/home/andrei/m…,modula-preview…",
+        "Mounts": "modula-preview…,/home/andrei/m…",
         "Names": "modula-preview-greenfield-postgres-1",
         "Networks": "modula-preview_modula_internal",
         "Platform": null,
@@ -635,7 +686,7 @@
       "nginx.service                                  loaded    active   running nginx - high performance web server"
     ],
     "timers": [
-      "Sun 2026-10-11 00:00:00 BST    57min Sat 2026-10-10 00:00:01 BST      23h ago dpkg-db-backup.timer           dpkg-db-backup.service"
+      "Thu 2026-10-15 00:00:00 BST       7h Wed 2026-10-14 00:00:01 BST          16h ago dpkg-db-backup.timer           dpkg-db-backup.service"
     ],
     "cronFiles": [
       ".placeholder",
@@ -656,12 +707,12 @@
     "type": "host bind mount",
     "root": "/var/lib/modula/greenfield-media",
     "mode": "775",
-    "files": 57,
-    "bytes": 28852215,
+    "files": 60,
+    "bytes": 29931163,
     "classes": {
       "attachments": {
-        "files": 25,
-        "bytes": 19921070
+        "files": 27,
+        "bytes": 20824057
       },
       "posts": {
         "files": 13,
@@ -672,8 +723,8 @@
         "bytes": 1224761
       },
       "stories": {
-        "files": 16,
-        "bytes": 6818855
+        "files": 17,
+        "bytes": 6994816
       }
     }
   },
@@ -1637,6 +1688,34 @@
     },
     {
       "method": "GET",
+      "url": "/v1/admin/registry/artifacts/orphans",
+      "path": "/v1/admin/registry/artifacts/orphans",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/registry/artifacts/orphans",
+      "path": "/v1/admin/registry/artifacts/orphans",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/registry/modules/:moduleId/versions",
       "path": "/v1/registry/modules/:moduleId/versions",
       "prefix": "",
@@ -1727,7 +1806,7 @@
       "schema": null,
       "config": {
         "rateLimit": {
-          "max": 120,
+          "max": 240,
           "timeWindow": "1 minute"
         }
       },
@@ -1741,7 +1820,63 @@
       "schema": null,
       "config": {
         "rateLimit": {
+          "max": 240,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/releases/:releaseId/descriptor",
+      "path": "/v1/registry/releases/:releaseId/descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
           "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/releases/:releaseId/descriptor",
+      "path": "/v1/registry/releases/:releaseId/descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/artifacts/:sha256",
+      "path": "/v1/registry/artifacts/:sha256",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 240,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/artifacts/:sha256",
+      "path": "/v1/registry/artifacts/:sha256",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 240,
           "timeWindow": "1 minute"
         }
       },
@@ -2169,6 +2304,20 @@
     },
     {
       "method": "POST",
+      "url": "/v1/modules/:moduleId/install-plan",
+      "path": "/v1/modules/:moduleId/install-plan",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
       "url": "/v1/modules/:moduleId/install",
       "path": "/v1/modules/:moduleId/install",
       "prefix": "",
@@ -2199,6 +2348,62 @@
       "method": "HEAD",
       "url": "/v1/modules/:moduleId/install-descriptor",
       "path": "/v1/modules/:moduleId/install-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/installation-descriptor",
+      "path": "/v1/modules/:moduleId/installation-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/installation-descriptor",
+      "path": "/v1/modules/:moduleId/installation-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/updates",
+      "path": "/v1/modules/updates",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/updates",
+      "path": "/v1/modules/updates",
       "prefix": "",
       "schema": null,
       "config": {
@@ -2281,8 +2486,50 @@
     },
     {
       "method": "POST",
+      "url": "/v1/modules/:moduleId/update-plan",
+      "path": "/v1/modules/:moduleId/update-plan",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/installations/:installationId/update-policy",
+      "path": "/v1/modules/installations/:installationId/update-policy",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
       "url": "/v1/modules/:moduleId/update",
       "path": "/v1/modules/:moduleId/update",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/rollback",
+      "path": "/v1/modules/:moduleId/rollback",
       "prefix": "",
       "schema": null,
       "config": {
@@ -2519,6 +2766,188 @@
     },
     {
       "method": "GET",
+      "url": "/v1/modules/:moduleId/records/shares/received",
+      "path": "/v1/modules/:moduleId/records/shares/received",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/shares/received",
+      "path": "/v1/modules/:moduleId/records/shares/received",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/shares/owned",
+      "path": "/v1/modules/:moduleId/records/shares/owned",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/shares/owned",
+      "path": "/v1/modules/:moduleId/records/shares/owned",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId/record",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId/record",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/record-shares/:shareId",
+      "path": "/v1/modules/:moduleId/record-shares/:shareId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/sync",
+      "path": "/v1/modules/:moduleId/records/sync",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/sync",
+      "path": "/v1/modules/:moduleId/records/sync",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/modules/:moduleId/records/:collection",
       "path": "/v1/modules/:moduleId/records/:collection",
       "prefix": "",
@@ -2577,6 +3006,244 @@
       "method": "HEAD",
       "url": "/v1/modules/:moduleId/records/:collection/:recordId",
       "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/shares",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/shares",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/order",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/order",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/current",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/references",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/reverse-references",
       "prefix": "",
       "schema": null,
       "config": {
@@ -2647,6 +3314,160 @@
       "method": "POST",
       "url": "/v1/modules/:moduleId/actions/:actionId",
       "path": "/v1/modules/:moduleId/actions/:actionId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/functions/:functionId/:version/invoke",
+      "path": "/v1/modules/:moduleId/functions/:functionId/:version/invoke",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-executors",
+      "path": "/v1/modules/:moduleId/host-function-executors",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "path": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "path": "/v1/modules/:moduleId/host-function-executors/:executorId/requests",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId/complete",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId/complete",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/host-function-requests/:requestId/cancel",
+      "path": "/v1/modules/:moduleId/host-function-requests/:requestId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/runtime-credentials",
+      "path": "/v1/modules/:moduleId/runtime-credentials",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/runtime-credentials/:credentialId",
+      "path": "/v1/modules/:moduleId/runtime-credentials/:credentialId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/module-runtime/actions/:targetModuleId/:actionId/:version",
+      "path": "/v1/module-runtime/actions/:targetModuleId/:actionId/:version",
       "prefix": "",
       "schema": null,
       "config": {
@@ -14533,6 +15354,58 @@
         "uniqueConstraints": []
       },
       {
+        "name": "greenfield_backup_sequence_acl_reconciliation",
+        "columns": [
+          {
+            "name": "record_identity",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_kind",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "schema_name",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "sequence_name",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "select_was_present",
+            "type": "boolean",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "reconciled_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_backup_sequence_acl_reconciliation_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_backup_sequence_acl_reconciliation_pkey ON public.greenfield_backup_sequence_acl_reconciliation USING btree (record_identity)"
+          }
+        ],
+        "primaryKey": [
+          "record_identity"
+        ],
+        "foreignKeys": [],
+        "uniqueConstraints": []
+      },
+      {
         "name": "greenfield_billing_adapter_registrations",
         "columns": [
           {
@@ -21452,6 +22325,24 @@
             "type": "boolean",
             "default": "false",
             "nullable": false
+          },
+          {
+            "name": "update_policy",
+            "type": "text",
+            "default": "'automaticStable'::text",
+            "nullable": false
+          },
+          {
+            "name": "release_channel",
+            "type": "text",
+            "default": "'stable'::text",
+            "nullable": false
+          },
+          {
+            "name": "locked_version",
+            "type": "text",
+            "default": null,
+            "nullable": true
           }
         ],
         "indexes": [
@@ -22612,6 +23503,247 @@
         "uniqueConstraints": []
       },
       {
+        "name": "greenfield_function_implementations",
+        "columns": [
+          {
+            "name": "implementation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_version",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "execution_mode",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "handler_key",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "endpoint_url",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "reviewed",
+            "type": "boolean",
+            "default": "false",
+            "nullable": false
+          },
+          {
+            "name": "enabled",
+            "type": "boolean",
+            "default": "false",
+            "nullable": false
+          },
+          {
+            "name": "network_allowed",
+            "type": "boolean",
+            "default": "false",
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_function_implement_release_id_function_id_functi_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_function_implement_release_id_function_id_functi_key ON public.greenfield_function_implementations USING btree (release_id, function_id, function_version, execution_mode)"
+          },
+          {
+            "name": "greenfield_function_implementations_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_function_implementations_pkey ON public.greenfield_function_implementations USING btree (implementation_id)"
+          }
+        ],
+        "primaryKey": [
+          "implementation_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_function_implementations_release_id_fkey",
+            "column": "release_id",
+            "referencesTable": "greenfield_module_releases",
+            "referencesColumn": "release_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_function_implement_release_id_function_id_functi_key",
+            "columns": [
+              "release_id",
+              "function_id",
+              "function_version",
+              "execution_mode"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_function_invocations",
+        "columns": [
+          {
+            "name": "invocation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_version",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "execution_mode",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "request_identity",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "success",
+            "type": "boolean",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "latency_ms",
+            "type": "integer",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "error_code",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "completed_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_function_invocatio_account_id_installation_id_fu_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_function_invocatio_account_id_installation_id_fu_key ON public.greenfield_function_invocations USING btree (account_id, installation_id, function_id, function_version, request_identity)"
+          },
+          {
+            "name": "greenfield_function_invocations_ledger_idx",
+            "definition": "CREATE INDEX greenfield_function_invocations_ledger_idx ON public.greenfield_function_invocations USING btree (account_id, installation_id, created_at DESC)"
+          },
+          {
+            "name": "greenfield_function_invocations_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_function_invocations_pkey ON public.greenfield_function_invocations USING btree (invocation_id)"
+          }
+        ],
+        "primaryKey": [
+          "invocation_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_function_invocations_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_function_invocatio_account_id_installation_id_fu_key",
+            "columns": [
+              "account_id",
+              "installation_id",
+              "function_id",
+              "function_version",
+              "request_identity"
+            ]
+          }
+        ]
+      },
+      {
         "name": "greenfield_function_jobs",
         "columns": [
           {
@@ -22705,6 +23837,110 @@
           }
         ],
         "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_function_mutations",
+        "columns": [
+          {
+            "name": "mutation_row_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_version",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mutation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "payload_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "result",
+            "type": "jsonb",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "completed_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_function_mutations_account_id_installation_id_fu_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_function_mutations_account_id_installation_id_fu_key ON public.greenfield_function_mutations USING btree (account_id, installation_id, function_id, function_version, mutation_id)"
+          },
+          {
+            "name": "greenfield_function_mutations_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_function_mutations_pkey ON public.greenfield_function_mutations USING btree (mutation_row_id)"
+          }
+        ],
+        "primaryKey": [
+          "mutation_row_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_function_mutations_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_function_mutations_account_id_installation_id_fu_key",
+            "columns": [
+              "account_id",
+              "installation_id",
+              "function_id",
+              "function_version",
+              "mutation_id"
+            ]
+          }
+        ]
       },
       {
         "name": "greenfield_functions",
@@ -22874,6 +24110,379 @@
           }
         ],
         "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_host_function_executors",
+        "columns": [
+          {
+            "name": "executor_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "capabilities",
+            "type": "jsonb",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "expires_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_host_function_executors_available_idx",
+            "definition": "CREATE INDEX greenfield_host_function_executors_available_idx ON public.greenfield_host_function_executors USING btree (account_id, installation_id, release_id, status, expires_at)"
+          },
+          {
+            "name": "greenfield_host_function_executors_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_host_function_executors_pkey ON public.greenfield_host_function_executors USING btree (executor_id)"
+          }
+        ],
+        "primaryKey": [
+          "executor_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_host_function_executors_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_host_function_executors_installation_id_fkey",
+            "column": "installation_id",
+            "referencesTable": "greenfield_extension_installations",
+            "referencesColumn": "installation_id"
+          },
+          {
+            "name": "greenfield_host_function_executors_release_id_fkey",
+            "column": "release_id",
+            "referencesTable": "greenfield_module_releases",
+            "referencesColumn": "release_id"
+          }
+        ],
+        "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_host_function_requests",
+        "columns": [
+          {
+            "name": "request_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "invocation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "executor_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "function_version",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "state",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "input_payload",
+            "type": "jsonb",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "output_payload",
+            "type": "jsonb",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "output_hash",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "deadline_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "completed_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_host_function_requests_dispatch_idx",
+            "definition": "CREATE INDEX greenfield_host_function_requests_dispatch_idx ON public.greenfield_host_function_requests USING btree (executor_id, state, deadline_at, created_at)"
+          },
+          {
+            "name": "greenfield_host_function_requests_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_host_function_requests_pkey ON public.greenfield_host_function_requests USING btree (request_id)"
+          }
+        ],
+        "primaryKey": [
+          "request_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_host_function_requests_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_host_function_requests_executor_id_fkey",
+            "column": "executor_id",
+            "referencesTable": "greenfield_host_function_executors",
+            "referencesColumn": "executor_id"
+          },
+          {
+            "name": "greenfield_host_function_requests_invocation_id_fkey",
+            "column": "invocation_id",
+            "referencesTable": "greenfield_function_invocations",
+            "referencesColumn": "invocation_id"
+          }
+        ],
+        "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_inter_module_action_requests",
+        "columns": [
+          {
+            "name": "request_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "target_installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "target_module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "target_release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "action_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "action_version",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mutation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "payload_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "result",
+            "type": "jsonb",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "latency_ms",
+            "type": "integer",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "completed_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_inter_module_actio_account_id_source_installatio_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_inter_module_actio_account_id_source_installatio_key ON public.greenfield_inter_module_action_requests USING btree (account_id, source_installation_id, target_installation_id, action_id, action_version, mutation_id)"
+          },
+          {
+            "name": "greenfield_inter_module_action_requests_ledger_idx",
+            "definition": "CREATE INDEX greenfield_inter_module_action_requests_ledger_idx ON public.greenfield_inter_module_action_requests USING btree (account_id, source_installation_id, created_at DESC)"
+          },
+          {
+            "name": "greenfield_inter_module_action_requests_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_inter_module_action_requests_pkey ON public.greenfield_inter_module_action_requests USING btree (request_id)"
+          }
+        ],
+        "primaryKey": [
+          "request_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_inter_module_action_requests_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_inter_module_actio_account_id_source_installatio_key",
+            "columns": [
+              "account_id",
+              "source_installation_id",
+              "target_installation_id",
+              "action_id",
+              "action_version",
+              "mutation_id"
+            ]
+          }
+        ]
       },
       {
         "name": "greenfield_link_blocklist",
@@ -25979,6 +27588,121 @@
         ]
       },
       {
+        "name": "greenfield_module_record_changes",
+        "columns": [
+          {
+            "name": "change_sequence",
+            "type": "bigint",
+            "default": "nextval('greenfield_module_record_changes_change_sequence_seq'::regclass)",
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "revision",
+            "type": "integer",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "operation",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "deleted",
+            "type": "boolean",
+            "default": "false",
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "owner_account_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "change_kind",
+            "type": "text",
+            "default": "'record'::text",
+            "nullable": false
+          },
+          {
+            "name": "details",
+            "type": "jsonb",
+            "default": "'{}'::jsonb",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_record_changes_owner_idx",
+            "definition": "CREATE INDEX greenfield_module_record_changes_owner_idx ON public.greenfield_module_record_changes USING btree (owner_account_id, module_id, record_type, record_id, change_sequence)"
+          },
+          {
+            "name": "greenfield_module_record_changes_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_changes_pkey ON public.greenfield_module_record_changes USING btree (change_sequence)"
+          },
+          {
+            "name": "greenfield_module_record_changes_sync_idx",
+            "definition": "CREATE INDEX greenfield_module_record_changes_sync_idx ON public.greenfield_module_record_changes USING btree (account_id, installation_id, module_id, change_sequence)"
+          }
+        ],
+        "primaryKey": [
+          "change_sequence"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_record_changes_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_changes_owner_account_id_fkey",
+            "column": "owner_account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": []
+      },
+      {
         "name": "greenfield_module_record_collections",
         "columns": [
           {
@@ -26221,6 +27945,735 @@
           }
         ],
         "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_module_record_media_bindings",
+        "columns": [
+          {
+            "name": "binding_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_owner_account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "asset_owner_account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "field_path",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "role",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "order_index",
+            "type": "integer",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "caption",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "media_type",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "filename",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "size",
+            "type": "bigint",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "content_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_record_media_asset_idx",
+            "definition": "CREATE INDEX greenfield_module_record_media_asset_idx ON public.greenfield_module_record_media_bindings USING btree (asset_id)"
+          },
+          {
+            "name": "greenfield_module_record_media_asset_unique",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_media_asset_unique ON public.greenfield_module_record_media_bindings USING btree (record_owner_account_id, module_id, record_type, record_id, asset_id)"
+          },
+          {
+            "name": "greenfield_module_record_media_bindings_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_media_bindings_pkey ON public.greenfield_module_record_media_bindings USING btree (binding_id)"
+          },
+          {
+            "name": "greenfield_module_record_media_order_unique",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_media_order_unique ON public.greenfield_module_record_media_bindings USING btree (record_owner_account_id, module_id, record_type, record_id, order_index)"
+          },
+          {
+            "name": "greenfield_module_record_media_record_idx",
+            "definition": "CREATE INDEX greenfield_module_record_media_record_idx ON public.greenfield_module_record_media_bindings USING btree (record_owner_account_id, module_id, record_type, record_id, order_index)"
+          }
+        ],
+        "primaryKey": [
+          "binding_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_record_media_bin_record_owner_account_id_fkey",
+            "column": "record_owner_account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_media_bind_asset_owner_account_id_fkey",
+            "column": "asset_owner_account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_media_bind_source_installation_id_fkey",
+            "column": "source_installation_id",
+            "referencesTable": "greenfield_extension_installations",
+            "referencesColumn": "installation_id"
+          },
+          {
+            "name": "greenfield_module_record_media_bindings_asset_id_fkey",
+            "column": "asset_id",
+            "referencesTable": "attachments",
+            "referencesColumn": "attachment_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_module_record_media_asset_unique",
+            "columns": [
+              "record_owner_account_id",
+              "module_id",
+              "record_type",
+              "record_id",
+              "asset_id"
+            ]
+          },
+          {
+            "name": "greenfield_module_record_media_order_unique",
+            "columns": [
+              "record_owner_account_id",
+              "module_id",
+              "record_type",
+              "record_id",
+              "order_index"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_module_record_mutations",
+        "columns": [
+          {
+            "name": "mutation_row_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mutation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "operation",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "payload_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "result",
+            "type": "jsonb",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "completed_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_record_muta_account_id_installation_id_mu_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_muta_account_id_installation_id_mu_key ON public.greenfield_module_record_mutations USING btree (account_id, installation_id, mutation_id)"
+          },
+          {
+            "name": "greenfield_module_record_mutations_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_mutations_pkey ON public.greenfield_module_record_mutations USING btree (mutation_row_id)"
+          },
+          {
+            "name": "greenfield_module_record_mutations_record_idx",
+            "definition": "CREATE INDEX greenfield_module_record_mutations_record_idx ON public.greenfield_module_record_mutations USING btree (account_id, module_id, record_type, record_id, created_at DESC)"
+          }
+        ],
+        "primaryKey": [
+          "mutation_row_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_record_mutations_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_mutations_installation_id_fkey",
+            "column": "installation_id",
+            "referencesTable": "greenfield_extension_installations",
+            "referencesColumn": "installation_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_module_record_muta_account_id_installation_id_mu_key",
+            "columns": [
+              "account_id",
+              "installation_id",
+              "mutation_id"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_module_record_references",
+        "columns": [
+          {
+            "name": "reference_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "source_module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_revision",
+            "type": "integer",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "field_path",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "ordinal",
+            "type": "integer",
+            "default": "0",
+            "nullable": false
+          },
+          {
+            "name": "target_module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "target_record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "target_record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_record_refe_account_id_source_module_id_s_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_refe_account_id_source_module_id_s_key ON public.greenfield_module_record_references USING btree (account_id, source_module_id, source_record_type, source_record_id, field_path, ordinal)"
+          },
+          {
+            "name": "greenfield_module_record_references_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_references_pkey ON public.greenfield_module_record_references USING btree (reference_id)"
+          },
+          {
+            "name": "greenfield_module_record_references_source_idx",
+            "definition": "CREATE INDEX greenfield_module_record_references_source_idx ON public.greenfield_module_record_references USING btree (account_id, source_module_id, source_record_type, source_record_id, field_path, ordinal)"
+          },
+          {
+            "name": "greenfield_module_record_references_target_idx",
+            "definition": "CREATE INDEX greenfield_module_record_references_target_idx ON public.greenfield_module_record_references USING btree (account_id, target_module_id, target_record_type, target_record_id, field_path)"
+          }
+        ],
+        "primaryKey": [
+          "reference_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_record_references_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_references_source_installation_id_fkey",
+            "column": "source_installation_id",
+            "referencesTable": "greenfield_extension_installations",
+            "referencesColumn": "installation_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_module_record_refe_account_id_source_module_id_s_key",
+            "columns": [
+              "account_id",
+              "source_module_id",
+              "source_record_type",
+              "source_record_id",
+              "field_path",
+              "ordinal"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_module_record_revisions",
+        "columns": [
+          {
+            "name": "revision_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "revision",
+            "type": "integer",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "base_revision",
+            "type": "integer",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "operation",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mutation_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "actor_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "data_snapshot",
+            "type": "jsonb",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "visibility",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "deleted",
+            "type": "boolean",
+            "default": "false",
+            "nullable": false
+          },
+          {
+            "name": "payload_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_record_revi_account_id_module_id_record_t_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_revi_account_id_module_id_record_t_key ON public.greenfield_module_record_revisions USING btree (account_id, module_id, record_type, record_id, revision)"
+          },
+          {
+            "name": "greenfield_module_record_revisions_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_revisions_pkey ON public.greenfield_module_record_revisions USING btree (revision_id)"
+          },
+          {
+            "name": "greenfield_module_record_revisions_record_idx",
+            "definition": "CREATE INDEX greenfield_module_record_revisions_record_idx ON public.greenfield_module_record_revisions USING btree (account_id, module_id, record_type, record_id, revision DESC)"
+          }
+        ],
+        "primaryKey": [
+          "revision_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_record_revisions_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_module_record_revi_account_id_module_id_record_t_key",
+            "columns": [
+              "account_id",
+              "module_id",
+              "record_type",
+              "record_id",
+              "revision"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_module_record_shares",
+        "columns": [
+          {
+            "name": "share_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "owner_account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "recipient_account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_type",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "record_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "permission",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mutation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "payload_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "expires_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "revoked_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "visibility_lost_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_record_shar_owner_account_id_source_insta_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_shar_owner_account_id_source_insta_key ON public.greenfield_module_record_shares USING btree (owner_account_id, source_installation_id, mutation_id)"
+          },
+          {
+            "name": "greenfield_module_record_shares_active_recipient_idx",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_shares_active_recipient_idx ON public.greenfield_module_record_shares USING btree (owner_account_id, recipient_account_id, module_id, record_type, record_id) WHERE (revoked_at IS NULL)"
+          },
+          {
+            "name": "greenfield_module_record_shares_owner_idx",
+            "definition": "CREATE INDEX greenfield_module_record_shares_owner_idx ON public.greenfield_module_record_shares USING btree (owner_account_id, module_id, record_type, record_id, created_at DESC)"
+          },
+          {
+            "name": "greenfield_module_record_shares_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_record_shares_pkey ON public.greenfield_module_record_shares USING btree (share_id)"
+          },
+          {
+            "name": "greenfield_module_record_shares_recipient_idx",
+            "definition": "CREATE INDEX greenfield_module_record_shares_recipient_idx ON public.greenfield_module_record_shares USING btree (recipient_account_id, module_id, revoked_at, expires_at, created_at DESC)"
+          }
+        ],
+        "primaryKey": [
+          "share_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_record_shares_owner_account_id_fkey",
+            "column": "owner_account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_shares_recipient_account_id_fkey",
+            "column": "recipient_account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_record_shares_source_installation_id_fkey",
+            "column": "source_installation_id",
+            "referencesTable": "greenfield_extension_installations",
+            "referencesColumn": "installation_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_module_record_shar_owner_account_id_source_insta_key",
+            "columns": [
+              "owner_account_id",
+              "source_installation_id",
+              "mutation_id"
+            ]
+          }
+        ]
       },
       {
         "name": "greenfield_module_record_versions",
@@ -26846,6 +29299,12 @@
             "type": "jsonb",
             "default": "'{}'::jsonb",
             "nullable": false
+          },
+          {
+            "name": "release_channel",
+            "type": "text",
+            "default": "'stable'::text",
+            "nullable": false
           }
         ],
         "indexes": [
@@ -27152,6 +29611,110 @@
             "columns": [
               "scope",
               "target_id"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_module_runtime_credentials",
+        "columns": [
+          {
+            "name": "credential_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "credential_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "installation_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "module_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "expires_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "revoked_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_module_runtime_credentials_credential_hash_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_runtime_credentials_credential_hash_key ON public.greenfield_module_runtime_credentials USING btree (credential_hash)"
+          },
+          {
+            "name": "greenfield_module_runtime_credentials_lookup_idx",
+            "definition": "CREATE INDEX greenfield_module_runtime_credentials_lookup_idx ON public.greenfield_module_runtime_credentials USING btree (credential_hash, expires_at) WHERE (revoked_at IS NULL)"
+          },
+          {
+            "name": "greenfield_module_runtime_credentials_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_module_runtime_credentials_pkey ON public.greenfield_module_runtime_credentials USING btree (credential_id)"
+          }
+        ],
+        "primaryKey": [
+          "credential_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_module_runtime_credentials_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          },
+          {
+            "name": "greenfield_module_runtime_credentials_installation_id_fkey",
+            "column": "installation_id",
+            "referencesTable": "greenfield_extension_installations",
+            "referencesColumn": "installation_id"
+          },
+          {
+            "name": "greenfield_module_runtime_credentials_release_id_fkey",
+            "column": "release_id",
+            "referencesTable": "greenfield_module_releases",
+            "referencesColumn": "release_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_module_runtime_credentials_credential_hash_key",
+            "columns": [
+              "credential_hash"
             ]
           }
         ]
@@ -30805,6 +33368,105 @@
             "name": "greenfield_recovery_tokens_token_hash_key",
             "columns": [
               "token_hash"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "greenfield_release_artifacts",
+        "columns": [
+          {
+            "name": "artifact_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "kind",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "sha256",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "filename",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "access_class",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "required_for_offline_launch",
+            "type": "boolean",
+            "default": "false",
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_release_artifacts_digest_idx",
+            "definition": "CREATE INDEX greenfield_release_artifacts_digest_idx ON public.greenfield_release_artifacts USING btree (sha256, access_class)"
+          },
+          {
+            "name": "greenfield_release_artifacts_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_release_artifacts_pkey ON public.greenfield_release_artifacts USING btree (artifact_id)"
+          },
+          {
+            "name": "greenfield_release_artifacts_release_id_kind_sha256_filenam_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_release_artifacts_release_id_kind_sha256_filenam_key ON public.greenfield_release_artifacts USING btree (release_id, kind, sha256, filename)"
+          },
+          {
+            "name": "greenfield_release_artifacts_release_idx",
+            "definition": "CREATE INDEX greenfield_release_artifacts_release_idx ON public.greenfield_release_artifacts USING btree (release_id, required_for_offline_launch DESC, kind, artifact_id)"
+          }
+        ],
+        "primaryKey": [
+          "artifact_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_release_artifacts_release_id_fkey",
+            "column": "release_id",
+            "referencesTable": "greenfield_module_releases",
+            "referencesColumn": "release_id"
+          },
+          {
+            "name": "greenfield_release_artifacts_sha256_fkey",
+            "column": "sha256",
+            "referencesTable": "greenfield_release_asset_blobs",
+            "referencesColumn": "sha256"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_release_artifacts_release_id_kind_sha256_filenam_key",
+            "columns": [
+              "release_id",
+              "kind",
+              "sha256",
+              "filename"
             ]
           }
         ]
@@ -38986,12 +41648,42 @@
         "id": "067_legacy_duplicate_installation_versions",
         "name": "067_legacy_duplicate_installation_versions.sql",
         "appliedAt": "2026-10-10T09:09:10.219911+00:00"
+      },
+      {
+        "id": "068_module_platform_records",
+        "name": "068_module_platform_records.sql",
+        "appliedAt": "2026-10-12T20:05:34.437215+00:00"
+      },
+      {
+        "id": "069_module_platform_media_sharing",
+        "name": "069_module_platform_media_sharing.sql",
+        "appliedAt": "2026-10-12T20:05:34.437215+00:00"
+      },
+      {
+        "id": "070_module_platform_functions_actions",
+        "name": "070_module_platform_functions_actions.sql",
+        "appliedAt": "2026-10-12T20:05:34.437215+00:00"
+      },
+      {
+        "id": "071_module_record_search_projection",
+        "name": "071_module_record_search_projection.sql",
+        "appliedAt": "2026-10-12T20:05:34.437215+00:00"
+      },
+      {
+        "id": "072_module_distribution_protocol",
+        "name": "072_module_distribution_protocol.sql",
+        "appliedAt": "2026-10-14T01:27:28.538373+00:00"
+      },
+      {
+        "id": "073_backup_sequence_acl_defaults",
+        "name": "073_backup_sequence_acl_defaults.sql",
+        "appliedAt": "2026-10-14T01:27:28.538373+00:00"
       }
     ]
   },
   "operationalAggregates": {
     "outbox": {
-      "count": 599,
+      "count": 757,
       "failed": 0,
       "pending": 0
     },
@@ -39022,6 +41714,12 @@
       },
       {
         "count": 2,
+        "latest": "2026-10-14T14:57:05.71+00:00",
+        "status": "FAILED",
+        "jobType": "module.update"
+      },
+      {
+        "count": 2,
         "latest": "2026-07-18T10:29:42.108+00:00",
         "status": "DEAD_LETTER",
         "jobType": "plugin.enable"
@@ -39034,9 +41732,9 @@
       }
     ],
     "storyItems": {
-      "count": 16,
+      "count": 17,
       "active": 0,
-      "deletedOrInactive": 16
+      "deletedOrInactive": 17
     },
     "aiProviders": [
       {
@@ -39081,9 +41779,9 @@
       "enabled": 0
     },
     "installPlans": {
-      "count": 49,
-      "withDescriptor": 19,
-      "withDescriptorDigest": 19
+      "count": 83,
+      "withDescriptor": 53,
+      "withDescriptorDigest": 53
     },
     "intelligence": {
       "runs": 0,
@@ -39096,9 +41794,9 @@
       "governorDecisions": 0
     },
     "notifications": {
-      "count": 187,
-      "active": 187,
-      "unread": 178
+      "count": 189,
+      "active": 189,
+      "unread": 180
     },
     "aiModelsByState": {
       "available:active:enabled=true": 1,
@@ -39115,7 +41813,7 @@
       "count": 1,
       "fresh": 1,
       "releases": [
-        "50dfc12045be639ad65acb95d2b4e94ea864ed42"
+        "f05d03c237c62d1b0946a760610d1155f02a8520"
       ]
     },
     "jobFailureDetails": [
@@ -39148,6 +41846,11 @@
         "code": "UNSUPPORTED_RECORD_TYPE",
         "count": 10,
         "latest": "2026-07-29T08:56:58.964+00:00"
+      },
+      {
+        "code": "UNTRUSTED_RELEASE",
+        "count": 2,
+        "latest": "2026-10-14T14:57:05.71+00:00"
       }
     ],
     "jobFailuresByCode": {
@@ -39155,6 +41858,7 @@
       "42P18": 2,
       "PLUGIN_FAILED": 1,
       "PLUGIN_TIMEOUT": 1,
+      "UNTRUSTED_RELEASE": 2,
       "UNSUPPORTED_RECORD_TYPE": 10,
       "MAIL_PROVISIONER_DISABLED": 10
     },
@@ -39167,10 +41871,10 @@
     },
     "publishedReleases": 12,
     "releaseAssetBlobs": {
-      "bytes": 4644817,
-      "count": 6
+      "bytes": 4741978,
+      "count": 38
     },
-    "releaseSignatures": 8,
+    "releaseSignatures": 34,
     "verifiedFrontends": 8,
     "aiProvidersByState": {
       "local:available": 1,
@@ -39197,41 +41901,41 @@
       "avatar": 1
     },
     "attachmentsByStatus": {
-      "ready": 25,
+      "ready": 27,
       "failed": 1,
       "created": 2,
       "expired": 1
     },
     "backgroundJobsByType": {
-      "mail.deliver": 369,
-      "module.enable": 68,
-      "module.update": 112,
+      "mail.deliver": 438,
+      "module.enable": 102,
+      "module.update": 128,
       "plugin.enable": 14,
-      "module.disable": 34,
-      "module.install": 66,
+      "module.disable": 42,
+      "module.install": 126,
       "plugin.disable": 6,
       "search.reindex": 4,
       "function.invoke": 15,
-      "module.uninstall": 30,
-      "search.index.post": 230,
+      "module.uninstall": 96,
+      "search.index.post": 236,
       "notification.quote": 6,
       "notification.reply": 8,
-      "notification.create": 64,
+      "notification.create": 68,
       "notification.repost": 36,
       "notification.comment": 68,
       "notification.mention": 2,
-      "search.index.profile": 120,
+      "search.index.profile": 128,
       "extension.job.execute": 2,
-      "module.release.verify": 36,
+      "module.release.verify": 92,
       "notification.reaction": 86,
-      "atproto.publish.delete": 68,
+      "atproto.publish.delete": 70,
       "atproto.publish.update": 10,
-      "module.release.publish": 36,
+      "module.release.publish": 92,
       "mail.identity.provision": 10,
       "module.release.imported": 2
     },
-    "publisherSigningKeys": 3,
-    "releaseIntegrityRows": 17,
+    "publisherSigningKeys": 11,
+    "releaseIntegrityRows": 43,
     "installDescriptorKeys": [
       "artifact",
       "compatibility",
@@ -39251,9 +41955,9 @@
     ],
     "installationsByStatus": {
       "failed": 1,
-      "enabled": 13,
-      "removed": 5,
-      "disabled": 2,
+      "enabled": 11,
+      "removed": 17,
+      "disabled": 1,
       "uninstalled": 3,
       "installedDisabled": 2
     },
@@ -39263,32 +41967,32 @@
       "activeInvokeCapabilityInstallations": 0
     },
     "moduleReleasesByState": {
-      "revoked": 3,
+      "revoked": 27,
       "published": 12,
       "superseded": 2
     },
     "backgroundJobsByStatus": {
-      "FAILED": 4,
-      "SUCCEEDED": 1486,
+      "FAILED": 6,
+      "SUCCEEDED": 1869,
       "DEAD_LETTER": 12
     },
     "readyAttachmentLinkage": {
-      "ready": 25,
+      "ready": 27,
       "linked": 16,
-      "orphanCandidates": 9
+      "orphanCandidates": 11
     },
     "eventDeliveriesByStatus": {
-      "completed": 505
+      "completed": 796
     },
     "releaseArtifactCoverage": {
-      "releases": 17,
-      "blobAvailable": 2
+      "releases": 41,
+      "blobAvailable": 26
     },
     "publishedUnsignedReleases": 7,
     "activeInstallPermissionReviews": {
-      "active": 15,
-      "reviews": 58,
-      "withoutReview": 2,
+      "active": 12,
+      "reviews": 122,
+      "withoutReview": 1,
       "missingReviews": [
         {
           "moduleId": "digital.modula.vault-notes.ai",
@@ -39303,26 +42007,6 @@
           "requestedPermissionClasses": [
             "ai",
             "notes"
-          ],
-          "effectiveAuthorizationSource": "no recorded grants (fail closed)"
-        },
-        {
-          "moduleId": "digital.modula.vault-notes.voice",
-          "reviewRowPresent": false,
-          "requestedPermissions": [
-            "media.audio.capture",
-            "media.audio.playback",
-            "notes.actions.contribute",
-            "notes.attachments.create",
-            "notes.attachments.read",
-            "notes.editor.contribute",
-            "notes.update",
-            "transcription.request"
-          ],
-          "requestedPermissionClasses": [
-            "media",
-            "notes",
-            "transcription"
           ],
           "effectiveAuthorizationSource": "no recorded grants (fail closed)"
         }

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "planId": "019f0000-0000-7000-8000-000000000003",
+  "installationId": "019f0000-0000-7000-8000-000000000001",
+  "fromVersion": "1.8.0",
+  "toVersion": "2.0.0-rc.2",
+  "allowed": false,
+  "blockedReasonCodes": ["PERMISSION_REVIEW_REQUIRED"],
+  "permissionDelta": {"added": ["settings:read"], "removed": [], "unchanged": ["settings:register"], "reviewRequired": true},
+  "rollback": {"available": true, "targetVersion": "1.8.0"}
+}

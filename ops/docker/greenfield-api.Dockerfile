@@ -54,18 +54,18 @@ RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/intelligence-contracts build \
  && pnpm --filter @modula/intelligence-governance build \
  && pnpm --filter @modula/greenfield-api build
+RUN pnpm --config.inject-workspace-packages=true --filter @modula/greenfield-api deploy --prod /prod/api
 
 FROM node:24.18.0-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
-RUN groupadd --system modula && useradd --system --gid modula --create-home modula \
- && corepack enable && corepack prepare pnpm@11.11.0 --activate
-COPY --from=build --chown=modula:modula /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build --chown=modula:modula /app/node_modules ./node_modules
-COPY --from=build --chown=modula:modula /app/packages ./packages
-COPY --from=build --chown=modula:modula /app/services/greenfield-api ./services/greenfield-api
-COPY --from=build --chown=modula:modula /modula-mod /modula-mod
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/* /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+ && groupadd --system modula \
+ && useradd --system --gid modula --create-home modula
+COPY --from=build --chown=modula:modula /prod/api ./
 USER modula
 EXPOSE 4020
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 CMD node -e "fetch('http://127.0.0.1:4020/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-CMD ["node", "services/greenfield-api/dist/main.js"]
+CMD ["node", "dist/main.js"]

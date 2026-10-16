@@ -1,0 +1,19 @@
+[Unit]
+Description=Modula GreenField encrypted production backup
+Requires=docker.service
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+EnvironmentFile=/etc/modula/greenfield-platform-recovery.env
+ExecStart=/usr/bin/flock -n /run/lock/modula-greenfield-backup.lock /usr/bin/node /root/modula-latest/ops/backup/greenfield-v1-backup.mjs
+ExecStartPost=/usr/bin/node /root/modula-latest/ops/backup/greenfield-v1-retention.mjs --apply
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+WantedBy=multi-user.target
