@@ -1,0 +1,18 @@
+[
+  {
+    "repoDigests": [],
+    "id": "sha256:9f05b40754980b91981475697eb00f37a76a9d7b8fb7fbcdbd2a7964b76351dd",
+    "created": "2026-10-15T21:34:12.214395907+01:00",
+    "revision": "855fff336e4aabbf6ca24b0b5973c23184051639",
+    "migration": "074_greenfield_v1_query_indexes",
+    "size": 278714724
+  },
+  {
+    "repoDigests": [],
+    "id": "sha256:4a1ecee414ca876eb5da604931e0a28242541cec81cfaafab82adc045cd886e1",
+    "created": "2026-10-15T21:34:41.677958955+01:00",
+    "revision": "855fff336e4aabbf6ca24b0b5973c23184051639",
+    "migration": "074_greenfield_v1_query_indexes",
+    "size": 260985460
+  }
+]

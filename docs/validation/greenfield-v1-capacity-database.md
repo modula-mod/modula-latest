@@ -1,6 +1,6 @@
 # GreenField v1 capacity-database evidence
 
-Date: 2026-10-15
+Evidence window: 2026-10-15 through 2026-10-16
 
 Environment: dedicated disposable PostgreSQL 16 database
 `modula_closeout_capacity` on loopback. It was created from zero and migrated
@@ -105,11 +105,24 @@ mistaken for user data or copied into production.
 
 ## Soak disposition
 
-A 25-client, 100 ms think-time soak was started against the isolated API and
-this fixture. Interim samples through roughly 15 minutes were stable: API RSS
-plateaued near 354 MiB with 45–47 file descriptors, worker RSS near 106 MiB with
-22 descriptors, database connections at 12, and queued/running jobs at zero.
-The 30-minute process ended while the operator terminal was detached and its
-final JSON report was not retained. These interim observations are useful but
-do **not** satisfy the closeout soak PASS gate; a complete retained run is still
-required before a freeze decision.
+The final isolated soak ran for 1,800.41 seconds at 25 clients and 250 ms think
+time. Its atomic report contains 361/361 valid samples and a PASS exit status.
+It completed 178,110 requests at 98.94 RPS with p50/p95/p99/max latency of
+0.61/10.85/12.62/45.06 ms. Sixteen requests received bounded HTTP 429 responses
+(0.009%); there were no 5xx responses, transport errors, or timeouts.
+
+API RSS moved from 290.14 MiB to 314.94 MiB (+24.80 MiB), with only +0.63 MiB
+in the final five minutes. Worker RSS moved from 93.61 MiB to 101.18 MiB
+(+7.57 MiB), with +1.36 MiB in the final five minutes. API file descriptors
+were 24/34 start/end with a maximum of 59; worker descriptors were 24/24 with a
+maximum of 24. Database connections were 2/12 start/end with a maximum of 14.
+Queued and running job maxima were zero. API, worker, and database availability
+held in every sample, and maximum worker-heartbeat age was 11.77 seconds.
+
+The first fully retained 30-minute run is kept as truthful failure evidence.
+All virtual clients shared the loopback source identity, so the abuse limiter
+bounded 428,812 of 445,131 requests with HTTP 429. It proved service stability
+under rejection, not useful mixed-client capacity. The corrected harness uses
+one RFC 2544 benchmarking identity per virtual client only on isolated URLs and
+rejects synthetic client identities for public production URLs. Both reports
+are retained under `docs/validation/evidence/greenfield-v1-closeout-r1/`.

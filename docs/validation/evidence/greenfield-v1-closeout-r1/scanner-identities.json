@@ -1,0 +1,24 @@
+[
+  {
+    "repoTags": [
+      "anchore/syft:latest",
+      "anchore/syft:v1.54.1"
+    ],
+    "repoDigests": [
+      "anchore/syft@sha256:3eb5379ba7b409c3f4069b686110527af0c47df993fa5c10d13e7cf34f49b1aa"
+    ],
+    "id": "sha256:dbff4983a6eda5a3d3db7d941fffdb39e214134ef3c20f8e76abbfda2f3d86e7",
+    "created": "2026-10-06T15:34:16.483430315Z"
+  },
+  {
+    "repoTags": [
+      "aquasec/trivy:0.76.0",
+      "aquasec/trivy:latest"
+    ],
+    "repoDigests": [
+      "aquasec/trivy@sha256:2416d1f74045b57274df1a340eee6b510cacd73c66a6ccb8da092b117eb7d222"
+    ],
+    "id": "sha256:418db8abbcc7bf136e2899c5bde42a309f556077420726badc669727fb204b67",
+    "created": "2026-10-14T11:43:50.278574239Z"
+  }
+]

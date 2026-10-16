@@ -10,11 +10,13 @@ const durationSeconds = Number(options.duration ?? 60)
 const thinkMs = Number(options['think-ms'] ?? 0)
 const token = process.env.MODULA_LOAD_ACCESS_TOKEN?.trim() || null
 const production = /(^|\.)api\.modula\.digital$/i.test(new URL(baseUrl).hostname)
+const syntheticClientIps = Boolean(options['synthetic-client-ips'])
 if (levels.some(value => !Number.isInteger(value) || value < 1 || value > 2_000)) fail('concurrency levels must be integers between 1 and 2000')
 if (!Number.isFinite(durationSeconds) || durationSeconds < 1 || durationSeconds > 3_600) fail('duration must be between 1 and 3600 seconds')
 if (!Number.isFinite(thinkMs) || thinkMs < 0 || thinkMs > 60_000) fail('think-ms must be between 0 and 60000')
 if (production && !options['production-bounded']) fail('production load requires --production-bounded')
 if (production && (Math.max(...levels) > 50 || durationSeconds > 60)) fail('production load is bounded to concurrency <=50 and duration <=60 seconds')
+if (production && syntheticClientIps) fail('synthetic client IPs are forbidden for production load')
 
 const endpoints = options.scenarios ? loadScenarios(String(options.scenarios)) : defaultScenarios(Boolean(token))
 if (!endpoints.length) fail('at least one load scenario is required')
@@ -25,6 +27,7 @@ const report = {
   startedAt: new Date().toISOString(),
   baseUrl,
   productionBounded: production,
+  syntheticClientIps,
   durationSeconds,
   thinkMs,
   scenarios: endpoints.map(({name, method, path}) => ({name, method, path})),
@@ -56,12 +59,13 @@ async function runLevel(concurrency) {
   loop.enable()
   const sampleTimer = options['local-metrics'] ? setInterval(() => samples.push(localMetrics()), 1_000) : null
   const started = performance.now()
-  await Promise.all(Array.from({length: concurrency}, async () => {
+  await Promise.all(Array.from({length: concurrency}, async (_, clientIndex) => {
     while (Date.now() < deadline) {
       const scenario = endpoints[nextScenario++ % endpoints.length]
       const before = performance.now()
       try {
         const headers = {'cache-control': 'no-store', 'x-request-id': `load-${crypto.randomUUID()}`, ...scenario.headers}
+        if (syntheticClientIps) headers['x-forwarded-for'] = syntheticClientIp(clientIndex)
         if (token) headers.authorization = `Bearer ${token}`
         const response = await fetch(`${baseUrl}${scenario.path}`, {
           method: scenario.method,
@@ -167,11 +171,18 @@ function parseArgs(values) {
     const item = values[index]
     if (!item.startsWith('--')) fail(`unexpected argument: ${item}`)
     const key = item.slice(2)
-    if (['production-bounded', 'local-metrics'].includes(key)) result[key] = true
+    if (['production-bounded', 'local-metrics', 'synthetic-client-ips'].includes(key)) result[key] = true
     else if (values[index + 1] === undefined) fail(`--${key} requires a value`)
     else result[key] = values[++index]
   }
   return result
+}
+
+function syntheticClientIp(clientIndex) {
+  // RFC 2544 benchmarking space; never routable as a public client address.
+  const thirdOctet = Math.floor(clientIndex / 254)
+  const fourthOctet = (clientIndex % 254) + 1
+  return `198.18.${thirdOctet}.${fourthOctet}`
 }
 
 function fail(message) {

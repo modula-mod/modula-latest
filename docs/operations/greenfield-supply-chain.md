@@ -26,11 +26,13 @@ All GitHub Actions used by the Atlas contract workflow are pinned to immutable
 commit SHAs. Any deliberately tag-pinned action must be recorded here before it
 is accepted.
 
-The API and worker runtime base is `node:24.18.0-bookworm-slim`. PostgreSQL is
-`postgres:16.9-alpine`; Redis is `redis:7.4-alpine`. Release evidence records
-the resolved image digests and the OCI revision/version labels. Production
-deployment accepts only an exact merged `origin/main` SHA and verifies those
-labels after cutover.
+The API and worker build base is `node:24.18.0-bookworm-slim`. Their runtime
+stages contain only the filtered production deployment, not the monorepo or
+package-manager toolchain, and execute as the unprivileged `modula` user.
+PostgreSQL is `postgres:16.9-alpine`; Redis is `redis:7.4-alpine`. Release
+evidence records the resolved image digests and the OCI revision/version
+labels. Production deployment accepts only an exact merged `origin/main` SHA
+and verifies those labels after cutover.
 
 ## Scanners and classification
 
@@ -45,14 +47,58 @@ candidates were manually classified as immutable Git/image revisions, lockfile
 checksums, a migration literal, or synthetic test signing material. A separate
 pattern scan found no private-key blocks or AWS, GitHub, or OpenAI credential
 shapes. The offline production signing private key is not present in the
-repository. Scanner output is treated as sensitive and is not committed.
+repository. Raw repository/config scanner output is treated as sensitive and
+is not committed. The retained exact-image reports are sanitized by first
+proving that their secret-finding arrays are empty.
 
-Candidate API and worker SBOMs are generated as CycloneDX JSON from the exact
+Candidate API and worker SBOMs are generated as SPDX JSON from the exact
 images and retained with their SHA-256 digests. Trivy scans those same images
 for OS/library vulnerabilities and secrets/configuration findings. A finding is
 not waived merely because a package is present: the release evidence must
 classify it as exploitable, unreachable, development-only, false positive, or
 upgrade-required.
+
+## R1 candidate image evidence
+
+Candidate source/container commit `855fff336e4aabbf6ca24b0b5973c23184051639`
+produced the following local immutable image identities:
+
+| Image | Image ID | Size | SBOM packages |
+| --- | --- | ---: | ---: |
+| API | `sha256:9f05b40754980b91981475697eb00f37a76a9d7b8fb7fbcdbd2a7964b76351dd` | 278,714,724 bytes | 282 |
+| worker | `sha256:4a1ecee414ca876eb5da604931e0a28242541cec81cfaafab82adc045cd886e1` | 260,985,460 bytes | 145 |
+
+Both images booted against migration 074, ran as `modula`, and lacked `npm` and
+`npx`. API readiness and worker heartbeat passed. The final SPDX SBOM digests
+are `cedf5a17a133301bc49bdba7cab91d8f39fba401a5f14bb24d173daca5160cda`
+and `c7a0b015a7a6e2f5d19b53bfe2b74a1548b426a98cc5ec1eacd3728f1600274c`.
+
+The initial runtime images copied the root workspace and package-manager
+toolchain, were about 2.5 GB each, and exposed application/development findings
+that were not required at runtime. The bounded Dockerfile remediation reduced
+them to the sizes above and removed that graph. The retained final Trivy scan
+reports no secrets and no high/critical finding with an available fixed
+version. It reports 57 package occurrences per image representing 12 unique OS
+advisories: one Debian `zlib1g` critical marked `will_not_fix`, five deferred
+package occurrences, and 51 occurrences without a published Debian fix.
+
+The critical `CVE-2023-45853` applies to MiniZip's
+`zipOpenNewFileInZip4_6`; GreenField neither ships nor invokes a MiniZip/archive
+execution path. The remaining high findings concern privileged `mount`/
+`nsenter` operations, `systemd-homed`, archive utilities, ACL symlink handling,
+or terminal parsing. The container runs a non-root Node process, has no Docker
+socket, does not execute these utilities, accepts no shell/archive workload,
+and exposes only the compiled service entry point. These are accepted as
+unreachable base-image findings for this candidate and must be rescanned when a
+fixed Debian/Node base becomes available. A distroless alternative was tested
+and rejected because its current Node 24 base contained fixed-but-unpatched
+critical OpenSSL findings; changing to that image would regress risk.
+
+The offline Ed25519 release-signing private key was not found in the repository,
+the production configuration/storage paths, or either image. The backend
+assertion-signing secret present in production is a distinct online runtime
+credential; registry schema and release trust store contain public keys only.
+No secret value was read into or written into this evidence.
 
 ## Reproduction commands
 

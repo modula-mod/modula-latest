@@ -1,0 +1,4 @@
+cedf5a17a133301bc49bdba7cab91d8f39fba401a5f14bb24d173daca5160cda  api-sbom.spdx.json
+c7a0b015a7a6e2f5d19b53bfe2b74a1548b426a98cc5ec1eacd3728f1600274c  worker-sbom.spdx.json
+54a17e517928cf5e8230e7091071c9ed83beb17b58e51dcedbda6e87cf51426a  api-trivy.json
+96167d0fe6e5ec785c2795bc25593fc902f72a58d95266e9e7ac8327992b5783  worker-trivy.json

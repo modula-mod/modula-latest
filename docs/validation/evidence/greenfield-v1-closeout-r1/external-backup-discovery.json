@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-10-15T20:20:00Z",
+  "recheckedAt": "2026-10-16T07:40:00Z",
+  "host": "core.modula.digital",
+  "rcloneConfiguredRemotes": 0,
+  "resticRepositoryConfigured": false,
+  "awsClientConfigurationPresent": false,
+  "minioClientAliasesPresent": false,
+  "independentBackupMounts": 0,
+  "configuredBackupEnvironmentScope": "local database backup role only",
+  "allDiscoveredBackupStorageOnRootDevice": true,
+  "status": "BLOCKED",
+  "reason": "No authorized independently administered backup destination or credentials were present. Same-host directories are not classified as off-host recovery."
+}
