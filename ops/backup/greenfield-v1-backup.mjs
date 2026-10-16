@@ -24,8 +24,14 @@ const sourceRevision = git(['rev-parse', 'HEAD'])
 if (!/^[0-9a-f]{40}$/.test(sourceRevision)) fail('production checkout has no exact Git SHA')
 if (git(['branch', '--show-current']) !== 'main') fail('production checkout must be on main')
 if (git(['status', '--short'])) fail('production checkout must be clean')
-const originMain = git(['rev-parse', 'origin/main'])
-if (sourceRevision !== originMain) fail('production checkout does not match origin/main')
+const expectedSourceRevision = process.env.MODULA_BACKUP_EXPECTED_SOURCE_SHA
+if (expectedSourceRevision !== undefined) {
+  if (!/^[0-9a-f]{40}$/.test(expectedSourceRevision)) fail('MODULA_BACKUP_EXPECTED_SOURCE_SHA must be an exact Git SHA')
+  if (sourceRevision !== expectedSourceRevision) fail('production checkout does not match the expected backup source SHA')
+} else {
+  const originMain = git(['rev-parse', 'origin/main'])
+  if (sourceRevision !== originMain) fail('scheduled backup requires production checkout to match origin/main')
+}
 
 for (const container of [apiContainer, workerContainer]) {
   const running = dockerInspect(container)

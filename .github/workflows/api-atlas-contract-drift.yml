@@ -93,6 +93,8 @@ jobs:
         run: CI=true pnpm verify:greenfield-v1-contract-freeze
       - name: GreenField v1 permission declaration and enforcement inventory
         run: CI=true pnpm verify:greenfield-v1-permissions
+      - name: GreenField v1 deployment and backup safety contract
+        run: CI=true pnpm verify:greenfield-v1-deploy-safety
       - name: API tests
         run: CI=true pnpm api:test
       - name: Worker tests

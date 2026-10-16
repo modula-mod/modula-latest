@@ -118,19 +118,16 @@ for service in api worker; do
 done
 
 DEPLOY_PHASE="pre-deploy-backup"
-if systemctl cat modula-greenfield-backup.service >/dev/null 2>&1; then
-  systemctl start modula-greenfield-backup.service
-else
-  BACKUP_RUNNER="${MODULA_DEPLOY_BACKUP_RUNNER:-${SCRIPT_ROOT}/backup/greenfield-v1-backup.mjs}"
-  [[ -f "${BACKUP_RUNNER}" ]] || { echo "backup runner missing: ${BACKUP_RUNNER}" >&2; exit 1; }
-  (
-    set -a
-    # shellcheck disable=SC1090
-    source "${RECOVERY_ENV_FILE}"
-    set +a
+BACKUP_RUNNER="${MODULA_DEPLOY_BACKUP_RUNNER:-${SCRIPT_ROOT}/backup/greenfield-v1-backup.mjs}"
+[[ -f "${BACKUP_RUNNER}" ]] || { echo "backup runner missing: ${BACKUP_RUNNER}" >&2; exit 1; }
+(
+  set -a
+  # shellcheck disable=SC1090
+  source "${RECOVERY_ENV_FILE}"
+  set +a
+  MODULA_BACKUP_EXPECTED_SOURCE_SHA="${PREVIOUS_SHA}" \
     exec flock -n /run/lock/modula-greenfield-backup.lock node "${BACKUP_RUNNER}"
-  )
-fi
+)
 node -e '
   const fs = require("node:fs");
   const [path, expected] = process.argv.slice(1);
