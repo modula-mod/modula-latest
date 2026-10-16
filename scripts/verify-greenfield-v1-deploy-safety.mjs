@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {readFileSync} from 'node:fs'
+import {existsSync, readFileSync} from 'node:fs'
 import {spawnSync} from 'node:child_process'
 
 const deploy = readFileSync('ops/deploy/greenfield-production.sh', 'utf8')
@@ -10,6 +10,10 @@ check(deploy.includes('MODULA_BACKUP_EXPECTED_SOURCE_SHA="${PREVIOUS_SHA}"'), 'd
 check(!deploy.includes('systemctl start modula-greenfield-backup.service'), 'deploy does not delegate its synchronous backup gate to systemd')
 check(deploy.includes('flock -n /run/lock/modula-greenfield-backup.lock'), 'deploy uses the backup lock')
 check(deploy.includes('${SCRIPT_ROOT}/ops/backup/greenfield-v1-backup.mjs'), 'deploy resolves the default backup runner from the repository ops directory')
+check(deploy.includes('node dist/scripts/db-migrate.js'), 'deploy invokes the compiled migration entrypoint in the production image')
+check(deploy.includes('node dist/scripts/db-status.js'), 'deploy invokes the compiled migration status entrypoint in the production image')
+check(existsSync('services/greenfield-api/src/scripts/db-migrate.ts'), 'compiled migration entrypoint source is included in the API build')
+check(existsSync('services/greenfield-api/src/scripts/db-status.ts'), 'compiled migration status entrypoint source is included in the API build')
 check(deploy.indexOf('DEPLOY_PHASE="pre-deploy-backup"') < deploy.indexOf('DEPLOY_PHASE="checkout-fast-forward"'), 'backup precedes checkout fast-forward')
 check(backup.includes("process.env.MODULA_BACKUP_EXPECTED_SOURCE_SHA"), 'backup wrapper accepts an explicit expected source SHA')
 check(backup.includes("scheduled backup requires production checkout to match origin/main"), 'scheduled backups remain pinned to origin/main')
