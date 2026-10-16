@@ -9,6 +9,7 @@ const failures = []
 check(deploy.includes('MODULA_BACKUP_EXPECTED_SOURCE_SHA="${PREVIOUS_SHA}"'), 'deploy pins the backup to the currently deployed SHA')
 check(!deploy.includes('systemctl start modula-greenfield-backup.service'), 'deploy does not delegate its synchronous backup gate to systemd')
 check(deploy.includes('flock -n /run/lock/modula-greenfield-backup.lock'), 'deploy uses the backup lock')
+check(deploy.includes('${SCRIPT_ROOT}/ops/backup/greenfield-v1-backup.mjs'), 'deploy resolves the default backup runner from the repository ops directory')
 check(deploy.indexOf('DEPLOY_PHASE="pre-deploy-backup"') < deploy.indexOf('DEPLOY_PHASE="checkout-fast-forward"'), 'backup precedes checkout fast-forward')
 check(backup.includes("process.env.MODULA_BACKUP_EXPECTED_SOURCE_SHA"), 'backup wrapper accepts an explicit expected source SHA')
 check(backup.includes("scheduled backup requires production checkout to match origin/main"), 'scheduled backups remain pinned to origin/main')
