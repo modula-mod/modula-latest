@@ -160,8 +160,8 @@ done
 
 DEPLOY_PHASE="migration"
 docker compose -f "${COMPOSE_FILE}" run --rm --no-deps greenfield-api \
-  node services/greenfield-api/dist/scripts/db-migrate.js
-MIGRATION_STATUS="$(docker compose -f "${COMPOSE_FILE}" run --rm --no-deps greenfield-api node services/greenfield-api/dist/scripts/db-status.js)"
+  node dist/scripts/db-migrate.js
+MIGRATION_STATUS="$(docker compose -f "${COMPOSE_FILE}" run --rm --no-deps greenfield-api node dist/scripts/db-status.js)"
 node -e '
   let value = "";
   process.stdin.on("data", chunk => { value += chunk; });
