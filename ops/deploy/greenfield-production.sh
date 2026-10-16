@@ -118,7 +118,7 @@ for service in api worker; do
 done
 
 DEPLOY_PHASE="pre-deploy-backup"
-BACKUP_RUNNER="${MODULA_DEPLOY_BACKUP_RUNNER:-${SCRIPT_ROOT}/backup/greenfield-v1-backup.mjs}"
+BACKUP_RUNNER="${MODULA_DEPLOY_BACKUP_RUNNER:-${SCRIPT_ROOT}/ops/backup/greenfield-v1-backup.mjs}"
 [[ -f "${BACKUP_RUNNER}" ]] || { echo "backup runner missing: ${BACKUP_RUNNER}" >&2; exit 1; }
 (
   set -a
