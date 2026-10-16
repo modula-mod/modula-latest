@@ -21,7 +21,13 @@ record('runtime permission review fail closed', runtimeAccess.includes('permissi
 record('function invoke enforcement', functionService.includes('governedFunctionInvokeCapability') && functionService.includes('enforceCapability'), 'present')
 record('action request enforcement', actionService.includes('interModuleRequestCapability') && actionService.includes('enforceCapability'), 'present')
 
-const manifestFiles = execFileSync('rg', ['--files', '-g', 'manifest.json', '-g', 'module.json', '-g', 'modula.module.json'], {cwd: root, encoding: 'utf8'}).trim().split('\n').filter(Boolean)
+// Git is guaranteed by the checkout workflow; ripgrep is not installed on all
+// GitHub-hosted runner images. Include tracked and non-ignored untracked files
+// so local candidate manifests are still audited before commit.
+const manifestFiles = execFileSync('git', ['ls-files', '-co', '--exclude-standard'], {cwd: root, encoding: 'utf8'})
+  .trim()
+  .split('\n')
+  .filter(file => /(?:^|\/)(?:manifest|module|modula\.module)\.json$/.test(file))
 let manifests = 0
 let requests = 0
 for (const file of manifestFiles) {
