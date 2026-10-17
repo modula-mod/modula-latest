@@ -51,6 +51,15 @@ export class GreenfieldExtensionFabricService {
     const product = extensionProduct(input.release.manifest)
     if (!product) return
     const now = new Date()
+    // A removed installation can leave this account/product row behind. The
+    // primary key is the new installation id, so the leftover row must go
+    // before insert or reinstall fails the account/product unique key.
+    await trx
+      .deleteFrom('greenfield_extension_runtime_projection')
+      .where('account_id', '=', input.accountId)
+      .where('product_id', '=', input.release.moduleId)
+      .where('installation_id', '!=', input.installationId)
+      .execute()
     await trx
       .insertInto('greenfield_extension_runtime_projection')
       .values({
