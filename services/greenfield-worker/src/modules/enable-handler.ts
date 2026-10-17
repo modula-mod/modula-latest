@@ -29,6 +29,13 @@ export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfi
     throw permanentModuleJob('VALIDATION_FAILED', 'Community executable module contributions are disabled')
   }
   await db.transaction().execute(async trx => {
+    const current = await trx.selectFrom('greenfield_extension_installations')
+      .select('status')
+      .where('installation_id', '=', p.installationId)
+      .forUpdate()
+      .executeTakeFirst()
+    // A duplicate enable job must not pull an update or uninstall back to enabled.
+    if (!current || ['removed', 'uninstalled', 'notInstalled', 'uninstalling', 'updating'].includes(current.status)) return
     await registerModuleContributions(trx as any, release.release_id, release.extension_version_id, {enableExecutable: true})
     await projectStandard2Runtime(trx as any, {
       installationId: p.installationId,

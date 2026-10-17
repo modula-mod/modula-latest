@@ -37,7 +37,10 @@ export async function drainOutboxOnce(db: ModulaWorkerDb, batchSize: number): Pr
         .selectFrom('background_jobs')
         .select('id')
         .where('job_type', '=', event.event_type)
-        .where(sql<boolean>`payload ->> 'outboxId' = ${event.id}`)
+        // The API enqueue writes `outboxEventId`. This drain writes `outboxId`
+        // when it has to create the job itself. Either key means the event
+        // already has its worker job.
+        .where(sql<boolean>`coalesce(payload ->> 'outboxId', payload ->> 'outboxEventId') = ${event.id}`)
         .executeTakeFirst()
 
       if (!alreadyEnqueued) {

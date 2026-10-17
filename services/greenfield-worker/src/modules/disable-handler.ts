@@ -13,6 +13,12 @@ export async function handleModuleDisable(db: ModulaWorkerDb, payload: unknown):
     .where('greenfield_extension_installations.installation_id', '=', p.installationId)
     .executeTakeFirst()
   await db.transaction().execute(async trx => {
+    const current = await trx.selectFrom('greenfield_extension_installations')
+      .select('status')
+      .where('installation_id', '=', p.installationId)
+      .forUpdate()
+      .executeTakeFirst()
+    if (!current || ['removed', 'uninstalled', 'notInstalled', 'uninstalling', 'updating', 'installing'].includes(current.status)) return
     await setStandard2RuntimeStatus(trx as any, {
       installationId: p.installationId,
       accountId: p.accountId,
