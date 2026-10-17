@@ -76,6 +76,52 @@ describeLive('transactional outbox fault recovery', () => {
     expect(await outboxJobs()).toHaveLength(1)
   })
 
+  it('does not enqueue a second job when the API already stored outboxEventId', async () => {
+    const eventId = `closeout-eager-${suffix}`
+    const now = new Date()
+    await db.insertInto('outbox_events').values({
+      id: eventId,
+      event_type: 'module.update',
+      aggregate_type: 'module',
+      aggregate_id: eventId,
+      payload: {probe: 'eager-job'},
+      created_at: now,
+      published_at: null,
+      attempt_count: 0,
+      last_error: null,
+    }).execute()
+    await db.insertInto('background_jobs').values({
+      id: `job-eager-${suffix}`,
+      job_type: 'module.update',
+      payload: {outboxEventId: eventId, probe: 'eager-job'},
+      status: 'QUEUED',
+      action: 'module.update',
+      trace_id: eventId,
+      priority: 100,
+      available_at: now,
+      lease_owner: null,
+      lease_expires_at: null,
+      attempt_count: 0,
+      maximum_attempts: 5,
+      last_error: null,
+      created_at: now,
+      updated_at: now,
+      completed_at: null,
+    }).execute()
+
+    await drainOutboxOnce(db, 1_000)
+
+    const jobs = await db.selectFrom('background_jobs').select('id')
+      .where(sql<boolean>`coalesce(payload ->> 'outboxId', payload ->> 'outboxEventId') = ${eventId}`)
+      .execute()
+    expect(jobs).toHaveLength(1)
+    const published = await db.selectFrom('outbox_events').select('published_at').where('id', '=', eventId).executeTakeFirstOrThrow()
+    expect(published.published_at).not.toBeNull()
+
+    await db.deleteFrom('background_jobs').where('id', '=', `job-eager-${suffix}`).execute()
+    await db.deleteFrom('outbox_events').where('id', '=', eventId).execute()
+  })
+
   async function outboxJobs() {
     return db.selectFrom('background_jobs').select('id').where(sql<boolean>`payload ->> 'outboxId' = ${outboxId}`).execute()
   }

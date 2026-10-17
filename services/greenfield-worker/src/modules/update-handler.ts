@@ -26,9 +26,36 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfi
   const restoredStatus = p.previousStatus === 'installedDisabled' ? 'installedDisabled'
     : p.previousStatus === 'enabled' ? 'enabled' : 'disabled'
   await db.transaction().execute(async trx => {
-    const old = await trx.selectFrom('greenfield_extension_installations').select(['extension_version_id', 'account_id'])
+    const old = await trx.selectFrom('greenfield_extension_installations').select(['extension_version_id', 'account_id', 'status'])
       .where('installation_id', '=', p.installationId).forUpdate().executeTakeFirst()
     if (!old || old.account_id !== p.accountId) throw permanentModuleJob('VALIDATION_FAILED', 'Installation is unavailable to this account')
+    const notInstalled = new Set(['removed', 'uninstalled', 'notInstalled'])
+    if (notInstalled.has(old.status)) {
+      // Uninstall won. Completing the version move would revive the module.
+      if (typeof p.planId === 'string' && p.planId) {
+        await trx.updateTable('greenfield_module_install_plans').set({status: 'cancelled', updated_at: new Date()}).where('plan_id', '=', p.planId).where('status', 'in', ['queued', 'claimed']).execute()
+      }
+      return
+    }
+    if (!p.legacyTrustMigration && old.extension_version_id !== release.extension_version_id) {
+      const occupants = await trx.selectFrom('greenfield_extension_installations')
+        .select(['installation_id', 'status'])
+        .where('account_id', '=', p.accountId)
+        .where('extension_version_id', '=', release.extension_version_id)
+        .where('installation_id', '!=', p.installationId)
+        .where('legacy_duplicate_allowed', '=', false)
+        .execute()
+      for (const occupant of occupants) {
+        if (!notInstalled.has(occupant.status)) {
+          throw permanentModuleJob('VALIDATION_FAILED', 'Another active installation already uses this release')
+        }
+        // A removed install keeps its row. Free the release slot without deleting that history.
+        await trx.updateTable('greenfield_extension_installations')
+          .set({legacy_duplicate_allowed: true, updated_at: new Date()})
+          .where('installation_id', '=', occupant.installation_id)
+          .execute()
+      }
+    }
     if (old) {
       const oldRelease = await trx.selectFrom('greenfield_module_releases').select(['release_id', 'module_id', 'version'])
         .where('extension_version_id', '=', old.extension_version_id).executeTakeFirst()
