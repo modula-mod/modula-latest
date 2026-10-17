@@ -279,8 +279,10 @@ export function permissionDiff(current: GreenfieldModuleReleaseRecord, target: G
     added,
     removed: [...currentSet].filter(permission => !nextSet.has(permission)).sort(),
     retained: next.filter(permission => currentSet.has(permission)),
-    // Anything the account never saw needs fresh consent, whichever direction the switch goes.
-    requiresConsent: added.map(item => item.permission).filter(permission => !granted.includes(permission)),
+    // A permission the account has not granted still needs consent, including one
+    // that was declared before and left denied. Only newly declared permissions
+    // appear in `added`; `requiresConsent` is the full set still awaiting review.
+    requiresConsent: next.filter(permission => !granted.includes(permission)),
     highRiskIncrease: added.some(item => ['high', 'restricted'].includes(item.risk)),
   }
 }
