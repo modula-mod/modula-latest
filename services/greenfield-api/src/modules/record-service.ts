@@ -49,6 +49,7 @@ export type ModuleRecordQuery = {
   updatedFrom?: string
   updatedTo?: string
   filters?: Record<string, unknown>
+  contains?: Record<string, string | number | boolean>
   recordState?: 'active' | 'deleted'
 }
 
@@ -82,6 +83,10 @@ export class GreenfieldModuleRecordService {
     for (const key of Object.keys(filters)) {
       if (!definition.filterableFields.includes(key)) throw moduleError('VALIDATION_FAILED', `Unsupported filter field ${key}`)
     }
+    const contains = input.contains ?? {}
+    for (const key of Object.keys(contains)) {
+      if (!definition.filterableFields.includes(key)) throw moduleError('VALIDATION_FAILED', `Unsupported membership filter field ${key}`)
+    }
 
     let query = this.db
       .selectFrom('greenfield_module_records')
@@ -98,6 +103,9 @@ export class GreenfieldModuleRecordService {
       query = value === null
         ? query.where(sql`greenfield_module_records.data ->> ${field}`, 'is', null) as typeof query
         : query.where(sql`greenfield_module_records.data ->> ${field}`, '=', String(value)) as typeof query
+    }
+    for (const [field, value] of Object.entries(contains)) {
+      query = query.where(sql<boolean>`(greenfield_module_records.data -> ${field}) @> ${JSON.stringify([value])}::jsonb`) as typeof query
     }
     if (input.q) {
       if (definition.searchableFields.length === 0) throw moduleError('VALIDATION_FAILED', 'Collection is not searchable')
@@ -152,11 +160,12 @@ export class GreenfieldModuleRecordService {
   ) {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const context = await this.resolveRecordContext(accountId, canonicalId, collection, 'write')
-    const data = requireRecordData(input.data)
+    const suppliedData = requireRecordData(input.data)
     const visibility = normalizeVisibility(input.visibility ?? context.collectionDefinition.defaultVisibility)
     const mutationId = requireMutationId(input.mutationId)
-    validateRecordData(context.collectionDefinition, data, visibility, true)
     const recordId = input.recordId ?? uuidv7()
+    const data = populateServerManagedFields(context.collectionDefinition, suppliedData, recordId, new Date())
+    validateRecordData(context.collectionDefinition, data, visibility, true)
     const references = extractReferences(context.collectionDefinition, data)
     await this.validateReferenceTargets(accountId, references)
     return this.executeMutation({
@@ -168,7 +177,8 @@ export class GreenfieldModuleRecordService {
       visibility,
       mutationId,
       actor,
-      payloadInput: {data, visibility, requestedRecordId: input.recordId ?? null},
+      // The idempotency fingerprint describes caller input, not generated IDs/timestamps.
+      payloadInput: {data: suppliedData, visibility, requestedRecordId: input.recordId ?? null},
       references,
     })
   }
@@ -529,6 +539,7 @@ export class GreenfieldModuleRecordService {
       let data = input.data
       let visibility = input.visibility
       let references = input.references ?? []
+      let legacyData: Record<string, unknown> | undefined
       if (input.operation === 'restore') {
         const source = await trx
           .selectFrom('greenfield_module_record_revisions')
@@ -541,21 +552,24 @@ export class GreenfieldModuleRecordService {
           .executeTakeFirst()
         if (!source) throw moduleError('NOT_FOUND', 'Module record revision not found')
         data = requireRecordData(source.data_snapshot)
+        legacyData = data
         visibility = source.visibility
         references = extractReferences(input.collectionDefinition, data)
       }
       if (input.operation === 'update' && current) {
+        legacyData = requireRecordData(current.data)
         data = {...requireRecordData(current.data), ...requireRecordData(input.data)}
         visibility = input.visibility ?? current.visibility
         references = extractReferences(input.collectionDefinition, data)
       }
       if (input.operation === 'delete' && current) {
         data = requireRecordData(current.data)
+        legacyData = data
         visibility = current.visibility
         references = []
       }
       if (!data || !visibility) throw moduleError('VALIDATION_FAILED', 'Record mutation data is incomplete')
-      validateRecordData(input.collectionDefinition, data, visibility, true)
+      validateRecordData(input.collectionDefinition, data, visibility, true, legacyData)
 
       const revision = current ? current.revision + 1 : 1
       const baseRevision = current?.revision ?? null
@@ -1114,18 +1128,37 @@ export class GreenfieldModuleRecordService {
   }
 }
 
+export function populateServerManagedFields(
+  definition: GreenfieldModuleCollectionDefinition,
+  supplied: Record<string, unknown>,
+  recordId: string,
+  now: Date,
+): Record<string, unknown> {
+  const fields = new Set(definition.fields.map(field => field.name))
+  const data = {...supplied}
+  if (fields.has('id') && data.id === undefined) data.id = recordId
+  if (fields.has('createdAt') && data.createdAt === undefined) data.createdAt = now.toISOString()
+  if (fields.has('updatedAt') && data.updatedAt === undefined) data.updatedAt = now.toISOString()
+  return data
+}
+
 function validateRecordData(
   definition: GreenfieldModuleCollectionDefinition,
   data: Record<string, unknown>,
   visibility: string,
   strictReferences = false,
+  legacyData?: Record<string, unknown>,
 ): void {
   if (visibility === 'public' && definition.defaultVisibility === 'private') throw moduleError('FORBIDDEN', 'Collection is private by default and cannot publish records')
   const fieldsByName = new Map(definition.fields.map(field => [field.name, field]))
   for (const field of definition.fields) {
     const value = data[field.name]
     if (field.required && (value === undefined || value === null || value === '')) throw moduleError('VALIDATION_FAILED', `Missing required field ${field.name}`)
-    if (value !== undefined && value !== null) validateFieldValue(field, value, strictReferences)
+    if (value !== undefined && value !== null) {
+      const unchangedLegacyReference = field.type === 'recordReference' && typeof value === 'string'
+        && legacyData?.[field.name] === value
+      validateFieldValue(field, value, strictReferences && !unchangedLegacyReference)
+    }
   }
   if (fieldsByName.size > 0) {
     for (const key of Object.keys(data)) {
@@ -1305,7 +1338,8 @@ function buildSearchText(definition: GreenfieldModuleCollectionDefinition, data:
 function getStringField(data: Record<string, unknown>, field?: string): string | null {
   if (!field) return null
   const value = data[field]
-  return typeof value === 'string' && value.length ? value : null
+  if (typeof value === 'string' && value.length) return value
+  return parseRecordReference(value)?.recordId ?? null
 }
 
 function clampLimit(value: unknown, fallback: number): number {
