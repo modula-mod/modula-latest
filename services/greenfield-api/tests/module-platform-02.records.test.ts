@@ -86,6 +86,7 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
       data: {
         title: 'Alpha source',
         link: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}},
+        optionalLink: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}},
       },
     }
     const alphaCreate = await request('POST', `/v1/modules/${alpha.moduleId}/records/item`, alphaPayload)
@@ -123,10 +124,14 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
     const update = await request('PATCH', `/v1/modules/${alpha.moduleId}/records/item/${alphaRecordId}`, {
       mutationId: 'alpha-update-1',
       expectedRevision: 1,
-      data: {title: 'Alpha second'},
+      data: {title: 'Alpha second', optionalLink: null},
     })
     expect(update.statusCode).toBe(200)
     expect(update.json().data.revision).toBe(2)
+    expect(update.json().data.data.optionalLink).toBeNull()
+    const clearedReference = await request('GET', `/v1/modules/${alpha.moduleId}/records/item/${alphaRecordId}/references?fieldPath=optionalLink`)
+    expect(clearedReference.statusCode).toBe(200)
+    expect(clearedReference.json().data.references).toEqual([])
 
     const concurrent = await Promise.all([
       request('PATCH', `/v1/modules/${alpha.moduleId}/records/item/${alphaRecordId}`, {
@@ -352,11 +357,12 @@ function alphaCollection(): GreenfieldModuleCollectionDefinition {
     fields: [
       {fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true},
       {fieldId: 'link', name: 'link', type: 'recordReference', label: 'Linked record', required: true},
+      {fieldId: 'optionalLink', name: 'optionalLink', type: 'recordReference', label: 'Optional linked record'},
     ],
     searchableFields: ['title'],
     filterableFields: ['link'],
     sortableFields: ['createdAt', 'updatedAt', 'title'],
-    referenceFields: ['link'],
+    referenceFields: ['link', 'optionalLink'],
     retentionPolicy: 'keepOnUninstall',
   }
 }
