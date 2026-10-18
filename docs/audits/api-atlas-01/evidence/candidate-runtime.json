@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-16T14:25:37.482Z",
+  "capturedAt": "2026-10-18T20:59:33.684Z",
   "source": {
-    "branch": "greenfield-v1-migration-entrypoints",
-    "headAtCapture": "28f14294aeb5c7264f518685052de37961717449",
+    "branch": "phase/vault-record-metadata-01",
+    "headAtCapture": "189ed41e682559998d94b5347701094dffdb9341",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "76b708af74286ac59b3505f5db29dd6b0aa0ba765314d90b3f81e3e3027a7e7b"
+    "apiSourceSha256": "2affc8003bd03ba0c95dd051f800324fed52d9a337f673c584391cd25b55f7c9"
   },
   "runtimeRoutes": [
     {

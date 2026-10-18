@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "greenfield-v1-migration-entrypoints",
-      "sourceSha256": "76b708af74286ac59b3505f5db29dd6b0aa0ba765314d90b3f81e3e3027a7e7b",
-      "capturedAt": "2026-10-16T14:25:37.482Z",
+      "branch": "phase/vault-record-metadata-01",
+      "sourceSha256": "2affc8003bd03ba0c95dd051f800324fed52d9a337f673c584391cd25b55f7c9",
+      "capturedAt": "2026-10-18T20:59:33.684Z",
       "routeCount": 630
     },
     "status": "PASS"
