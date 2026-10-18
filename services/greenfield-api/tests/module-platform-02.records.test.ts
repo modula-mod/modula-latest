@@ -206,6 +206,20 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
     })
     expect(legacyRestored.statusCode).toBe(200)
     expect(legacyRestored.json().data.data.link).toBe('legacy-target-id')
+
+    const retainedRecordId = `${alphaRecordId}-retained`
+    const retainedCreate = await request('POST', `/v1/modules/${alpha.moduleId}/records/item`, {
+      mutationId: 'alpha-retained-create', recordId: retainedRecordId,
+      data: {title: 'Retained source', link: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}}},
+    })
+    expect(retainedCreate.statusCode).toBe(201)
+    const targetDeleted = await request('DELETE', `/v1/modules/${beta.moduleId}/records/entity/${betaRecordId}`, {
+      mutationId: 'beta-delete-1', expectedRevision: 1,
+    })
+    expect(targetDeleted.statusCode).toBe(200)
+    const retainedSource = await request('GET', `/v1/modules/${alpha.moduleId}/records/item/${retainedRecordId}`)
+    expect(retainedSource.statusCode).toBe(200)
+    expect(retainedSource.json().data.data.link).toEqual({record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}})
   })
 
   async function registerAccount(email: string, handle: string) {
