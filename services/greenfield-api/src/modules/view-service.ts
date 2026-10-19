@@ -101,6 +101,8 @@ export class GreenfieldModuleViewService {
         sortableFields: arrayOfStrings(row.sortable_fields),
         folderField: row.folder_field ?? undefined,
         referenceFields: arrayOfStrings(row.reference_fields),
+        ...(row.schema_definition && typeof row.schema_definition === 'object' && !Array.isArray(row.schema_definition)
+          ? {schemaDefinition: row.schema_definition as Record<string, unknown>} : {}),
         retentionPolicy: row.retention_policy,
       }
       const result = validateGreenfieldModuleCollection(candidate, context.moduleId)

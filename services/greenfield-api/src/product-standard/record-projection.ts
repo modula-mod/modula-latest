@@ -82,20 +82,28 @@ export function projectMpsRecordCollections(input: {
     })
     const fieldNames = new Set(fields.map(field => field.fieldId))
     const policy = queryPolicies.get(collection)
-    for (const field of policy?.staticFilters ?? []) {
+    for (const field of [...(policy?.staticFilters ?? []), ...(policy?.membershipFields ?? [])]) {
       if (!fieldNames.has(field)) throw moduleError('VALIDATION_FAILED', `Frontend filter ${field} is not declared by record schema ${schemaRef}`)
     }
     const scalar = fields.filter(field => SCALAR_FIELD_TYPES.has(field.type)).map(field => field.fieldId)
     const searchable = fields.filter(field => SEARCHABLE_FIELD_TYPES.has(field.type)).map(field => field.fieldId)
+    const declaredFolderField = asRecord(schema['x-greenfield']).folderField
+    const folderField = typeof declaredFolderField === 'string' && fieldNames.has(declaredFolderField)
+      ? declaredFolderField : undefined
     const projection: MpsRecordCollectionProjection = {
       collection,
       schemaRef,
       defaultVisibility: 'private',
       fields,
       searchableFields: policy?.search ? searchable : [],
-      filterableFields: policy?.filter ? scalar : [...(policy?.staticFilters ?? [])],
+      filterableFields: [...new Set([
+        ...(policy?.filter ? scalar : []),
+        ...(policy?.staticFilters ?? []),
+        ...[...(policy?.membershipFields ?? [])].filter(field => fields.some(candidate => candidate.name === field && (candidate.type === 'tags' || candidate.type === 'multiSelect'))),
+      ])],
       sortableFields: policy?.sort ? scalar : [],
       referenceFields: fields.filter(field => field.type === 'recordReference').map(field => field.fieldId),
+      ...(folderField ? {folderField} : {}),
       schemaDefinition: schema,
       retentionPolicy: 'keepOnUninstall',
     }
@@ -137,7 +145,16 @@ function fieldDefinition(
   }
 }
 
-function schemaFieldType(schema: Record<string, unknown>): GreenfieldModuleFieldType {
+function schemaFieldType(schema: Record<string, unknown>, depth = 0): GreenfieldModuleFieldType {
+  if (depth > 4) throw moduleError('VALIDATION_FAILED', 'MPS record schema field union is too deep')
+  if (schema.oneOf !== undefined) {
+    if (!Array.isArray(schema.oneOf) || schema.oneOf.length < 2 || schema.oneOf.length > 8 || !schema.oneOf.every(isRecord)) {
+      throw moduleError('VALIDATION_FAILED', 'MPS record schema field union is invalid')
+    }
+    const variants = schema.oneOf.filter(variant => variant.type !== 'null').map(variant => schemaFieldType(variant, depth + 1))
+    if (variants.length === 0) throw moduleError('VALIDATION_FAILED', 'MPS record schema field union has no value type')
+    return variants.every(type => type === variants[0]) ? variants[0]! : 'json'
+  }
   if (Array.isArray(schema.enum) && schema.enum.every(value => typeof value === 'string')) return 'singleSelect'
   if (typeof schema.const === 'boolean') return 'boolean'
   if (typeof schema.const === 'number') return 'number'
@@ -179,16 +196,17 @@ function collectFrontendFields(frontend: Record<string, unknown> | null): Map<st
 }
 
 function collectQueryPolicies(frontend: Record<string, unknown> | null) {
-  const out = new Map<string, {search: boolean; filter: boolean; sort: boolean; staticFilters: Set<string>}>()
+  const out = new Map<string, {search: boolean; filter: boolean; sort: boolean; staticFilters: Set<string>; membershipFields: Set<string>}>()
   for (const view of arrayOfRecords(frontend?.views)) {
     for (const binding of arrayOfRecords(view.bindings)) {
       if (binding.source !== 'record.query' || typeof binding.recordType !== 'string') continue
       const query = asRecord(binding.query)
-      const current = out.get(binding.recordType) ?? {search: false, filter: false, sort: false, staticFilters: new Set<string>()}
+      const current = out.get(binding.recordType) ?? {search: false, filter: false, sort: false, staticFilters: new Set<string>(), membershipFields: new Set<string>()}
       current.search ||= typeof query.searchParam === 'string'
       current.filter ||= typeof query.filterParam === 'string'
       current.sort ||= typeof query.sortParam === 'string'
       for (const key of Object.keys(asRecord(query.filters))) current.staticFilters.add(key)
+      if (typeof asRecord(query.membership).field === 'string') current.membershipFields.add(query.membership.field)
       out.set(binding.recordType, current)
     }
   }

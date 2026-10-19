@@ -612,7 +612,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
-      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version, modulePlatform(body.platform)), request.id))
+      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version, modulePlatform(body.platform), typeof body.hostVersion === 'string' ? body.hostVersion : null), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install preview failed')
     }

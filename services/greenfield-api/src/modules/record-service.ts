@@ -85,7 +85,10 @@ export class GreenfieldModuleRecordService {
     }
     const contains = input.contains ?? {}
     for (const key of Object.keys(contains)) {
-      if (!definition.filterableFields.includes(key)) throw moduleError('VALIDATION_FAILED', `Unsupported membership filter field ${key}`)
+      const declaredArray = definition.fields.some(field => field.name === key && (field.type === 'tags' || field.type === 'multiSelect'))
+      if (!definition.filterableFields.includes(key) && !declaredArray) {
+        throw moduleError('VALIDATION_FAILED', `Unsupported membership filter field ${key}`)
+      }
     }
 
     let query = this.db
@@ -111,7 +114,14 @@ export class GreenfieldModuleRecordService {
       if (definition.searchableFields.length === 0) throw moduleError('VALIDATION_FAILED', 'Collection is not searchable')
       query = query.where('search_text', 'ilike', `%${escapeLike(input.q)}%`)
     }
-    if (input.folder) query = query.where('folder_ref', '=', input.folder)
+    if (input.folder) {
+      const folderField = resolvedFolderField(definition)
+      query = folderField
+        ? query.where(sql<boolean>`(greenfield_module_records.folder_ref = ${input.folder}
+            OR greenfield_module_records.data ->> ${folderField} = ${input.folder}
+            OR greenfield_module_records.data -> ${folderField} -> 'record' ->> 'recordId' = ${input.folder})`) as typeof query
+        : query.where('folder_ref', '=', input.folder)
+    }
     if (input.createdFrom) query = query.where('created_at', '>=', new Date(input.createdFrom))
     if (input.createdTo) query = query.where('created_at', '<=', new Date(input.createdTo))
     if (input.updatedFrom) query = query.where('updated_at', '>=', new Date(input.updatedFrom))
@@ -583,7 +593,7 @@ export class GreenfieldModuleRecordService {
             data,
             visibility,
             search_text: buildSearchText(input.collectionDefinition, data),
-            folder_ref: getStringField(data, input.collectionDefinition.folderField),
+            folder_ref: getStringField(data, resolvedFolderField(input.collectionDefinition)),
             source_uri: getStringField(data, 'sourceUri'),
             installation_id: current.installation_id ?? runtime.installationId,
             revision,
@@ -608,7 +618,7 @@ export class GreenfieldModuleRecordService {
           visibility,
           data,
           search_text: buildSearchText(input.collectionDefinition, data),
-          folder_ref: getStringField(data, input.collectionDefinition.folderField),
+          folder_ref: getStringField(data, resolvedFolderField(input.collectionDefinition)),
           source_uri: getStringField(data, 'sourceUri'),
           retained_after_uninstall: false,
           revision,
@@ -939,7 +949,7 @@ export class GreenfieldModuleRecordService {
           data,
           visibility,
           search_text: buildSearchText(collectionDefinition, data),
-          folder_ref: getStringField(data, collectionDefinition.folderField),
+          folder_ref: getStringField(data, resolvedFolderField(collectionDefinition)),
           source_uri: getStringField(data, 'sourceUri'),
           installation_id: context.installationId,
           revision: nextRevision,
@@ -1340,6 +1350,15 @@ function getStringField(data: Record<string, unknown>, field?: string): string |
   const value = data[field]
   if (typeof value === 'string' && value.length) return value
   return parseRecordReference(value)?.recordId ?? null
+}
+
+function resolvedFolderField(definition: GreenfieldModuleCollectionDefinition): string | undefined {
+  if (definition.folderField) return definition.folderField
+  const schema = definition.schemaDefinition as Record<string, unknown> | undefined
+  const extension = schema?.['x-greenfield'] as Record<string, unknown> | undefined
+  const field = extension?.folderField
+  return typeof field === 'string' && definition.fields.some(candidate => candidate.name === field)
+    ? field : undefined
 }
 
 function clampLimit(value: unknown, fallback: number): number {

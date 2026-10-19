@@ -130,4 +130,43 @@ describe('MPS record runtime projection', () => {
       }],
     })).toThrow(/Unsafe MPS record schema field reference/)
   })
+
+  it('projects bounded legacy scalar and structured-reference unions without widening schema validation', () => {
+    const compatibleSchema = {
+      ...schema,
+      properties: {
+        ...schema.properties,
+        parentId: {oneOf: [{type: 'string'}, {$ref: '#/$defs/recordReference'}, {type: 'null'}]},
+      },
+    }
+    const [collection] = projectMpsRecordCollections({
+      manifest,
+      frontend,
+      schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(compatibleSchema)}],
+    })
+    expect(collection.fields).toEqual(expect.arrayContaining([expect.objectContaining({fieldId: 'parentId', type: 'json'})]))
+    expect(collection.schemaDefinition).toEqual(compatibleSchema)
+    const invalid = structuredClone(compatibleSchema)
+    invalid.properties.parentId.oneOf[1] = {$ref: 'https://unsafe.example/ref.json'}
+    expect(() => projectMpsRecordCollections({manifest, frontend, schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(invalid)}]})).toThrow(/Unsafe MPS record schema field reference/)
+  })
+
+  it('projects declared array membership used by generic tag routes', () => {
+    const taggedSchema = {
+      ...schema,
+      properties: {...schema.properties, tagIds: {type: 'array', items: {type: 'string'}}},
+    }
+    const taggedFrontend = structuredClone(frontend) as any
+    taggedFrontend.views[0].bindings[0].query.membership = {field: 'tagIds', param: 'tagId'}
+    const [collection] = projectMpsRecordCollections({
+      manifest, frontend: taggedFrontend,
+      schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(taggedSchema)}],
+    })
+    expect(collection.filterableFields).toContain('tagIds')
+    taggedFrontend.views[0].bindings[0].query.membership.field = 'undeclared'
+    expect(() => projectMpsRecordCollections({
+      manifest, frontend: taggedFrontend,
+      schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(taggedSchema)}],
+    })).toThrow(/not declared by record schema/)
+  })
 })
