@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-10-18T20:59:33.684Z for branch `phase/vault-record-metadata-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-20T09:02:12.719Z for branch `phase/vault-record-metadata-01`; this does not claim deployment.
 
 - Runtime method routes: 630
 - Application routes: 446

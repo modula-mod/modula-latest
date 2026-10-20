@@ -16330,7 +16330,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "sourceContractSha256": "9df92806e007da2b2ee8d892ea7efba26b31ed345c40a8dd8f2dd4a89999296d"
+      "sourceContractSha256": "b4c5640327b2e9deeb4fdf0e94786536d593a95832d1d9e63efeb20c57f28e83"
     },
     {
       "id": "GET /v1/modules/:moduleId/installation-descriptor",
