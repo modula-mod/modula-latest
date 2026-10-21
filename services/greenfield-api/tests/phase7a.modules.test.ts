@@ -46,6 +46,21 @@ const manifest = {
 }
 
 describe('Phase 7A module platform contracts', () => {
+  it('checks a requested iOS host version instead of the API server fallback', () => {
+    const service = new GreenfieldModuleCompatibilityService()
+    const release = {
+      releaseState: 'published',
+      manifest: {
+        ...manifest,
+        compatibility: {...manifest.compatibility, minimumModulaHostVersion: '1.1.0', maximumModulaHostVersion: '1.2.0'},
+      },
+    } as any
+    expect(service.evaluate(release, {platform: 'ios', hostVersion: '1.1.0'}).compatible).toBe(true)
+    expect(service.evaluate(release, {platform: 'ios', hostVersion: '1.0.0'}).reasons).toContain('HOST_VERSION_TOO_OLD')
+    expect(service.evaluate(release, {platform: 'ios', hostVersion: '1.3.0'}).reasons).toContain('HOST_VERSION_TOO_NEW')
+    expect(service.evaluate(release, {platform: 'ios'}).reasons).toContain('HOST_VERSION_TOO_OLD')
+  })
+
   it('validates a namespaced first-party module and rejects DIMON permissions for non-DIMON modules', () => {
     expect(validateGreenfieldModuleManifest(manifest).valid).toBe(true)
     const bad = validateGreenfieldModuleManifest({
