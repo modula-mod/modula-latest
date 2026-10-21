@@ -117,6 +117,7 @@ export type VerifiedGithubRelease = {
   mpsBytes: Buffer
   manifest: GreenfieldModuleManifest
   frontend: {path: string; bytes: Buffer} | null
+  game: {path: string; bytes: Buffer; sha256: string} | null
   schemas: Array<{path: string; bytes: Buffer}>
   assets: Array<{path: string; bytes: Buffer}>
   evidence: GreenfieldModuleReleaseEvidence
@@ -201,6 +202,41 @@ export class GreenfieldGithubReleaseSyncService {
     if (frontendBytes && provenance.frontendChecksum && sha256(frontendBytes) !== provenance.frontendChecksum) throw moduleError('VALIDATION_FAILED', 'Frontend artifact checksum does not match provenance')
     if (frontendBytes) checks.push('frontend.sha256')
 
+    // Web gameplay is a second, immutable release artifact. Validate the nested
+    // archive before it can enter the installation-scoped distribution store.
+    const gameRuntime = mps.gameRuntime as Record<string, any> | undefined
+    let game: VerifiedGithubRelease['game'] = null
+    if (gameRuntime?.type === 'web-mini-game') {
+      const path = gameRuntime.artifact?.path
+      const digest = gameRuntime.artifact?.sha256
+      if (path !== 'game/game.tgz' || !/^[a-f0-9]{64}$/.test(digest ?? '')
+        || gameRuntime.artifact?.mediaType !== 'application/vnd.modula.game-web+tgz'
+        || gameRuntime.entryPath !== 'index.html'
+        || gameRuntime.contractVersion !== '1.0.0'
+        || !['phaser', 'playcanvas'].includes(gameRuntime.engine)
+        || typeof gameRuntime.engineVersion !== 'string' || !gameRuntime.engineVersion.trim()
+        || gameRuntime.assetInventory !== 'game.files.json'
+        || gameRuntime.compressedSizeLimitBytes !== 50 * 1024 * 1024
+        || gameRuntime.minimumHostVersion !== '>=1.1.0'
+        || gameRuntime.network !== 'none' || gameRuntime.offline !== true
+        || !['any', 'portrait', 'landscape'].includes(gameRuntime.orientation)
+        || !['none', 'webgl2'].includes(gameRuntime.graphics)
+        || (gameRuntime.engine === 'playcanvas' && gameRuntime.graphics !== 'webgl2')
+        || typeof gameRuntime.touchControls !== 'string' || !gameRuntime.touchControls.trim()) {
+        throw moduleError('VALIDATION_FAILED', 'Web game runtime artifact contract is invalid')
+      }
+      const bytes = file(path)
+      if (!bytes || bytes.length > 50 * 1024 * 1024 || sha256(bytes) !== digest) {
+        throw moduleError('VALIDATION_FAILED', 'Web game artifact is missing, oversized, or has a mismatched digest')
+      }
+      verifyWebGameArchive(bytes)
+      game = {path, bytes, sha256: digest}
+      checks.push('game.archive')
+    } else if (gameRuntime?.type === 'native-engine-content') {
+      // A Unity content contract does not make this host Unity-capable.
+      throw moduleError('VALIDATION_FAILED', 'Native engine content requires a separately accepted host')
+    }
+
     const schemaPaths = [...new Set(((mps.backend?.records ?? []) as Array<{schemaPath?: unknown}>).map(record => record.schemaPath).filter((path): path is string => typeof path === 'string'))]
     const schemas = schemaPaths.map(path => {
       const bytes = file(path)
@@ -236,6 +272,7 @@ export class GreenfieldGithubReleaseSyncService {
       mpsBytes,
       manifest,
       frontend: frontendPath && frontendBytes ? {path: frontendPath, bytes: frontendBytes} : null,
+      game,
       schemas,
       assets,
       evidence,
@@ -326,7 +363,55 @@ export class GreenfieldGithubReleaseSyncService {
         required_for_offline_launch: true,
         created_at: new Date(),
       }).onConflict(oc => oc.column('artifact_id').doNothing()).execute()
+      if (verified.game) {
+        await trx.insertInto('greenfield_release_asset_blobs').values({
+          sha256: verified.game.sha256,
+          // Blob storage's existing gzip media class covers the nested archive;
+          // the signed MPS manifest names the stricter game-web media type.
+          media_type: 'application/gzip',
+          byte_size: verified.game.bytes.length,
+          bytes: verified.game.bytes,
+          created_at: new Date(),
+        } as never).onConflict(oc => oc.column('sha256').doNothing()).execute()
+        await trx.insertInto('greenfield_release_artifacts').values({
+          artifact_id: `release:${releaseId}:web-game`,
+          release_id: releaseId,
+          kind: 'asset',
+          sha256: verified.game.sha256,
+          filename: 'game.tgz',
+          access_class: 'installation',
+          required_for_offline_launch: true,
+          created_at: new Date(),
+        }).onConflict(oc => oc.column('artifact_id').doNothing()).execute()
+      }
     })
+  }
+}
+
+export function verifyWebGameArchive(bytes: Buffer): void {
+  let files: TarEntries
+  try { files = readTarGz(bytes, {maxUncompressedBytes: 64 * 1024 * 1024, maxEntries: 512}) }
+  catch (error) { throw moduleError('VALIDATION_FAILED', `Web game archive: ${(error as Error).message}`) }
+  const inventoryBytes = files.get('game.files.json')
+  const entry = files.get('index.html')
+  if (!inventoryBytes || !entry) throw moduleError('VALIDATION_FAILED', 'Web game archive lacks inventory or entry document')
+  const inventory = parseJson(inventoryBytes, 'game.files.json') as Record<string, any>
+  if (inventory.schema !== 'modula.game-files.1' || !inventory.files || typeof inventory.files !== 'object' || Array.isArray(inventory.files)) {
+    throw moduleError('VALIDATION_FAILED', 'Web game inventory is invalid')
+  }
+  const actual = [...files.keys()].filter(path => path !== 'game.files.json').sort()
+  const listed = Object.keys(inventory.files).sort()
+  if (JSON.stringify(actual) !== JSON.stringify(listed)) throw moduleError('VALIDATION_FAILED', 'Web game inventory does not match archive members')
+  for (const path of actual) {
+    if (path.split('/').some(part => !part || part === '.' || part === '..') || /\.(?:wasm|dylib|so|dll|exe|node|ipa|a|o|jar|class|cs)$/i.test(path)) {
+      throw moduleError('VALIDATION_FAILED', `Unsafe web game member: ${path}`)
+    }
+    if (inventory.files[path] !== sha256(files.get(path)!)) throw moduleError('VALIDATION_FAILED', `Web game member digest mismatch: ${path}`)
+  }
+  const html = entry.toString('utf8')
+  if (!/Content-Security-Policy/i.test(html) || !/default-src 'none'/i.test(html)
+    || !/connect-src 'none'/i.test(html) || !/script-src 'self'/i.test(html)) {
+    throw moduleError('VALIDATION_FAILED', 'Web game entry lacks the required restrictive CSP')
   }
 }
 
