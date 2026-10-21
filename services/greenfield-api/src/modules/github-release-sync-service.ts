@@ -1,6 +1,6 @@
 import {createHash, randomUUID} from 'node:crypto'
 import {ingestProductManifest} from '@modula/greenfield-product-standard'
-import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
+import {isSupportedModulePermission, manifestChecksum, type GreenfieldModuleManifest, type GreenfieldModulePermission} from '@modula/greenfield-module-manifest'
 import type {ModulaDb} from '../database/client.js'
 import {readTarGz, TarGzError, type TarEntries} from '../lib/tar-gz.js'
 import {GreenfieldMpsIngestService, verifyPresentationAssetBytes} from '../product-standard/ingest-service.js'
@@ -501,7 +501,53 @@ function assertAdapterConsistency(input: {mps: Record<string, any>; product: {pr
     const legacyPublisher = legacy.publisher?.id ?? legacy.publisher?.publisherId
     if (publisherId && legacyPublisher !== undefined) expect('modula.module.json publisher', legacyPublisher, publisherId)
   }
+  if (mps.gameRuntime?.type === 'web-mini-game') {
+    const expected = webGamePermissionsFromMps(mps)
+    const normalize = (items: GreenfieldModulePermission[]) => items.map(item => ({permission: item.permission, reason: item.reason, risk: item.risk ?? null}))
+      .sort((a, b) => a.permission.localeCompare(b.permission))
+    if (JSON.stringify(normalize(manifest.permissions)) !== JSON.stringify(normalize(expected))) {
+      conflicts.push('module.manifest.json permissions do not match the scoped MPS requests')
+    }
+  }
   if (conflicts.length) throw moduleError('VALIDATION_FAILED', `Release adapters conflict with modula.product.json: ${conflicts.join('; ')}`)
+}
+
+/** Expand generic MPS record requests to the registry's exact collection grants. */
+export function webGamePermissionsFromMps(mps: Record<string, any>): GreenfieldModulePermission[] {
+  const moduleId = mps.identity?.id
+  if (typeof moduleId !== 'string' || !/^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/.test(moduleId)) {
+    throw moduleError('VALIDATION_FAILED', 'Web game module identity is invalid for scoped grants')
+  }
+  const records = mps.backend?.records ?? []
+  if (!Array.isArray(records)) throw moduleError('VALIDATION_FAILED', 'Web game record declarations are invalid')
+  const recordIds = records.map((item: any) => item?.id)
+  if (recordIds.some((id: unknown) => typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9-]{0,63}$/.test(id))
+    || new Set(recordIds).size !== recordIds.length) {
+    throw moduleError('VALIDATION_FAILED', 'Web game record IDs are invalid or duplicated')
+  }
+  const requests = mps.permissions ?? []
+  if (!Array.isArray(requests)) throw moduleError('VALIDATION_FAILED', 'Web game permissions are invalid')
+  const grants: GreenfieldModulePermission[] = []
+  for (const item of requests) {
+    const id = item?.id
+    const reason = item?.reason
+    const risk = item?.risk
+    if (typeof id !== 'string' || typeof reason !== 'string' || !reason.trim()
+      || !['low', 'medium', 'high', 'restricted'].includes(risk)) {
+      throw moduleError('VALIDATION_FAILED', 'Web game permission declaration is incomplete')
+    }
+    const expanded = id === 'records:read' || id === 'records:write'
+      ? recordIds.map((recordId: string) => `records:module.${moduleId}.${recordId}:${id.slice('records:'.length)}`)
+      : [id]
+    for (const permission of expanded) {
+      if (!isSupportedModulePermission(permission)) throw moduleError('VALIDATION_FAILED', `Unsupported web game permission ${permission}`)
+      grants.push({permission, reason, risk})
+    }
+  }
+  if (new Set(grants.map(item => item.permission)).size !== grants.length) {
+    throw moduleError('VALIDATION_FAILED', 'Web game permissions contain duplicate scoped grants')
+  }
+  return grants.sort((a, b) => a.permission.localeCompare(b.permission))
 }
 
 function assertStoredProvenance(verified: VerifiedGithubRelease, release: GreenfieldModuleReleaseRecord) {

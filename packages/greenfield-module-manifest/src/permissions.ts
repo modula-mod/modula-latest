@@ -46,7 +46,7 @@ const STATIC_PERMISSIONS = new Set([
 ])
 
 const RECORD_PERMISSION_PATTERN =
-  /^records:module\.[a-z0-9-]+(\.[a-z0-9-]+)+\.[a-z0-9-]+:(read|write|delete)$/
+  /^records:module\.[a-z0-9-]+(\.[a-z0-9-]+)+\.[A-Za-z0-9-]+:(read|write|delete)$/
 const MEDIA_PERMISSION_PATTERN =
   /^media:module\.[a-z0-9-]+(\.[a-z0-9-]+)+\.[a-z0-9-]+:(read|write)$/
 const SHARING_PERMISSION_PATTERN =
