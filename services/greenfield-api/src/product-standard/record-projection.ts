@@ -202,7 +202,7 @@ function visitComponents(value: unknown, visit: (component: Record<string, unkno
 }
 
 function requiredIdentifier(value: unknown, label: string): string {
-  if (typeof value !== 'string' || !/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/.test(value)) {
+  if (typeof value !== 'string' || !/^[A-Za-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)*$/.test(value)) {
     throw moduleError('VALIDATION_FAILED', `${label} is invalid`)
   }
   return value

@@ -242,7 +242,7 @@ const FORBIDDEN_KEYS = new Set([
 ])
 
 const IDENTIFIER_PATTERN = /^[a-z0-9]+(?:[.-][a-z0-9]+)*$/
-const COLLECTION_PATTERN = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/
+const COLLECTION_PATTERN = /^[A-Za-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)*$/
 const FIELD_PATTERN = /^[A-Za-z][A-Za-z0-9_]*$/
 
 export function isModuleNamespacedIdentifier(moduleId: string, identifier: string): boolean {

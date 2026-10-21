@@ -47,6 +47,15 @@ const frontend = {
 }
 
 describe('MPS record runtime projection', () => {
+  it('preserves canonical MPS camelCase record identities', () => {
+    const [collection] = projectMpsRecordCollections({
+      manifest: {backend: {mode: 'greenfield-records', records: [{id: 'playerProgress', schemaPath: 'schemas/task.schema.json'}]}},
+      frontend: null,
+      schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(schema)}],
+    })
+    expect(collection.collection).toBe('playerProgress')
+  })
+
   it('projects closed product schemas and frontend query policy without a product branch', () => {
     const [collection] = projectMpsRecordCollections({
       manifest,
