@@ -63,10 +63,22 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
     const betaCreate = await request('POST', `/v1/modules/${beta.moduleId}/records/entity`, {
       mutationId: 'beta-create-1',
       recordId: betaRecordId,
-      data: {title: 'Beta target'},
+      data: {title: 'Beta target', labels: ['focus', 'review']},
     })
     expect(betaCreate.statusCode).toBe(201)
     expect(betaCreate.json().data.revision).toBe(1)
+    expect(betaCreate.json().data.data.id).toBe(betaRecordId)
+    expect(betaCreate.json().data.data.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+    expect(betaCreate.json().data.data.updatedAt).toBe(betaCreate.json().data.data.createdAt)
+
+    const member = await request('GET', `/v1/modules/${beta.moduleId}/records/entity?contains.labels=${encodeURIComponent(JSON.stringify('focus'))}`)
+    expect(member.statusCode).toBe(200)
+    expect(member.json().data.items.map((item: {record_id: string}) => item.record_id)).toContain(betaRecordId)
+    const nonMember = await request('GET', `/v1/modules/${beta.moduleId}/records/entity?contains.labels=${encodeURIComponent(JSON.stringify('absent'))}`)
+    expect(nonMember.statusCode).toBe(200)
+    expect(nonMember.json().data.items).toEqual([])
+    const unknownFilter = await request('GET', `/v1/modules/${beta.moduleId}/records/entity?contains.secret=${encodeURIComponent(JSON.stringify('focus'))}`)
+    expect(unknownFilter.statusCode).toBe(400)
 
     const alphaPayload = {
       mutationId: 'alpha-create-1',
@@ -74,6 +86,7 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
       data: {
         title: 'Alpha source',
         link: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}},
+        optionalLink: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}},
       },
     }
     const alphaCreate = await request('POST', `/v1/modules/${alpha.moduleId}/records/item`, alphaPayload)
@@ -111,10 +124,14 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
     const update = await request('PATCH', `/v1/modules/${alpha.moduleId}/records/item/${alphaRecordId}`, {
       mutationId: 'alpha-update-1',
       expectedRevision: 1,
-      data: {title: 'Alpha second'},
+      data: {title: 'Alpha second', optionalLink: null},
     })
     expect(update.statusCode).toBe(200)
     expect(update.json().data.revision).toBe(2)
+    expect(update.json().data.data.optionalLink).toBeNull()
+    const clearedReference = await request('GET', `/v1/modules/${alpha.moduleId}/records/item/${alphaRecordId}/references?fieldPath=optionalLink`)
+    expect(clearedReference.statusCode).toBe(200)
+    expect(clearedReference.json().data.references).toEqual([])
 
     const concurrent = await Promise.all([
       request('PATCH', `/v1/modules/${alpha.moduleId}/records/item/${alphaRecordId}`, {
@@ -164,6 +181,45 @@ describeIf('MODULE-PLATFORM-02 generic records', () => {
     const invalidCursor = await request('GET', `/v1/modules/${beta.moduleId}/records/sync?after=${encodeURIComponent(cursor)}`)
     expect(invalidCursor.statusCode).toBe(400)
     expect(invalidCursor.json().error.code).toBe('INVALID_CURSOR')
+
+    const legacyId = `${alphaRecordId}-legacy`
+    const legacyCreated = await request('POST', `/v1/modules/${alpha.moduleId}/records/item`, {
+      mutationId: 'alpha-legacy-create', recordId: legacyId,
+      data: {title: 'Legacy source', link: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}}},
+    })
+    expect(legacyCreated.statusCode).toBe(201)
+    await db.updateTable('greenfield_module_records')
+      .set({data: jsonb({title: 'Legacy source', link: 'legacy-target-id'})})
+      .where('account_id', '=', accountId).where('module_id', '=', alpha.moduleId)
+      .where('collection', '=', 'item').where('record_id', '=', legacyId).execute()
+    const legacyEdited = await request('PATCH', `/v1/modules/${alpha.moduleId}/records/item/${legacyId}`, {
+      mutationId: 'alpha-legacy-edit', expectedRevision: 1, data: {title: 'Edited without losing legacy reference'},
+    })
+    expect(legacyEdited.statusCode).toBe(200)
+    expect(legacyEdited.json().data.data.link).toBe('legacy-target-id')
+    const newUnstructuredReference = await request('PATCH', `/v1/modules/${alpha.moduleId}/records/item/${legacyId}`, {
+      mutationId: 'alpha-legacy-replace', expectedRevision: 2, data: {link: 'unverified-new-target'},
+    })
+    expect(newUnstructuredReference.statusCode, JSON.stringify(newUnstructuredReference.json())).toBe(400)
+    const legacyRestored = await request('POST', `/v1/modules/${alpha.moduleId}/records/item/${legacyId}/restore`, {
+      mutationId: 'alpha-legacy-restore', expectedRevision: 2, sourceRevision: 2,
+    })
+    expect(legacyRestored.statusCode).toBe(200)
+    expect(legacyRestored.json().data.data.link).toBe('legacy-target-id')
+
+    const retainedRecordId = `${alphaRecordId}-retained`
+    const retainedCreate = await request('POST', `/v1/modules/${alpha.moduleId}/records/item`, {
+      mutationId: 'alpha-retained-create', recordId: retainedRecordId,
+      data: {title: 'Retained source', link: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}}},
+    })
+    expect(retainedCreate.statusCode).toBe(201)
+    const targetDeleted = await request('DELETE', `/v1/modules/${beta.moduleId}/records/entity/${betaRecordId}`, {
+      mutationId: 'beta-delete-1', expectedRevision: 1,
+    })
+    expect(targetDeleted.statusCode).toBe(200)
+    const retainedSource = await request('GET', `/v1/modules/${alpha.moduleId}/records/item/${retainedRecordId}`)
+    expect(retainedSource.statusCode).toBe(200)
+    expect(retainedSource.json().data.data.link).toEqual({record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}})
   })
 
   async function registerAccount(email: string, handle: string) {
@@ -315,11 +371,12 @@ function alphaCollection(): GreenfieldModuleCollectionDefinition {
     fields: [
       {fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true},
       {fieldId: 'link', name: 'link', type: 'recordReference', label: 'Linked record', required: true},
+      {fieldId: 'optionalLink', name: 'optionalLink', type: 'recordReference', label: 'Optional linked record'},
     ],
     searchableFields: ['title'],
     filterableFields: ['link'],
     sortableFields: ['createdAt', 'updatedAt', 'title'],
-    referenceFields: ['link'],
+    referenceFields: ['link', 'optionalLink'],
     retentionPolicy: 'keepOnUninstall',
   }
 }
@@ -329,9 +386,15 @@ function betaCollection(): GreenfieldModuleCollectionDefinition {
     collection: 'entity',
     schemaRef: 'schemas/audit-beta-entity.v1.schema.json',
     defaultVisibility: 'private',
-    fields: [{fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true}],
+    fields: [
+      {fieldId: 'id', name: 'id', type: 'text', label: 'ID', required: true},
+      {fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true},
+      {fieldId: 'labels', name: 'labels', type: 'tags', label: 'Labels'},
+      {fieldId: 'createdAt', name: 'createdAt', type: 'dateTime', label: 'Created at', required: true},
+      {fieldId: 'updatedAt', name: 'updatedAt', type: 'dateTime', label: 'Updated at', required: true},
+    ],
     searchableFields: ['title'],
-    filterableFields: [],
+    filterableFields: ['labels'],
     sortableFields: ['createdAt', 'updatedAt', 'title'],
     referenceFields: [],
     retentionPolicy: 'keepOnUninstall',

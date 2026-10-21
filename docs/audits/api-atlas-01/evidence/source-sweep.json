@@ -388,21 +388,21 @@
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
-      "line": 135,
+      "line": 143,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
-      "line": 135,
+      "line": 143,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
-      "line": 135,
+      "line": 143,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
@@ -976,7 +976,7 @@
     },
     {
       "file": "packages/greenfield-product-standard/src/tests/ingest.test.ts",
-      "line": 175,
+      "line": 213,
       "marker": "fake",
       "classification": "test-fixture-or-development",
       "excerpt": "test('backend-free plugin does not bind fake infrastructure', () => {"
@@ -2399,21 +2399,21 @@
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
-      "line": 135,
+      "line": 143,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
-      "line": 135,
+      "line": 143,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
-      "line": 135,
+      "line": 143,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"

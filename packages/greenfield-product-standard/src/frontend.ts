@@ -16,10 +16,10 @@ const COMPONENTS = new Set([
 ])
 const ACTIONS = new Set([
   'route.open', 'record.create', 'record.read', 'record.update', 'record.delete', 'record.restore', 'record.purge', 'record.query', 'function.invoke',
-  'service.invoke', 'extension.invoke', 'capability.invoke', 'settings.update', 'share', 'dismiss',
+  'record.toggle', 'media.attach', 'media.open', 'media.detach', 'service.invoke', 'extension.invoke', 'capability.invoke', 'settings.update', 'share', 'dismiss',
 ])
 const VIEW_KINDS = new Set(['collection', 'detail', 'form', 'dashboard', 'settings', 'emptyState'])
-const DATA_SOURCES = new Set(['record.query', 'record.detail', 'settings', 'installation', 'capability', 'job'])
+const DATA_SOURCES = new Set(['record.query', 'record.detail', 'record.revisions', 'record.revision', 'record.media', 'settings', 'installation', 'capability', 'job'])
 const FORBIDDEN_FIELDS = new Set([
   'script', 'rawjs', 'rawhtml', 'html', 'jsx', 'tsx', 'css', 'style', 'remotebundle', 'remoteentry',
   'customcomponentname', 'webview', 'unsafewebview', 'networkurl', 'eval',
@@ -146,6 +146,19 @@ export function validateMpsFrontendArtifact(input: {
       if (typeof action.recordType !== 'string' || !action.recordType) diagnostics.push(error('MPS-FRONTEND-109', `actions/${index}/recordType`, 'Record actions require a record type.'))
     }
     if (action.family === 'record.purge' && action.confirm !== true) diagnostics.push(error('MPS-FRONTEND-136', `actions/${index}/confirm`, 'record.purge requires explicit destructive confirmation.'))
+    if (action.family === 'record.toggle' && (typeof action.recordField !== 'string' || !/^[A-Za-z][A-Za-z0-9_]{0,79}$/.test(action.recordField))) {
+      diagnostics.push(error('MPS-FRONTEND-146', `actions/${index}/recordField`, 'record.toggle requires a simple boolean field name.'))
+    }
+    if (action.activeLabel && action.family !== 'record.toggle') diagnostics.push(error('MPS-FRONTEND-147', `actions/${index}/activeLabel`, 'activeLabel is only used for record.toggle.'))
+    if (action.family === 'media.attach' && (typeof action.recordType !== 'string' || typeof action.recordIdBinding !== 'string' || typeof action.capability !== 'string' || !declaredCapabilities.has(action.capability))) {
+      diagnostics.push(error('MPS-FRONTEND-143', `actions/${index}`, 'media.attach requires a record type, record binding, and declared capability.'))
+    }
+    if (action.family === 'media.open' && (typeof action.capability !== 'string' || !declaredCapabilities.has(action.capability))) {
+      diagnostics.push(error('MPS-FRONTEND-144', `actions/${index}`, 'media.open requires a declared capability.'))
+    }
+    if (action.family === 'media.detach' && (typeof action.recordType !== 'string' || typeof action.recordIdBinding !== 'string' || action.confirm !== true)) {
+      diagnostics.push(error('MPS-FRONTEND-145', `actions/${index}`, 'media.detach requires a record type, record binding, and confirmation.'))
+    }
     inspectActionInput(action.input, fieldIds, `actions/${index}/input`, diagnostics)
   }
   for (const [index, resource] of resources.entries()) {
@@ -197,7 +210,7 @@ function inspectActionInput(value: unknown, fields: Set<string>, path: string, d
   if (value.transforms !== undefined) {
     if (!Array.isArray(value.transforms) || value.transforms.length > 16) diagnostics.push(error('MPS-FRONTEND-139', `${path}/transforms`, 'Action transforms exceed bounded semantics.'))
     else for (const [index, transform] of value.transforms.entries()) {
-      if (!isRecord(transform) || transform.transform !== 'richText.plainText@1' || typeof transform.target !== 'string' || typeof transform.source !== 'string') {
+      if (!isRecord(transform) || !['richText.plainText@1', 'text.slug@1'].includes(String(transform.transform)) || typeof transform.target !== 'string' || typeof transform.source !== 'string') {
         diagnostics.push(error('MPS-FRONTEND-139', `${path}/transforms/${index}`, 'Action transform is unsupported.'))
       } else if (!fields.has(transform.source)) {
         diagnostics.push(error('MPS-FRONTEND-137', `${path}/transforms/${index}/source`, `Input transform references unknown field ${transform.source}.`))

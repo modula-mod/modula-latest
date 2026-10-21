@@ -111,6 +111,44 @@ test('frontend mirror accepts bounded query, lifecycle, defaults, and rich-text 
   assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join('; '))
 })
 
+test('frontend mirror accepts current generic record, revision, media, and toggle contracts', () => {
+  const result = validateFrontendMutation(artifact => {
+    artifact.capabilities = {required: ['ui.mediaAttach@1', 'ui.mediaOpen@1']}
+    const views = artifact.views as Record<string, unknown>[]
+    const bindings = views[0]!.bindings as Array<Record<string, unknown>>
+    bindings.push(
+      {id: 'revisions', source: 'record.revisions', recordType: 'note'},
+      {id: 'revision', source: 'record.revision', recordType: 'note'},
+      {id: 'media', source: 'record.media', recordType: 'note'},
+    )
+    const actions = artifact.actions as Array<Record<string, unknown>>
+    actions.push(
+      {id: 'toggleStar', family: 'record.toggle', label: 'Star', recordType: 'note', recordIdBinding: 'note', recordField: 'starred'},
+      {id: 'attachFile', family: 'media.attach', label: 'Attach', recordType: 'note', recordIdBinding: 'note', capability: 'ui.mediaAttach@1'},
+      {id: 'openFile', family: 'media.open', label: 'Open', capability: 'ui.mediaOpen@1'},
+      {id: 'removeFile', family: 'media.detach', label: 'Remove', recordType: 'note', recordIdBinding: 'note', confirm: true},
+    )
+    actions.find(action => action.id === 'createNote')!.input = {
+      transforms: [{target: 'slug', source: 'body', transform: 'text.slug@1'}],
+    }
+  })
+  assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join('; '))
+})
+
+test('frontend mirror rejects ungranted media and unsafe toggle or detach declarations', () => {
+  const result = validateFrontendMutation(artifact => {
+    const actions = artifact.actions as Array<Record<string, unknown>>
+    actions.push(
+      {id: 'badToggle', family: 'record.toggle', label: 'Toggle', recordType: 'note', recordField: 'metadata.starred'},
+      {id: 'badAttach', family: 'media.attach', label: 'Attach', recordType: 'note', recordIdBinding: 'note', capability: 'ui.mediaAttach@1'},
+      {id: 'badDetach', family: 'media.detach', label: 'Remove', recordType: 'note', recordIdBinding: 'note'},
+    )
+  })
+  assert.equal(result.diagnostics.some(item => item.code === 'MPS-FRONTEND-146'), true)
+  assert.equal(result.diagnostics.some(item => item.code === 'MPS-FRONTEND-143'), true)
+  assert.equal(result.diagnostics.some(item => item.code === 'MPS-FRONTEND-145'), true)
+})
+
 test('frontend mirror rejects unsafe lifecycle and input shaping', () => {
   const purge = validateFrontendMutation(artifact => {
     const actions = artifact.actions as Array<Record<string, unknown>>

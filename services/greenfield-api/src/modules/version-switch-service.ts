@@ -236,7 +236,7 @@ export class GreenfieldModuleVersionSwitchService {
     }
     const platform = platformOf(options.platform)
     if (platform) {
-      const compatibility = new GreenfieldModuleCompatibilityService(this.config).evaluate(release, {platform})
+      const compatibility = new GreenfieldModuleCompatibilityService(this.config).evaluate(release, {platform, hostVersion: options.hostVersion})
       // Release state is gated above (superseded stays switchable); keep the other reasons.
       const reasons = compatibility.reasons.filter(reason => !['RELEASE_NOT_PUBLISHED', 'RELEASE_QUARANTINED', 'RELEASE_REVOKED'].includes(reason))
       if (reasons.length) blockers.push({code: 'INCOMPATIBLE', message: reasons.join(', ')})

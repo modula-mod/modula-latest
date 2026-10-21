@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 446 application / 630 runtime method routes
-Route evidence: local-candidate-runtime for feature branch greenfield-v1-migration-entrypoints; not deployed
+Route evidence: local-candidate-runtime for feature branch phase/vault-record-metadata-01; not deployed
 Public routes: 76
 Authenticated routes: 276
 Admin/internal routes: 94

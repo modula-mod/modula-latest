@@ -86,6 +86,17 @@ describe('Phase 7A module platform contracts', () => {
     expect(result.reasons).toEqual(expect.arrayContaining(['RELEASE_NOT_PUBLISHED', 'RELEASE_QUARANTINED', 'PLATFORM_UNSUPPORTED']))
   })
 
+  it('evaluates a declared client host version instead of the server fallback', () => {
+    const release = {releaseState: 'published', manifest: {
+      ...manifest,
+      compatibility: {...manifest.compatibility, minimumModulaHostVersion: '1.1.0'},
+    }} as any
+    const service = new GreenfieldModuleCompatibilityService()
+    expect(service.evaluate(release, {platform: 'ios', hostVersion: '1.1.0'}).reasons).not.toContain('HOST_VERSION_TOO_OLD')
+    expect(service.evaluate(release, {platform: 'ios', hostVersion: '1.0.0'}).reasons).toContain('HOST_VERSION_TOO_OLD')
+    expect(service.evaluate(release, {platform: 'ios'}).reasons).toContain('HOST_VERSION_TOO_OLD')
+  })
+
   it('keeps lifecycle transitions centralized and rejects direct removal from enabled', () => {
     expect(GREENFIELD_MODULE_INSTALLATION_TRANSITIONS.enabled).toContain('disabling')
     expect(GREENFIELD_MODULE_INSTALLATION_TRANSITIONS.enabled).not.toContain('removed')

@@ -612,7 +612,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
-      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version, modulePlatform(body.platform)), request.id))
+      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version, modulePlatform(body.platform), typeof body.hostVersion === 'string' ? body.hostVersion : null), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install preview failed')
     }
@@ -1738,6 +1738,7 @@ function withRecordMutationId(body: Record<string, unknown>, request: FastifyReq
 function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery {
   const reserved = new Set(['cursor', 'limit', 'sort', 'direction', 'q', 'folder', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo', 'recordState'])
   const filters: Record<string, unknown> = {}
+  const contains: Record<string, string | number | boolean> = {}
   for (const [key, value] of Object.entries(query ?? {})) {
     if (key.startsWith('filter.')) {
       const field = key.slice('filter.'.length)
@@ -1750,6 +1751,17 @@ function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery
       }
       if (!(decoded === null || ['string', 'number', 'boolean'].includes(typeof decoded))) throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
       filters[field] = decoded
+    } else if (key.startsWith('contains.')) {
+      const field = key.slice('contains.'.length)
+      if (!field || typeof value !== 'string') throw moduleError('VALIDATION_FAILED', 'Invalid encoded membership filter')
+      let decoded: unknown
+      try {
+        decoded = JSON.parse(value)
+      } catch {
+        throw moduleError('VALIDATION_FAILED', 'Invalid encoded membership filter')
+      }
+      if (!['string', 'number', 'boolean'].includes(typeof decoded)) throw moduleError('VALIDATION_FAILED', 'Invalid encoded membership filter')
+      contains[field] = decoded as string | number | boolean
     } else if (!reserved.has(key) && typeof value !== 'object') filters[key] = value
   }
   if (query.recordState !== undefined && query.recordState !== 'active' && query.recordState !== 'deleted') throw moduleError('VALIDATION_FAILED', 'Invalid module record state')
@@ -1767,6 +1779,7 @@ function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery
     updatedTo: stringOrUndefined(query.updatedTo),
     recordState: query.recordState === 'deleted' ? 'deleted' : query.recordState === 'active' ? 'active' : undefined,
     filters,
+    contains,
   }
 }
 
