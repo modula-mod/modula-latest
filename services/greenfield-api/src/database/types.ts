@@ -1264,6 +1264,32 @@ export interface Database {
   greenfield_account_data_request_domains: {data_request_domain_id: string; data_request_id: string; domain_key: string; domain_kind: 'GREENFIELD_CORE' | 'GREENFIELD_RECORDS' | 'MODULE_SERVICE' | 'OBJECT_STORAGE' | 'EXTERNAL_SERVICE'; product_id: string | null; installation_id: string | null; resource_id: string | null; handler: string; state: 'PENDING' | 'CLAIMED' | 'SUCCEEDED' | 'RETAINED' | 'FAILED' | 'SKIPPED'; retention_decision: 'DELETE' | 'RETAIN_LEGAL_HOLD' | 'RETAIN_POLICY' | 'NOT_APPLICABLE' | null; claimed_by_service_id: string | null; claim_expires_at: Date | null; failure_code: string | null; created_at: Date; updated_at: Date; completed_at: Date | null}
   greenfield_account_data_artifacts: {artifact_id: string; data_request_id: string; data_request_domain_id: string; artifact_ref: string; sha256: string; media_type: string; byte_length: number; payload: unknown | null; created_at: Date; expires_at: Date | null}
   greenfield_account_deletion_tombstones: {account_id: string; data_request_id: string; retained_domains: unknown; deletion_manifest_sha256: string; completed_at: Date}
+  greenfield_conversations: {
+    conversation_id: string
+    kind: 'direct' | 'inmail'
+    subject: string | null
+    direct_key: string | null
+    created_by_actor_id: string
+    created_at: Date
+    updated_at: Date
+    last_message_at: Date
+  }
+  greenfield_conversation_members: {
+    conversation_id: string
+    actor_id: string
+    state: 'active' | 'pending' | 'declined'
+    last_read_at: Date | null
+    joined_at: Date
+    updated_at: Date
+  }
+  greenfield_conversation_messages: {
+    message_id: string
+    conversation_id: string
+    sender_actor_id: string
+    subject: string | null
+    body: string
+    created_at: Date
+  }
   greenfield_story_groups: {
     group_id: string
     owner_actor_id: string
