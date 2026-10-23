@@ -105,6 +105,21 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
     expect(conflict.errors.join('\n')).toContain('Conflicting module digital.modula.reference-conflict is installed')
   })
 
+  it('selects the highest compatible semantic version for a dependency', async () => {
+    const dependencyId = `digital.modula.version-choice-${suffix}`
+    const consumerId = `digital.modula.version-consumer-${suffix}`
+    await ensurePublishedRelease(fixtureManifest(dependencyId, '1.9.0'))
+    await ensurePublishedRelease(fixtureManifest(dependencyId, '1.10.0'))
+    const manifest = fixtureManifest(consumerId, '1.0.0', {
+      dependencyGraph: graph({requires: [{moduleId: dependencyId, versionRange: '^1.0.0', reason: 'Versioned runtime'}]}),
+    })
+    const plan = await new GreenfieldModuleDependencyResolver(db).resolve({moduleId: consumerId, manifest})
+    expect(plan.installable).toBe(true)
+    expect(plan.dependencies.find(dependency => dependency.moduleId === dependencyId)).toMatchObject({
+      requestedRange: '^1.0.0', resolvedVersion: '1.10.0', satisfied: true,
+    })
+  })
+
   it('persists accepted dependency and permission state atomically during installation', async () => {
     const preview = await app.inject({
       method: 'POST',
@@ -242,11 +257,26 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
     expect((await invokeService('invoke-reenabled', {text: 'reenabled service'})).statusCode).toBe(200)
 
     const updateRelease = await ensurePublishedRelease(referenceManifest('2.0.1'))
+    const deniedUpdate = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/update`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `update-runtime2-denied-${suffix}`},
+      payload: {version: '2.0.1'},
+    })
+    expect(deniedUpdate.statusCode).toBe(403)
+    expect(deniedUpdate.json().error.code).toBe('PERMISSION_REVIEW_REQUIRED')
+
     const update = await app.inject({
       method: 'POST',
       url: `/v1/modules/${moduleId}/update`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `update-runtime2-${suffix}`},
-      payload: {version: '2.0.1'},
+      payload: {
+        version: '2.0.1',
+        approvedPermissions: [
+          'search:index',
+          'requires-reauthorisation:module.digital.modula.standard2-reference.secret-rotation',
+        ],
+      },
     })
     expect(update.statusCode).toBe(202)
     expect(update.json().data.status).toBe('updating')
