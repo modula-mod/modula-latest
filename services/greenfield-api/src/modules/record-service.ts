@@ -884,7 +884,7 @@ export class GreenfieldModuleRecordService {
   }
 
   private async resolveRecordContext(accountId: string, moduleId: string, collection: string, operation: 'read' | 'write' | 'delete') {
-    if (!/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/.test(collection)) throw moduleError('VALIDATION_FAILED', 'Invalid module collection')
+    if (!/^[A-Za-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)*$/.test(collection)) throw moduleError('VALIDATION_FAILED', 'Invalid module collection')
     const canonicalId = resolveCanonicalModuleId(moduleId)
     await new GreenfieldModuleIdentityMigrationService(this.db).normalizeAccount(accountId)
     const runtime = await this.access.resolve(accountId, canonicalId, {requireEnabled: true})

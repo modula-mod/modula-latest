@@ -38,6 +38,7 @@ export class GreenfieldModuleRegistryService {
       .selectFrom('greenfield_module_releases')
       .innerJoin('greenfield_module_versions', 'greenfield_module_versions.module_version_id', 'greenfield_module_releases.module_version_id')
       .innerJoin('greenfield_publishers', 'greenfield_publishers.publisher_id', 'greenfield_module_releases.publisher_id')
+      .leftJoin('greenfield_mps_ingestions', 'greenfield_mps_ingestions.release_id', 'greenfield_module_releases.release_id')
       .select([
         'greenfield_module_releases.release_id',
         'greenfield_module_releases.module_id',
@@ -49,6 +50,7 @@ export class GreenfieldModuleRegistryService {
         'greenfield_module_releases.trust_level',
         'greenfield_module_releases.published_at',
         'greenfield_module_releases.product_kind',
+        'greenfield_mps_ingestions.registry_kind as mps_kind',
         'greenfield_module_versions.manifest',
         'greenfield_publishers.publisher_id',
         'greenfield_publishers.display_name',
@@ -56,7 +58,6 @@ export class GreenfieldModuleRegistryService {
       .$if(Boolean(filters.publisher), qb => qb.where('greenfield_module_releases.publisher_id', '=', filters.publisher!))
       .$if(Boolean(filters.trust), qb => qb.where('greenfield_module_releases.trust_level', '=', filters.trust as any))
       .$if(Boolean(filters.status), qb => qb.where('greenfield_module_releases.release_state', '=', filters.status as any))
-      .$if((filters.productKind ?? 'module') !== 'all', qb => qb.where('greenfield_module_releases.product_kind', '=', (filters.productKind ?? 'module') as any))
       .orderBy('greenfield_module_releases.module_id')
       .orderBy('greenfield_module_releases.version', 'desc')
       .execute()
@@ -67,6 +68,10 @@ export class GreenfieldModuleRegistryService {
     for (const row of releases as any[]) {
       const manifest = row.manifest as GreenfieldModuleManifest
       const canonicalId = resolveCanonicalModuleId(row.module_id)
+      // MPS is canonical for product identity. The extension-product kind in
+      // the signed adapter remains "module" for a game hosted by that module.
+      const productKind = row.mps_kind ?? row.product_kind
+      if ((filters.productKind ?? 'module') !== 'all' && productKind !== (filters.productKind ?? 'module')) continue
       if (filters.q && !`${manifest.name} ${manifest.description} ${canonicalId}`.toLowerCase().includes(filters.q.toLowerCase())) continue
       if (filters.platform && !manifest.compatibility.platforms.includes(filters.platform)) continue
       const beta = classifyBetaModule({moduleId: canonicalId, status: row.release_state, manifest: manifest as any})
@@ -82,7 +87,7 @@ export class GreenfieldModuleRegistryService {
         latestReleaseDigests.set(canonicalId, row.release_sha256 ?? null)
         byModule.set(canonicalId, {
           moduleId: canonicalId,
-          productKind: row.product_kind,
+          productKind,
           name: manifest.name,
           description: manifest.description,
           publisherId: row.publisher_id,
@@ -197,9 +202,11 @@ export class GreenfieldModuleRegistryService {
       const beta = classifyBetaModule({moduleId: latest.moduleId, status: latest.releaseState, manifest: latest.manifest as any})
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
       const manifestRecord = latest.manifest as Record<string, unknown>
-      const [product, packageSizeBytes] = await Promise.all([
+      const [product, packageSizeBytes, mpsIdentity] = await Promise.all([
         this.productProjectionFor(latest.releaseId),
         this.packageSizeBytes(latest.releaseSha256),
+        this.db.selectFrom('greenfield_mps_ingestions').select('registry_kind')
+          .where('release_id', '=', latest.releaseId).executeTakeFirst(),
       ])
       const [marketplace, presentation, trust] = await Promise.all([
         this.marketplace.project({
@@ -217,7 +224,7 @@ export class GreenfieldModuleRegistryService {
         presentation,
         registryTrust: trust,
         moduleId: latest.moduleId,
-        productKind: (latest.manifest as any).extensionProduct?.kind ?? 'module',
+        productKind: mpsIdentity?.registry_kind ?? (latest.manifest as any).extensionProduct?.kind ?? 'module',
         name: latest.manifest.name,
         description: latest.manifest.description,
         publisher: latest.manifest.publisher,

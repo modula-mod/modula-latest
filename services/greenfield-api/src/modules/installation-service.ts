@@ -144,14 +144,15 @@ export class GreenfieldModuleInstallationService {
       productKind: row.product_kind}
   }
 
-  async installPreview(accountId: string, moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' | 'server' = 'web'): Promise<GreenfieldModuleInstallPreview> {
+  async installPreview(accountId: string, moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' | 'server' = 'web', hostVersion?: string | null): Promise<GreenfieldModuleInstallPreview> {
     const release = version ? await this.registry.getVersion(moduleId, version) : await this.registry.latestPublished(moduleId)
-    this.assertExecutableTrust(await this.trust.forRelease(release, {platform}))
+    this.assertExecutableTrust(await this.trust.forRelease(release, {platform, hostVersion}))
     const publisher = await this.db.selectFrom('greenfield_publishers').select(['status']).where('publisher_id', '=', release.publisherId).executeTakeFirst()
     const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
     const extensionReview = await this.extensionFabric.targetReview(accountId, release)
     const compatibility = new GreenfieldModuleCompatibilityService(this.config).evaluate(release, {
       platform,
+      hostVersion,
       publisherStatus: publisher?.status,
       unavailableDependencies: !dependencyPlan.installable || extensionReview.errors.length > 0,
     })
@@ -235,7 +236,7 @@ export class GreenfieldModuleInstallationService {
     }
 
     const release = input.version ? await this.registry.getVersion(canonicalId, input.version) : await this.registry.latestPublished(canonicalId)
-    const preview = await this.installPreview(accountId, canonicalId, release.version, input.platform ?? 'web')
+    const preview = await this.installPreview(accountId, canonicalId, release.version, input.platform ?? 'web', input.hostVersion)
     const dependencyPlan = await this.dependencies.resolve({moduleId: canonicalId, manifest: release.manifest, accountId})
     if (!preview.compatible) throw moduleError('VALIDATION_FAILED', `Module is incompatible: ${preview.incompatibilityReasons.join(', ')}`)
     const declaredPermissions = Array.from(new Set([

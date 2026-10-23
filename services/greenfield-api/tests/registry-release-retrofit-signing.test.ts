@@ -245,7 +245,7 @@ describeIfDb('retrospective publisher release signatures', () => {
       releaseTag: targetEvidence.releaseTag, releaseCommit: targetEvidence.releaseCommit,
       packageFile: targetManifest.source.releaseAssetName!, packageSha256: targetEvidence.artifactSha256,
       packageBytes: Buffer.from('test release'), mpsBytes: Buffer.alloc(0), manifest: targetManifest,
-      frontend: null, schemas: [], assets: [], evidence: targetEvidence, checks: ['package.sha256', 'tag.commit'],
+      frontend: null, game: null, schemas: [], assets: [], evidence: targetEvidence, checks: ['package.sha256', 'tag.commit'],
     }
     const account = await registerAccount(app, `legacy-exit-${suffix}@example.com`, `legacyexit${suffix}`, db)
     const installationId = `legacy-exit-install-${suffix}`

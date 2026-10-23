@@ -18,6 +18,7 @@ export type GreenfieldModuleIncompatibilityReason =
 
 export type CompatibilityContext = {
   platform: 'ios' | 'android' | 'web' | 'desktop' | 'server'
+  hostVersion?: string | null
   trustPolicy?: 'firstPartyOnly' | 'reviewed'
   requiredCapabilities?: string[]
   unavailableDependencies?: boolean
@@ -36,8 +37,8 @@ export class GreenfieldModuleCompatibilityService {
     if (context.publisherStatus === 'suspended' || context.publisherStatus === 'revoked') reasons.push('PUBLISHER_SUSPENDED')
     if (!this.licenseApproved(manifest)) reasons.push('LICENSE_NOT_APPROVED')
     if (!this.greenfieldVersionAllowed(manifest)) reasons.push('GREENFIELD_VERSION_TOO_OLD')
-    if (!this.hostMinimumAllowed(manifest)) reasons.push('HOST_VERSION_TOO_OLD')
-    if (!this.hostMaximumAllowed(manifest)) reasons.push('HOST_VERSION_TOO_NEW')
+    if (!this.hostMinimumAllowed(manifest, context.hostVersion)) reasons.push('HOST_VERSION_TOO_OLD')
+    if (!this.hostMaximumAllowed(manifest, context.hostVersion)) reasons.push('HOST_VERSION_TOO_NEW')
     if (!manifest.compatibility.protocolVersions.includes(GREENFIELD_PROTOCOL_VERSION)) reasons.push('PROTOCOL_UNSUPPORTED')
     if (!manifest.compatibility.platforms.includes(context.platform)) reasons.push('PLATFORM_UNSUPPORTED')
     if (context.unavailableDependencies) reasons.push('DEPENDENCY_UNAVAILABLE')
@@ -56,13 +57,13 @@ export class GreenfieldModuleCompatibilityService {
     return compareSemver(GREENFIELD_VERSION, manifest.compatibility.minimumGreenfieldVersion) >= 0
   }
 
-  private hostMinimumAllowed(manifest: GreenfieldModuleManifest): boolean {
-    return compareSemver(MODULA_HOST_VERSION, manifest.compatibility.minimumModulaHostVersion) >= 0
+  private hostMinimumAllowed(manifest: GreenfieldModuleManifest, hostVersion?: string | null): boolean {
+    return compareSemver(hostVersion ?? MODULA_HOST_VERSION, manifest.compatibility.minimumModulaHostVersion) >= 0
   }
 
-  private hostMaximumAllowed(manifest: GreenfieldModuleManifest): boolean {
+  private hostMaximumAllowed(manifest: GreenfieldModuleManifest, hostVersion?: string | null): boolean {
     return manifest.compatibility.maximumModulaHostVersion
-      ? satisfiesSemverRange(MODULA_HOST_VERSION, `<=${manifest.compatibility.maximumModulaHostVersion}`)
+      ? satisfiesSemverRange(hostVersion ?? MODULA_HOST_VERSION, `<=${manifest.compatibility.maximumModulaHostVersion}`)
       : true
   }
 }

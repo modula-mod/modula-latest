@@ -7,7 +7,7 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {readTarGz} from '../src/lib/tar-gz.js'
-import {GreenfieldGithubReleaseSyncService, type GithubRelease, type GithubReleaseAsset, type GithubReleaseSource} from '../src/modules/github-release-sync-service.js'
+import {GreenfieldGithubReleaseSyncService, verifyWebGameArchive, type GithubRelease, type GithubReleaseAsset, type GithubReleaseSource} from '../src/modules/github-release-sync-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, fixtureProduct, fixtureRoot, registerAccount, sha256} from './helpers/registry-fixtures.js'
@@ -43,6 +43,38 @@ function tarEntry(path: string, bytes: Buffer): Buffer {
 function tgz(files: Record<string, Buffer>): Buffer {
   return gzipSync(Buffer.concat([...Object.entries(files).map(([path, bytes]) => tarEntry(`package/${path}`, bytes)), Buffer.alloc(1024)]))
 }
+
+it('accepts only fully inventoried offline web game archives', () => {
+  const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'">')
+  const js = Buffer.from('document.title="Game"')
+  const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(js)}}))
+  const game = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', js), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
+  expect(() => verifyWebGameArchive(game)).not.toThrow()
+  const changed = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', Buffer.from('changed')), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
+  expect(() => verifyWebGameArchive(changed)).toThrow(/digest mismatch/)
+  const outside = gzipSync(Buffer.concat([tarEntry('../outside.js', js), tarEntry('index.html', html), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
+  expect(() => verifyWebGameArchive(outside)).toThrow(/unsafe/i)
+  const collidingInventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {
+    'index.html': sha256(html), 'main.js': sha256(js), 'MAIN.js': sha256(Buffer.from('other')),
+  }}))
+  const colliding = gzipSync(Buffer.concat([
+    tarEntry('index.html', html), tarEntry('main.js', js),
+    tarEntry('MAIN.js', Buffer.from('other')), tarEntry('game.files.json', collidingInventory), Buffer.alloc(1024),
+  ]))
+  expect(() => verifyWebGameArchive(colliding)).toThrow(/case-conflicting/)
+  const tooMany = gzipSync(Buffer.concat([
+    ...Array.from({length: 513}, (_, index) => tarEntry('file-' + index + '.txt', Buffer.from('x'))),
+    Buffer.alloc(1024),
+  ]))
+  expect(() => verifyWebGameArchive(tooMany)).toThrow(/too many entries/)
+  const invalidHeader = Buffer.from(tarEntry('index.html', html))
+  invalidHeader.write('gnu!!', 257)
+  invalidHeader.fill(32, 148, 156)
+  const checksum = invalidHeader.subarray(0, 512).reduce((sum, byte) => sum + byte, 0)
+  invalidHeader.write(checksum.toString(8).padStart(6, '0') + '\0 ', 148)
+  const nonUstar = gzipSync(Buffer.concat([invalidHeader, Buffer.alloc(1024)]))
+  expect(() => verifyWebGameArchive(nonUstar)).toThrow(/regular ustar/)
+})
 
 type Built = {source: FakeSource; productId: string; version: string; tag: string; packageBytes: Buffer; files: Record<string, Buffer>; provenance: Record<string, unknown>}
 
