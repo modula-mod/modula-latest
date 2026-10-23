@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "feature/game-platform-02-qa-delivery",
-      "sourceSha256": "22062838bf9ae6e606fd70d9508bd039a08a2576f11d717481735d94f563264c",
-      "capturedAt": "2026-10-23T00:55:29.056Z",
+      "sourceSha256": "6cd3283714a77df3deb235f8ee6bd005ae89bd2114cbe962660eaa6d91d2bc14",
+      "capturedAt": "2026-10-23T07:59:48.967Z",
       "routeCount": 649
     },
     "status": "PASS"

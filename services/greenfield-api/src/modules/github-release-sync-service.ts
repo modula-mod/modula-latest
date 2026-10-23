@@ -389,8 +389,9 @@ export class GreenfieldGithubReleaseSyncService {
 }
 
 export function verifyWebGameArchive(bytes: Buffer): void {
+  if (bytes.length > 50 * 1024 * 1024) throw moduleError('VALIDATION_FAILED', 'Web game archive exceeds 50 MiB')
   let files: TarEntries
-  try { files = readTarGz(bytes, {maxUncompressedBytes: 64 * 1024 * 1024, maxEntries: 512}) }
+  try { files = readTarGz(bytes, {maxUncompressedBytes: 64 * 1024 * 1024, maxEntries: 512, strictUstar: true}) }
   catch (error) { throw moduleError('VALIDATION_FAILED', `Web game archive: ${(error as Error).message}`) }
   const inventoryBytes = files.get('game.files.json')
   const entry = files.get('index.html')

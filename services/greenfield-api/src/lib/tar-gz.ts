@@ -9,7 +9,7 @@ export type TarEntries = Map<string, Buffer>
 
 export class TarGzError extends Error {}
 
-export function readTarGz(bytes: Buffer, limits: {maxUncompressedBytes: number; maxEntries?: number} ): TarEntries {
+export function readTarGz(bytes: Buffer, limits: {maxUncompressedBytes: number; maxEntries?: number; strictUstar?: boolean} ): TarEntries {
   let tar: Buffer
   try {
     tar = gunzipSync(bytes, {maxOutputLength: limits.maxUncompressedBytes})
@@ -17,18 +17,26 @@ export function readTarGz(bytes: Buffer, limits: {maxUncompressedBytes: number; 
     throw new TarGzError(`Release package is not a readable gzip archive within ${limits.maxUncompressedBytes} bytes`)
   }
   const entries: TarEntries = new Map()
+  const foldedPaths = new Set<string>()
   const maxEntries = limits.maxEntries ?? 10_000
   let offset = 0
   let pendingPath: string | null = null
+  let reachedEnd = false
   while (offset + 512 <= tar.length) {
     const header = tar.subarray(offset, offset + 512)
-    if (header.every(byte => byte === 0)) break
+    if (header.every(byte => byte === 0)) { reachedEnd = true; break }
+    if (limits.strictUstar && (header.toString('ascii', 257, 263) !== 'ustar\0'
+      || (header[156] !== 0 && header[156] !== 48)
+      || header.subarray(345, 500).some(byte => byte !== 0))) {
+      throw new TarGzError('Web game archive requires regular ustar members')
+    }
     if (!checksumOk(header)) throw new TarGzError('Release package tar header checksum mismatch')
     const size = parseOctal(header.subarray(124, 136))
     const type = String.fromCharCode(header[156] || 48)
     const dataStart = offset + 512
     const dataEnd = dataStart + size
     if (dataEnd > tar.length) throw new TarGzError('Release package tar entry is truncated')
+    if (limits.strictUstar && size > 30 * 1024 * 1024) throw new TarGzError('Web game member exceeds 30 MiB')
     const data = tar.subarray(dataStart, dataEnd)
     offset = dataStart + Math.ceil(size / 512) * 512
     if (type === 'L') { pendingPath = cString(data); continue }
@@ -41,10 +49,23 @@ export function readTarGz(bytes: Buffer, limits: {maxUncompressedBytes: number; 
     if (type === '5') continue
     if (type !== '0' && type !== '7') throw new TarGzError(`Release package contains a non-regular entry: ${path}`)
     const normalized = safePath(path)
+    if (limits.strictUstar) {
+      if (normalized.length > 100 || !/^[A-Za-z0-9._/-]+$/.test(normalized)
+        || normalized.split('/').some(part => part === '.' || part === '..')) {
+        throw new TarGzError('Web game archive path is unsafe: ' + normalized)
+      }
+      if (foldedPaths.has(normalized.toLowerCase())) {
+        throw new TarGzError('Web game archive has a case-conflicting path: ' + normalized)
+      }
+      foldedPaths.add(normalized.toLowerCase())
+    }
     assertPortableModulePayload(normalized, data)
     if (entries.has(normalized)) throw new TarGzError(`Release package contains a duplicate entry: ${normalized}`)
     entries.set(normalized, Buffer.from(data))
     if (entries.size > maxEntries) throw new TarGzError('Release package contains too many entries')
+  }
+  if (limits.strictUstar && (!reachedEnd || tar.subarray(offset).some(byte => byte !== 0))) {
+    throw new TarGzError('Web game archive has an invalid trailer')
   }
   return entries
 }

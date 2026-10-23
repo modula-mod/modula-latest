@@ -54,6 +54,26 @@ it('accepts only fully inventoried offline web game archives', () => {
   expect(() => verifyWebGameArchive(changed)).toThrow(/digest mismatch/)
   const outside = gzipSync(Buffer.concat([tarEntry('../outside.js', js), tarEntry('index.html', html), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
   expect(() => verifyWebGameArchive(outside)).toThrow(/unsafe/i)
+  const collidingInventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {
+    'index.html': sha256(html), 'main.js': sha256(js), 'MAIN.js': sha256(Buffer.from('other')),
+  }}))
+  const colliding = gzipSync(Buffer.concat([
+    tarEntry('index.html', html), tarEntry('main.js', js),
+    tarEntry('MAIN.js', Buffer.from('other')), tarEntry('game.files.json', collidingInventory), Buffer.alloc(1024),
+  ]))
+  expect(() => verifyWebGameArchive(colliding)).toThrow(/case-conflicting/)
+  const tooMany = gzipSync(Buffer.concat([
+    ...Array.from({length: 513}, (_, index) => tarEntry('file-' + index + '.txt', Buffer.from('x'))),
+    Buffer.alloc(1024),
+  ]))
+  expect(() => verifyWebGameArchive(tooMany)).toThrow(/too many entries/)
+  const invalidHeader = Buffer.from(tarEntry('index.html', html))
+  invalidHeader.write('gnu!!', 257)
+  invalidHeader.fill(32, 148, 156)
+  const checksum = invalidHeader.subarray(0, 512).reduce((sum, byte) => sum + byte, 0)
+  invalidHeader.write(checksum.toString(8).padStart(6, '0') + '\0 ', 148)
+  const nonUstar = gzipSync(Buffer.concat([invalidHeader, Buffer.alloc(1024)]))
+  expect(() => verifyWebGameArchive(nonUstar)).toThrow(/regular ustar/)
 })
 
 type Built = {source: FakeSource; productId: string; version: string; tag: string; packageBytes: Buffer; files: Record<string, Buffer>; provenance: Record<string, unknown>}

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-23T00:55:29.056Z",
+  "capturedAt": "2026-10-23T07:59:48.967Z",
   "source": {
     "branch": "feature/game-platform-02-qa-delivery",
-    "headAtCapture": "aae7068722f2ad907e064f5406f8116c61d1564c",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "22062838bf9ae6e606fd70d9508bd039a08a2576f11d717481735d94f563264c"
+    "headAtCapture": "d6feebdbf3ec631fd1a08983acd2dc57ec80fb65",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "6cd3283714a77df3deb235f8ee6bd005ae89bd2114cbe962660eaa6d91d2bc14"
   },
   "runtimeRoutes": [
     {

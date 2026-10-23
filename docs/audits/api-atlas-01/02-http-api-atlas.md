@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-10-23T00:55:29.056Z for branch `feature/game-platform-02-qa-delivery`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-23T07:59:48.967Z for branch `feature/game-platform-02-qa-delivery`; this does not claim deployment.
 
 - Runtime method routes: 649
 - Application routes: 459
