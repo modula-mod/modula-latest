@@ -1,4 +1,5 @@
 import {
+  compareSemver,
   dependencyProvidesFromManifest,
   dependencyRequestsFromManifest,
   satisfiesSemverRange,
@@ -207,9 +208,10 @@ export class GreenfieldModuleDependencyResolver {
       .select(['module_id', 'version', 'release_state'])
       .where('module_id', '=', moduleId)
       .where('release_state', '=', 'published')
-      .orderBy('version', 'desc')
       .execute()
-    const resolved = releases.find(row => satisfiesSemverRange(row.version, versionRange))
+    const resolved = releases
+      .filter(row => satisfiesSemverRange(row.version, versionRange))
+      .sort((a, b) => compareSemver(b.version, a.version))[0]
     return resolved ? {moduleId: resolved.module_id, version: resolved.version} : null
   }
 
@@ -222,10 +224,14 @@ export class GreenfieldModuleDependencyResolver {
       .where('greenfield_module_releases.release_state', '=', 'published')
       .orderBy('greenfield_module_releases.module_id')
       .execute()
+    const candidates: Array<{moduleId: string; version: string; providedVersion: string}> = []
     for (const row of releases as any[]) {
       const provider = dependencyProvidesFromManifest(row.manifest).find(contract => contract.id === provides && satisfiesSemverRange(contract.version, versionRange))
-      if (provider) return {moduleId: row.module_id, version: row.version}
+      if (provider) candidates.push({moduleId: row.module_id, version: row.version, providedVersion: provider.version})
     }
-    return null
+    candidates.sort((a, b) => compareSemver(b.providedVersion, a.providedVersion)
+      || compareSemver(b.version, a.version) || a.moduleId.localeCompare(b.moduleId))
+    const resolved = candidates[0]
+    return resolved ? {moduleId: resolved.moduleId, version: resolved.version} : null
   }
 }

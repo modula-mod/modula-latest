@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "feature/game-platform-02-qa-delivery",
-      "sourceSha256": "6cd3283714a77df3deb235f8ee6bd005ae89bd2114cbe962660eaa6d91d2bc14",
-      "capturedAt": "2026-10-23T07:59:48.967Z",
+      "branch": "codex/on-demand-packages-01-resolver",
+      "sourceSha256": "a42565fa36659e530bf27ff96c76aa93fe5c3f74e5302978c7a2e42e33b29b00",
+      "capturedAt": "2026-10-23T08:40:57.605Z",
       "routeCount": 649
     },
     "status": "PASS"
