@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-10-24T02:26:16.594Z for branch `codex/on-demand-packages-02`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-24T10:48:54.896Z for branch `codex/on-demand-packages-02`; this does not claim deployment.
 
 - Runtime method routes: 650
 - Application routes: 460

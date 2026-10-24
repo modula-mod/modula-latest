@@ -56,7 +56,7 @@ flowchart TD
 ## Versions and migration truth
 
 - Applied migrations: 73; latest `073_backup_sequence_acl_defaults` at 2026-10-14T01:27:28.538373+00:00.
-- Git up migrations: 75; latest `075_greenfield_messaging.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
+- Git up migrations: 76; latest `076_optional_package_media.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
 - Production runtime routes: 630; excluded automatic production framework routes: 184. Candidate route counts, when present, are reported only in the HTTP atlas and do not alter deployment truth.
 
 ## Safe configuration

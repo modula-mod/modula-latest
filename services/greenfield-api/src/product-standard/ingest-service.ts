@@ -510,7 +510,11 @@ async function storeDistributionArtifacts(db: any, input: {
     artifacts.push({
       artifactId: `release:${input.releaseId}:optional-package`, kind: 'asset',
       sha256: input.packageArtifact.sha256,
-      filename: safeFilename(input.packageArtifact.path, 'optional-package'),
+      // The signed web-game compatibility artifact already uses game.tgz for
+      // this digest. Give the optional-package record its own immutable name
+      // so both access contracts can coexist under the release tuple key.
+      filename: input.packageArtifact.path === 'game/game.tgz'
+        ? 'game-content.tgz' : safeFilename(input.packageArtifact.path, 'optional-package'),
       mediaType: input.packageArtifact.mediaType, bytes: input.packageArtifact.bytes,
       access: input.packageArtifact.sharing === 'public-immutable' ? 'public' : 'installation',
       required: true,

@@ -1,6 +1,6 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 75 ordered up migrations, latest `075_greenfield_messaging.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 76 ordered up migrations, latest `076_optional_package_media.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 

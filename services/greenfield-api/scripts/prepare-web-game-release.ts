@@ -112,7 +112,7 @@ export function prepareWebGameRelease(input: {
   return {packagePath, provenancePath, packageSha256: sha256(packageBytes), gameSha256: sha256(game)}
 }
 
-function adapter(mps: Record<string, any>, tag: string, commit: string, filename: string): GreenfieldModuleManifest {
+export function adapter(mps: Record<string, any>, tag: string, commit: string, filename: string): GreenfieldModuleManifest {
   const moduleId = mps.identity.id as string
   const version = mps.identity.version as string
   const manifest = {
@@ -154,7 +154,7 @@ function adapter(mps: Record<string, any>, tag: string, commit: string, filename
   return manifest
 }
 
-function tarGz(files: Map<string, Buffer>): Buffer {
+export function tarGz(files: Map<string, Buffer>): Buffer {
   const entries: Buffer[] = []
   for (const [path, bytes] of [...files].sort(([a], [b]) => a.localeCompare(b))) {
     const name = `package/${path}`
