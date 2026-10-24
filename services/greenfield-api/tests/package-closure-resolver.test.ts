@@ -43,6 +43,20 @@ describe('exact signed package closure', () => {
     expect(lock.packages.find(item => item.packageId === phaser.packageId)?.version).toBe('4.2.1')
   })
 
+  it('rejects incompatible requirements and unsupported capabilities', () => {
+    const incompatibleGame = release(dash.packageId, '0.1.1', 'f',
+      [{packageId: phaser.packageId, versionRange: '<4.2.0'}])
+    expect(() => resolvePackageClosure(request([arena.packageId, incompatibleGame.packageId],
+      [arena, incompatibleGame, phaser]))).toThrowError(PackageResolutionError)
+    try {
+      resolvePackageClosure(request([arena.packageId, incompatibleGame.packageId], [arena, incompatibleGame, phaser]))
+    } catch (error) { expect((error as PackageResolutionError).code).toBe('DEPENDENCY_CONFLICT') }
+    const privileged = {...phaser, requiredCapabilities: ['native.camera']}
+    expect(() => resolvePackageClosure(request([arena.packageId], [arena, privileged]))).toThrowError(PackageResolutionError)
+    try { resolvePackageClosure(request([arena.packageId], [arena, privileged])) }
+    catch (error) { expect((error as PackageResolutionError).code).toBe('CAPABILITY_UNSUPPORTED') }
+  })
+
   it.each([
     ['DEPENDENCY_MISSING', [arena]],
     ['PACKAGE_REVOKED', [arena, {...phaser, trust: {...phaser.trust, revoked: true}}]],
