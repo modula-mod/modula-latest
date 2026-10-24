@@ -10,7 +10,7 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 075', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 076', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -90,6 +90,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '070_module_platform_functions_actions', '071_module_record_search_projection',
       '072_module_distribution_protocol', '073_backup_sequence_acl_defaults',
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
+      '076_optional_package_media',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -97,7 +98,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('075')
+    expect(version.rows[0]?.value).toBe('076')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -106,7 +107,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('075_greenfield_messaging')
+    expect(applied.at(-1)).toBe('076_optional_package_media')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -118,6 +119,13 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(table.rows[0]?.name).toBe('follow_requests')
     expect(constraints.rows[0]?.count).toBeGreaterThanOrEqual(5)
     await client.end()
+
+    expect(await migrateDown(freshUrl)).toBe('076_optional_package_media')
+    const rolledBackOptionalMedia = new pg.Client({connectionString: freshUrl})
+    await rolledBackOptionalMedia.connect()
+    const versionAfter076 = await rolledBackOptionalMedia.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(versionAfter076.rows[0]?.value).toBe('075')
+    await rolledBackOptionalMedia.end()
 
     expect(await migrateDown(freshUrl)).toBe('075_greenfield_messaging')
     const rolledBackMessaging = new pg.Client({connectionString: freshUrl})
@@ -152,7 +160,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(version.rows[0]?.value).toBe('072')
     await rolledBackBackupAcl.end()
 
-    expect(await migrateUp(freshUrl)).toEqual(['073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes', '075_greenfield_messaging'])
+    expect(await migrateUp(freshUrl)).toEqual(['073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes', '075_greenfield_messaging', '076_optional_package_media'])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
     const restoredPrivilege = await reapplied.query(
