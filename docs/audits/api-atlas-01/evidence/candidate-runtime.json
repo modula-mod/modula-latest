@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-23T08:40:57.605Z",
+  "capturedAt": "2026-10-24T02:26:16.594Z",
   "source": {
-    "branch": "codex/on-demand-packages-01-resolver",
-    "headAtCapture": "737704b60e3903bb329cd618f6587af94f1035c6",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "a42565fa36659e530bf27ff96c76aa93fe5c3f74e5302978c7a2e42e33b29b00"
+    "branch": "codex/on-demand-packages-02",
+    "headAtCapture": "969a938099f0f39badb2d2e3f589a407e130f8bf",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "e55ddd62746886dab78cd690768724bb80307895e3769872e568af35334ee490"
   },
   "runtimeRoutes": [
     {
@@ -1041,6 +1041,15 @@
       "method": "POST",
       "url": "/v1/modules/:moduleId/install-plan",
       "path": "/v1/modules/:moduleId/install-plan",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/package-install-plan",
+      "path": "/v1/modules/:moduleId/package-install-plan",
       "prefix": "",
       "schema": null,
       "config": null,

@@ -6,18 +6,18 @@ API service: `modula-production-greenfield-api-1` (healthy)
 Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no Docker healthcheck)
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
-HTTP routes discovered: 459 application / 649 runtime method routes
-Route evidence: local-candidate-runtime for feature branch codex/on-demand-packages-01-resolver; not deployed
+HTTP routes discovered: 460 application / 650 runtime method routes
+Route evidence: local-candidate-runtime for feature branch codex/on-demand-packages-02; not deployed
 Public routes: 76
-Authenticated routes: 289
+Authenticated routes: 290
 Admin/internal routes: 94
-Mutating routes: 270
+Mutating routes: 271
 Read-only routes: 189
 Routes with request schemas: 15
 Routes with response schemas: 0
-Routes with automated tests: 384
+Routes with automated tests: 385
 Routes live-probed: 26 unique routes
-Routes with known callers: 237
+Routes with known callers: 238
 Database tables: 309
 Workers: 1 GreenField worker
 Queues: PostgreSQL outbox plus background job tables
@@ -49,7 +49,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 | Search | 9 | 4 | 0 | 0 | 0 |
 | Discover | 1 | 1 | 4 | 0 | 0 |
 | Activity | 4 | 1 | 1 | 1 | 0 |
-| Modules | 150 | 2 | 2 | 0 | 0 |
+| Modules | 151 | 2 | 2 | 0 | 0 |
 | Module Runtime | 29 | 0 | 0 | 0 | 0 |
 | Intelligence | 20 | 0 | 0 | 0 | 0 |
 | Moderation | 2 | 0 | 0 | 0 | 0 |
@@ -58,7 +58,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 ## Candidate and production conclusions
 
 - The running API and worker are the same OCI revision, `f05d03c237c62d1b0946a760610d1155f02a8520`; that revision exactly matches captured `origin/main`.
-- Candidate source/runtime reconciliation is exact: 649 = 459 application routes + 190 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
+- Candidate source/runtime reconciliation is exact: 650 = 460 application routes + 190 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
 - API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
