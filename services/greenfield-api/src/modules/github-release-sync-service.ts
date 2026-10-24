@@ -118,6 +118,7 @@ export type VerifiedGithubRelease = {
   manifest: GreenfieldModuleManifest
   frontend: {path: string; bytes: Buffer} | null
   game: {path: string; bytes: Buffer; sha256: string} | null
+  optionalPackage: {path: string; bytes: Buffer; sha256: string; mediaType: string; sharing: 'public-immutable' | 'account-private'} | null
   schemas: Array<{path: string; bytes: Buffer}>
   assets: Array<{path: string; bytes: Buffer}>
   evidence: GreenfieldModuleReleaseEvidence
@@ -212,7 +213,7 @@ export class GreenfieldGithubReleaseSyncService {
       if (path !== 'game/game.tgz' || !/^[a-f0-9]{64}$/.test(digest ?? '')
         || gameRuntime.artifact?.mediaType !== 'application/vnd.modula.game-web+tgz'
         || gameRuntime.entryPath !== 'index.html'
-        || gameRuntime.contractVersion !== '1.0.0'
+        || !['1.0.0', '1.1.0'].includes(gameRuntime.contractVersion)
         || !['phaser', 'playcanvas'].includes(gameRuntime.engine)
         || typeof gameRuntime.engineVersion !== 'string' || !gameRuntime.engineVersion.trim()
         || gameRuntime.assetInventory !== 'game.files.json'
@@ -225,6 +226,13 @@ export class GreenfieldGithubReleaseSyncService {
         || typeof gameRuntime.touchControls !== 'string' || !gameRuntime.touchControls.trim()) {
         throw moduleError('VALIDATION_FAILED', 'Web game runtime artifact contract is invalid')
       }
+      if (gameRuntime.contractVersion === '1.1.0' && (!gameRuntime.runtimeDependency?.packageId ||
+          !gameRuntime.runtimeDependency?.versionRange ||
+          !mps.distribution?.dependencies?.some((dependency: any) =>
+            dependency.packageId === gameRuntime.runtimeDependency.packageId &&
+            dependency.versionRange === gameRuntime.runtimeDependency.versionRange))) {
+        throw moduleError('VALIDATION_FAILED', 'Externalized game runtime is missing from the package dependency closure')
+      }
       const bytes = file(path)
       if (!bytes || bytes.length > 50 * 1024 * 1024 || sha256(bytes) !== digest) {
         throw moduleError('VALIDATION_FAILED', 'Web game artifact is missing, oversized, or has a mismatched digest')
@@ -235,6 +243,35 @@ export class GreenfieldGithubReleaseSyncService {
     } else if (gameRuntime?.type === 'native-engine-content') {
       // A Unity content contract does not make this host Unity-capable.
       throw moduleError('VALIDATION_FAILED', 'Native engine content requires a separately accepted host')
+    }
+
+    const distribution = mps.distribution as Record<string, any> | undefined
+    let optionalPackage: VerifiedGithubRelease['optionalPackage'] = null
+    if (distribution) {
+      const meta = distribution.artifact as Record<string, any> | undefined
+      const path = meta?.path
+      const digest = meta?.sha256
+      if (distribution.schema !== 'modula.package.1' || !/^(?:module|web-runtime|game-content|model-data|asset-pack)$/.test(distribution.category ?? '') ||
+          typeof path !== 'string' || !/^[a-f0-9]{64}$/.test(digest ?? '') ||
+          !Number.isSafeInteger(meta?.compressedSizeBytes) || !Number.isSafeInteger(meta?.installedSizeEstimateBytes) ||
+          !['public-immutable', 'account-private'].includes(distribution.sharing)) {
+        throw moduleError('VALIDATION_FAILED', 'Optional package metadata is invalid')
+      }
+      const bytes = file(path)
+      if (!bytes || bytes.length !== meta!.compressedSizeBytes || sha256(bytes) !== digest) {
+        throw moduleError('VALIDATION_FAILED', 'Optional package artifact is missing or has a mismatched size or digest')
+      }
+      if (distribution.category === 'game-content') {
+        if (!game || game.sha256 !== digest || game.path !== path) {
+          throw moduleError('VALIDATION_FAILED', 'Game content package must match the verified game archive')
+        }
+      } else if (distribution.category === 'web-runtime' || distribution.category === 'asset-pack') {
+        verifyOptionalArchive(bytes, distribution.category)
+      } else if (/(?:^|\/)\S+\.(?:app|framework|dylib|so|dll|exe|node|ipa|wasm)$/i.test(path)) {
+        throw moduleError('VALIDATION_FAILED', 'Native executable package artifacts are forbidden')
+      }
+      optionalPackage = {path, bytes, sha256: digest, mediaType: meta!.mediaType, sharing: distribution.sharing}
+      checks.push('optional-package.sha256')
     }
 
     const schemaPaths = [...new Set(((mps.backend?.records ?? []) as Array<{schemaPath?: unknown}>).map(record => record.schemaPath).filter((path): path is string => typeof path === 'string'))]
@@ -273,6 +310,7 @@ export class GreenfieldGithubReleaseSyncService {
       manifest,
       frontend: frontendPath && frontendBytes ? {path: frontendPath, bytes: frontendBytes} : null,
       game,
+      optionalPackage,
       schemas,
       assets,
       evidence,
@@ -317,6 +355,7 @@ export class GreenfieldGithubReleaseSyncService {
         frontend: verified.frontend,
         schemas: verified.schemas,
         assets: verified.assets,
+        packageArtifact: verified.optionalPackage,
         distributionVerified: true,
       })
       if (!ingested || ingested.productId !== verified.productId || ingested.version !== verified.version) throw moduleError('VALIDATION_FAILED', 'MPS ingest did not persist the release')
@@ -366,9 +405,7 @@ export class GreenfieldGithubReleaseSyncService {
       if (verified.game) {
         await trx.insertInto('greenfield_release_asset_blobs').values({
           sha256: verified.game.sha256,
-          // Blob storage's existing gzip media class covers the nested archive;
-          // the signed MPS manifest names the stricter game-web media type.
-          media_type: 'application/gzip',
+          media_type: 'application/vnd.modula.game-web+tgz',
           byte_size: verified.game.bytes.length,
           bytes: verified.game.bytes,
           created_at: new Date(),
@@ -404,7 +441,9 @@ export function verifyWebGameArchive(bytes: Buffer): void {
   const listed = Object.keys(inventory.files).sort()
   if (JSON.stringify(actual) !== JSON.stringify(listed)) throw moduleError('VALIDATION_FAILED', 'Web game inventory does not match archive members')
   for (const path of actual) {
-    if (path.split('/').some(part => !part || part === '.' || part === '..') || /\.(?:wasm|dylib|so|dll|exe|node|ipa|a|o|jar|class|cs)$/i.test(path)) {
+    if (path === '__runtime' || path.startsWith('__runtime/') ||
+        path.split('/').some(part => !part || part === '.' || part === '..') || /\.(?:wasm|dylib|so|dll|exe|node|ipa|a|o|jar|class|cs)$/i.test(path) ||
+        hasNativeExecutableMagic(files.get(path)!)) {
       throw moduleError('VALIDATION_FAILED', `Unsafe web game member: ${path}`)
     }
     if (inventory.files[path] !== sha256(files.get(path)!)) throw moduleError('VALIDATION_FAILED', `Web game member digest mismatch: ${path}`)
@@ -414,6 +453,45 @@ export function verifyWebGameArchive(bytes: Buffer): void {
     || !/connect-src 'none'/i.test(html) || !/script-src 'self'/i.test(html)) {
     throw moduleError('VALIDATION_FAILED', 'Web game entry lacks the required restrictive CSP')
   }
+}
+
+export function verifyOptionalArchive(bytes: Buffer, category: 'web-runtime' | 'asset-pack'): void {
+  if (bytes.length > 50 * 1024 * 1024) throw moduleError('VALIDATION_FAILED', 'Optional archive exceeds 50 MiB')
+  let files: TarEntries
+  try { files = readTarGz(bytes, {maxUncompressedBytes: 64 * 1024 * 1024, maxEntries: 512, strictUstar: true}) }
+  catch (error) { throw moduleError('VALIDATION_FAILED', `Optional archive: ${(error as Error).message}`) }
+  const inventoryBytes = files.get('package.files.json')
+  if (!inventoryBytes) throw moduleError('VALIDATION_FAILED', 'Optional archive lacks a digest inventory')
+  const inventory = parseJson(inventoryBytes, 'package.files.json') as Record<string, any>
+  if (inventory.schema !== 'modula.package-files.1' || !inventory.files || typeof inventory.files !== 'object' || Array.isArray(inventory.files)) {
+    throw moduleError('VALIDATION_FAILED', 'Optional archive inventory is invalid')
+  }
+  const actual = [...files.keys()].filter(path => path !== 'package.files.json').sort()
+  if (JSON.stringify(actual) !== JSON.stringify(Object.keys(inventory.files).sort())) {
+    throw moduleError('VALIDATION_FAILED', 'Optional archive inventory does not match its members')
+  }
+  for (const path of actual) {
+    if (path.split('/').some(part => !part || part === '.' || part === '..') ||
+        /\.(?:wasm|dylib|so|dll|exe|node|ipa|app|framework|a|o|jar|class|cs)$/i.test(path) ||
+        hasNativeExecutableMagic(files.get(path)!)) {
+      throw moduleError('VALIDATION_FAILED', `Optional archive contains an unsafe member: ${path}`)
+    }
+    if (category === 'web-runtime' && !/\.(?:js|mjs|css|json|map)$/i.test(path)) {
+      throw moduleError('VALIDATION_FAILED', `Web runtime has an unsupported member: ${path}`)
+    }
+    if (inventory.files[path] !== sha256(files.get(path)!)) {
+      throw moduleError('VALIDATION_FAILED', `Optional archive member digest mismatch: ${path}`)
+    }
+  }
+  if (category === 'web-runtime' && JSON.stringify(actual) !== JSON.stringify(['engine.mjs'])) {
+    throw moduleError('VALIDATION_FAILED', 'Web runtime must expose exactly engine.mjs')
+  }
+}
+
+function hasNativeExecutableMagic(bytes: Buffer): boolean {
+  const head = bytes.subarray(0, 4).toString('hex')
+  return head === '7f454c46' || bytes.subarray(0, 2).toString('hex') === '4d5a' ||
+    ['feedface', 'cefaedfe', 'feedfacf', 'cffaedfe', 'cafebabe', 'bebafeca'].includes(head)
 }
 
 function releaseChannelFromMps(bytes: Buffer): 'stable' | 'beta' | 'rc' | 'dev' {

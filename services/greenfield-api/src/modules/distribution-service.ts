@@ -12,6 +12,8 @@ import {
   type ModuleReleaseDescriptor,
   type ModuleUpdateFeed,
   type ModuleUpdatePlan,
+  type PackageLockfile,
+  type PackageReleaseDescriptor,
 } from '@modula/greenfield-module-registry-contracts'
 import {
   negotiateHostCapabilities,
@@ -39,6 +41,7 @@ import {
   permissionDiff,
 } from './version-switch-service.js'
 import {allRuntimePermissionKeys} from './runtime2-service.js'
+import {resolvePackageClosure} from './package-closure-resolver.js'
 
 export type DistributionHostContext = {
   hostVersion?: string | null
@@ -308,6 +311,74 @@ export class GreenfieldModuleDistributionService {
       allowed: blockers.length === 0,
       blockers,
     }
+  }
+
+  /** Resolve exact optional bytes from MPS ingestions linked to signed releases.
+   * This uses the existing release and artifact tables; it does not create a
+   * second registry or accept caller-supplied release metadata.
+   */
+  async packageInstallPlan(moduleId: string, version: string | null, context: DistributionHostContext,
+                           cachedPublicDigests: readonly string[] = []): Promise<{lock: PackageLockfile; lockSha256: string}> {
+    if (cachedPublicDigests.length > 4096 || cachedPublicDigests.some(digest => !/^[a-f0-9]{64}$/.test(digest))) {
+      throw moduleError('VALIDATION_FAILED', 'Invalid cached artifact digest list')
+    }
+    const ingestions = await this.db.selectFrom('greenfield_mps_ingestions')
+      .select(['product_id', 'version', 'release_id', 'manifest'])
+      .where('release_id', 'is not', null)
+      .execute()
+    const packaged = ingestions.filter(row => {
+      const manifest = row.manifest as Record<string, unknown> | null
+      return manifest?.distribution != null
+    })
+    if (!packaged.some(row => row.product_id === moduleId)) {
+      throw moduleError('NOT_FOUND', `No optional package release exists for ${moduleId}`)
+    }
+    if (!context.hostVersion || !context.platform) throw moduleError('VALIDATION_FAILED', 'Host version and platform are required for a package plan')
+    const releases = await Promise.allSettled(packaged.map(async row => {
+      const manifest = row.manifest as Record<string, any>
+      const distribution = manifest.distribution as Record<string, any>
+      if (manifest.identity?.id !== row.product_id || manifest.identity?.version !== row.version ||
+          distribution?.schema !== 'modula.package.1' || !row.release_id) return null
+      const signed = await this.releaseDescriptorById(row.release_id, context)
+      if (signed.moduleId !== row.product_id || signed.version !== row.version) return null
+      const artifact = signed.artifacts.find(item => item.digest === distribution.artifact?.sha256 &&
+        item.size === distribution.artifact?.compressedSizeBytes && item.contentType === distribution.artifact?.mediaType)
+      if (!artifact) return null
+      const candidate: PackageReleaseDescriptor = {
+        schemaVersion: 'modula.package.1', packageId: signed.moduleId,
+        publisherId: manifest.publisher?.id,
+        category: distribution.category, version: signed.version, releaseId: signed.releaseId,
+        artifact: {sha256: artifact.digest, compressedSizeBytes: artifact.size,
+          installedSizeEstimateBytes: distribution.artifact.installedSizeEstimateBytes,
+          mediaType: artifact.contentType, download: artifact.download},
+        signature: {algorithm: 'Ed25519', keyId: signed.signature.keyId, signature: signed.signature.signature,
+          statementDigest: signed.signature.statementDigest},
+        trust: {verified: signed.trust.verified && signed.trust.signatureState === 'verified',
+          publisherVerified: signed.trust.publisherVerified, revoked: signed.revoked || signed.trust.signerRevoked},
+        minimumHostVersion: distribution.minimumHostVersion,
+        platforms: distribution.platforms, dependencies: distribution.dependencies ?? [],
+        requiredCapabilities: distribution.requiredCapabilities ?? [],
+        cachePolicy: distribution.cachePolicy, sharing: distribution.sharing,
+        ...(distribution.executionProvider ? {executionProvider: distribution.executionProvider} : {}),
+      }
+      return candidate
+    }))
+    const available = releases.flatMap(result => result.status === 'fulfilled' && result.value ? [result.value] : [])
+    if (!available.some(release => release.packageId === moduleId)) {
+      // NOT_FOUND is reserved for historical releases with no package contract.
+      // A declared package whose signature/artifact cannot be verified must
+      // never fall through the legacy install path.
+      throw moduleError('UNTRUSTED_RELEASE', `No signed optional package release exists for ${moduleId}`)
+    }
+    const lock = resolvePackageClosure({
+      requested: [{packageId: moduleId, versionRange: version ? `=${version}` : '*'}], available,
+      hostVersion: context.hostVersion, platform: context.platform,
+      hostCapabilities: new Set((context.hostCapabilities ?? []).filter(item => item.status === 'available').map(item => item.id)),
+      trustedPublishers: new Set(available.filter(item => item.trust.publisherVerified).map(item => item.publisherId)),
+      installedPublicDigests: new Set(cachedPublicDigests),
+    })
+    const lockSha256 = createHash('sha256').update(canonicalJsonStringify(lock)).digest('hex')
+    return {lock, lockSha256}
   }
 
   async updatePlan(accountId: string, moduleId: string, targetVersion: string | null, context: DistributionHostContext = {}): Promise<ModuleUpdatePlan> {
