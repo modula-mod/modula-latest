@@ -1290,6 +1290,31 @@ export interface Database {
     body: string
     created_at: Date
   }
+  greenfield_premium_tiers: {tier_id: string; display_name: string; rank: number; paid: boolean}
+  greenfield_premium_products: {product_id: string; tier_id: string; billing_period: 'monthly' | 'yearly'}
+  greenfield_premium_members: {actor_id: string; app_account_token: string; member_since: Date | null; created_at: Date; updated_at: Date}
+  greenfield_premium_entitlements: {
+    entitlement_id: string
+    actor_id: string
+    tier_id: string
+    source: 'apple' | 'admin'
+    environment: 'Sandbox' | 'Production' | 'qa'
+    product_id: string | null
+    original_transaction_id: string | null
+    latest_transaction_id: string | null
+    status: 'active' | 'grace' | 'billing_retry' | 'expired' | 'revoked'
+    auto_renew: boolean | null
+    started_at: Date
+    expires_at: Date | null
+    grace_expires_at: Date | null
+    revoked_at: Date | null
+    revocation_reason: string | null
+    last_signed_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_premium_events: {event_id: string; entitlement_id: string | null; actor_id: string | null; source: string; notification_uuid: string | null; notification_type: string | null; notification_subtype: string | null; previous_status: string | null; status: string | null; payload_sha256: string; occurred_at: Date}
+  greenfield_verifications: {actor_id: string; verified_type: 'person' | 'organisation' | 'official'; state: 'verified' | 'revoked'; verified_at: Date; revoked_at: Date | null; reason: string | null; set_by_actor_id: string; updated_at: Date}
   greenfield_story_groups: {
     group_id: string
     owner_actor_id: string

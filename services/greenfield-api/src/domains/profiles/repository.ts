@@ -3,6 +3,7 @@ import type {ModulaProfileDto} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 import type {Database} from '../../database/types.js'
 import {mapProfile} from './mapper.js'
+import {badgesForActor} from '../../premium/badges.js'
 
 type ProfileRow = Database['profiles']
 
@@ -181,6 +182,6 @@ export class ProfileRepository {
     }
 
     const dto = mapProfile(row, links, {followers: followers?.count ?? 0, following: following?.count ?? 0, posts: posts?.count ?? 0})
-    return {...dto, isFollowing, followsViewer}
+    return {...dto, isFollowing, followsViewer, ...(await badgesForActor(this.db, row.actor_id))}
   }
 }

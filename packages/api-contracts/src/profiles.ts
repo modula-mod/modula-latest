@@ -52,6 +52,14 @@ export type ModulaProfileDto = {
   isFollowing: boolean
   followsViewer: boolean
   version?: number
+  /** Modula Premium tier while entitled (active or grace); null for Core. */
+  premiumTier?: 'plus' | 'horizon' | 'horizon_plus' | 'studio' | null
+  /** Premium tenure start, never reset. Null unless premiumTier is set. */
+  premiumSince?: string | null
+  /** Verification mark, independent of billing and never purchasable. */
+  verifiedType?: 'person' | 'organisation' | 'official' | null
+  /** verifiedType !== null. */
+  isVerified?: boolean
 }
 
 /**

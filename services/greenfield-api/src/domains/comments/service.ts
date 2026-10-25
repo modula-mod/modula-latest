@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {badgesForActors, NO_BADGES} from '../../premium/badges.js'
 import {GREENFIELD_REACTION_TYPES} from '@modula/greenfield-contracts'
 import {sql, type Selectable} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
@@ -259,9 +260,10 @@ export class CommentService {
       .where('deleted_at', 'is', null)
       .execute()
     const byActor = new Map(profiles.map(profile => [profile.actor_id, profile]))
+    const badges = await badgesForActors(this.db, profiles.map(profile => profile.actor_id))
     const present = (actorId: string) => {
       const profile = byActor.get(actorId)
-      return profile ? {id: profile.id, handle: profile.handle, displayName: profile.display_name, avatarUri: profile.avatar_url ?? undefined} : null
+      return profile ? {id: profile.id, handle: profile.handle, displayName: profile.display_name, avatarUri: profile.avatar_url ?? undefined, ...(badges.get(actorId) ?? NO_BADGES)} : null
     }
     const quotedById = new Map(quotedRows.map(row => [row.comment_id, row]))
     return rows.map(row => {
