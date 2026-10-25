@@ -9,6 +9,7 @@ import {excerptFor, matchedFieldsFor} from './ranking.js'
 import {SearchRepository} from './repository.js'
 import {resourceTypeForSearch, toSearchResult} from './visibility.js'
 import {ModuleRecordSearchAccessEvaluator} from './module-record-access.js'
+import {publicIdentitiesForActors, type PublicIdentitySummary} from '../../premium/badges.js'
 
 export class GreenfieldSearchService {
   private readonly repository: SearchRepository
@@ -30,6 +31,7 @@ export class GreenfieldSearchService {
 
     const started = Date.now()
     const page = await this.repository.search(parsed, actor, limits)
+    const identities = await publicIdentitiesForActors(this.db, page.rows.map(row => row.ownerId ?? '').filter(Boolean))
     const results = []
     for (const row of page.rows) {
       if (row.entityType === 'module-record') {
@@ -41,7 +43,7 @@ export class GreenfieldSearchService {
           {accountId: actor.accountId, requestId: actor.requestId, correlationId: actor.correlationId},
         )
         const matchedFields = matchedFieldsFor(row, parsed.normalizedQuery, parsed.tags)
-        results.push(toSearchResult(row, matchedFields, excerptFor(row, parsed.normalizedQuery)))
+        results.push(withPublicIdentity(toSearchResult(row, matchedFields, excerptFor(row, parsed.normalizedQuery)), row.ownerId ? identities.get(row.ownerId) : undefined))
         continue
       }
       const decision = await this.policy.evaluateAndAudit({
@@ -59,7 +61,7 @@ export class GreenfieldSearchService {
       })
       if (!decision.allowed) continue
       const matchedFields = matchedFieldsFor(row, parsed.normalizedQuery, parsed.tags)
-      results.push(toSearchResult(row, matchedFields, excerptFor(row, parsed.normalizedQuery)))
+      results.push(withPublicIdentity(toSearchResult(row, matchedFields, excerptFor(row, parsed.normalizedQuery)), row.ownerId ? identities.get(row.ownerId) : undefined))
     }
     const tookMs = Date.now() - started
     await this.repository.recordMetric({
@@ -219,6 +221,22 @@ export class GreenfieldSearchService {
     if (requestedAccountId !== actorAccountId) throw Object.assign(new Error('Account scope is not visible'), {code: 'FORBIDDEN', searchCode: 'RESOURCE_NOT_VISIBLE'})
   }
 
+}
+
+function withPublicIdentity<T extends {metadata: Record<string, unknown>}>(result: T, identity?: PublicIdentitySummary): T {
+  if (!identity) return result
+  return {
+    ...result,
+    metadata: {
+      ...result.metadata,
+      publicIdentity: identity.publicIdentity,
+      premiumTier: identity.premiumTier,
+      premiumBadgeVisible: identity.premiumBadgeVisible,
+      verificationStatus: identity.verificationStatus,
+      verifiedType: identity.verifiedType,
+      isVerified: identity.isVerified,
+    },
+  }
 }
 
 function requireAccount(actor: SearchActorContext): string {

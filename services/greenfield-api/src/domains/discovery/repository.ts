@@ -2,6 +2,7 @@ import type {ActivityItemDto, DiscoverResultDto, ReelItemDto} from '@modula/api-
 import type {ModulaDb} from '../../database/client.js'
 import {ProfileRepository} from '../profiles/repository.js'
 import {PostRepository} from '../posts/repository.js'
+import {publicIdentitiesForActors} from '../../premium/badges.js'
 
 export class DiscoveryRepository {
   private readonly profiles: ProfileRepository
@@ -11,7 +12,10 @@ export class DiscoveryRepository {
 
   async getDiscover(viewerActorId: string | null = null): Promise<DiscoverResultDto> {
     const excluded = await this.excludedActorIds(viewerActorId)
-    const suggestedProfiles = await this.profiles.listPublic(viewerActorId, excluded)
+    // Discover intentionally omits raw identity claims. Older Native builds
+    // treated the mere presence of a claim as verification; only the
+    // server-authoritative publicIdentity/isVerified fields may drive a mark.
+    const suggestedProfiles = (await this.profiles.listPublic(viewerActorId, excluded)).map(profile => ({...profile, identityClaims: []}))
     const trendingTopics = await this.db
       .selectFrom('trending_topics')
       .selectAll()
@@ -61,7 +65,7 @@ export class DiscoveryRepository {
     const excluded = suppliedExcluded ?? await this.excludedActorIds(viewerActorId)
     let query = this.db
       .selectFrom('posts as p')
-      .select(['p.id', 'p.created_at'])
+      .select(['p.id', 'p.author_actor_id', 'p.created_at'])
       .where('p.deleted_at', 'is', null)
       .where('p.audience', '=', 'public')
       .where(({exists, selectFrom}) => exists(selectFrom('post_content as c')
@@ -73,6 +77,7 @@ export class DiscoveryRepository {
       .limit(30)
     if (excluded.length) query = query.where('p.author_actor_id', 'not in', excluded)
     const rows = await query.execute()
+    await publicIdentitiesForActors(this.db, rows.map(row => row.author_actor_id))
     const posts = new PostRepository(this.db, this.publicApiUrl)
     const out: ReelItemDto[] = []
     for (const row of rows) {

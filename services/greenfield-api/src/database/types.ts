@@ -1290,6 +1290,16 @@ export interface Database {
     body: string
     created_at: Date
   }
+  greenfield_premium_catalogue_versions: {catalogue_version: number; status: 'active' | 'retired'; effective_at: Date; metadata: unknown; created_at: Date}
+  greenfield_premium_tiers: {catalogue_version: number; tier_id: 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'; display_name: string; rank: number; paid: boolean; metadata: unknown}
+  greenfield_premium_capabilities: {catalogue_version: number; capability_id: string; display_name: string; minimum_rank: number; availability_mode: 'existing_free' | 'qa_only' | 'future_disabled'; value_by_tier: unknown; metadata: unknown}
+  greenfield_premium_memberships: {account_id: string; catalogue_version: number; tier_id: 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'; subscription_status: 'active' | 'expired' | 'revoked' | 'downgraded'; entitlement_source: 'qa_fixture' | 'apple_verified' | 'migration' | 'promotion'; effective_at: Date; expires_at: Date | null; membership_since: Date | null; revision: number; provider_reference_hash: string | null; audit_metadata: unknown; created_at: Date; updated_at: Date}
+  greenfield_premium_preferences: {account_id: string; badge_visible: boolean; revision: number; updated_by_actor_id: string; updated_at: Date}
+  greenfield_premium_membership_events: {event_id: string; account_id: string; event_type: 'assigned' | 'renewed' | 'expired' | 'revoked' | 'downgraded' | 'badge_visibility_changed'; previous_tier_id: string | null; tier_id: string; previous_status: string | null; subscription_status: string; source: string; idempotency_key: string; actor_id: string | null; audit_metadata: unknown; occurred_at: Date}
+  greenfield_verification_applications: {application_id: string; account_id: string; requested_type: 'person' | 'notable_person' | 'organization' | 'public_body' | 'official_module_developer'; state: 'pending' | 'under_review' | 'verified' | 'paused' | 'denied' | 'revoked'; statement: string | null; submitted_by_actor_id: string; reviewer_actor_id: string | null; review_reason: string | null; reverification_due_at: Date | null; revision: number; created_at: Date; updated_at: Date}
+  greenfield_verification_statuses: {account_id: string; state: 'unverified' | 'pending' | 'under_review' | 'verified' | 'paused' | 'denied' | 'revoked'; verification_type: 'person' | 'notable_person' | 'organization' | 'public_body' | 'official_module_developer' | null; active_application_id: string | null; effective_at: Date; reverification_due_at: Date | null; revision: number; updated_at: Date}
+  greenfield_verification_appeals: {appeal_id: string; application_id: string; account_id: string; state: 'pending' | 'under_review' | 'accepted' | 'denied'; statement: string; submitted_by_actor_id: string; reviewer_actor_id: string | null; review_reason: string | null; revision: number; created_at: Date; updated_at: Date}
+  greenfield_verification_events: {event_id: string; account_id: string; application_id: string | null; appeal_id: string | null; event_type: string; from_state: string | null; to_state: string; actor_id: string; reason: string | null; audit_metadata: unknown; occurred_at: Date}
   greenfield_story_groups: {
     group_id: string
     owner_actor_id: string

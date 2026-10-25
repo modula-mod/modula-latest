@@ -251,7 +251,16 @@ describeIf('Phase 6S social product integration', () => {
     expect(comment.statusCode).toBe(201)
     const commentId = comment.json().data.comment_id
     expect(comment.json().data.author).toMatchObject({id: beta.profileId, handle: beta.handle, avatarUri})
-    expect(Object.keys(comment.json().data.author).sort()).toEqual(['avatarUri', 'displayName', 'handle', 'id'])
+    expect(comment.json().data.author).toMatchObject({
+      publicIdentity: {
+        schemaVersion: 1,
+        verification: {status: 'unverified', type: null, mark: null},
+        membership: {tier: 'core', status: 'core', badgeVisible: false, mark: null},
+      },
+      isVerified: false,
+      premiumTier: null,
+    })
+    expect(comment.json().data.author).not.toHaveProperty('accountId')
     const commentReload = await authed(beta.accessToken, 'GET', `/v1/posts/${socialPostId}/comments`)
     expect(commentReload.json().data.items.find((item: any) => item.comment_id === commentId).author.handle).toBe(beta.handle)
 

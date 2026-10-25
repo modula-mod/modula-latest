@@ -5,6 +5,7 @@ import type {Database} from '../../database/types.js'
 import {sql} from 'kysely'
 import {GreenfieldPolicyEngine} from '../policy/index.js'
 import {ProfileRepository} from '../profiles/repository.js'
+import {publicIdentitiesForActors} from '../../premium/badges.js'
 
 type PostRow = Database['posts']
 
@@ -209,6 +210,9 @@ export class PostRepository {
 
   
   private async hydrateMany(rows: PostRow[], viewerActorId: string | null): Promise<SocialPostDto[]> {
+    // Pre-warm the bounded identity cache with one batched lookup so feed
+    // hydration never adds one membership/verification query per author.
+    await publicIdentitiesForActors(this.db, rows.map(row => row.author_actor_id))
     const items: SocialPostDto[] = []
     for (const row of rows) {
       try {
