@@ -1,7 +1,9 @@
 # Branch cleanup candidates — future controlled phase
 
-Mission: `VPS-CONSOLIDATION-01`  
-Snapshot: 2026-10-25  
+Mission: `VPS-CONSOLIDATION-01`
+
+Snapshot: 2026-10-25
+
 Execution in this phase: **NONE**
 
 No GitHub branch or tag was deleted. This file is a proposal for after the Mac reconnects, local-only refs and dirty files are preserved, branch tips are fetched again, and each candidate is re-proven against then-current `main`.

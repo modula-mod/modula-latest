@@ -1,8 +1,11 @@
 # Mac return handoff — Premium, Verification, and Native consolidation
 
-Mission: `VPS-CONSOLIDATION-01`  
-Prepared: 2026-10-25  
-Production deployment: **NONE**  
+Mission: `VPS-CONSOLIDATION-01`
+
+Prepared: 2026-10-25
+
+Production deployment: **NONE**
+
 Real Premium payments: **DISABLED**
 
 ## Source identity
@@ -127,13 +130,20 @@ Both QA mutation flags are refused when `MODULA_ENVIRONMENT=production`. No publ
 
 ## QA deployment and fixtures
 
-Isolated PostgreSQL database: `modula_vps_consolidation_01_qa` in container `modula-premium-qa-pg`, PostgreSQL 16.9.  
-QA API: `modula-premium-verification-qa-api`, loopback only at `127.0.0.1:4024`.  
-QA worker: `modula-premium-verification-qa-worker`; external ingest and mail disabled.  
-QA media volume: `modula-premium-verification-qa-media`.  
-QA migration: 076, no pending/unknown migrations.  
-API image ID: `sha256:af5cfd073788713adefab448f8a6e093b584be09bfa816e081d062d753bc925a`.  
-Worker image ID: `sha256:b1490b583bbd36cbd0c2d899b5ad37b561d4b784f7d3c63c7eeae71e3db100d2`.  
+Isolated PostgreSQL database: `modula_vps_consolidation_01_qa` in container `modula-premium-qa-pg`, PostgreSQL 16.9.
+
+QA API: `modula-premium-verification-qa-api`, loopback only at `127.0.0.1:4024`.
+
+QA worker: `modula-premium-verification-qa-worker`; external ingest and mail disabled.
+
+QA media volume: `modula-premium-verification-qa-media`.
+
+QA migration: 076, no pending/unknown migrations.
+
+API image ID: `sha256:af5cfd073788713adefab448f8a6e093b584be09bfa816e081d062d753bc925a`.
+
+Worker image ID: `sha256:b1490b583bbd36cbd0c2d899b5ad37b561d4b784f7d3c63c7eeae71e3db100d2`.
+
 Both images are labeled with revision `58bde349fa40c1907a74e2f5d66ca38f3134e2fb` and expected migration 076.
 
 Non-secret fixture identities:

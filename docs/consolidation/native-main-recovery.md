@@ -1,9 +1,13 @@
 # MODULA Native main recovery and consolidation inventory
 
-Mission: `VPS-CONSOLIDATION-01`  
-Snapshot time: 2026-10-25  
-Evidence source: GitHub remote refs, GitHub PR metadata/checks, and the read-only Linux reference checkout.  
-Reference checkout: `/root/modula-worktrees/modula-native-vps-reference`  
+Mission: `VPS-CONSOLIDATION-01`
+
+Snapshot time: 2026-10-25
+
+Evidence source: GitHub remote refs, GitHub PR metadata/checks, and the read-only Linux reference checkout.
+
+Reference checkout: `/root/modula-worktrees/modula-native-vps-reference`
+
 Remote: `modula-mod/modula-native`
 
 ## Recovery boundary
