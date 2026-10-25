@@ -2,76 +2,164 @@ import type {ModulaDb} from '../database/client.js'
 
 export const PREMIUM_TIERS = ['core', 'plus', 'horizon', 'horizon_plus', 'studio'] as const
 export type PremiumTier = (typeof PREMIUM_TIERS)[number]
-export const VERIFIED_TYPES = ['person', 'organisation', 'official'] as const
-export type VerifiedType = (typeof VERIFIED_TYPES)[number]
+export const VERIFICATION_TYPES = ['person', 'notable_person', 'organization', 'public_body', 'official_module_developer'] as const
+export type VerificationType = (typeof VERIFICATION_TYPES)[number]
+export type VerificationMark = 'blue_identity_seal' | 'ink_squircle' | 'slate_hexagon' | 'developer_seal'
 
-/** Public badge fields embedded wherever an author or profile is returned. */
-export type PublicBadgeFields = {
-  /** Paid tier with an active or grace entitlement; null for Core / none. */
+export type PublicIdentitySummary = {
+  schemaVersion: 1
+  verification: {status: 'unverified' | 'verified'; type: VerificationType | null; mark: VerificationMark | null}
+  membership: {tier: PremiumTier; status: 'core' | 'active' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
+  publicIdentity: {
+    schemaVersion: 1
+    verification: {status: 'unverified' | 'verified'; type: VerificationType | null; mark: VerificationMark | null}
+    membership: {tier: PremiumTier; status: 'core' | 'active' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
+  }
   premiumTier: Exclude<PremiumTier, 'core'> | null
-  /** Tenure start (never reset). Only set while premiumTier is set. */
   premiumSince: string | null
-  /** Trust mark, independent of billing. */
-  verifiedType: VerifiedType | null
-  /** Convenience mirror of verifiedType !== null for existing native decoders. */
+  premiumBadgeVisible: boolean
+  verificationStatus: 'unverified' | 'verified'
+  verifiedType: VerificationType | null
   isVerified: boolean
 }
 
-export const NO_BADGES: PublicBadgeFields = Object.freeze({premiumTier: null, premiumSince: null, verifiedType: null, isVerified: false})
+export const EMPTY_PUBLIC_IDENTITY: PublicIdentitySummary = Object.freeze({
+  schemaVersion: 1,
+  verification: Object.freeze({status: 'unverified', type: null, mark: null}),
+  membership: Object.freeze({tier: 'core', status: 'core', badgeVisible: false, mark: null}),
+  publicIdentity: Object.freeze({
+    schemaVersion: 1,
+    verification: Object.freeze({status: 'unverified', type: null, mark: null}),
+    membership: Object.freeze({tier: 'core', status: 'core', badgeVisible: false, mark: null}),
+  }),
+  premiumTier: null,
+  premiumSince: null,
+  premiumBadgeVisible: false,
+  verificationStatus: 'unverified',
+  verifiedType: null,
+  isVerified: false,
+})
 
-let badgesEnabled = false
+let premiumEnabled = false
+let verificationEnabled = false
+const CACHE_TTL_MS = 15_000
+const cache = new Map<string, {expiresAt: number; value: PublicIdentitySummary}>()
 
-/** Set once at boot from MODULA_PREMIUM_ENTITLEMENTS_ENABLED. When off, every payload carries the empty defaults and no premium table is read. */
-export function setPremiumBadgesEnabled(enabled: boolean) { badgesEnabled = enabled }
-export function premiumBadgesEnabled() { return badgesEnabled }
-
-/** Entitled statuses: Apple keeps service during the grace period, not during billing retry. */
-export const ENTITLED_STATUSES = ['active', 'grace'] as const
-
-export function isEntitledNow(row: {status: string; expires_at: Date | null; grace_expires_at: Date | null}, now = new Date()) {
-  if (row.status === 'active') return !row.expires_at || row.expires_at.getTime() > now.getTime()
-  if (row.status === 'grace') return !row.grace_expires_at || row.grace_expires_at.getTime() > now.getTime()
-  return false
+export function setPublicIdentityProjectionEnabled(input: {premium: boolean; verification: boolean}) {
+  premiumEnabled = input.premium
+  verificationEnabled = input.verification
+  cache.clear()
 }
 
-/** One batched read for a set of actors. Missing actors get NO_BADGES. */
-export async function badgesForActors(db: ModulaDb, actorIds: string[]): Promise<Map<string, PublicBadgeFields>> {
+export function invalidatePublicIdentity(actorIds?: string[]) {
+  if (!actorIds) cache.clear()
+  else for (const actorId of actorIds) cache.delete(actorId)
+}
+
+export function verificationMark(type: VerificationType): VerificationMark {
+  if (type === 'organization') return 'ink_squircle'
+  if (type === 'public_body') return 'slate_hexagon'
+  if (type === 'official_module_developer') return 'developer_seal'
+  return 'blue_identity_seal'
+}
+
+/**
+ * Canonical batched public projection. It never reads profile identity claims,
+ * payment identifiers, application evidence or review notes.
+ */
+export async function publicIdentitiesForActors(db: ModulaDb, actorIds: string[]): Promise<Map<string, PublicIdentitySummary>> {
   const ids = [...new Set(actorIds.filter(Boolean))]
-  const result = new Map<string, PublicBadgeFields>()
-  for (const id of ids) result.set(id, NO_BADGES)
-  if (!badgesEnabled || ids.length === 0) return result
-  const now = new Date()
-  const [entitlements, members, verifications] = await Promise.all([
-    db.selectFrom('greenfield_premium_entitlements')
-      .innerJoin('greenfield_premium_tiers', 'greenfield_premium_tiers.tier_id', 'greenfield_premium_entitlements.tier_id')
-      .select(['greenfield_premium_entitlements.actor_id', 'greenfield_premium_entitlements.tier_id', 'greenfield_premium_entitlements.status', 'greenfield_premium_entitlements.expires_at', 'greenfield_premium_entitlements.grace_expires_at', 'greenfield_premium_tiers.rank'])
-      .where('greenfield_premium_entitlements.actor_id', 'in', ids)
-      .where('greenfield_premium_entitlements.status', 'in', [...ENTITLED_STATUSES])
-      .execute(),
-    db.selectFrom('greenfield_premium_members').select(['actor_id', 'member_since']).where('actor_id', 'in', ids).execute(),
-    db.selectFrom('greenfield_verifications').select(['actor_id', 'verified_type']).where('actor_id', 'in', ids).where('state', '=', 'verified').execute(),
-  ])
-  const since = new Map(members.map(row => [row.actor_id, row.member_since]))
-  const best = new Map<string, {tier: string; rank: number}>()
-  for (const row of entitlements) {
-    if (!isEntitledNow(row, now) || row.tier_id === 'core') continue
-    const current = best.get(row.actor_id)
-    if (!current || row.rank > current.rank) best.set(row.actor_id, {tier: row.tier_id, rank: row.rank})
-  }
-  const verified = new Map(verifications.map(row => [row.actor_id, row.verified_type as VerifiedType]))
+  const result = new Map<string, PublicIdentitySummary>()
+  const missing: string[] = []
+  const nowMs = Date.now()
   for (const id of ids) {
-    const tier = best.get(id)?.tier as PublicBadgeFields['premiumTier'] | undefined
-    const verifiedType = verified.get(id) ?? null
-    result.set(id, {
-      premiumTier: tier ?? null,
-      premiumSince: tier ? since.get(id)?.toISOString() ?? null : null,
-      verifiedType,
-      isVerified: verifiedType !== null,
-    })
+    const hit = cache.get(id)
+    if (hit && hit.expiresAt > nowMs) result.set(id, hit.value)
+    else missing.push(id)
+  }
+  if (missing.length === 0) return result
+  if (!premiumEnabled && !verificationEnabled) {
+    for (const id of missing) result.set(id, EMPTY_PUBLIC_IDENTITY)
+    return result
+  }
+
+  const values = new Map<string, PublicIdentitySummary>()
+  for (const id of missing) values.set(id, structuredClone(EMPTY_PUBLIC_IDENTITY))
+  const now = new Date()
+
+  if (premiumEnabled) {
+    const rows = await db.selectFrom('actors')
+      .leftJoin('greenfield_premium_memberships', 'greenfield_premium_memberships.account_id', 'actors.account_id')
+      .leftJoin('greenfield_premium_preferences', 'greenfield_premium_preferences.account_id', 'actors.account_id')
+      .select([
+        'actors.id as actor_id',
+        'greenfield_premium_memberships.tier_id',
+        'greenfield_premium_memberships.subscription_status',
+        'greenfield_premium_memberships.effective_at',
+        'greenfield_premium_memberships.expires_at',
+        'greenfield_premium_memberships.membership_since',
+        'greenfield_premium_preferences.badge_visible',
+      ])
+      .where('actors.id', 'in', missing)
+      .execute()
+    for (const row of rows) {
+      const current = values.get(row.actor_id) ?? structuredClone(EMPTY_PUBLIC_IDENTITY)
+      const tier = (row.tier_id ?? 'core') as PremiumTier
+      const recordedStatus = row.subscription_status ?? 'core'
+      const active = recordedStatus === 'active'
+        && row.effective_at !== null
+        && row.effective_at.getTime() <= now.getTime()
+        && (!row.expires_at || row.expires_at.getTime() > now.getTime())
+      const effectiveTier = active ? tier : 'core'
+      const effectiveStatus = recordedStatus === 'active' && !active ? 'expired' : recordedStatus
+      const badgeVisible = active && effectiveTier !== 'core' && row.badge_visible !== false
+      values.set(row.actor_id, {
+        ...current,
+        membership: {tier: effectiveTier, status: active ? 'active' : effectiveStatus, badgeVisible, mark: badgeVisible ? 'modula_unit' : null},
+        publicIdentity: {...current.publicIdentity, membership: {tier: effectiveTier, status: active ? 'active' : effectiveStatus, badgeVisible, mark: badgeVisible ? 'modula_unit' : null}},
+        premiumTier: effectiveTier === 'core' ? null : effectiveTier,
+        premiumSince: effectiveTier === 'core' ? null : row.membership_since?.toISOString() ?? null,
+        premiumBadgeVisible: badgeVisible,
+      })
+    }
+  }
+
+  if (verificationEnabled) {
+    const rows = await db.selectFrom('actors')
+      .innerJoin('greenfield_verification_statuses', 'greenfield_verification_statuses.account_id', 'actors.account_id')
+      .select(['actors.id as actor_id', 'greenfield_verification_statuses.state', 'greenfield_verification_statuses.verification_type', 'greenfield_verification_statuses.reverification_due_at'])
+      .where('actors.id', 'in', missing)
+      .where('greenfield_verification_statuses.state', '=', 'verified')
+      .execute()
+    for (const row of rows) {
+      if (!row.verification_type || (row.reverification_due_at && row.reverification_due_at.getTime() <= now.getTime())) continue
+      const current = values.get(row.actor_id) ?? structuredClone(EMPTY_PUBLIC_IDENTITY)
+      const type = row.verification_type as VerificationType
+      values.set(row.actor_id, {
+        ...current,
+        verification: {status: 'verified', type, mark: verificationMark(type)},
+        publicIdentity: {...current.publicIdentity, verification: {status: 'verified', type, mark: verificationMark(type)}},
+        verificationStatus: 'verified',
+        verifiedType: type,
+        isVerified: true,
+      })
+    }
+  }
+
+  for (const id of missing) {
+    const value = values.get(id) ?? EMPTY_PUBLIC_IDENTITY
+    cache.set(id, {expiresAt: nowMs + CACHE_TTL_MS, value})
+    result.set(id, value)
   }
   return result
 }
 
-export async function badgesForActor(db: ModulaDb, actorId: string): Promise<PublicBadgeFields> {
-  return (await badgesForActors(db, [actorId])).get(actorId) ?? NO_BADGES
+export async function publicIdentityForActor(db: ModulaDb, actorId: string): Promise<PublicIdentitySummary> {
+  return (await publicIdentitiesForActors(db, [actorId])).get(actorId) ?? EMPTY_PUBLIC_IDENTITY
 }
+
+/** Compatibility aliases retained for existing social repositories. */
+export const badgesForActors = publicIdentitiesForActors
+export const badgesForActor = publicIdentityForActor
+export type PublicBadgeFields = PublicIdentitySummary
+export const NO_BADGES = EMPTY_PUBLIC_IDENTITY

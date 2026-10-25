@@ -213,28 +213,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 145,
-      "marker": "mock",
-      "classification": "implementation-word-review",
-      "excerpt": "/** QA only: extra trusted root (PEM/DER path) for mock StoreKit chains. Refused in production. */"
-    },
-    {
-      "file": "services/greenfield-api/src/config/env.ts",
-      "line": 251,
+      "line": 249,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 279,
+      "line": 277,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 281,
+      "line": 279,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -392,34 +385,6 @@
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 78,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "if (options.environment !== 'Sandbox') throw new Error('Only the App Store Sandbox environment is enabled for Modula Premium')"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 122,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "if (digest !== APPLE_ROOT_CA_G3_SHA256) throw new Error('Pinned Apple root certificate does not match its fingerprint')"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 126,
-      "marker": "mock",
-      "classification": "implementation-word-review",
-      "excerpt": "/** QA only: load extra PEM/DER roots so mock transactions can be verified end to end. Refused in production. */"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 128,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "if (modulaEnvironment === 'production') throw new Error('Custom App Store root certificates are refused in production')"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
@@ -2259,28 +2224,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 145,
-      "marker": "mock",
-      "classification": "implementation-word-review",
-      "excerpt": "/** QA only: extra trusted root (PEM/DER path) for mock StoreKit chains. Refused in production. */"
-    },
-    {
-      "file": "services/greenfield-api/src/config/env.ts",
-      "line": 251,
+      "line": 249,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 279,
+      "line": 277,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 281,
+      "line": 279,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2438,34 +2396,6 @@
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 78,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "if (options.environment !== 'Sandbox') throw new Error('Only the App Store Sandbox environment is enabled for Modula Premium')"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 122,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "if (digest !== APPLE_ROOT_CA_G3_SHA256) throw new Error('Pinned Apple root certificate does not match its fingerprint')"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 126,
-      "marker": "mock",
-      "classification": "implementation-word-review",
-      "excerpt": "/** QA only: load extra PEM/DER roots so mock transactions can be verified end to end. Refused in production. */"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 128,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "if (modulaEnvironment === 'production') throw new Error('Custom App Store root certificates are refused in production')"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",

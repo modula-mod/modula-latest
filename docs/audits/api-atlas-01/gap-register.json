@@ -478,7 +478,7 @@
       "affectedFiles": [
         "services/greenfield-api/src"
       ],
-      "productionImpact": "All 446 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
+      "productionImpact": "All 471 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
       "recommendedFix": "Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.",
       "dependencies": [
         "API contract ownership"

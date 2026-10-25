@@ -33,7 +33,6 @@
     "ops:closeout-terminal-jobs": "tsx scripts/closeout-terminal-jobs.ts"
   },
   "dependencies": {
-    "@apple/app-store-server-library": "3.1.0",
     "@atproto/oauth-client-node": "^0.3.2",
     "@fastify/cors": "^11.0.1",
     "@fastify/helmet": "^13.0.1",
@@ -47,8 +46,8 @@
     "@modula/greenfield-module-manifest": "workspace:*",
     "@modula/greenfield-module-registry-contracts": "workspace:*",
     "@modula/greenfield-module-ui-contracts": "workspace:*",
-    "@modula/greenfield-protocol": "workspace:*",
     "@modula/greenfield-product-standard": "workspace:*",
+    "@modula/greenfield-protocol": "workspace:*",
     "@modula/greenfield-runtime": "workspace:*",
     "@modula/greenfield-schema-registry": "workspace:*",
     "@modula/intelligence-contracts": "workspace:*",

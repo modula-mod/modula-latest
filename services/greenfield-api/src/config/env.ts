@@ -134,18 +134,18 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
-  /** StoreKit bundle identifier. Verification is App Store Sandbox only in this phase. */
-  MODULA_APPLE_BUNDLE_ID: z.string().optional(),
-  MODULA_APPLE_ENVIRONMENT: z.enum(['Sandbox']).optional(),
-  /** OCSP + current-date certificate checks. Defaults on. */
-  MODULA_APPLE_ONLINE_CHECKS: z
+  /** QA-only membership fixture assignments. Refused in production. */
+  MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED: z
     .string()
     .optional()
-    .transform(v => v !== 'false'),
-  /** QA only: extra trusted root (PEM/DER path) for mock StoreKit chains. Refused in production. */
-  MODULA_APPLE_QA_ROOT_CERT_PATH: z.string().optional(),
-  /** QA only: admin route to set verified_type. Refused in production. */
-  MODULA_PREMIUM_QA_ADMIN_ENABLED: z
+    .transform(v => v === 'true'),
+  /** Independent identity verification routes and public status. Off by default. */
+  MODULA_VERIFICATION_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  /** QA-only synthetic review decisions. Refused in production. */
+  MODULA_VERIFICATION_QA_REVIEW_ENABLED: z
     .string()
     .optional()
     .transform(v => v === 'true'),
@@ -239,11 +239,9 @@ export type AppConfig = {
   adminHandles: string[]
   premium: {
     enabled: boolean
-    appleBundleId: string | null
-    appleEnvironment: 'Sandbox'
-    appleOnlineChecks: boolean
-    appleQaRootCertificatePath: string | null
-    qaAdminEnabled: boolean
+    qaAssignmentsEnabled: boolean
+    verificationEnabled: boolean
+    verificationQaReviewEnabled: boolean
   }
 }
 
@@ -526,15 +524,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
 
 function premiumConfig(raw: z.infer<typeof envSchema>): AppConfig['premium'] {
   const production = raw.MODULA_ENVIRONMENT === 'production'
-  if (production && raw.MODULA_APPLE_QA_ROOT_CERT_PATH) refuse('MODULA_APPLE_QA_ROOT_CERT_PATH is refused in production')
-  if (production && raw.MODULA_PREMIUM_QA_ADMIN_ENABLED) refuse('MODULA_PREMIUM_QA_ADMIN_ENABLED is refused in production')
+  if (production && raw.MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED) refuse('MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED is refused in production')
+  if (production && raw.MODULA_VERIFICATION_QA_REVIEW_ENABLED) refuse('MODULA_VERIFICATION_QA_REVIEW_ENABLED is refused in production')
   return {
     enabled: Boolean(raw.MODULA_PREMIUM_ENTITLEMENTS_ENABLED),
-    appleBundleId: raw.MODULA_APPLE_BUNDLE_ID?.trim() || null,
-    appleEnvironment: 'Sandbox',
-    appleOnlineChecks: raw.MODULA_APPLE_ONLINE_CHECKS !== false,
-    appleQaRootCertificatePath: raw.MODULA_APPLE_QA_ROOT_CERT_PATH?.trim() || null,
-    qaAdminEnabled: Boolean(raw.MODULA_PREMIUM_QA_ADMIN_ENABLED),
+    qaAssignmentsEnabled: Boolean(raw.MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED),
+    verificationEnabled: Boolean(raw.MODULA_VERIFICATION_ENABLED),
+    verificationQaReviewEnabled: Boolean(raw.MODULA_VERIFICATION_QA_REVIEW_ENABLED),
   }
 }
 

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-23T08:40:57.605Z",
+  "capturedAt": "2026-10-25T19:41:08.307Z",
   "source": {
-    "branch": "codex/on-demand-packages-01-resolver",
-    "headAtCapture": "737704b60e3903bb329cd618f6587af94f1035c6",
+    "branch": "phase/greenfield-premium-verification-01",
+    "headAtCapture": "834524a4ad0b197f9f1ef43c3cda90243914586d",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "a42565fa36659e530bf27ff96c76aa93fe5c3f74e5302978c7a2e42e33b29b00"
+    "apiSourceSha256": "34ddf71338cd92c68ab555b089b9a38763ee638bb6eaa0cacccacfdc4689062f"
   },
   "runtimeRoutes": [
     {
@@ -5532,6 +5532,256 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/premium/tiers",
+      "path": "/v1/premium/tiers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/premium/tiers",
+      "path": "/v1/premium/tiers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/membership",
+      "path": "/v1/me/membership",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/membership",
+      "path": "/v1/me/membership",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/entitlements",
+      "path": "/v1/me/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/entitlements",
+      "path": "/v1/me/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/entitlements/:capabilityId",
+      "path": "/v1/me/entitlements/:capabilityId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityId"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{2,79}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/entitlements/:capabilityId",
+      "path": "/v1/me/entitlements/:capabilityId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityId"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{2,79}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/me/membership/badge-visibility",
+      "path": "/v1/me/membership/badge-visibility",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/qa/premium/:handle",
+      "path": "/v1/admin/qa/premium/:handle",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "handle"
+          ],
+          "properties": {
+            "handle": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/verification",
+      "path": "/v1/me/verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/verification",
+      "path": "/v1/me/verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/verification/applications",
+      "path": "/v1/me/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/verification/applications/:applicationId/appeals",
+      "path": "/v1/me/verification/applications/:applicationId/appeals",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicationId"
+          ],
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/qa/verification/applications",
+      "path": "/v1/admin/qa/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/qa/verification/applications",
+      "path": "/v1/admin/qa/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "path": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicationId"
+          ],
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "path": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "appealId"
+          ],
+          "properties": {
+            "appealId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
             }
           }
         }
