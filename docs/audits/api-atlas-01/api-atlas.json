@@ -8,19 +8,19 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase/greenfield-premium-verification-01",
-      "sourceSha256": "34ddf71338cd92c68ab555b089b9a38763ee638bb6eaa0cacccacfdc4689062f",
-      "capturedAt": "2026-10-25T19:41:08.307Z",
-      "routeCount": 667
+      "branch": "codex/on-demand-packages-02",
+      "sourceSha256": "22dd4991edf1ec885f5138ae55f3374f8d605fbbfe12ce02fda28130ea2173e2",
+      "capturedAt": "2026-10-26T10:32:16.879Z",
+      "routeCount": 668
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 667,
-    "applicationRuntimeRoutes": 471,
-    "mappedApplicationRoutes": 471,
+    "runtimeMethodRoutes": 668,
+    "applicationRuntimeRoutes": 472,
+    "mappedApplicationRoutes": 472,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 471,
+    "sourceRoutes": 472,
     "sourceOnlyRoutes": 0,
     "explicitlyExcludedFrameworkRoutes": 196,
     "frameworkRoutes": [
@@ -1006,7 +1006,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "667 = 471 application + 196 framework-derived"
+    "equation": "668 = 472 application + 196 framework-derived"
   },
   "routes": [
     {
@@ -10516,7 +10516,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1528
+        "line": 1570
       },
       "handler": "inline",
       "controllerServices": [
@@ -10640,7 +10640,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1628
+        "line": 1670
       },
       "handler": "inline",
       "controllerServices": [
@@ -10745,7 +10745,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1633
+        "line": 1675
       },
       "handler": "inline",
       "controllerServices": [
@@ -10856,7 +10856,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1644
+        "line": 1686
       },
       "handler": "inline",
       "controllerServices": [
@@ -10968,7 +10968,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1625
+        "line": 1667
       },
       "handler": "inline",
       "controllerServices": [
@@ -11072,7 +11072,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1622
+        "line": 1664
       },
       "handler": "inline",
       "controllerServices": [
@@ -11176,7 +11176,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1612
+        "line": 1654
       },
       "handler": "inline",
       "controllerServices": [],
@@ -11275,7 +11275,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1615
+        "line": 1657
       },
       "handler": "inline",
       "controllerServices": [
@@ -11386,7 +11386,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1618
+        "line": 1660
       },
       "handler": "inline",
       "controllerServices": [
@@ -11496,7 +11496,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1575
+        "line": 1617
       },
       "handler": "inline",
       "controllerServices": [
@@ -11572,7 +11572,8 @@
           "greenfield_module_releases",
           "greenfield_module_versions",
           "greenfield_mps_ingestions",
-          "greenfield_release_frontends"
+          "greenfield_release_frontends",
+          "the"
         ],
         "writes": [
           "greenfield_module_release_signatures",
@@ -11621,7 +11622,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1572
+        "line": 1614
       },
       "handler": "inline",
       "controllerServices": [
@@ -11742,7 +11743,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1541
+        "line": 1583
       },
       "handler": "inline",
       "controllerServices": [
@@ -11808,7 +11809,8 @@
       ],
       "data": {
         "reads": [
-          "greenfield_accounts"
+          "greenfield_accounts",
+          "the"
         ],
         "writes": [
           "greenfield_module_releases",
@@ -11859,7 +11861,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1561
+        "line": 1603
       },
       "handler": "inline",
       "controllerServices": [
@@ -32027,7 +32029,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1428
+        "line": 1470
       },
       "handler": "inline",
       "controllerServices": [
@@ -32278,7 +32280,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1302
+        "line": 1344
       },
       "handler": "inline",
       "controllerServices": [
@@ -32903,7 +32905,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1466
+        "line": 1508
       },
       "handler": "inline",
       "controllerServices": [
@@ -33045,7 +33047,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1499
+        "line": 1541
       },
       "handler": "inline",
       "controllerServices": [
@@ -33190,7 +33192,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1477
+        "line": 1519
       },
       "handler": "inline",
       "controllerServices": [
@@ -33338,7 +33340,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1510
+        "line": 1552
       },
       "handler": "inline",
       "controllerServices": [
@@ -33476,7 +33478,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1488
+        "line": 1530
       },
       "handler": "inline",
       "controllerServices": [
@@ -33620,7 +33622,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1519
+        "line": 1561
       },
       "handler": "inline",
       "controllerServices": [
@@ -34506,7 +34508,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 721
+        "line": 749
       },
       "handler": "inline",
       "controllerServices": [
@@ -34657,7 +34659,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 711
+        "line": 739
       },
       "handler": "inline",
       "controllerServices": [
@@ -34809,7 +34811,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1445
+        "line": 1487
       },
       "handler": "inline",
       "controllerServices": [
@@ -34955,7 +34957,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 938
+        "line": 980
       },
       "handler": "inline",
       "controllerServices": [
@@ -35094,7 +35096,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1323
+        "line": 1365
       },
       "handler": "inline",
       "controllerServices": [
@@ -35258,7 +35260,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1456
+        "line": 1498
       },
       "handler": "inline",
       "controllerServices": [
@@ -35406,7 +35408,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1342
+        "line": 1384
       },
       "handler": "inline",
       "controllerServices": [
@@ -35550,7 +35552,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1355
+        "line": 1397
       },
       "handler": "inline",
       "controllerServices": [
@@ -35697,7 +35699,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1366
+        "line": 1408
       },
       "handler": "inline",
       "controllerServices": [
@@ -35844,7 +35846,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1390
+        "line": 1432
       },
       "handler": "inline",
       "controllerServices": [
@@ -35992,7 +35994,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1377
+        "line": 1419
       },
       "handler": "inline",
       "controllerServices": [
@@ -36148,7 +36150,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 870
+        "line": 912
       },
       "handler": "inline",
       "controllerServices": [
@@ -36294,12 +36296,14 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 638
+        "line": 654
       },
       "handler": "inline",
       "controllerServices": [
         "distribution.installationDescriptor",
+        "distribution.packageInstallPlan",
         "installations.install",
+        "packages.find",
         "version.trim"
       ],
       "authentication": "greenfield bearer access session",
@@ -36366,6 +36370,7 @@
           "greenfield_module_permission_reviews",
           "greenfield_module_release_signatures",
           "greenfield_module_releases",
+          "greenfield_mps_ingestions",
           "greenfield_publishers",
           "greenfield_release_artifacts",
           "greenfield_release_asset_blobs",
@@ -36384,7 +36389,9 @@
           "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
           "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
           "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+          "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
           "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+          "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
           "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
           "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
           "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
@@ -36465,7 +36472,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 672
+        "line": 700
       },
       "handler": "inline",
       "controllerServices": [
@@ -36905,7 +36912,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 683
+        "line": 711
       },
       "handler": "inline",
       "controllerServices": [
@@ -37044,6 +37051,159 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "POST /v1/modules/:moduleId/package-install-plan",
+      "domain": "Modules",
+      "method": "POST",
+      "effectiveRoute": "/v1/modules/:moduleId/package-install-plan",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/modules/:moduleId/package-install-plan",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 638
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "cached.some",
+        "distribution.packageInstallPlan"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "not evident in the route handler; inspect downstream service",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "Record<string, unknown> | null) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_module_release_signatures",
+          "greenfield_module_releases",
+          "greenfield_mps_ingestions",
+          "greenfield_release_artifacts",
+          "greenfield_release_asset_blobs",
+          "greenfield_release_frontends"
+        ],
+        "writes": [
+          "objects"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+          "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
+          "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+          "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/data/repositories/api/ApiModuleRepository.ts",
+          "src/data/repositories/api/ApiToolsRepository.ts"
+        ],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/extensions/extension-router.ts",
+          "services/greenfield-api/src/modules/install-descriptor-service.ts"
+        ],
+        "tests": [
+          "scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "scripts/verify-phase7b-module-runtime.mjs",
+          "scripts/verify-phase7e-ai-product-actions.mjs",
+          "scripts/verify-phase7e-ai-provider-runtime.mjs",
+          "scripts/verify-phase7e-ai-security.mjs",
+          "scripts/verify-phase7e-module-backend-auth.mjs",
+          "scripts/verify-phase7e-module-backend-discovery.mjs",
+          "scripts/verify-phase7e-module-backend-health.mjs",
+          "scripts/verify-phase7e-vault-notes-ai-integration.mjs",
+          "scripts/verify-phase7e-vault-notes-host.mjs",
+          "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
+          "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
+          "services/greenfield-api/tests/module-platform-02.records.test.ts",
+          "services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts",
+          "services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts",
+          "services/greenfield-api/tests/module-settings-permissions.test.ts",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-api/tests/permission-reconciliation.test.ts",
+          "services/greenfield-api/tests/phase7b.module-runtime.test.ts",
+          "services/greenfield-api/tests/phase7e.module-runtime-2.test.ts",
+          "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
+          "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
+          "services/greenfield-api/tests/registry-trust.install-descriptor.test.ts",
+          "services/greenfield-api/tests/registry-trust.installed-state.test.ts",
+          "services/greenfield-api/tests/registry-trust.signing.test.ts",
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
+          "tests/konsta-web-presentation.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "POST /v1/modules/:moduleId/permissions/review",
       "domain": "Modules",
       "method": "POST",
@@ -37053,7 +37213,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 846
+        "line": 888
       },
       "handler": "inline",
       "controllerServices": [
@@ -37205,7 +37365,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1025
+        "line": 1067
       },
       "handler": "inline",
       "controllerServices": [
@@ -37355,7 +37515,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 980
+        "line": 1022
       },
       "handler": "inline",
       "controllerServices": [
@@ -37497,7 +37657,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1014
+        "line": 1056
       },
       "handler": "inline",
       "controllerServices": [
@@ -37650,7 +37810,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1003
+        "line": 1045
       },
       "handler": "inline",
       "controllerServices": [
@@ -37797,7 +37957,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 991
+        "line": 1033
       },
       "handler": "inline",
       "controllerServices": [
@@ -37942,7 +38102,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1051
+        "line": 1093
       },
       "handler": "inline",
       "controllerServices": [
@@ -38085,7 +38245,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1062
+        "line": 1104
       },
       "handler": "inline",
       "controllerServices": [
@@ -38253,7 +38413,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1253
+        "line": 1295
       },
       "handler": "inline",
       "controllerServices": [
@@ -38418,7 +38578,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1080
+        "line": 1122
       },
       "handler": "inline",
       "controllerServices": [
@@ -38560,7 +38720,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1234
+        "line": 1276
       },
       "handler": "inline",
       "controllerServices": [
@@ -38729,7 +38889,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1102
+        "line": 1144
       },
       "handler": "inline",
       "controllerServices": [
@@ -38873,7 +39033,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1113
+        "line": 1155
       },
       "handler": "inline",
       "controllerServices": [
@@ -39032,7 +39192,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1146
+        "line": 1188
       },
       "handler": "inline",
       "controllerServices": [
@@ -39186,7 +39346,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1135
+        "line": 1177
       },
       "handler": "inline",
       "controllerServices": [
@@ -39342,7 +39502,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1124
+        "line": 1166
       },
       "handler": "inline",
       "controllerServices": [
@@ -39498,7 +39658,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1291
+        "line": 1333
       },
       "handler": "inline",
       "controllerServices": [
@@ -39654,7 +39814,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1199
+        "line": 1241
       },
       "handler": "inline",
       "controllerServices": [
@@ -39801,7 +39961,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1272
+        "line": 1314
       },
       "handler": "inline",
       "controllerServices": [
@@ -39970,7 +40130,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1217
+        "line": 1259
       },
       "handler": "inline",
       "controllerServices": [
@@ -40117,7 +40277,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1157
+        "line": 1199
       },
       "handler": "inline",
       "controllerServices": [
@@ -40263,7 +40423,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1182
+        "line": 1224
       },
       "handler": "inline",
       "controllerServices": [
@@ -40407,7 +40567,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1171
+        "line": 1213
       },
       "handler": "inline",
       "controllerServices": [
@@ -40550,7 +40710,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1091
+        "line": 1133
       },
       "handler": "inline",
       "controllerServices": [
@@ -40704,7 +40864,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 969
+        "line": 1011
       },
       "handler": "inline",
       "controllerServices": [
@@ -40845,7 +41005,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 959
+        "line": 1001
       },
       "handler": "inline",
       "controllerServices": [
@@ -40984,7 +41144,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1036
+        "line": 1078
       },
       "handler": "inline",
       "controllerServices": [
@@ -41135,7 +41295,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 818
+        "line": 860
       },
       "handler": "inline",
       "controllerServices": [
@@ -41451,7 +41611,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1401
+        "line": 1443
       },
       "handler": "inline",
       "controllerServices": [
@@ -41595,7 +41755,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1415
+        "line": 1457
       },
       "handler": "inline",
       "controllerServices": [
@@ -41894,7 +42054,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 902
+        "line": 944
       },
       "handler": "inline",
       "controllerServices": [
@@ -42033,7 +42193,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 912
+        "line": 954
       },
       "handler": "inline",
       "controllerServices": [
@@ -42181,7 +42341,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 892
+        "line": 934
       },
       "handler": "inline",
       "controllerServices": [
@@ -42319,7 +42479,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 860
+        "line": 902
       },
       "handler": "inline",
       "controllerServices": [
@@ -42462,11 +42622,13 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 794
+        "line": 822
       },
       "handler": "inline",
       "controllerServices": [
         "approvedPermissions.filter",
+        "distribution.packageInstallPlan",
+        "packages.find",
         "updates.update",
         "version.trim"
       ],
@@ -42528,16 +42690,27 @@
       ],
       "data": {
         "reads": [
-          "greenfield_module_install_plans"
+          "greenfield_module_install_plans",
+          "greenfield_module_release_signatures",
+          "greenfield_module_releases",
+          "greenfield_mps_ingestions",
+          "greenfield_release_artifacts",
+          "greenfield_release_asset_blobs",
+          "greenfield_release_frontends"
         ],
         "writes": [
           "failed",
           "greenfield_module_install_plans",
           "greenfield_module_permission_reviews",
+          "objects",
           "plan",
           "policy"
         ],
         "evidence": [
+          "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+          "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
+          "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+          "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
           "services/greenfield-api/src/modules/update-service.ts#planKey",
           "services/greenfield-api/src/modules/update-service.ts#update",
           "services/greenfield-api/src/modules/update-service.ts#updateInternal"
@@ -42614,7 +42787,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 759
+        "line": 787
       },
       "handler": "inline",
       "controllerServices": [
@@ -42771,7 +42944,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 745
+        "line": 773
       },
       "handler": "inline",
       "controllerServices": [
@@ -42914,7 +43087,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 733
+        "line": 761
       },
       "handler": "inline",
       "controllerServices": [
@@ -43050,7 +43223,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 928
+        "line": 970
       },
       "handler": "inline",
       "controllerServices": [
@@ -43192,7 +43365,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 948
+        "line": 990
       },
       "handler": "inline",
       "controllerServices": [
@@ -43336,7 +43509,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 922
+        "line": 964
       },
       "handler": "inline",
       "controllerServices": [
@@ -43441,7 +43614,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 776
+        "line": 804
       },
       "handler": "inline",
       "controllerServices": [
@@ -43792,7 +43965,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 697
+        "line": 725
       },
       "handler": "inline",
       "controllerServices": [
@@ -81846,7 +82019,9 @@
         "POST /v1/modules/:moduleId/install",
         "POST /v1/modules/:moduleId/install-plan",
         "GET /v1/modules/:moduleId/installation-descriptor",
+        "POST /v1/modules/:moduleId/package-install-plan",
         "POST /v1/modules/:moduleId/rollback",
+        "POST /v1/modules/:moduleId/update",
         "POST /v1/modules/:moduleId/update-plan",
         "PATCH /v1/modules/installations/:installationId/update-policy",
         "GET /v1/modules/updates",
@@ -82193,6 +82368,7 @@
         "DELETE /v1/modules/:moduleId/install",
         "POST /v1/modules/:moduleId/install",
         "GET /v1/modules/:moduleId/install-descriptor",
+        "POST /v1/modules/:moduleId/package-install-plan",
         "POST /v1/modules/:moduleId/permissions/review",
         "DELETE /v1/modules/:moduleId/record-shares/:shareId",
         "PATCH /v1/modules/:moduleId/record-shares/:shareId",
@@ -82209,6 +82385,7 @@
         "GET /v1/modules/:moduleId/runtime",
         "POST /v1/modules/:moduleId/services/:serviceId/invoke",
         "POST /v1/modules/:moduleId/uninstall-preview",
+        "POST /v1/modules/:moduleId/update",
         "GET /v1/modules/contributions",
         "PATCH /v1/modules/installations/:installationId/update-policy",
         "GET /v1/modules/installed",
@@ -84543,6 +84720,9 @@
         "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify",
         "GET /v1/modules/:moduleId/frontend",
+        "POST /v1/modules/:moduleId/install",
+        "POST /v1/modules/:moduleId/package-install-plan",
+        "POST /v1/modules/:moduleId/update",
         "GET /v1/modules/updates",
         "GET /v1/product-standard/products/:productId",
         "GET /v1/product-standard/products/:productId/versions/:version",
@@ -87855,7 +88035,9 @@
         "POST /v1/modules/:moduleId/install",
         "POST /v1/modules/:moduleId/install-plan",
         "GET /v1/modules/:moduleId/installation-descriptor",
+        "POST /v1/modules/:moduleId/package-install-plan",
         "POST /v1/modules/:moduleId/rollback",
+        "POST /v1/modules/:moduleId/update",
         "POST /v1/modules/:moduleId/update-plan",
         "PATCH /v1/modules/installations/:installationId/update-policy",
         "GET /v1/modules/updates",
@@ -87939,7 +88121,9 @@
         "POST /v1/modules/:moduleId/install",
         "POST /v1/modules/:moduleId/install-plan",
         "GET /v1/modules/:moduleId/installation-descriptor",
+        "POST /v1/modules/:moduleId/package-install-plan",
         "POST /v1/modules/:moduleId/rollback",
+        "POST /v1/modules/:moduleId/update",
         "POST /v1/modules/:moduleId/update-plan",
         "PATCH /v1/modules/installations/:installationId/update-policy",
         "GET /v1/modules/updates",
@@ -88169,7 +88353,9 @@
         "POST /v1/modules/:moduleId/install",
         "POST /v1/modules/:moduleId/install-plan",
         "GET /v1/modules/:moduleId/installation-descriptor",
+        "POST /v1/modules/:moduleId/package-install-plan",
         "POST /v1/modules/:moduleId/rollback",
+        "POST /v1/modules/:moduleId/update",
         "POST /v1/modules/:moduleId/update-plan",
         "PATCH /v1/modules/installations/:installationId/update-policy",
         "GET /v1/modules/updates",
