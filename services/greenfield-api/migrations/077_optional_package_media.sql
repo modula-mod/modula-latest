@@ -13,5 +13,5 @@ ALTER TABLE greenfield_release_asset_blobs
     'application/vnd.modula.asset-pack+tgz'
   ));
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '076')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '077')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

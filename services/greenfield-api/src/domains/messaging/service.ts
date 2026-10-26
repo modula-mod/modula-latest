@@ -1,8 +1,9 @@
 import {randomUUID} from 'node:crypto'
+import {badgesForActors, NO_BADGES, type PublicBadgeFields} from '../../premium/badges.js'
 
 import type {ModulaDb} from '../../database/client.js'
 
-export type ParticipantDto = {id: string; handle: string; displayName: string; avatarUrl: string | null}
+export type ParticipantDto = {id: string; handle: string; displayName: string; avatarUrl: string | null} & Partial<PublicBadgeFields>
 export type MessagePreviewDto = {id: string; body: string; sentAt: string; senderId: string}
 export type ConversationDto = {
   id: string
@@ -91,8 +92,9 @@ export class MessagingService {
       .select(['actor_id', 'handle', 'display_name', 'avatar_url'])
       .where('actor_id', 'in', [...new Set(actorIds)])
       .execute()
+    const badges = await badgesForActors(this.db, rows.map(row => row.actor_id))
     for (const row of rows) {
-      map.set(row.actor_id, {id: row.actor_id, handle: row.handle, displayName: row.display_name, avatarUrl: row.avatar_url})
+      map.set(row.actor_id, {id: row.actor_id, handle: row.handle, displayName: row.display_name, avatarUrl: row.avatar_url, ...(badges.get(row.actor_id) ?? NO_BADGES)})
     }
     for (const id of actorIds) {
       if (!map.has(id)) map.set(id, {id, handle: '', displayName: 'Member', avatarUrl: null})

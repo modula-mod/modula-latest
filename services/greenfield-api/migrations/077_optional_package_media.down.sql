@@ -9,7 +9,7 @@ BEGIN
       'application/vnd.modula.asset-pack+tgz'
     )
   ) THEN
-    RAISE EXCEPTION 'cannot roll back 076 while optional package blobs exist';
+    RAISE EXCEPTION 'cannot roll back 077 while optional package blobs exist';
   END IF;
 END;
 $$;
@@ -24,4 +24,4 @@ ALTER TABLE greenfield_release_asset_blobs
     'application/json','application/schema+json','application/vnd.modula.frontend+json'
   ));
 
-UPDATE schema_metadata SET value = '075', updated_at = NOW() WHERE key = 'schema_version';
+UPDATE schema_metadata SET value = '076', updated_at = NOW() WHERE key = 'schema_version';

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-25T11:51:48.325Z",
+  "capturedAt": "2026-10-25T19:41:08.307Z",
   "source": {
-    "branch": "codex/on-demand-packages-02",
-    "headAtCapture": "ef859f3104103dfb32fc84d06b926b9ff6746085",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "944868674dd3ebc369681474098549a1138337e1d08fce04a4312c1a2fdafbed"
+    "branch": "phase/greenfield-premium-verification-01",
+    "headAtCapture": "834524a4ad0b197f9f1ef43c3cda90243914586d",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "34ddf71338cd92c68ab555b089b9a38763ee638bb6eaa0cacccacfdc4689062f"
   },
   "runtimeRoutes": [
     {
@@ -1041,15 +1041,6 @@
       "method": "POST",
       "url": "/v1/modules/:moduleId/install-plan",
       "path": "/v1/modules/:moduleId/install-plan",
-      "prefix": "",
-      "schema": null,
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "POST",
-      "url": "/v1/modules/:moduleId/package-install-plan",
-      "path": "/v1/modules/:moduleId/package-install-plan",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -5541,6 +5532,256 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/premium/tiers",
+      "path": "/v1/premium/tiers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/premium/tiers",
+      "path": "/v1/premium/tiers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/membership",
+      "path": "/v1/me/membership",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/membership",
+      "path": "/v1/me/membership",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/entitlements",
+      "path": "/v1/me/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/entitlements",
+      "path": "/v1/me/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/entitlements/:capabilityId",
+      "path": "/v1/me/entitlements/:capabilityId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityId"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{2,79}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/entitlements/:capabilityId",
+      "path": "/v1/me/entitlements/:capabilityId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityId"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{2,79}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/me/membership/badge-visibility",
+      "path": "/v1/me/membership/badge-visibility",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/qa/premium/:handle",
+      "path": "/v1/admin/qa/premium/:handle",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "handle"
+          ],
+          "properties": {
+            "handle": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/verification",
+      "path": "/v1/me/verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/verification",
+      "path": "/v1/me/verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/verification/applications",
+      "path": "/v1/me/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/verification/applications/:applicationId/appeals",
+      "path": "/v1/me/verification/applications/:applicationId/appeals",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicationId"
+          ],
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/qa/verification/applications",
+      "path": "/v1/admin/qa/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/qa/verification/applications",
+      "path": "/v1/admin/qa/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "path": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicationId"
+          ],
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "path": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "appealId"
+          ],
+          "properties": {
+            "appealId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
             }
           }
         }

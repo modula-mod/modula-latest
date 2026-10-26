@@ -7,6 +7,15 @@ export type ProfileKind =
 
 export type ProfileVisibility = 'public' | 'followers' | 'teams' | 'private'
 
+export type PublicVerificationType = 'person' | 'notable_person' | 'organization' | 'public_body' | 'official_module_developer'
+export type PublicVerificationMark = 'blue_identity_seal' | 'ink_squircle' | 'slate_hexagon' | 'developer_seal'
+export type PublicPremiumTier = 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'
+export type PublicIdentitySummary = {
+  schemaVersion: 1
+  verification: {status: 'unverified' | 'verified'; type: PublicVerificationType | null; mark: PublicVerificationMark | null}
+  membership: {tier: PublicPremiumTier; status: 'core' | 'active' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
+}
+
 export type ProfileFocusStatus = {
   id: string
   label: string
@@ -52,6 +61,18 @@ export type ModulaProfileDto = {
   isFollowing: boolean
   followsViewer: boolean
   version?: number
+  /** Modula Premium tier while entitled (active or grace); null for Core. */
+  premiumTier?: 'plus' | 'horizon' | 'horizon_plus' | 'studio' | null
+  /** Premium tenure start, never reset. Null unless premiumTier is set. */
+  premiumSince?: string | null
+  /** Verification mark, independent of billing and never purchasable. */
+  verifiedType?: PublicVerificationType | null
+  /** verifiedType !== null. */
+  isVerified?: boolean
+  /** Server-authoritative identity summary. Additive for older clients. */
+  publicIdentity?: PublicIdentitySummary
+  premiumBadgeVisible?: boolean
+  verificationStatus?: 'unverified' | 'verified'
 }
 
 /**

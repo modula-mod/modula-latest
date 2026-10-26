@@ -129,6 +129,26 @@ const envSchema = z.object({
     .transform(v => v !== 'false'),
   /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
   MODULA_ADMIN_HANDLES: z.string().optional(),
+  /** Modula Premium entitlement routes and public badge fields. Off by default. */
+  MODULA_PREMIUM_ENTITLEMENTS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  /** QA-only membership fixture assignments. Refused in production. */
+  MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  /** Independent identity verification routes and public status. Off by default. */
+  MODULA_VERIFICATION_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  /** QA-only synthetic review decisions. Refused in production. */
+  MODULA_VERIFICATION_QA_REVIEW_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
 })
 
 export type EncryptionKeyMaterial = {
@@ -217,6 +237,12 @@ export type AppConfig = {
   aiGatewayEnabled: boolean
   /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
   adminHandles: string[]
+  premium: {
+    enabled: boolean
+    qaAssignmentsEnabled: boolean
+    verificationEnabled: boolean
+    verificationQaReviewEnabled: boolean
+  }
 }
 
 function refuse(message: string): never {
@@ -492,6 +518,19 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       .split(',')
       .map(h => h.trim().toLowerCase())
       .filter(Boolean),
+    premium: premiumConfig(raw),
+  }
+}
+
+function premiumConfig(raw: z.infer<typeof envSchema>): AppConfig['premium'] {
+  const production = raw.MODULA_ENVIRONMENT === 'production'
+  if (production && raw.MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED) refuse('MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED is refused in production')
+  if (production && raw.MODULA_VERIFICATION_QA_REVIEW_ENABLED) refuse('MODULA_VERIFICATION_QA_REVIEW_ENABLED is refused in production')
+  return {
+    enabled: Boolean(raw.MODULA_PREMIUM_ENTITLEMENTS_ENABLED),
+    qaAssignmentsEnabled: Boolean(raw.MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED),
+    verificationEnabled: Boolean(raw.MODULA_VERIFICATION_ENABLED),
+    verificationQaReviewEnabled: Boolean(raw.MODULA_VERIFICATION_QA_REVIEW_ENABLED),
   }
 }
 
