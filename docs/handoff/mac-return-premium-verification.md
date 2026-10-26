@@ -2,7 +2,7 @@
 
 Mission: `VPS-CONSOLIDATION-01`
 
-Prepared: 2026-10-25
+Prepared: 2026-10-26
 
 Production deployment: **NONE**
 
@@ -15,7 +15,8 @@ Real Premium payments: **DISABLED**
 - GreenField starting main: `17aa21c3058b73a2e5b8f355e9798d8e150f6ee4`.
 - GreenField candidate branch: `phase/greenfield-premium-verification-01`.
 - GreenField implementation commit before handoff documents: `58bde349fa40c1907a74e2f5d66ca38f3134e2fb`.
-- Accepted backend PR/merge: recorded in the mission final report after remote CI and merge; no production deployment is implied.
+- Accepted backend PR: [modula-latest #138](https://github.com/modula-mod/modula-latest/pull/138).
+- Accepted backend merge: `6c1c2180839079915e26c9a43ab12ee90b4fe20a` on canonical GreenField `main`; no production deployment is implied.
 - Migration: `076_greenfield_premium_entitlements`.
 - Known collision: GreenField draft PR #137 currently also uses migration 076 for optional packages. Rebase and renumber #137 after this migration lands; do not combine the migrations.
 
