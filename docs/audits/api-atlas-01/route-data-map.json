@@ -1533,7 +1533,8 @@
       "greenfield_module_releases",
       "greenfield_module_versions",
       "greenfield_mps_ingestions",
-      "greenfield_release_frontends"
+      "greenfield_release_frontends",
+      "the"
     ],
     "writes": [
       "greenfield_module_release_signatures",
@@ -1579,7 +1580,8 @@
   },
   "POST /v1/admin/registry/sync": {
     "reads": [
-      "greenfield_accounts"
+      "greenfield_accounts",
+      "the"
     ],
     "writes": [
       "greenfield_module_releases",
@@ -5143,6 +5145,7 @@
       "greenfield_module_permission_reviews",
       "greenfield_module_release_signatures",
       "greenfield_module_releases",
+      "greenfield_mps_ingestions",
       "greenfield_publishers",
       "greenfield_release_artifacts",
       "greenfield_release_asset_blobs",
@@ -5164,7 +5167,9 @@
       "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
+      "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
@@ -5247,6 +5252,28 @@
       "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor"
+    ]
+  },
+  "POST /v1/modules/:moduleId/package-install-plan": {
+    "reads": [
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "objects"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById"
     ]
   },
   "POST /v1/modules/:moduleId/permissions/review": {
@@ -5975,12 +6002,19 @@
   },
   "POST /v1/modules/:moduleId/update": {
     "reads": [
-      "greenfield_module_install_plans"
+      "greenfield_module_install_plans",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_frontends"
     ],
     "writes": [
       "failed",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
+      "objects",
       "plan",
       "policy"
     ],
@@ -5988,6 +6022,10 @@
     "jobs": [],
     "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
       "services/greenfield-api/src/modules/update-service.ts#planKey",
       "services/greenfield-api/src/modules/update-service.ts#update",
       "services/greenfield-api/src/modules/update-service.ts#updateInternal"

@@ -17751,6 +17751,62 @@
       "sourceContractSha256": "80340c9496573725a666b81dd08141974abdae5cc1c7f6b52100fcf821428fd5"
     },
     {
+      "id": "POST /v1/modules/:moduleId/package-install-plan",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "not evident in the route handler; inspect downstream service",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "not evident in the route handler; inspect downstream service",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "Record<string, unknown> | null) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "d1ee713c5982ba1b086c5a6292512e83d8787edc391415edacab666a867b0bca"
+    },
+    {
       "id": "POST /v1/modules/:moduleId/permissions/review",
       "authorization": {
         "visibility": "AUTHENTICATED",

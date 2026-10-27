@@ -7,7 +7,7 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {readTarGz} from '../src/lib/tar-gz.js'
-import {GreenfieldGithubReleaseSyncService, verifyWebGameArchive, type GithubRelease, type GithubReleaseAsset, type GithubReleaseSource} from '../src/modules/github-release-sync-service.js'
+import {GreenfieldGithubReleaseSyncService, verifyOptionalArchive, verifyWebGameArchive, type GithubRelease, type GithubReleaseAsset, type GithubReleaseSource} from '../src/modules/github-release-sync-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, fixtureProduct, fixtureRoot, registerAccount, sha256} from './helpers/registry-fixtures.js'
@@ -74,6 +74,17 @@ it('accepts only fully inventoried offline web game archives', () => {
   invalidHeader.write(checksum.toString(8).padStart(6, '0') + '\0 ', 148)
   const nonUstar = gzipSync(Buffer.concat([invalidHeader, Buffer.alloc(1024)]))
   expect(() => verifyWebGameArchive(nonUstar)).toThrow(/regular ustar/)
+})
+
+it('accepts an inventoried web runtime and rejects substitution or native members', () => {
+  const js = Buffer.from('export const Phaser = {VERSION: "4.2.1"}')
+  const inventory = Buffer.from(JSON.stringify({schema: 'modula.package-files.1', files: {'engine.mjs': sha256(js)}}))
+  const runtime = gzipSync(Buffer.concat([tarEntry('engine.mjs', js), tarEntry('package.files.json', inventory), Buffer.alloc(1024)]))
+  expect(() => verifyOptionalArchive(runtime, 'web-runtime')).not.toThrow()
+  const changed = gzipSync(Buffer.concat([tarEntry('engine.mjs', Buffer.from('substituted')), tarEntry('package.files.json', inventory), Buffer.alloc(1024)]))
+  expect(() => verifyOptionalArchive(changed, 'web-runtime')).toThrow(/digest mismatch/)
+  const native = gzipSync(Buffer.concat([tarEntry('native.dylib', js), tarEntry('package.files.json', inventory), Buffer.alloc(1024)]))
+  expect(() => verifyOptionalArchive(native, 'web-runtime')).toThrow(/native payload|unsafe member/)
 })
 
 type Built = {source: FakeSource; productId: string; version: string; tag: string; packageBytes: Buffer; files: Record<string, Buffer>; provenance: Record<string, unknown>}

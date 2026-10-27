@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-25T19:41:08.307Z",
+  "capturedAt": "2026-10-26T10:32:16.879Z",
   "source": {
-    "branch": "phase/greenfield-premium-verification-01",
-    "headAtCapture": "834524a4ad0b197f9f1ef43c3cda90243914586d",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "34ddf71338cd92c68ab555b089b9a38763ee638bb6eaa0cacccacfdc4689062f"
+    "branch": "codex/on-demand-packages-02",
+    "headAtCapture": "3b1e2fbbe7d53cc2abb97c93a9ef3d66bf0d366e",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "22dd4991edf1ec885f5138ae55f3374f8d605fbbfe12ce02fda28130ea2173e2"
   },
   "runtimeRoutes": [
     {
@@ -1041,6 +1041,15 @@
       "method": "POST",
       "url": "/v1/modules/:moduleId/install-plan",
       "path": "/v1/modules/:moduleId/install-plan",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/package-install-plan",
+      "path": "/v1/modules/:moduleId/package-install-plan",
       "prefix": "",
       "schema": null,
       "config": null,

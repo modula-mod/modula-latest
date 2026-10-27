@@ -27,6 +27,7 @@ export class GreenfieldMpsIngestService {
     schemas?: MpsSchemaArtifact[]
     /** Verified bytes of declared presentation assets (paths relative to the product root). */
     assets?: Array<{path: string; bytes: Buffer}>
+    packageArtifact?: {path: string; bytes: Buffer; sha256: string; mediaType: string; sharing: 'public-immutable' | 'account-private'} | null
     /** True only when every supplied byte was extracted from the verified release package. */
     distributionVerified?: boolean
   }) {
@@ -35,6 +36,18 @@ export class GreenfieldMpsIngestService {
       throw moduleError('VALIDATION_FAILED', result.diagnostics.map(item => `${item.code}: ${item.message}`).join('; ') || 'Invalid MPS manifest')
     }
     const product = result.product
+    const packageMeta = (product.raw as Record<string, any>).distribution as Record<string, any> | undefined
+    if (packageMeta) {
+      const artifact = input.packageArtifact
+      if (input.distributionVerified !== true || !artifact || artifact.path !== packageMeta.artifact?.path ||
+          artifact.sha256 !== packageMeta.artifact?.sha256 || artifact.mediaType !== packageMeta.artifact?.mediaType ||
+          artifact.sharing !== packageMeta.sharing || artifact.bytes.length !== packageMeta.artifact?.compressedSizeBytes ||
+          createHash('sha256').update(artifact.bytes).digest('hex') !== artifact.sha256) {
+        throw moduleError('VALIDATION_FAILED', 'Optional package bytes must match a verified signed release artifact')
+      }
+    } else if (input.packageArtifact) {
+      throw moduleError('VALIDATION_FAILED', 'Undeclared optional package artifact')
+    }
     if (product.visibility === 'public' && product.testFixture) {
       throw moduleError('FORBIDDEN', 'Test fixtures cannot be public')
     }
@@ -104,6 +117,7 @@ export class GreenfieldMpsIngestService {
           } : null,
           schemas: input.schemas ?? [],
           assets: assetBytes.map(asset => ({...asset, role: product.presentationAssets.find(item => item.path === asset.path)?.role ?? 'product.background'})),
+          packageArtifact: input.packageArtifact ?? null,
         })
       }
       if (input.releaseId) {
@@ -254,6 +268,7 @@ export class GreenfieldMpsIngestService {
           } : null,
           schemas: input.schemas ?? [],
           assets: assetBytes.map(asset => ({...asset, role: product.presentationAssets.find(item => item.path === asset.path)?.role ?? 'product.background'})),
+          packageArtifact: input.packageArtifact ?? null,
         })
       }
 
@@ -433,6 +448,7 @@ async function storeDistributionArtifacts(db: any, input: {
   frontend: {path: string; sha256: string; mediaType: string; bytes: Buffer} | null
   schemas: MpsSchemaArtifact[]
   assets: Array<VerifiedAssetBytes & {role: string}>
+  packageArtifact: {path: string; bytes: Buffer; sha256: string; mediaType: string; sharing: 'public-immutable' | 'account-private'} | null
 }) {
   const now = new Date()
   const artifacts: Array<{
@@ -488,6 +504,20 @@ async function storeDistributionArtifacts(db: any, input: {
       bytes: asset.bytes,
       access: 'public',
       required: false,
+    })
+  }
+  if (input.packageArtifact) {
+    artifacts.push({
+      artifactId: `release:${input.releaseId}:optional-package`, kind: 'asset',
+      sha256: input.packageArtifact.sha256,
+      // The signed web-game compatibility artifact already uses game.tgz for
+      // this digest. Give the optional-package record its own immutable name
+      // so both access contracts can coexist under the release tuple key.
+      filename: input.packageArtifact.path === 'game/game.tgz'
+        ? 'game-content.tgz' : safeFilename(input.packageArtifact.path, 'optional-package'),
+      mediaType: input.packageArtifact.mediaType, bytes: input.packageArtifact.bytes,
+      access: input.packageArtifact.sharing === 'public-immutable' ? 'public' : 'installation',
+      required: true,
     })
   }
   for (const artifact of artifacts) {

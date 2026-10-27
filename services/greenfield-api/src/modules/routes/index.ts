@@ -635,6 +635,22 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/package-install-plan', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as Record<string, unknown> | null) ?? {}
+      const cached = Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : []
+      if (cached.some(value => typeof value !== 'string')) throw moduleError('VALIDATION_FAILED', 'Cached digest list must contain strings')
+      const plan = await distribution.packageInstallPlan(canonicalModuleParam(request),
+        typeof body.version === 'string' ? body.version : null, distributionContext(body), cached as string[])
+      reply.header('Cache-Control', 'private, no-store')
+      return reply.send(successEnvelope(plan, request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Package install plan failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/install', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -642,8 +658,20 @@ export async function registerModuleRoutes(
       const body = (request.body as any) ?? {}
       const moduleId = canonicalModuleParam(request)
       const hostContext = distributionContext(body)
+      let exactPackageVersion: string | undefined
+      try {
+        const plan = await distribution.packageInstallPlan(moduleId,
+          typeof body.version === 'string' ? body.version : null, hostContext,
+          Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : [])
+        if (body.packageLockSha256 !== plan.lockSha256) {
+          throw moduleError('CONFLICT', 'The approved package closure has changed; review the new install plan')
+        }
+        exactPackageVersion = plan.lock.packages.find(item => item.packageId === moduleId)?.version
+      } catch (error) {
+        if (String((error as {code?: unknown})?.code ?? '') !== 'NOT_FOUND') throw error
+      }
       const result = await installations.install(auth.accountId, moduleId, {
-        version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
+        version: exactPackageVersion ?? (typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined),
         approvedPermissions: body.approvedPermissions,
         platform: modulePlatform(body.platform),
         hostVersion: hostContext.hostVersion,
@@ -796,10 +824,24 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
+      const moduleId = canonicalModuleParam(request)
+      const hostContext = distributionContext(body)
+      let exactPackageVersion: string | undefined
+      try {
+        const plan = await distribution.packageInstallPlan(moduleId,
+          typeof body.version === 'string' ? body.version : null, hostContext,
+          Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : [])
+        if (body.packageLockSha256 !== plan.lockSha256) {
+          throw moduleError('CONFLICT', 'The approved package closure has changed; review the new update plan')
+        }
+        exactPackageVersion = plan.lock.packages.find(item => item.packageId === moduleId)?.version
+      } catch (error) {
+        if (String((error as {code?: unknown})?.code ?? '') !== 'NOT_FOUND') throw error
+      }
       return reply.code(202).send(
         successEnvelope(
-          await updates.update(auth.accountId, canonicalModuleParam(request), {
-            version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
+          await updates.update(auth.accountId, moduleId, {
+            version: exactPackageVersion ?? (typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined),
             approvedPermissionIncrease: body.approvedPermissionIncrease === true,
             approvedPermissions: Array.isArray(body.approvedPermissions) ? body.approvedPermissions.filter((permission: unknown): permission is string => typeof permission === 'string') : undefined,
             acknowledgeDowngradeRisk: body.acknowledgeDowngradeRisk === true,
