@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "codex/02r-package-revocation-errors",
-      "sourceSha256": "6bcb06d8fe4bb4f8aa10f517525ff909dab713411d894baa472db4d6f20a5051",
-      "capturedAt": "2026-10-27T21:34:32.640Z",
+      "sourceSha256": "62260a7be7695a32d6cec1008b04ad7967b07e56428a1d5ae24b8eb0f55ae543",
+      "capturedAt": "2026-10-27T21:37:36.993Z",
       "routeCount": 668
     },
     "status": "PASS"

@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-10-27T21:34:32.640Z for branch `codex/02r-package-revocation-errors`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-27T21:37:36.993Z for branch `codex/02r-package-revocation-errors`; this does not claim deployment.
 
 - Runtime method routes: 668
 - Application routes: 472
