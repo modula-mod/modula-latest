@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-26T10:32:16.879Z",
+  "capturedAt": "2026-10-27T21:37:36.993Z",
   "source": {
-    "branch": "codex/on-demand-packages-02",
-    "headAtCapture": "3b1e2fbbe7d53cc2abb97c93a9ef3d66bf0d366e",
+    "branch": "codex/02r-package-revocation-errors",
+    "headAtCapture": "d916127ea0eeda382b3b0b2d40a531af55b43ae8",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "22dd4991edf1ec885f5138ae55f3374f8d605fbbfe12ce02fda28130ea2173e2"
+    "apiSourceSha256": "62260a7be7695a32d6cec1008b04ad7967b07e56428a1d5ae24b8eb0f55ae543"
   },
   "runtimeRoutes": [
     {

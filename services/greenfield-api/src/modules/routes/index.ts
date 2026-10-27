@@ -44,6 +44,7 @@ import {statusForAiError} from '../../ai/errors.js'
 import {GreenfieldGovernedFunctionService} from '../governed-function-service.js'
 import {GreenfieldInterModuleActionService} from '../inter-module-action-service.js'
 import {GreenfieldModuleDistributionService, type DistributionHostContext} from '../distribution-service.js'
+import {PackageResolutionError} from '../package-closure-resolver.js'
 import {validateHostCapabilityDescriptor, type HostCapabilityDescriptor} from '@modula/greenfield-module-ui-contracts'
 
 type RouteConfig = Record<string, unknown>
@@ -1913,6 +1914,14 @@ function sendError(reply: FastifyReply, code: any, message: string, requestId: s
 }
 
 function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fallback: string) {
+  if (error instanceof PackageResolutionError) {
+    const publicCode = error.code === 'PACKAGE_REVOKED' ? 'RELEASE_REVOKED'
+      : ['PACKAGE_UNTRUSTED', 'PACKAGE_METADATA_INVALID'].includes(error.code) ? 'UNTRUSTED_RELEASE'
+      : error.code === 'HOST_INCOMPATIBLE' ? 'HOST_VERSION_TOO_OLD'
+      : ['HOST_VERSION_INVALID', 'DEPENDENCY_CONSTRAINT_INVALID'].includes(error.code) ? 'VALIDATION_FAILED'
+      : 'CONFLICT'
+    return sendError(reply, publicCode, error.message, requestId)
+  }
   const code = error && typeof error === 'object' && 'code' in error ? (error as any).code : 'SERVER_ERROR'
   if (typeof code === 'string' && code.startsWith('AI_')) {
     return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))

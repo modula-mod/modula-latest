@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 472 application / 668 runtime method routes
-Route evidence: local-candidate-runtime for feature branch codex/on-demand-packages-02; not deployed
+Route evidence: local-candidate-runtime for feature branch codex/02r-package-revocation-errors; not deployed
 Public routes: 76
 Authenticated routes: 298
 Admin/internal routes: 98

@@ -125,9 +125,9 @@ function validateRelease(release: PackageReleaseDescriptor): void {
 }
 
 function incompatible(release: PackageReleaseDescriptor, request: PackageResolutionRequest): PackageResolutionError | null {
+  if (release.trust.revoked) return new PackageResolutionError('PACKAGE_REVOKED', `${release.packageId}@${release.version} is revoked`)
   if (!release.trust.verified || !release.trust.publisherVerified || !request.trustedPublishers.has(release.publisherId))
     return new PackageResolutionError('PACKAGE_UNTRUSTED', `${release.packageId}@${release.version} is not trusted`)
-  if (release.trust.revoked) return new PackageResolutionError('PACKAGE_REVOKED', `${release.packageId}@${release.version} is revoked`)
   if (!satisfiesSemverRange(request.hostVersion, release.minimumHostVersion))
     return new PackageResolutionError('HOST_INCOMPATIBLE', `${release.packageId}@${release.version} requires host ${release.minimumHostVersion}`)
   if (!release.platforms.includes(request.platform))

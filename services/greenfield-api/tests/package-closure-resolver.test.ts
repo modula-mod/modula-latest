@@ -60,6 +60,7 @@ describe('exact signed package closure', () => {
   it.each([
     ['DEPENDENCY_MISSING', [arena]],
     ['PACKAGE_REVOKED', [arena, {...phaser, trust: {...phaser.trust, revoked: true}}]],
+    ['PACKAGE_REVOKED', [arena, {...phaser, trust: {...phaser.trust, verified: false, revoked: true}}]],
     ['PACKAGE_UNTRUSTED', [arena, {...phaser, trust: {...phaser.trust, verified: false}}]],
     ['PLATFORM_UNSUPPORTED', [arena, {...phaser, platforms: ['android']}]],
     ['HOST_INCOMPATIBLE', [arena, {...phaser, minimumHostVersion: '>=99.0.0'}]],
