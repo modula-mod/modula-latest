@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-29T10:11:35.727Z",
+  "capturedAt": "2026-10-29T17:58:11.864Z",
   "source": {
-    "branch": "greenfield-gubic-foundation-01",
-    "headAtCapture": "a100f86f6b9be91c9f43bd91d505ef5d0e220d4d",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "38a560a14bff735f3632953dfcee58a82317d17ebab3ae4b289cb287ccd88548"
+    "branch": "phase/greenfield-functional-parity-01",
+    "headAtCapture": "5b8dde5ec1f430e7942c08443122ebb3322a83ab",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "7f6ce57f5290e6c24593cc9ba9b4be8aeeca2b4c21bebc735ad723c241980185"
   },
   "runtimeRoutes": [
     {
