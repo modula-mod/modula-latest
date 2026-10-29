@@ -1,5 +1,5 @@
 import {createHash, randomUUID} from 'node:crypto'
-import {mkdtemp, rm} from 'node:fs/promises'
+import {access, mkdtemp, rm} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {STANDARD_SESSION_CAPABILITIES} from '@modula/api-contracts'
@@ -150,6 +150,24 @@ describeIfDb('POST-04 attachment integration', () => {
     ])
     expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1)
     expect(results.filter(result => result.status === 'rejected')).toHaveLength(1)
+
+    const reaped = await service.createUpload(owner.accountId, {filename: 'reaped.png', mimeType: 'image/png', size: png.length})
+    async function* expireDuringTransfer() {
+      yield png.subarray(0, 16)
+      await db.transaction().execute(async trx => {
+        await trx.updateTable('attachment_upload_sessions').set({state: 'expired', updated_at: new Date()})
+          .where('upload_id', '=', reaped.uploadId).execute()
+        await trx.updateTable('attachments').set({status: 'expired', updated_at: new Date()})
+          .where('attachment_id', '=', reaped.attachmentId).execute()
+      })
+      yield png.subarray(16)
+    }
+    await expect(service.upload(owner.accountId, reaped.uploadId, expireDuringTransfer())).rejects.toMatchObject({code: 'CONFLICT'})
+    expect(await db.selectFrom('attachment_upload_sessions').select('state').where('upload_id', '=', reaped.uploadId).executeTakeFirstOrThrow())
+      .toMatchObject({state: 'expired'})
+    expect(await db.selectFrom('attachments').select(['status', 'storage_key']).where('attachment_id', '=', reaped.attachmentId).executeTakeFirstOrThrow())
+      .toMatchObject({status: 'expired', storage_key: null})
+    await expect(access(join(root, 'attachments', `${reaped.attachmentId}.png`))).rejects.toThrow()
   })
 
   it('accepts a streamed binary through the authenticated HTTP contract', async () => {
@@ -193,16 +211,6 @@ describeIfDb('POST-04 attachment integration', () => {
     const content = await app.inject({method: 'GET', url: `/v1/attachments/${session.attachmentId}/content`})
     expect(content.statusCode, content.body).toBe(200)
     expect(content.rawPayload.equals(png)).toBe(true)
-  })
-
-  it('cleans only stale unattached assets', async () => {
-    const orphan = await service.createUpload(owner.accountId, {filename: 'orphan.png', mimeType: 'image/png', size: png.length})
-    await service.upload(owner.accountId, orphan.uploadId, png)
-    const old = new Date(Date.now() - AttachmentPolicy.orphanRetentionMs - 1_000)
-    await db.updateTable('attachments').set({created_at: old}).where('attachment_id', '=', orphan.attachmentId).execute()
-    const result = await service.cleanupStaleOrphans(new Date())
-    expect(result.removedAttachments).toBeGreaterThanOrEqual(1)
-    await expect(service.status(owner.accountId, orphan.attachmentId)).rejects.toMatchObject({code: 'NOT_FOUND'})
   })
 
   it('binds owned image attachments as persistent avatar and cover media', async () => {
@@ -265,6 +273,46 @@ describeIfDb('POST-04 attachment integration', () => {
     })
     expect(removed.statusCode, removed.body).toBe(200)
     expect(removed.json().data.avatarUri).toBeUndefined()
+  })
+
+  it('binds comment media exactly once and expires it when the comment is deleted', async () => {
+    const upload = await service.createUpload(owner.accountId, {filename: 'comment.png', mimeType: 'image/png', size: png.length})
+    await service.upload(owner.accountId, upload.uploadId, png)
+    const post = await app.inject({
+      method: 'POST', url: '/v1/posts', headers: {authorization: `Bearer ${bearer}`},
+      payload: {text: 'Comment media lifecycle', audience: 'public', idempotencyKey: `comment-media-${suffix}`},
+    })
+    expect(post.statusCode, post.body).toBe(201)
+    const media = [{type: 'attachment', attachmentId: upload.attachmentId}]
+    const comment = await app.inject({
+      method: 'POST', url: `/v1/posts/${post.json().data.id}/comments`,
+      headers: {authorization: `Bearer ${bearer}`}, payload: {text: 'Bound media', media},
+    })
+    expect(comment.statusCode, comment.body).toBe(201)
+    const bound = await db.selectFrom('attachments').select(['status', 'attached_at'])
+      .where('attachment_id', '=', upload.attachmentId).executeTakeFirstOrThrow()
+    expect(bound.status).toBe('ready')
+    expect(bound.attached_at).not.toBeNull()
+
+    const duplicate = await app.inject({
+      method: 'POST', url: `/v1/posts/${post.json().data.id}/comments`,
+      headers: {authorization: `Bearer ${bearer}`}, payload: {text: 'Must not reuse media', media},
+    })
+    expect(duplicate.statusCode, duplicate.body).toBe(400)
+
+    const removed = await app.inject({
+      method: 'DELETE', url: `/v1/comments/${comment.json().data.comment_id}`,
+      headers: {authorization: `Bearer ${bearer}`},
+    })
+    expect(removed.statusCode, removed.body).toBe(200)
+    const expired = await db.selectFrom('attachments').select(['status', 'attached_at'])
+      .where('attachment_id', '=', upload.attachmentId).executeTakeFirstOrThrow()
+    expect(expired).toMatchObject({status: 'expired', attached_at: null})
+    const content = await app.inject({
+      method: 'GET', url: `/v1/attachments/${upload.attachmentId}/content`,
+      headers: {authorization: `Bearer ${bearer}`},
+    })
+    expect(content.statusCode).toBe(404)
   })
 })
 

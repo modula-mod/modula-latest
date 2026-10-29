@@ -215,21 +215,21 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-017 — P2 — Attachment orphan cleanup exists but is never scheduled
 
 - Domain/type: `media` / `missing worker`
-- Remediation status: **OPEN**
-- Remediation evidence: none
-- Evidence: `services/greenfield-api/src/domains/attachments/service.ts:191`, `services/greenfield-api/tests/post04.attachments.test.ts:199`, `evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-worker/tests/media-cleanup.test.ts#reports candidates without mutation, then safely removes only stale unbound media`, `services/greenfield-worker/src/main.ts`, `ops/docker/compose.production.yml`
+- Evidence: `services/greenfield-worker/src/main.ts`, `services/greenfield-worker/src/media/cleanup.ts`, `services/greenfield-worker/tests/media-cleanup.test.ts`, `evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage`
 - Affected routes: `POST /v1/attachments/uploads`
-- Affected files: `services/greenfield-api/src/domains/attachments/service.ts`
-- Production impact: Five ready attachments are unbound; only tests invoke cleanup.
-- Recommended fix: Add a bounded worker/ops job with retention, metrics and dry-run visibility.
-- Dependencies: worker schedule
+- Affected files: `services/greenfield-worker/src/media/cleanup.ts`
+- Production impact: The captured production revision predates the candidate worker schedule and reports five ready unbound attachments. Candidate cleanup is bounded, observable and dry-run by default.
+- Recommended fix: Deploy through the controlled release gate, inspect dry-run counts, then explicitly activate delete mode after QA acceptance.
+- Dependencies: production deployment approval
 - Verification: Expired sessions/orphans must be removed while bound media remains retrievable.
 
 ## API-ATLAS-GAP-018 — P2 — Story upload validates labels but not decoded size or file signature
 
 - Domain/type: `media` / `missing request schema`
-- Remediation status: **OPEN**
-- Remediation evidence: none
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-api/tests/phase7i.f5-stories.test.ts#publishes verified attachments with retry safety, visibility enforcement and cleanup`, `services/greenfield-api/src/domains/stories/service.ts`
 - Evidence: `services/greenfield-api/src/domains/stories/service.ts:280`, `services/greenfield-api/src/domains/stories/service.ts:333`, `services/greenfield-api/src/domains/stories/service.ts:411`
 - Affected routes: `POST /v1/stories`
 - Affected files: `services/greenfield-api/src/domains/stories/service.ts`
@@ -516,4 +516,4 @@ The JSON form is canonical for remediation tooling and preserves these fields ve
 
 ## TODO / FIXME / placeholder sweep
 
-The literal sweep found 287 marker occurrences; 282 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=36, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=95, possible-runtime-placeholder=66, test-fixture-or-development=5. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.
+The literal sweep found 290 marker occurrences; 285 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=36, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=98, possible-runtime-placeholder=66, test-fixture-or-development=5. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.

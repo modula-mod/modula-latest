@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-29T17:58:11.864Z",
+  "capturedAt": "2026-10-29T20:54:12.233Z",
   "source": {
-    "branch": "phase/greenfield-functional-parity-01",
-    "headAtCapture": "5b8dde5ec1f430e7942c08443122ebb3322a83ab",
+    "branch": "phase/greenfield-functional-parity-media-cleanup",
+    "headAtCapture": "22ca9947f4dd64f498d2c56ff2773b3cf15c1ae2",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "7f6ce57f5290e6c24593cc9ba9b4be8aeeca2b4c21bebc735ad723c241980185"
+    "apiSourceSha256": "9e3b72b355c73ebed12a6b4cdb8ad38f4ca9c75548cff6486d4fac1472b91902"
   },
   "runtimeRoutes": [
     {

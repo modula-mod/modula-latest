@@ -528,21 +528,21 @@
     },
     {
       "file": "services/greenfield-worker/src/config.ts",
-      "line": 119,
+      "line": 133,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula worker configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-worker/src/config.ts",
-      "line": 137,
+      "line": 151,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-worker/src/config.ts",
-      "line": 139,
+      "line": 153,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -560,6 +560,27 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!this.config.mailHestiaUser) throw new Error('MODULA_MAIL_HESTIA_USER is required for Hestia provisioning')"
+    },
+    {
+      "file": "services/greenfield-worker/src/media/cleanup.ts",
+      "line": 96,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) throw new Error('Media root must be a real directory')"
+    },
+    {
+      "file": "services/greenfield-worker/src/media/cleanup.ts",
+      "line": 100,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Attachment storage root must be a real directory')"
+    },
+    {
+      "file": "services/greenfield-worker/src/media/cleanup.ts",
+      "line": 105,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Attachment storage root is outside the configured media root')"
     },
     {
       "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
@@ -2539,21 +2560,21 @@
     },
     {
       "file": "services/greenfield-worker/src/config.ts",
-      "line": 119,
+      "line": 133,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula worker configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-worker/src/config.ts",
-      "line": 137,
+      "line": 151,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-worker/src/config.ts",
-      "line": 139,
+      "line": 153,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2571,6 +2592,27 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!this.config.mailHestiaUser) throw new Error('MODULA_MAIL_HESTIA_USER is required for Hestia provisioning')"
+    },
+    {
+      "file": "services/greenfield-worker/src/media/cleanup.ts",
+      "line": 96,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) throw new Error('Media root must be a real directory')"
+    },
+    {
+      "file": "services/greenfield-worker/src/media/cleanup.ts",
+      "line": 100,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Attachment storage root must be a real directory')"
+    },
+    {
+      "file": "services/greenfield-worker/src/media/cleanup.ts",
+      "line": 105,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Attachment storage root is outside the configured media root')"
     },
     {
       "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",

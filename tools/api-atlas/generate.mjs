@@ -578,6 +578,15 @@ function buildGapRegister() {
     ['AI stream cancel and reconnect omit account ownership checks', [
       'services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel',
     ]],
+    ['Attachment orphan cleanup exists but is never scheduled', [
+      'services/greenfield-worker/tests/media-cleanup.test.ts#reports candidates without mutation, then safely removes only stale unbound media',
+      'services/greenfield-worker/src/main.ts',
+      'ops/docker/compose.production.yml',
+    ]],
+    ['Story upload validates labels but not decoded size or file signature', [
+      'services/greenfield-api/tests/phase7i.f5-stories.test.ts#publishes verified attachments with retry safety, visibility enforcement and cleanup',
+      'services/greenfield-api/src/domains/stories/service.ts',
+    ]],
   ])
   const productionCloseoutPath = join(evidenceDir, 'api-fix-01c-production-closeout.json')
   const productionCloseout = existsSync(productionCloseoutPath)
@@ -631,7 +640,7 @@ function buildGapRegister() {
     ['media','architecture debt','P1','User media exists only on one host bind mount',['evidence/production-snapshot.json#/storage','services/greenfield-api/src/domains/attachments/service.ts:169'],['GET /v1/attachments/:attachmentId/content','GET /v1/media/:mediaFile','GET /v1/media/stories/:mediaFile'],['services/greenfield-api/src/domains/attachments/service.ts'],'Container recreation preserves the bind, but host loss has no discovered object replication or storage readiness/recovery contract.','Define backed-up object storage or a tested media backup/restore policy and expose storage readiness internally.',['storage decision','recovery rehearsal'],'Restore media plus metadata to a clean host and digest-check every referenced object.'],
     ['modules','missing worker','P1','Automated registry/GitHub ingestion is disabled and has no production source',['evidence/production-snapshot.json#/config/worker/safe/GREENFIELD_MODULE_GITHUB_SYNC_ENABLED','evidence/production-snapshot.json#/operationalAggregates/syncSources','services/greenfield-worker/src/jobs/runner.ts:84'],['POST /v1/admin/registry/sync'],['services/greenfield-api/src/modules/github-release-sync-service.ts','services/greenfield-worker/src/jobs/runner.ts'],'Ingestion code exists, but production automation is disabled, source count is zero, and the two historical runs cannot recur automatically.','Configure a reviewed source and exercise repository-to-published-release convergence with signature/artifact gates.',['signing policy','GitHub source'],'A tagged release must be discovered, verified, ingested and published without manual database work.'],
     ['contracts','missing request schema','P2','No application route registers a Fastify request or response schema',['api-atlas.json#/routes','openapi.generated.yaml'],[],['services/greenfield-api/src'],`All ${atlas.length} routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.`,'Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.',['API contract ownership'],'Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.'],
-    ['media','missing worker','P2','Attachment orphan cleanup exists but is never scheduled',['services/greenfield-api/src/domains/attachments/service.ts:191','services/greenfield-api/tests/post04.attachments.test.ts:199','evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage'],['POST /v1/attachments/uploads'],['services/greenfield-api/src/domains/attachments/service.ts'],'Five ready attachments are unbound; only tests invoke cleanup.','Add a bounded worker/ops job with retention, metrics and dry-run visibility.',['worker schedule'],'Expired sessions/orphans must be removed while bound media remains retrievable.'],
+    ['media','missing worker','P2','Attachment orphan cleanup exists but is never scheduled',['services/greenfield-worker/src/main.ts','services/greenfield-worker/src/media/cleanup.ts','services/greenfield-worker/tests/media-cleanup.test.ts','evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage'],['POST /v1/attachments/uploads'],['services/greenfield-worker/src/media/cleanup.ts'],'The captured production revision predates the candidate worker schedule and reports five ready unbound attachments. Candidate cleanup is bounded, observable and dry-run by default.','Deploy through the controlled release gate, inspect dry-run counts, then explicitly activate delete mode after QA acceptance.',['production deployment approval'],'Expired sessions/orphans must be removed while bound media remains retrievable.'],
     ['media','missing request schema','P2','Story upload validates labels but not decoded size or file signature',['services/greenfield-api/src/domains/stories/service.ts:280','services/greenfield-api/src/domains/stories/service.ts:333','services/greenfield-api/src/domains/stories/service.ts:411'],['POST /v1/stories'],['services/greenfield-api/src/domains/stories/service.ts'],'Arbitrary base64 bytes can be stored under an image/video content type; expiration/deletion leaves files on disk.','Reuse AttachmentPolicy byte/count/signature validation and add physical cleanup.',['attachment service'],'Invalid magic bytes and oversized decoded payloads must fail; expired bytes must be removed.'],
     ['profiles','architecture debt','P2','Profile media has competing canonical-attachment and arbitrary-URL paths',['services/greenfield-api/src/domains/profiles/writes.ts:173','services/greenfield-api/src/domains/profiles/writes.ts:292'],['PATCH /v1/profiles/me','POST /v1/profiles/me/avatar','POST /v1/profiles/me/cover'],['services/greenfield-api/src/domains/profiles/writes.ts'],'PATCH can bypass profile_media ownership/binding with an arbitrary public HTTPS URL, producing two ownership/delivery models.','Deprecate raw avatarUri/coverUri writes and require owned attachment bindings.',['client migration'],'All new avatar/cover writes must create profile_media and resolve to canonical attachment URLs.'],
     ['feed','missing request schema','P2','Unknown feed modes silently receive a mislabeled fallback',['services/greenfield-api/src/app/register-routes.ts:1443','services/greenfield-api/src/app/register-routes.ts:1449'],['GET /v1/feed/home'],['services/greenfield-api/src/app/register-routes.ts'],'Typos or unsupported modes do not fail validation and are labeled modules-chrono-v1.','Validate the FeedMode enum before querying.',['shared schema'],'Unknown mode must return VALIDATION_FAILED; three supported modes need response snapshots.'],
@@ -991,7 +1000,7 @@ ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Mis
 
 ### Missing for Posts/Media
 
-- Explicit link/poll contracts, aligned public upload limits, scheduled orphan/expired-file cleanup, and host-loss recovery/object replication.
+- Explicit link/poll contracts, aligned public upload limits, controlled activation of the candidate orphan/expired-file cleanup worker, and host-loss recovery/object replication.
 
 ### Missing for Product Hub
 
@@ -1167,7 +1176,7 @@ ${mdTable(['Class','Files','Bytes','API family'], Object.entries(snapshot.storag
 3. Metadata and state are stored in PostgreSQL; bytes are atomically placed under the media root.
 4. Profile avatar/cover binding requires the same owner, ready state and image kind (\`services/greenfield-api/src/domains/profiles/writes.ts:292\`). Post content accepts up to ten ready owned attachments.
 5. \`GET /v1/attachments/:attachmentId/content\` resolves public/private/owner access and streams the file through nginx.
-6. Delete/cleanup support exists in the service, but no production scheduler invokes orphan cleanup.
+6. Candidate worker code schedules bounded orphan/expired-session cleanup with metrics and a dry-run default. The captured production revision predates it, so delete-mode activation remains deployment-gated.
 
 Current attachment states: ${Object.entries(media.attachmentsByStatus).map(([key,value]) => `${key}=${value}`).join(', ')}. Ready linkage: ${media.readyAttachmentLinkage.linked}/${media.readyAttachmentLinkage.ready} linked, ${media.readyAttachmentLinkage.orphanCandidates} orphan candidates.
 
@@ -1175,7 +1184,7 @@ Current attachment states: ${Object.entries(media.attachmentsByStatus).map(([key
 
 ${mdTable(['Class','Bytes','Metadata','URL and policy','Deletion/durability'], [
     ['Avatar/cover', 'canonical attachment bytes or external URL', `profile_media (${Object.entries(media.profileMediaByKind).map(([key,value]) => `${key}=${value}`).join(', ')})`, 'canonical attachment URL is policy-checked; PATCH also accepts public HTTPS URL', 'binding removal does not establish object garbage collection'],
-    ['Post attachments', 'attachment store', `post_content (${Object.entries(media.postContentByType).map(([key,value]) => `${key}=${value}`).join(', ')})`, 'viewer visibility follows post plus attachment policy', 'soft post deletion; orphan cleanup unscheduled'],
+    ['Post attachments', 'attachment store', `post_content (${Object.entries(media.postContentByType).map(([key,value]) => `${key}=${value}`).join(', ')})`, 'viewer visibility follows post plus attachment policy', 'soft post deletion; candidate cleanup is dry-run by default and production-gated'],
     ['Legacy post image', 'posts directory', `post_media count=${media.postMedia.count}`, '`/v1/media/:mediaFile`; public path follows post policy', `${media.postMedia.activeWithUrl}/${media.postMedia.active} active rows have a URL; 20 MiB app limit conflicts with 1 MiB nginx default`],
     ['Stories', 'stories directory', `story_items count=${media.storyItems.count}`, '`/v1/media/stories/:mediaFile` with story visibility', `${media.storyItems.deletedOrInactive} inactive/deleted rows and ${snapshot.storage.classes.stories.files} files remain`],
     ['Module packages', 'PostgreSQL release blob/ref metadata', `${media.releaseArtifactCoverage.blobAvailable}/${media.releaseArtifactCoverage.releases} release blobs`, 'public artifact route when blob is available; digest checked', 'immutable metadata, incomplete byte coverage'],
@@ -1186,7 +1195,7 @@ ${mdTable(['Class','Bytes','Metadata','URL and policy','Deletion/durability'], [
 
 - Database paths can be non-servable: ${media.presentationAssets.count - media.presentationAssets.blobAvailable} module presentation records lack blobs; ${media.postMedia.active - media.postMedia.activeWithUrl} active legacy post-media rows lack URLs.
 - Profile media has two competing trust/ownership paths: attachment binding and arbitrary public HTTPS URL.
-- Story upload checks declared labels/base64 length but does not reuse decoded-byte magic validation; deleting a story does not remove its file.
+- Candidate story publishing uses verified attachment bytes, size/signature checks and deletion cleanup; legacy inline upload remains compatibility-only. Captured production predates this candidate.
 - nginx is the delivery path; there is no separate CDN/object-store authorization layer. Registry assets alone receive immutable cache handling.
 - The attachment content endpoint returns 403 for an existing private object and 404 for unknown, exposing existence to a caller who learns an identifier.
 `
@@ -1517,7 +1526,7 @@ Make package/artwork blob presence a publication gate; backfill or withdraw inco
 
 ## API-FIX-03 — Media integrity and recovery
 
-Move legacy post upload to canonical attachments, align narrow nginx limits, enforce byte-signature validation for stories, schedule orphan/expired cleanup, canonicalize profile media and prove media backup/restore. Includes storage readiness.
+Move legacy post upload to canonical attachments, align narrow nginx limits, activate the candidate orphan/expired cleanup worker after dry-run review, canonicalize profile media and prove media backup/restore. Includes storage readiness.
 
 ## API-FIX-04 — Social contract and delivery reliability
 

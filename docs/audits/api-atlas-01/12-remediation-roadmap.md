@@ -12,7 +12,7 @@ Make package/artwork blob presence a publication gate; backfill or withdraw inco
 
 ## API-FIX-03 — Media integrity and recovery
 
-Move legacy post upload to canonical attachments, align narrow nginx limits, enforce byte-signature validation for stories, schedule orphan/expired cleanup, canonicalize profile media and prove media backup/restore. Includes storage readiness.
+Move legacy post upload to canonical attachments, align narrow nginx limits, activate the candidate orphan/expired cleanup worker after dry-run review, canonicalize profile media and prove media backup/restore. Includes storage readiness.
 
 ## API-FIX-04 — Social contract and delivery reliability
 

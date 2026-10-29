@@ -51,6 +51,41 @@ export type AtprotoPublicationStatus =
   | 'revoked'
 
 export interface Database {
+  attachments: {
+    attachment_id: string
+    owner_account_id: string
+    kind: string
+    mime_type: string
+    original_filename: string
+    byte_size: string
+    checksum: string | null
+    storage_key: string | null
+    storage_provider: string
+    status: 'created' | 'uploading' | 'uploaded' | 'processing' | 'ready' | 'failed' | 'expired' | 'rejected'
+    width: number | null
+    height: number | null
+    duration_seconds: number | null
+    page_count: number | null
+    thumbnail_key: string | null
+    preview_key: string | null
+    metadata: unknown
+    attached_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
+  attachment_upload_sessions: {
+    upload_id: string
+    attachment_id: string
+    owner_account_id: string
+    expected_byte_size: string
+    expected_mime_type: string
+    expected_checksum: string | null
+    state: 'created' | 'uploading' | 'completed' | 'failed' | 'expired'
+    expires_at: Date
+    completed_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
   greenfield_worker_heartbeats: {
     worker_id: string
     release_sha: string | null

@@ -3,6 +3,7 @@ import type {CreateReportInput, ModerationActionType, ReportDto, ReportEvidenceR
 import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
+import {commentAttachmentIds, expireUnreferencedCommentAttachments} from '../comments/media.js'
 
 const jsonb = (value: unknown) => sql<unknown>`${JSON.stringify(value)}::jsonb`
 const REPORT_TARGETS = new Set(['profile', 'post', 'comment', 'story', 'message', 'other'])
@@ -361,6 +362,7 @@ export class ModerationRepository {
       const comment = await db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', targetId).where('deleted_at', 'is', null).executeTakeFirst()
       if (!comment) throw Object.assign(new Error('Reported content not found'), {code: 'NOT_FOUND'})
       await db.updateTable('greenfield_comments').set({text: comment.reply_count ? 'Comment removed' : '', deleted_at: now, deletion_kind: 'moderation', updated_at: now, version: comment.version + 1}).where('comment_id', '=', targetId).execute()
+      await expireUnreferencedCommentAttachments(db, commentAttachmentIds(comment.media), targetId, now)
       await db.updateTable('posts').set({reply_count: sql`greatest(reply_count - 1, 0)`, updated_at: now}).where('id', '=', comment.post_id).execute()
       if (comment.parent_comment_id) await db.updateTable('greenfield_comments').set({reply_count: sql`greatest(reply_count - 1, 0)`, updated_at: now}).where('comment_id', '=', comment.parent_comment_id).execute()
       return

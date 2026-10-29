@@ -8,7 +8,13 @@ import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {GreenfieldPolicyEngine} from '../policy/index.js'
 import type {ReactionType} from '../reactions/service.js'
-import {normalizeCommentMedia, presentCommentMedia, type CommentMediaItem} from './media.js'
+import {
+  commentAttachmentIds,
+  expireUnreferencedCommentAttachments,
+  normalizeCommentMedia,
+  presentCommentMedia,
+  type CommentMediaItem,
+} from './media.js'
 
 const validateText = (text: string, allowEmpty = false) => {
   const value = text.trim()
@@ -51,7 +57,7 @@ export class CommentService {
   async createComment(actorId: string, postId: string, text: string, media?: {accountId: string; raw: unknown}, quotedCommentId?: unknown) {
     const items = media ? await normalizeCommentMedia(this.db, media.accountId, media.raw) : []
     const quoted = await this.resolveQuote(postId, quotedCommentId)
-    return this.create(actorId, postId, null, validateText(text, items.length > 0 || Boolean(quoted)), undefined, items, quoted)
+    return this.create(actorId, postId, null, validateText(text, items.length > 0 || Boolean(quoted)), undefined, items, media?.accountId ?? null, quoted)
   }
 
   /** Quotes must point at a live comment on the same post. */
@@ -117,7 +123,7 @@ export class CommentService {
       parent = ancestor
     }
     const depth = Math.min(parent.depth + 1, 4)
-    return this.create(actorId, parent.post_id, {...parent, depth: parent.depth}, validateText(text, items.length > 0), depth, items)
+    return this.create(actorId, parent.post_id, {...parent, depth: parent.depth}, validateText(text, items.length > 0), depth, items, media?.accountId ?? null)
   }
 
   async updateComment(actorId: string, commentId: string, text: string, expectedVersion: number) {
@@ -138,6 +144,7 @@ export class CommentService {
     const now = new Date()
     await this.db.transaction().execute(async trx => {
       await trx.updateTable('greenfield_comments').set({text: row.reply_count ? 'Comment deleted' : '', deleted_at: now, deletion_kind: deletionKind, updated_at: now, version: row.version + 1}).where('comment_id', '=', commentId).execute()
+      await expireUnreferencedCommentAttachments(trx as ModulaDb, commentAttachmentIds(row.media), commentId, now)
       await trx.updateTable('posts').set({reply_count: sql<number>`greatest(reply_count - 1, 0)`, updated_at: now}).where('id', '=', row.post_id).execute()
       if (row.parent_comment_id) {
         await trx.updateTable('greenfield_comments').set({reply_count: sql<number>`greatest(reply_count - 1, 0)`, updated_at: now}).where('comment_id', '=', row.parent_comment_id).execute()
@@ -170,6 +177,7 @@ export class CommentService {
     text: string,
     forcedDepth?: number,
     media: CommentMediaItem[] = [],
+    mediaAccountId: string | null = null,
     quotedCommentId: string | null = null,
   ) {
     const post = await this.db.selectFrom('posts').selectAll().where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
@@ -186,6 +194,18 @@ export class CommentService {
     const rootId = parent ? parent.root_comment_id ?? parent.comment_id : null
     const depth = forcedDepth ?? (parent ? Math.min(parent.depth + 1, 4) : 0)
     await this.db.transaction().execute(async trx => {
+      const attachmentIds = commentAttachmentIds(media)
+      if (attachmentIds.length) {
+        if (!mediaAccountId) throw Object.assign(new Error('Attachment owner is required'), {code: 'FORBIDDEN'})
+        const attachments = await trx.selectFrom('attachments').select(['attachment_id', 'owner_account_id', 'status', 'attached_at'])
+          .where('attachment_id', 'in', attachmentIds).forUpdate().execute()
+        if (attachments.length !== attachmentIds.length || attachments.some(item => item.owner_account_id !== mediaAccountId)) {
+          throw Object.assign(new Error('Cross-account comment attachment binding denied'), {code: 'FORBIDDEN'})
+        }
+        if (attachments.some(item => item.status !== 'ready' || item.attached_at !== null)) {
+          throw Object.assign(new Error('Comment attachment is not available for binding'), {code: 'CONFLICT'})
+        }
+      }
       await trx
         .insertInto('greenfield_comments')
         .values({
@@ -206,10 +226,12 @@ export class CommentService {
           quoted_comment_id: quotedCommentId,
         })
         .execute()
-      const attachmentIds = media.flatMap(item => item.type === 'attachment' ? [item.attachmentId] : [])
       if (attachmentIds.length) {
-        await trx.updateTable('attachments').set({attached_at: now, updated_at: now})
+        const bound = await trx.updateTable('attachments').set({attached_at: now, updated_at: now})
           .where('attachment_id', 'in', attachmentIds).where('attached_at', 'is', null).execute()
+        if (bound.reduce((total, item) => total + Number(item.numUpdatedRows ?? 0), 0) !== attachmentIds.length) {
+          throw Object.assign(new Error('Comment attachment binding conflict'), {code: 'CONFLICT'})
+        }
       }
       await trx.updateTable('posts').set({reply_count: post.reply_count + 1, updated_at: now}).where('id', '=', postId).execute()
       if (parent) {

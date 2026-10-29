@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-10-29T17:58:11.864Z for branch `phase/greenfield-functional-parity-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-29T20:54:12.233Z for branch `phase/greenfield-functional-parity-media-cleanup`; this does not claim deployment.
 
 - Runtime method routes: 689
 - Application routes: 484
@@ -7182,7 +7182,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7221,7 +7221,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7260,7 +7260,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7299,7 +7299,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7338,7 +7338,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7377,7 +7377,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7416,7 +7416,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7455,7 +7455,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -7487,14 +7487,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `greenfield_comment_poll_votes`, `greenfield_comment_reactions`, `greenfield_comments`, `greenfield_handles`, `greenfield_mentions`, `posts`, `profiles`
+- Database reads: `actors`, `attachments`, `greenfield_comment_poll_votes`, `greenfield_comment_reactions`, `greenfield_comments`, `greenfield_handles`, `greenfield_mentions`, `posts`, `profiles`
 - Database writes: `attachments`, `greenfield_comments`, `greenfield_mentions`, `posts`
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/features/social/data/useCommentsQuery.ts`
-- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15638,7 +15638,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `greenfield_comment_poll_votes`, `greenfield_comment_reactions`, `greenfield_comments`, `greenfield_handles`, `greenfield_mentions`, `posts`, `profiles`
+- Database reads: `actors`, `attachments`, `greenfield_comment_poll_votes`, `greenfield_comment_reactions`, `greenfield_comments`, `greenfield_handles`, `greenfield_mentions`, `posts`, `profiles`
 - Database writes: `attachments`, `greenfield_comments`, `greenfield_mentions`, `posts`
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`
 - Events produced: none observed
