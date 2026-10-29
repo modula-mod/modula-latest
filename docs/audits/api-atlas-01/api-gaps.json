@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "mission": "GREENFIELD-FUNCTIONAL-PARITY-01",
+  "provenance": {
+    "greenfieldMainSha": "e32409ad8b2633ca4649d19adfe7ef9c234c5125",
+    "nativeSha": "7cd5e5956182327eed5e4e57d515fdf90d81f0a3",
+    "productionSha": "db0e1e31c19f07538198c8191fa97976c39a7684"
+  },
+  "gaps": [
+    {
+      "feature": "Native Activity follow requests",
+      "severity": "P1",
+      "endpoint": "GET /v1/connections/requests",
+      "owningRepository": "modula-mod/modula-native",
+      "reproduction": "Open Activity > Requests while authenticated; Native calls /v1/connections/requests, which resolves as connector id \"requests\" rather than the follow-request collection.",
+      "expectedResult": "Native calls GET /v1/profiles/me/follow-requests and decodes the cursor page.",
+      "observedResult": "The active Native request does not map to the follow-request API contract.",
+      "rootCause": "ActivityRepository uses an outdated path; the canonical secured route already exists and its response is compatible with ActivityPayloadDecoder.",
+      "fixStatus": "NATIVE_HANDOFF_REQUIRED",
+      "linkedTest": "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
+      "linkedPR": ""
+    },
+    {
+      "feature": "Nodus downloadable model release discovery",
+      "severity": "P1",
+      "endpoint": "GET /v1/intelligence/nodus/releases/latest",
+      "owningRepository": "modula-mod/modula-latest",
+      "reproduction": "Open the Nodus model settings card without an Info.plist/developer override; the default GreenField endpoint returns HTTP 404 in main and production.",
+      "expectedResult": "A governed descriptor names immutable, digest-pinned model files for an approved Nodus release, or the client explicitly reports that no release channel is configured.",
+      "observedResult": "Native constructs and fetches the default endpoint, but GreenField registers no such route and owns no approved model artifact.",
+      "rootCause": "The Native download contract was added without a corresponding governed GreenField release source; adding a fabricated descriptor would weaken artifact trust.",
+      "fixStatus": "BLOCKED_APPROVED_MODEL_ARTIFACT_AND_RELEASE_POLICY",
+      "linkedTest": "modula-native/ios/ModulaTests/NodusReleaseTests.swift",
+      "linkedPR": ""
+    },
+    {
+      "feature": "Story/AR attachment publishing",
+      "severity": "P0",
+      "endpoint": "POST /v1/attachments/uploads; PUT /v1/attachments/uploads/:uploadId/content; POST /v1/stories",
+      "owningRepository": "modula-mod/modula-native",
+      "reproduction": "Publish an exported AR-composited image from StoryCamera; Native still base64-inlines the image in POST /v1/stories instead of using the attachment workflow.",
+      "expectedResult": "Upload bytes through the attachment session, then create the story with attachmentId and an idempotency key.",
+      "observedResult": "GreenField supports attachment-backed stories, but the pinned Native client does not consume that contract.",
+      "rootCause": "Backend support landed after the current Native story request implementation.",
+      "fixStatus": "BACKEND_FIXED_NATIVE_HANDOFF_REQUIRED",
+      "linkedTest": "services/greenfield-api/tests/story-attachment.integration.test.ts",
+      "linkedPR": "https://github.com/modula-mod/modula-latest/pull/142"
+    },
+    {
+      "feature": "Generic module sync, revision browser, and record media bindings",
+      "severity": "P0",
+      "endpoint": "GET /v1/modules/:moduleId/records/sync; /revisions; /media",
+      "owningRepository": "modula-mod/modula-native",
+      "reproduction": "Inspect the closed ModuleBackendRequest vocabulary and ProductUI runtime; they call record CRUD/restore/purge but never call sync, revision, or record-media binding routes.",
+      "expectedResult": "Offline replay consumes revision cursors/conflicts, revision UI loads history, and attachments use the generic record media binding contract.",
+      "observedResult": "The backend contracts and PostgreSQL tests exist, but the current Native runtime has no caller for these required integrations.",
+      "rootCause": "Native bridge vocabulary stops at record CRUD and stores attachment-like metadata as a record rather than binding uploaded attachment bytes.",
+      "fixStatus": "NATIVE_HANDOFF_REQUIRED",
+      "linkedTest": "services/greenfield-api/tests/module-platform-02.records.test.ts; services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts",
+      "linkedPR": ""
+    },
+    {
+      "feature": "Developer Studio server draft persistence",
+      "severity": "P0",
+      "endpoint": "MISSING_EXISTING_DEVELOPER_DRAFT_CONTRACT",
+      "owningRepository": "modula-mod/modula-latest",
+      "reproduction": "Save a Module Generator project on one device and attempt to reopen it on another; DeveloperModuleStore writes only the local application-support directory and GreenField has no draft resource.",
+      "expectedResult": "Authenticated creators can create, update, reopen, and preview account-scoped drafts with optimistic concurrency.",
+      "observedResult": "Draft save/reopen is device-local only.",
+      "rootCause": "The Developer domain has publisher/product/build/release rows but no account-scoped project draft persistence contract.",
+      "fixStatus": "BACKEND_DEFECT_CONFIRMED",
+      "linkedTest": "",
+      "linkedPR": ""
+    },
+    {
+      "feature": "Developer release to signed registry promotion",
+      "severity": "P0",
+      "endpoint": "POST /v1/developer/products/:productId/releases",
+      "owningRepository": "modula-mod/modula-latest",
+      "reproduction": "Create a successful verified build and then a Developer release; the row remains CANDIDATE with module_release_id null and cannot enter the registry installation path.",
+      "expectedResult": "The official QA/private publication flow verifies the signed artifact, creates one immutable registry release, links module_release_id, and makes it installable by an authorized second account.",
+      "observedResult": "Developer release persistence and registry publication are disconnected lifecycles.",
+      "rootCause": "DeveloperService.createRelease records metadata only; no governed promotion service joins build provenance, publisher signing, registry review, and publication.",
+      "fixStatus": "BACKEND_DEFECT_CONFIRMED",
+      "linkedTest": "services/greenfield-api/tests/greenfield-backend-v1.developer-domain.test.ts; services/greenfield-api/tests/greenfield-mps-v1.publish.test.ts",
+      "linkedPR": ""
+    },
+    {
+      "feature": "Production parity with accepted GreenField main",
+      "severity": "P1",
+      "endpoint": "25 registered main routes",
+      "owningRepository": "modula-mod/modula-latest",
+      "reproduction": "Compare accepted main e32409ad8b2633ca4649d19adfe7ef9c234c5125 with deployed source/image db0e1e31c19f07538198c8191fa97976c39a7684.",
+      "expectedResult": "A separately approved rollout advances migrations 076 through 079 and deploys retained API/worker images after backup and recovery rehearsal.",
+      "observedResult": "Production remains intentionally at migration 075 with 459 application routes; main has 484.",
+      "rootCause": "Production deployment is explicitly outside this mission authority.",
+      "fixStatus": "DEPLOYMENT_APPROVAL_REQUIRED",
+      "linkedTest": "API Atlas source/runtime reconciliation and migration-validation CI",
+      "linkedPR": "https://github.com/modula-mod/modula-latest/pull/142; https://github.com/modula-mod/modula-latest/pull/143"
+    }
+  ]
+}
