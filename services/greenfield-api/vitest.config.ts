@@ -6,6 +6,7 @@ export default defineConfig({
     include: ['tests/**/*.test.ts'],
     testTimeout: 60_000,
     hookTimeout: 60_000,
+    setupFiles: ['tests/setup/database-test-isolation.ts'],
     fileParallelism: false,
     sequence: {concurrent: false},
   },
