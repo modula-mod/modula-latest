@@ -8,4 +8,3 @@ export {
   type ModulaMotionName,
   type ModulaMotionSpec,
 } from '@/platform/ui/motion/modula-motion-spec'
-export {isReactNativeSkiaNativeAvailable} from '@/platform/ui/native-modules/expo-native-availability'

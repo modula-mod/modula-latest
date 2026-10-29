@@ -76,15 +76,6 @@ record(
     moduleAction.includes('onPress'),
 )
 
-const tabBar = read('src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx')
-record(
-  'TAB BAR OPAQUE CHROME',
-  !tabBar.includes("from 'expo-blur'") &&
-    !tabBar.includes("require('@callstack/liquid-glass')") &&
-    tabBar.includes('ChromeSurface') &&
-    tabBar.includes('surfaceRaised'),
-)
-
 const lab = read('src/platform/ui/dev/modula-primitives-lab.tsx')
 for (const primitive of [
   'Typography',

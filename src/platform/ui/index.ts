@@ -63,8 +63,7 @@ export type {
 } from '@/platform/ui/controls/modula-list'
 export {ModulaProgress} from '@/platform/ui/controls/modula-progress'
 export type {ModulaProgressProps} from '@/platform/ui/controls/modula-progress'
-// Camera / video adapters stay out of this startup barrel — they must not
-// pull expo-camera / expo-video into `_layout` before a native rebuild.
+// Camera and video adapters stay out of this startup barrel to keep startup lean.
 // Import from `@/platform/ui/camera/*` or `@/platform/ui/video` at call sites.
 export {
   captureMediaFromSource,
@@ -188,7 +187,6 @@ export * from '@/platform/ui/motion'
 export * from '@/platform/ui/presentation'
 export {Surface, type SurfaceVariant} from '@/components/primitives/Surface'
 export {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
-export {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 export {PageIntro} from '@/platform/ui/chrome/page-intro'
 export {SectionHeader} from '@/platform/ui/chrome/section-header'
 export {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'

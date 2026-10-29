@@ -74,17 +74,6 @@ record('DIRECTION B', lab.includes('pvp-ui-1r-direction-b') && existsSync(file('
 record('DIRECTION C', lab.includes('pvp-ui-1r-direction-c') && existsSync(file('src/features/modules/components/presentation/EditorialSplitHero.tsx')))
 record('LIGHT / DARK / DESKTOP FRAMES', lab.includes('desktop') && existsSync(file('docs/design/pvp-ui-1r-directions.md')))
 
-console.log('\n# NATIVE')
-const experiments = read('docs/research/pvp-ui-1r-native-experiments.md') + read('src/platform/ui/dev/pvp-native-experiments.tsx')
-record('SDK 57 TYPES', existsSync(file('node_modules/expo-router/build/layouts/stack-utils/StackSearchBar.d.ts')))
-record('STACK SEARCH EVALUATED', experiments.includes('Stack.SearchBar'))
-record('BOTTOM SEARCH SLOT EVALUATED', experiments.includes('SearchBarSlot'))
-record('SEGMENTED CONTROL EVALUATED', experiments.includes('Segmented'))
-record('LIQUID GLASS EVALUATED', experiments.includes('expo-glass-effect') || experiments.includes('GlassView'))
-record('ANIMATED SYMBOLS EVALUATED', experiments.includes('Animated'))
-record('APPLE ZOOM EVALUATED', experiments.includes('AppleZoom') || read('src/features/modules/components/presentation/ModuleEditorialHero.tsx').includes('Link.AppleZoom'))
-record('COMPOSE / MATERIAL EVALUATED', experiments.includes('Material') || experiments.includes('Compose'))
-
 console.log('\n# PRODUCT')
 const hub = read('src/features/modules/screens/ProductHubMarketplaceScreen.tsx')
 const header = read('src/features/modules/components/ProductHubHeader.tsx')
@@ -135,8 +124,7 @@ if (ci) {
   spawn('EXPO INSTALL CHECK', 'pnpm', ['exec', 'expo', 'install', '--check'])
   const doctor = spawnSync('pnpm', ['exec', 'expo-doctor'], {cwd: root, encoding: 'utf8'})
   const doctorOut = `${doctor.stdout || ''}\n${doctor.stderr || ''}`
-  const expectedWarning = /CNG|native folder|prebuild/i.test(doctorOut)
-  record('EXPO DOCTOR', doctor.status === 0 || (doctor.status === 1 && expectedWarning), doctor.status === 0 ? 'clean' : expectedWarning ? 'PASS_WITH_EXPECTED_WARNING' : 'fail')
+  record('EXPO DOCTOR', doctor.status === 0, doctor.status === 0 ? 'clean' : doctorOut.trim().split('\n').slice(-4).join(' | '))
   spawn('GIT DIFF CHECK', 'git', ['diff', '--check'])
 }
 

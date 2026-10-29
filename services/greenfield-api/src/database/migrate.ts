@@ -6,6 +6,12 @@ import pg from 'pg'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const MIGRATION_ADVISORY_LOCK_KEY = 7_314_202_610_14
 
+// Historical QA builds applied the optional-package migration before Premium
+// claimed 076. Keep that immutable ledger row recognised while the canonical
+// migration remains 077. The canonical 077 still runs so schema_metadata and
+// every fresh/production upgrade converge on the same forward-only sequence.
+const KNOWN_LEGACY_MIGRATIONS = new Set(['076_optional_package_media'])
+
 export type MigrationRecord = {
   id: string
   name: string
@@ -74,7 +80,7 @@ export async function migrateStatus(connectionString: string, migrationsDir?: st
       ? (await client.query<MigrationRecord>('SELECT id FROM schema_migrations ORDER BY id')).rows.map(r => r.id)
       : []
     const done = new Set(applied)
-    const source = new Set(files.map(migration => migration.id))
+    const source = new Set([...files.map(migration => migration.id), ...KNOWN_LEGACY_MIGRATIONS])
     const pending = files.map(migration => migration.id).filter(id => !done.has(id))
     const unknown = applied.filter(id => !source.has(id))
     return {applied, pending, unknown}
@@ -97,6 +103,14 @@ export async function migrateDown(connectionString: string, migrationsDir?: stri
       return null
     }
     const latest = rows[0]!
+    if (KNOWN_LEGACY_MIGRATIONS.has(latest.id)) {
+      // A canonical replacement migration has already performed the matching
+      // down operation. Removing this compatibility ledger row is therefore a
+      // metadata-only step during an explicit QA rollback.
+      await client.query('DELETE FROM schema_migrations WHERE id = $1', [latest.id])
+      await client.query('COMMIT')
+      return latest.id
+    }
     const dir = migrationsDir ?? path.resolve(__dirname, '../../migrations')
     const downFile = path.join(dir, `${latest.id}.down.sql`)
     const sql = await fs.readFile(downFile, 'utf8')

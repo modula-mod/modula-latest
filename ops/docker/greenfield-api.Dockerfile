@@ -24,7 +24,6 @@ COPY packages/dimon-contracts/package.json packages/dimon-contracts/
 COPY packages/intelligence-contracts/package.json packages/intelligence-contracts/
 COPY packages/intelligence-governance/package.json packages/intelligence-governance/
 COPY services/greenfield-api/package.json services/greenfield-api/
-COPY patches ./patches
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard
 RUN pnpm install --frozen-lockfile --filter @modula/greenfield-api...
 
@@ -33,7 +32,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages ./packages
 COPY --from=deps /app/services ./services
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY patches ./patches
 COPY packages ./packages
 COPY services/greenfield-api ./services/greenfield-api
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard

@@ -28,9 +28,6 @@ const devOnlyPrefixes = [
   'src/app/dev/',
   'src/platform/ui/dev/',
   'src/features/settings/screens/DeveloperSettingsScreen.tsx',
-  'src/features/settings/screens/ExpoUiLabScreen.tsx',
-  'src/features/settings/screens/ExpoUiPlaygroundScreen.tsx',
-  'src/features/settings/screens/ExpoUiSectionScreen.tsx',
 ]
 
 const localOnlyPrefixes = [

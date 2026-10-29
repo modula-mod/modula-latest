@@ -20,7 +20,6 @@ for (const rel of [
   'scripts/verify-phase7c-profile.mjs',
   'scripts/verify-phase7c-board.mjs',
   'scripts/verify-phase7c-settings.mjs',
-  'scripts/verify-phase7c-native-readiness.mjs',
   'scripts/verify-phase7c-product-complete.mjs',
   'scripts/verify-phase7c-api-parity.mjs',
   'scripts/verify-phase7c-placeholder-free.mjs',
@@ -45,7 +44,6 @@ for (const verifier of [
   'verify-phase7c-profile.mjs',
   'verify-phase7c-board.mjs',
   'verify-phase7c-settings.mjs',
-  'verify-phase7c-native-readiness.mjs',
   'verify-phase7c-product-complete.mjs',
   'verify-phase7c-api-parity.mjs',
   'verify-phase7c-placeholder-free.mjs',
@@ -109,12 +107,6 @@ const moduleBoundary = read('docs/architecture/adr/ADR-013-module-execution-boun
 check('arbitrary module execution boundary missing', moduleBoundary.includes('Remote HTTP is disabled') || moduleBoundary.includes('remoteHttp'))
 check('DIMON must remain inactive', read('docs/audits/phase7c-starting-baseline.md').includes('greenfieldDimon` | false'))
 check('AT dependency must remain optional', read('docs/audits/phase7c-starting-baseline.md').includes('atproto` | false'))
-check('native config baseline missing', read('docs/audits/phase7c-expo-native-baseline.md').includes('development build'))
-
-const nativeAcceptance = read('docs/validation/phase7c-native-acceptance.md')
-check('Phase 7C must defer native packaging instead of requiring it', /^Status:\s+DEFERRED\s*$/m.test(nativeAcceptance))
-check('Phase 7C native deferral missing TestFlight boundary', nativeAcceptance.includes('TestFlight candidate: deferred to native packaging phase'))
-
 const finalReport = read('docs/validation/phase7c-final-report.md')
 check('final report must be accepted under revised Phase 7C criteria', /^Status:\s+ACCEPTED\s*$/m.test(finalReport))
 check('final report must include deployment record', finalReport.includes('## Deployment Record'))

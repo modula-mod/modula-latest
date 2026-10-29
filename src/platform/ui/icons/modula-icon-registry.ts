@@ -1,15 +1,12 @@
-import type {IconName} from '@expo/ui'
-
-/** SF Symbol names as typed by the installed `@expo/ui` (57.0.10). */
-type SFSymbol = Extract<IconName, string>
+/** Retained as portable metadata for Native consumers of the shared registry. */
+type SFSymbol = string
 
 /**
  * Canonical Modula semantic icon registry (7M-B).
  *
  * One semantic name → three render paths:
- * - iOS: SF Symbol via the installed `@expo/ui` universal Icon (typed —
- *   an invalid symbol name fails typecheck).
- * - Android + web: Modula-owned SVG path data (react-native-svg). No icon
+ * - Native consumers may map the retained SF Symbol metadata.
+ * - The GreenField web host renders Modula-owned SVG path data. No icon
  *   font is used for new UI, so there is no tofu/404 failure mode.
  *
  * Unknown semantic names fail typecheck via the `ModulaIconName` union.

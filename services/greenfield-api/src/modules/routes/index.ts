@@ -46,6 +46,7 @@ import {GreenfieldInterModuleActionService} from '../inter-module-action-service
 import {GreenfieldModuleDistributionService, type DistributionHostContext} from '../distribution-service.js'
 import {PackageResolutionError} from '../package-closure-resolver.js'
 import {validateHostCapabilityDescriptor, type HostCapabilityDescriptor} from '@modula/greenfield-module-ui-contracts'
+import {GreenfieldGubicService} from '../gubic-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -114,6 +115,7 @@ export async function registerModuleRoutes(
   const governedFunctions = new GreenfieldGovernedFunctionService(db, config)
   const interModuleActions = new GreenfieldInterModuleActionService(db, config)
   const distribution = new GreenfieldModuleDistributionService(db, config)
+  const gubic = new GreenfieldGubicService(db, config)
   const artifactConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 240, timeWindow: '1 minute'}}} : {}
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
@@ -139,6 +141,112 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await registry.listModules({...(request.query as any), productKind: (request.query as any)?.productKind ?? 'all'}), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry product listing failed')
+    }
+  })
+
+  app.get('/v1/gubic/games', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.listGames(request.query as any), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC game listing failed')
+    }
+  })
+
+  app.get('/v1/gubic/featured', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.featuredGames(Number((request.query as any)?.limit) || 20), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC featured games failed')
+    }
+  })
+
+  app.get('/v1/gubic/new-releases', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.newReleases(Number((request.query as any)?.limit) || 20), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC new releases failed')
+    }
+  })
+
+  app.get('/v1/gubic/categories', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.categories(), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC categories failed')
+    }
+  })
+
+  app.get('/v1/gubic/publishers/:publisherId', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.publisherDetail(String((request.params as any).publisherId ?? '')), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC publisher lookup failed')
+    }
+  })
+
+  app.get('/v1/gubic/games/:gameId', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.getGame(String((request.params as any).gameId ?? '')), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC game lookup failed')
+    }
+  })
+
+  app.get('/v1/gubic/games/:gameId/versions', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.versions(String((request.params as any).gameId ?? ''), distributionContext(request.query)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC game versions failed')
+    }
+  })
+
+  app.get('/v1/gubic/games/:gameId/eligibility', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await gubic.eligibility(
+        request.auth?.accountId ?? null,
+        String((request.params as any).gameId ?? ''),
+        distributionContext(request.query),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC installation eligibility failed')
+    }
+  })
+
+  app.post('/v1/gubic/games/:gameId/install-plan', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as Record<string, unknown> | null) ?? {}
+      const cached = Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : []
+      if (cached.some(value => typeof value !== 'string')) throw moduleError('VALIDATION_FAILED', 'Cached digest list must contain strings')
+      return reply.send(successEnvelope(await gubic.packageInstallPlan(
+        auth.accountId,
+        String((request.params as any).gameId ?? ''),
+        distributionContext(body),
+        cached as string[],
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC package install plan failed')
+    }
+  })
+
+  app.get('/v1/gubic/my-games', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await gubic.myGames(auth.accountId, distributionContext(request.query)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'GUBIC My Games failed')
     }
   })
 
@@ -613,6 +721,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, canonicalModuleParam(request))
       return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version, modulePlatform(body.platform), parseTrustOptions({hostVersion: body.hostVersion}).hostVersion), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install preview failed')
@@ -624,6 +733,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as Record<string, unknown> | null) ?? {}
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, canonicalModuleParam(request))
       const version = typeof body.version === 'string' && body.version.trim() ? body.version.trim() : null
       return reply.send(successEnvelope(await distribution.installPlan(
         auth.accountId,
@@ -641,6 +751,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as Record<string, unknown> | null) ?? {}
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, canonicalModuleParam(request))
       const cached = Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : []
       if (cached.some(value => typeof value !== 'string')) throw moduleError('VALIDATION_FAILED', 'Cached digest list must contain strings')
       const plan = await distribution.packageInstallPlan(canonicalModuleParam(request),
@@ -658,6 +769,7 @@ export async function registerModuleRoutes(
     try {
       const body = (request.body as any) ?? {}
       const moduleId = canonicalModuleParam(request)
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, moduleId)
       const hostContext = distributionContext(body)
       let exactPackageVersion: string | undefined
       try {

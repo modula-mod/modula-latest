@@ -1312,7 +1312,7 @@
     },
     {
       "file": "src/features/marketplace/screens/ModuleDetailScreen.tsx",
-      "line": 120,
+      "line": 119,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')"
@@ -1914,7 +1914,7 @@
     },
     {
       "file": "src/features/security/app-lock/app-lock-context.tsx",
-      "line": 390,
+      "line": 319,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('useAppLock must be used within AppLockProvider')"
@@ -1963,7 +1963,7 @@
     },
     {
       "file": "src/features/settings/screens/SettingsHomeScreen.tsx",
-      "line": 315,
+      "line": 309,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "placeholder=\"Search settings\""
@@ -3288,7 +3288,7 @@
     },
     {
       "file": "src/features/marketplace/screens/ModuleDetailScreen.tsx",
-      "line": 120,
+      "line": 119,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')"
@@ -3890,7 +3890,7 @@
     },
     {
       "file": "src/features/security/app-lock/app-lock-context.tsx",
-      "line": 390,
+      "line": 319,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('useAppLock must be used within AppLockProvider')"
@@ -3939,7 +3939,7 @@
     },
     {
       "file": "src/features/settings/screens/SettingsHomeScreen.tsx",
-      "line": 315,
+      "line": 309,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "placeholder=\"Search settings\""

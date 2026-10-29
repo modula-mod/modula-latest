@@ -57,11 +57,10 @@ record('RATING MIGRATION', existsSync(path.join(root, 'services/greenfield-api/m
 contains('src/data/repositories/api/ApiModuleRepository.ts', 'rateModule(moduleId', 'RATING CLIENT')
 contains('src/features/modules/components/product-detail/ProductRatingPanel.tsx', 'Ratings are submitted by signed-in Modula accounts', 'RATING PRODUCT UI')
 
-console.log('\n# Expo audit')
+console.log('\n# Expo web-host audit')
 const pkg = JSON.parse(read('package.json'))
-record('LOCAL AUTH SDK ALIGNED', pkg.dependencies?.['expo-local-authentication'] === '~57.0.2', pkg.dependencies?.['expo-local-authentication'])
-contains('docs/validation/phase7m-b10-source-audit.md', 'directly declared', 'DEPENDENCY CAUSE DOCUMENTED')
-contains('docs/validation/phase7m-b10-source-audit.md', 'intentionally committed', 'NATIVE WARNING DOCUMENTED')
+record('LOCAL AUTH SDK RETIRED', !pkg.dependencies?.['expo-local-authentication'])
+record('EXPO DEV CLIENT RETIRED', !pkg.dependencies?.['expo-dev-client'])
 
 const diff = spawnSync('git', ['diff', '--check'], {cwd: root, encoding: 'utf8'})
 record('GIT DIFF CHECK', diff.status === 0, diff.stderr.trim())

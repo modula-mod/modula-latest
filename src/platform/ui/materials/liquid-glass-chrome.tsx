@@ -1,16 +1,12 @@
-import type {ComponentType, ReactNode} from 'react'
+import type {ReactNode} from 'react'
 import {
-  Platform,
   StyleSheet,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native'
-import {BlurView} from 'expo-blur'
 
-import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
-import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type LiquidGlassChromeProps = {
@@ -28,78 +24,18 @@ type LiquidGlassChromeProps = {
   blurIntensity?: number
 }
 
-type CallstackModule = {
-  LiquidGlassView: ComponentType<{
-    style?: StyleProp<ViewStyle>
-    interactive?: boolean
-    effect?: string
-    children?: ReactNode
-  }>
-  isLiquidGlassSupported: boolean
-}
-
-type ExpoGlassViewComponent = ComponentType<{
-  style?: StyleProp<ViewStyle>
-  glassEffectStyle?: string
-  colorScheme?: 'light' | 'dark'
-  isInteractive?: boolean
-  children?: ReactNode
-}>
-
 type WebGlassStyle = ViewStyle & {
   backdropFilter: string
   WebkitBackdropFilter: string
 }
 
-let cachedCallstack: CallstackModule | null | undefined
-let cachedExpoGlassView: ExpoGlassViewComponent | null | undefined
-
-function loadCallstackLiquidGlass(): CallstackModule | null {
-  if (cachedCallstack !== undefined) return cachedCallstack
-  if (!isCallstackLiquidGlassNativeAvailable()) {
-    cachedCallstack = null
-    return null
-  }
-  try {
-    // Dynamic require — static import crashes Expo Go / missing pods.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    cachedCallstack = require('@callstack/liquid-glass') as CallstackModule
-  } catch {
-    cachedCallstack = null
-  }
-  return cachedCallstack
-}
-
-function loadExpoGlassView(): ExpoGlassViewComponent | null {
-  if (cachedExpoGlassView !== undefined) return cachedExpoGlassView
-  if (!isNativeGlassRuntimeAvailable()) {
-    cachedExpoGlassView = null
-    return null
-  }
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('expo-glass-effect') as {
-      GlassView: ExpoGlassViewComponent
-    }
-    cachedExpoGlassView = mod.GlassView
-  } catch {
-    cachedExpoGlassView = null
-  }
-  return cachedExpoGlassView
-}
-
-const loadedCallstackLiquidGlass = loadCallstackLiquidGlass()
-const LoadedExpoGlassView = loadExpoGlassView()
-
 /**
- * Liquid-glass chrome for circular / pill controls.
- * Callstack (iOS 26) → expo-glass-effect → translucent BlurView glass.
- * Never paints an opaque surface fill (that reads as a flat grey disc).
+ * Token-derived web glass for circular and pill controls.
  */
 export function LiquidGlassChrome({
   children,
   style,
-  interactive = true,
+  interactive: _interactive = true,
   fallback = 'clear',
   contentLayout = 'fill',
   blurIntensity,
@@ -107,7 +43,6 @@ export function LiquidGlassChrome({
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const isDark = scheme === 'dark'
-  const effect = fallback === 'regular' ? 'regular' : 'clear'
   const resolvedBlur =
     blurIntensity ?? (fallback === 'regular' ? 78 : 64)
   // `regular` is denser so sticky chrome / tracks don’t read as see-through.
@@ -127,8 +62,6 @@ export function LiquidGlassChrome({
       : isDark
         ? 'rgba(255,255,255,0.24)'
         : 'rgba(255,255,255,0.78)'
-  const flow = contentLayout === 'flow'
-
   if (reduceTransparency) {
     return (
       <View
@@ -146,85 +79,17 @@ export function LiquidGlassChrome({
     )
   }
 
-  const callstack = loadedCallstackLiquidGlass
-  if (callstack?.isLiquidGlassSupported) {
-    const Glass = callstack.LiquidGlassView
-    // No elevation shadow / overflow clip — system liquid glass (Home) needs
-    // the material to extend past the layout box.
-    return (
-      <Glass
-        interactive={interactive}
-        effect={effect}
-        style={style}>
-        {flow ? children : <View style={styles.foreground}>{children}</View>}
-      </Glass>
-    )
-  }
-
-  if (LoadedExpoGlassView) {
-    return (
-      <LoadedExpoGlassView
-        glassEffectStyle={effect}
-        isInteractive={interactive}
-        colorScheme={isDark ? 'dark' : 'light'}
-        style={style}>
-        {flow ? children : <View style={styles.foreground}>{children}</View>}
-      </LoadedExpoGlassView>
-    )
-  }
-
-  if (Platform.OS === 'web') {
-    const webBlur = `blur(${Math.round(resolvedBlur * 0.28)}px) saturate(145%)`
-    return (
-      <View
-        style={[
-          styles.base,
-          styles.shadow,
-          {
-            backdropFilter: webBlur,
-            WebkitBackdropFilter: webBlur,
-          } as WebGlassStyle,
-          {
-            backgroundColor: wash,
-            borderColor: rim,
-            borderWidth: StyleSheet.hairlineWidth,
-          },
-          style,
-        ]}>
-        {children}
-      </View>
-    )
-  }
-
+  const webBlur = `blur(${Math.round(resolvedBlur * 0.28)}px) saturate(145%)`
   return (
-    <View style={[styles.base, styles.shadow, style]}>
-      <BlurView
-        intensity={resolvedBlur}
-        tint={
-          fallback === 'regular'
-            ? isDark
-              ? 'systemThickMaterialDark'
-              : 'systemThickMaterialLight'
-            : isDark
-              ? 'systemUltraThinMaterialDark'
-              : 'systemUltraThinMaterialLight'
-        }
-        style={StyleSheet.absoluteFill}
-      />
-      <View
-        pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: wash,
-            borderColor: rim,
-            borderWidth: StyleSheet.hairlineWidth,
-          },
-        ]}
-      />
-      <View style={flow ? styles.flowForeground : styles.foreground}>
-        {children}
-      </View>
+    <View
+      style={[
+        styles.base,
+        styles.shadow,
+        {backdropFilter: webBlur, WebkitBackdropFilter: webBlur} as WebGlassStyle,
+        {backgroundColor: wash, borderColor: rim, borderWidth: StyleSheet.hairlineWidth},
+        style,
+      ]}>
+      {contentLayout === 'flow' ? children : <View style={styles.foreground}>{children}</View>}
     </View>
   )
 }
@@ -232,10 +97,6 @@ export function LiquidGlassChrome({
 const styles = StyleSheet.create({
   base: {
     overflow: 'hidden',
-  },
-  flowForeground: {
-    flexDirection: 'row',
-    width: '100%',
   },
   foreground: {
     alignItems: 'center',

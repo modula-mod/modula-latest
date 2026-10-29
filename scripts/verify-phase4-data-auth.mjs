@@ -87,16 +87,6 @@ for (const forbidden of [
   }
 }
 
-// Reanimated/Worklets re-admitted only for Phase 4.5 authorized liquid-glass tabs
-const liquidGlassGate =
-  exists('src/platform/ui/navigation/liquid-glass-availability.ts') &&
-  exists('src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx')
-for (const name of ['react-native-reanimated', 'react-native-worklets']) {
-  if (Object.prototype.hasOwnProperty.call(allDeps, name) && !liquidGlassGate) {
-    fail(`Forbidden Phase 4 dependency present: ${name}`)
-  }
-}
-
 if (pkg.scripts?.['verify:phase4'] !== 'node scripts/verify-phase4-data-auth.mjs') {
   fail('package.json must expose verify:phase4')
 }
@@ -160,7 +150,6 @@ for (const file of [
   'src/auth/contracts/SessionTokens.ts',
   'src/auth/contracts/AuthCapability.ts',
   'src/auth/storage/SessionStorage.ts',
-  'src/auth/storage/NativeSecureSessionStorage.ts',
   'src/auth/storage/WebPersistentSessionStorage.ts',
   'src/auth/runtime/SessionProvider.tsx',
   'src/auth/runtime/SessionRefreshCoordinator.ts',
@@ -229,7 +218,6 @@ requireText('src/api/contracts/CursorPage.ts', /nextCursor:\s*string \| null[\s\
 requireText('src/api/contracts/identifiers.ts', /parseAccountId[\s\S]*parseProfileId[\s\S]*parsePostId[\s\S]*parseSessionId/, 'Branded identifier parsers are missing')
 requireText('src/config/runtimeEnvironment.ts', /production[\s\S]*remote/, 'Production remote-mode rule is missing')
 requireText('src/auth/storage/SessionStorage.ts', 'modula.session.refresh-token.v1', 'Secure session storage key is incorrect')
-requireText('src/auth/storage/NativeSecureSessionStorage.ts', 'expo-secure-store', 'Native session storage must use Expo SecureStore')
 requireText('src/auth/storage/WebPersistentSessionStorage.ts', 'modula.web.session.bundle.v1', 'Web session storage key is incorrect')
 requireText('src/auth/storage/WebPersistentSessionStorage.ts', /localStorage/, 'Web session storage must persist through localStorage')
 requireText('src/auth/contracts/Session.ts', /SessionState[\s\S]*BootingSession[\s\S]*SignedOutSession[\s\S]*GuestSession[\s\S]*AuthenticatedSession[\s\S]*RefreshingSession[\s\S]*ExpiredSession[\s\S]*ErrorSession/, 'Session state must be a discriminated union')

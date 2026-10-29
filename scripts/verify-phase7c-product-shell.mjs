@@ -31,23 +31,11 @@ includes('src/features/product/data/resolveTabBar.ts', [
   'REQUIRED_ROOT_TAB_IDS.includes(tabId)',
 ], 'tab resolver')
 
-includes('src/platform/ui/navigation/platform-tabs.native.tsx', [
-  'NativeTabs',
-  'LiquidGlassPlatformTabs',
-  "title: 'Create'",
-], 'native tabs adapter')
-
 includes('src/platform/ui/navigation/platform-tabs.web.tsx', [
   "create: 'create'",
   "label: 'Board'",
   'MORE',
 ], 'web tab rail')
-
-includes('src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx', [
-  "tab.routeName !== 'create'",
-  "router.push('/compose'",
-  'Open compose menu',
-], 'custom native create affordance')
 
 includes('src/shell/NavigationDrawer.tsx', [
   "label: 'Board'",

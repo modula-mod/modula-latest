@@ -211,6 +211,8 @@ export function productProjection(ingestion: {manifest: unknown; manifest_sha256
     support: pick('support'),
     accessibility: pick('accessibility'),
     localization: pick('localization'),
+    gameRuntime: pick('gameRuntime'),
+    distribution: pick('distribution'),
     frontend: record(manifest.frontend) ? {mode: record(manifest.frontend)!.mode ?? null, artifact: record(manifest.frontend)!.artifact ?? null} : null,
     release: release ? {channel: release.channel ?? null, notes: release.notes ?? null} : null,
   }

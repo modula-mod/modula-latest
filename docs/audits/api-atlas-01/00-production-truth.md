@@ -50,13 +50,13 @@ flowchart TD
 - Registry release assets: separate immutable-cache location.
 - `/v1/stories`: 25 MiB and 300s timeouts.
 - attachment byte upload: 101 MiB, proxy buffering disabled, 300s timeouts.
-- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 0/472 application routes carry Fastify rate-limit configuration.
+- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 0/484 application routes carry Fastify rate-limit configuration.
 - Every registered route is transport-reachable through the catch-all; feature flags and handler authorization still determine application availability. `/v1/internal/ssrf-check` is handler-hidden in production.
 
 ## Versions and migration truth
 
 - Applied migrations: 73; latest `073_backup_sequence_acl_defaults` at 2026-10-14T01:27:28.538373+00:00.
-- Git up migrations: 77; latest `077_optional_package_media.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
+- Git up migrations: 78; latest `078_gubic_game_catalogue.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
 - Production runtime routes: 630; excluded automatic production framework routes: 184. Candidate route counts, when present, are reported only in the HTTP atlas and do not alter deployment truth.
 
 ## Safe configuration

@@ -28,9 +28,8 @@ function runSupersedingVerifier(script) {
 
 if (fs.existsSync('docs/validation/phase7c-verifier-reconciliation.md')) {
   runSupersedingVerifier('scripts/verify-phase7c-product-shell.mjs')
-  runSupersedingVerifier('scripts/verify-phase7c-native-readiness.mjs')
   console.log('Phase 6 frontend boundary verifier retired for Phase 7C.')
-  console.log('Superseded by verify-phase7c-product-shell.mjs and verify-phase7c-native-readiness.mjs.')
+  console.log('Superseded by verify-phase7c-product-shell.mjs.')
   process.exit(0)
 }
 

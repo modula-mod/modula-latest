@@ -2,6 +2,7 @@ import {generateKeyPairSync, randomUUID, sign} from 'node:crypto'
 import {readFileSync} from 'node:fs'
 import {join} from 'node:path'
 import {gzipSync} from 'node:zlib'
+import {sql} from 'kysely'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
@@ -178,6 +179,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
+    process.env.MODULA_ADMIN_HANDLES = `gubicadmin${suffix}`
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -456,6 +458,206 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     })
     expect(afterRevocationDownload.statusCode).toBe(404)
   })
+
+  it('projects a signed external game through governed GUBIC discovery, entitlement and publisher isolation', async () => {
+    const owner = await registerAccount(app, `gubic-owner-${suffix}@example.invalid`, `gubicowner${suffix}`, db)
+    const intruder = await registerAccount(app, `gubic-intruder-${suffix}@example.invalid`, `gubicintruder${suffix}`, db)
+    const admin = await registerAccount(app, `gubic-admin-${suffix}@example.invalid`, `gubicadmin${suffix}`, db)
+    const publisherId = `indie-${suffix}`
+    const namespace = `games.${suffix}`
+    const gameId = `${namespace}.asteroid-run`
+    const now = new Date()
+    await db.insertInto('greenfield_publishers').values({
+      publisher_id: publisherId, display_name: 'Independent Test Studio', website: 'https://example.invalid',
+      status: 'verified', trust_level: 'verifiedPublisher', created_at: now, updated_at: now,
+      verified_at: now, suspended_at: null, revoked_at: null,
+    }).execute()
+    await db.insertInto('greenfield_publisher_owners').values({
+      publisher_owner_id: randomUUID(), publisher_id: publisherId, owner_type: 'ACCOUNT',
+      account_id: owner.accountId, organisation_id: null, created_at: now,
+    }).execute()
+    await db.insertInto('greenfield_publisher_namespaces').values({
+      namespace, publisher_id: publisherId, verification_method: 'operatorReview',
+      verification_evidence: {test: 'gubic-external-publisher'}, verified_at: now, revoked_at: null, created_at: now,
+    }).execute()
+
+    const keys = generateKeyPairSync('ed25519')
+    const keyId = `gubic-${suffix}`
+    await new GreenfieldPublisherSigningKeyService(db).register(
+      publisherId,
+      {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()},
+      owner.accountId,
+    )
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'">')
+    const javascript = Buffer.from('document.title="Asteroid Run"')
+    const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
+    const gameBytes = gzipSync(Buffer.concat([
+      tarEntry('index.html', html), tarEntry('main.js', javascript), tarEntry('game.files.json', inventory), Buffer.alloc(1024),
+    ]))
+    const built = buildRelease(gameId, '1.0.0', {
+      sign: {keyId, privateKey: keys.privateKey},
+      legacy: {id: gameId, moduleVersion: '1.0.0', publisher: {id: publisherId}},
+      manifestOverrides: {
+        publisher: {publisherId, displayName: 'Independent Test Studio', website: 'https://example.invalid'},
+        trust: {requestedLevel: 'verifiedPublisher'},
+        license: {status: 'verified', spdx: 'MIT', evidenceIds: ['LICENSE']},
+      },
+      mutateProduct: (mps) => {
+        mps.identity.kind = 'game'
+        mps.publisher = {id: publisherId, displayName: 'Independent Test Studio'}
+        mps.permissions = []
+        mps.gameRuntime = {
+          contractVersion: '1.0.0', type: 'web-mini-game', engine: 'phaser', engineVersion: '4.2.1',
+          entryPath: 'index.html', artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz'},
+          compressedSizeLimitBytes: 50 * 1024 * 1024, minimumHostVersion: '>=1.1.0', offline: true,
+          network: 'none', assetInventory: 'game.files.json', orientation: 'any', graphics: 'none', touchControls: 'pointer',
+        }
+        mps.distribution = {
+          schema: 'modula.package.1', category: 'game-content',
+          artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz', compressedSizeBytes: gameBytes.length, installedSizeEstimateBytes: 4096},
+          minimumHostVersion: '>=1.1.0', platforms: ['ios'], dependencies: [], requiredCapabilities: [],
+          cachePolicy: 'retain-while-owned', sharing: 'public-immutable',
+        }
+      },
+      mutateFiles: files => { files['game/game.tgz'] = gameBytes },
+    })
+    const synced = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({
+      repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false,
+    })
+    expect(synced).toMatchObject({signed: true, releaseState: 'published'})
+
+    const headers = {authorization: `Bearer ${owner.token}`}
+    const register = await app.inject({
+      method: 'PUT', url: `/v1/developer/gubic/games/${gameId}`, headers,
+      payload: {publisherId, origin: 'independent-publisher', genre: 'arcade', categories: ['arcade', 'action'], runtimeCategory: 'html5-javascript', ageClassification: {system: 'IARC', rating: '3+'}, availability: 'available'},
+    })
+    expect(register.statusCode, register.body).toBe(200)
+    expect(register.json().data).toMatchObject({game_id: gameId, publication_status: 'draft'})
+
+    const unauthorized = await app.inject({
+      method: 'PUT', url: `/v1/developer/gubic/games/${gameId}`,
+      headers: {authorization: `Bearer ${intruder.token}`},
+      payload: {publisherId, origin: 'commercial-publisher', genre: 'arcade', categories: ['arcade'], runtimeCategory: 'html5-javascript', ageClassification: {}},
+    })
+    expect(unauthorized.statusCode, unauthorized.body).toBe(403)
+    expect((await app.inject({method: 'GET', url: `/v1/gubic/games?q=${encodeURIComponent(gameId)}`})).json().data.items).toEqual([])
+    const draftInstall = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `draft-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(draftInstall.statusCode, draftInstall.body).toBe(403)
+
+    const review = await app.inject({
+      method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`,
+      headers: {authorization: `Bearer ${admin.token}`},
+      payload: {publicationStatus: 'published', availability: 'available', featured: true, featuredRank: 1, reason: 'Synthetic isolated QA acceptance'},
+    })
+    expect(review.statusCode, review.body).toBe(200)
+    expect(review.json().data).toMatchObject({publication_status: 'published', featured: true})
+    const games = await app.inject({method: 'GET', url: `/v1/gubic/games?q=${encodeURIComponent(gameId)}&genre=arcade&category=action`})
+    expect(games.statusCode, games.body).toBe(200)
+    expect(games.json().data.items[0]).toMatchObject({
+      gameId, title: expect.any(String), origin: 'independent-publisher', genre: 'arcade',
+      publisher: {publisherId, verified: true}, runtime: {category: 'html5-javascript'},
+      sizes: {installedSizeEstimateBytes: 4096, nativeCacheBytes: null}, publicationStatus: 'published', featured: true,
+    })
+    expect((await app.inject({method: 'GET', url: '/v1/gubic/featured'})).json().data.items)
+      .toEqual(expect.arrayContaining([expect.objectContaining({gameId})]))
+    const categories = (await app.inject({method: 'GET', url: '/v1/gubic/categories'})).json().data.items
+    expect(categories.find((item: {category: string}) => item.category === 'action')?.gameCount).toBeGreaterThanOrEqual(1)
+    expect((await app.inject({method: 'GET', url: `/v1/gubic/publishers/${publisherId}`})).json().data).toMatchObject({publisherId, verified: true})
+
+    const comingSoon = await app.inject({
+      method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`,
+      headers: {authorization: `Bearer ${admin.token}`},
+      payload: {publicationStatus: 'published', availability: 'coming-soon', featured: false, reason: 'Availability isolation proof'},
+    })
+    expect(comingSoon.statusCode, comingSoon.body).toBe(200)
+    expect((await app.inject({method: 'GET', url: `/v1/gubic/games?q=${encodeURIComponent(gameId)}`})).json().data.items[0])
+      .toMatchObject({gameId, availability: 'coming-soon'})
+    const unavailableEligibility = await app.inject({method: 'GET', url: `/v1/gubic/games/${gameId}/eligibility?hostVersion=1.1.0&platform=ios`, headers})
+    expect(unavailableEligibility.json().data).toMatchObject({eligible: false, reasonCode: 'NOT_AVAILABLE'})
+    const comingSoonInstall = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `coming-soon-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(comingSoonInstall.statusCode, comingSoonInstall.body).toBe(403)
+    const restoreAvailable = await app.inject({
+      method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`,
+      headers: {authorization: `Bearer ${admin.token}`},
+      payload: {publicationStatus: 'published', availability: 'available', featured: true, featuredRank: 1, reason: 'Resume entitlement acceptance'},
+    })
+    expect(restoreAvailable.statusCode, restoreAvailable.body).toBe(200)
+
+    const offerId = `offer:${gameId}`
+    await db.insertInto('greenfield_offers').values({
+      offer_id: offerId, product_id: gameId, kind: 'ONE_TIME', display_name: 'Owned game',
+      capabilities: sql`${JSON.stringify([])}::jsonb`, commercial_terms: sql`${JSON.stringify({})}::jsonb`,
+      trial_duration_seconds: null, state: 'ACTIVE', created_by_account_id: admin.accountId,
+      created_at: now, updated_at: now,
+    }).execute()
+    const ineligible = await app.inject({method: 'GET', url: `/v1/gubic/games/${gameId}/eligibility?hostVersion=1.1.0&platform=ios`, headers})
+    expect(ineligible.json().data).toMatchObject({eligible: false, reasonCode: 'ENTITLEMENT_REQUIRED', entitlement: {required: true, owned: false}})
+    const unownedInstall = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `unowned-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(unownedInstall.statusCode, unownedInstall.body).toBe(403)
+    await db.insertInto('greenfield_entitlements').values({
+      entitlement_id: `entitlement:${gameId}:${owner.accountId}`, owner_type: 'ACCOUNT', owner_account_id: owner.accountId,
+      owner_organisation_id: null, product_id: gameId, offer_id: offerId, source: 'ADMIN', state: 'ACTIVE',
+      external_receipt_id: null, provenance_reference: 'isolated-gubic-qa', started_at: now, expires_at: null,
+      created_at: now, updated_at: now,
+    }).execute()
+    const eligible = await app.inject({method: 'GET', url: `/v1/gubic/games/${gameId}/eligibility?hostVersion=1.1.0&platform=ios`, headers})
+    expect(eligible.statusCode, eligible.body).toBe(200)
+    expect(eligible.json().data).toMatchObject({eligible: true, reasonCode: 'ELIGIBLE', entitlement: {required: true, owned: true}, packagePlan: {lock: {packages: [expect.objectContaining({packageId: gameId})]}}})
+    const ownedBeforeInstall = await app.inject({method: 'GET', url: '/v1/gubic/my-games?hostVersion=1.1.0&platform=ios', headers})
+    expect(ownedBeforeInstall.statusCode, ownedBeforeInstall.body).toBe(200)
+    expect(ownedBeforeInstall.json().data.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({gameId, installation: null, eligibility: expect.objectContaining({eligible: true}), entitlement: expect.objectContaining({owned: true})}),
+    ]))
+    const plan = await app.inject({
+      method: 'POST', url: `/v1/gubic/games/${gameId}/install-plan`, headers,
+      payload: {hostVersion: '1.1.0', platform: 'ios', cachedPublicDigests: []},
+    })
+    expect(plan.statusCode, plan.body).toBe(200)
+    const install = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `owned-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios', hostVersion: '1.1.0', packageLockSha256: plan.json().data.lockSha256},
+    })
+    expect(install.statusCode, install.body).toBe(202)
+    const mine = await app.inject({method: 'GET', url: '/v1/gubic/my-games?hostVersion=1.1.0&platform=ios', headers})
+    expect(mine.statusCode, mine.body).toBe(200)
+    expect(mine.json().data.items).toEqual(expect.arrayContaining([expect.objectContaining({gameId, nativeCacheBytes: null, entitlement: expect.objectContaining({owned: true})})]))
+
+    const reject = await app.inject({
+      method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`, headers: {authorization: `Bearer ${admin.token}`},
+      payload: {publicationStatus: 'rejected', availability: 'unavailable', featured: false, reason: 'Synthetic rejection proof'},
+    })
+    expect(reject.statusCode, reject.body).toBe(200)
+    expect((await app.inject({method: 'GET', url: `/v1/gubic/games?q=${encodeURIComponent(gameId)}`})).json().data.items).toEqual([])
+    const rejectedInstall = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `rejected-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(rejectedInstall.statusCode, rejectedInstall.body).toBe(403)
+
+    const republish = await app.inject({
+      method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`, headers: {authorization: `Bearer ${admin.token}`},
+      payload: {publicationStatus: 'published', availability: 'available', featured: false, reason: 'Signer revocation acceptance setup'},
+    })
+    expect(republish.statusCode, republish.body).toBe(200)
+    await new GreenfieldPublisherSigningKeyService(db).revoke(publisherId, keyId, 'Synthetic revoked-game proof', admin.accountId)
+    expect((await app.inject({method: 'GET', url: `/v1/gubic/games?q=${encodeURIComponent(gameId)}`})).json().data.items).toEqual([])
+    const revokedInstall = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `revoked-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios'},
+    })
+    expect(revokedInstall.statusCode, revokedInstall.body).toBeGreaterThanOrEqual(400)
+    await expect(db.updateTable('greenfield_game_catalogue_events').set({publication_status: 'published'}).where('game_id', '=', gameId).execute())
+      .rejects.toThrow(/append-only/)
+  }, 120_000)
 
   it('performs a governed rollback to the advertised trusted release', async () => {
     const keys = generateKeyPairSync('ed25519')

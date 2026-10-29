@@ -189,12 +189,6 @@ const developerRows: SettingsNavRow[] = [
     iconDomain: 'developer' as const,
   })),
   {
-    title: 'Expo UI Lab',
-    icon: 'developer',
-    iconDomain: 'developer',
-    route: '/settings/developer/expo-ui',
-  },
-  {
     title: 'Developer',
     icon: 'developer',
     iconDomain: 'developer',

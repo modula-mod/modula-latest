@@ -147,12 +147,6 @@ for (const name of [
 const uiLab = read('src/features/settings/screens/ModulaUiLabScreen.tsx')
 assert.match(uiLab, /PvpUi1LabBlocks/)
 assert.doesNotMatch(uiLab, /create another UI Lab/i)
-const experiments = read('src/platform/ui/dev/pvp-native-experiments.tsx')
-assert.match(experiments, /ADAPT/)
-assert.match(experiments, /DEFER/)
-assert.match(experiments, /NativeTabs/)
-const route = read('src/app/settings/developer/pvp-native-experiments.tsx')
-assert.match(route, /canAccessDeveloperLabs/)
 console.log('UI LAB                         PASS')
 
 section('Architecture')

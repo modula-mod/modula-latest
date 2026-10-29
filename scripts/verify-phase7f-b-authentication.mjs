@@ -31,15 +31,15 @@ const authScreens = [
 for (const rel of authScreens) requireFile(rel)
 
 const sessionStorageFiles = [
-  'src/auth/storage/NativeSecureSessionStorage.ts',
+  'src/auth/storage/WebPersistentSessionStorage.ts',
   'src/auth/storage/SessionStorage.ts',
   'src/auth/storage/createSessionStorage.ts',
 ]
 for (const rel of sessionStorageFiles) requireFile(rel)
 
-const secureStore = read('src/auth/storage/NativeSecureSessionStorage.ts')
-if (!secureStore.includes('expo-secure-store') && !secureStore.includes('SecureStore')) {
-  errors.push('NativeSecureSessionStorage must use expo-secure-store / SecureStore')
+const webStore = read('src/auth/storage/WebPersistentSessionStorage.ts')
+if (!webStore.includes('localStorage')) {
+  errors.push('WebPersistentSessionStorage must use localStorage')
 }
 
 const createAccount = read('src/auth/screens/CreateAccountScreen.tsx')
