@@ -18,7 +18,6 @@ COPY packages/greenfield-schema-registry/package.json packages/greenfield-schema
 COPY packages/dimon-contracts/package.json packages/dimon-contracts/
 COPY packages/greenfield-product-standard/package.json packages/greenfield-product-standard/
 COPY services/greenfield-worker/package.json services/greenfield-worker/
-COPY patches ./patches
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard
 RUN pnpm install --frozen-lockfile --filter @modula/greenfield-worker...
 
@@ -27,7 +26,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages ./packages
 COPY --from=deps /app/services ./services
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY patches ./patches
 COPY packages ./packages
 COPY services/greenfield-worker ./services/greenfield-worker
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard
