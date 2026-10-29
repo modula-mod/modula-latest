@@ -496,25 +496,30 @@
       "severity": "P2",
       "title": "Attachment orphan cleanup exists but is never scheduled",
       "evidence": [
-        "services/greenfield-api/src/domains/attachments/service.ts:191",
-        "services/greenfield-api/tests/post04.attachments.test.ts:199",
+        "services/greenfield-worker/src/main.ts",
+        "services/greenfield-worker/src/media/cleanup.ts",
+        "services/greenfield-worker/tests/media-cleanup.test.ts",
         "evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage"
       ],
       "affectedRoutes": [
         "POST /v1/attachments/uploads"
       ],
       "affectedFiles": [
-        "services/greenfield-api/src/domains/attachments/service.ts"
+        "services/greenfield-worker/src/media/cleanup.ts"
       ],
-      "productionImpact": "Five ready attachments are unbound; only tests invoke cleanup.",
-      "recommendedFix": "Add a bounded worker/ops job with retention, metrics and dry-run visibility.",
+      "productionImpact": "The captured production revision predates the candidate worker schedule and reports five ready unbound attachments. Candidate cleanup is bounded, observable and dry-run by default.",
+      "recommendedFix": "Deploy through the controlled release gate, inspect dry-run counts, then explicitly activate delete mode after QA acceptance.",
       "dependencies": [
-        "worker schedule"
+        "production deployment approval"
       ],
       "verification": "Expired sessions/orphans must be removed while bound media remains retrievable.",
       "remediation": {
-        "status": "OPEN",
-        "evidence": []
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-worker/tests/media-cleanup.test.ts#reports candidates without mutation, then safely removes only stale unbound media",
+          "services/greenfield-worker/src/main.ts",
+          "ops/docker/compose.production.yml"
+        ]
       }
     },
     {
@@ -541,8 +546,11 @@
       ],
       "verification": "Invalid magic bytes and oversized decoded payloads must fail; expired bytes must be removed.",
       "remediation": {
-        "status": "OPEN",
-        "evidence": []
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts#publishes verified attachments with retry safety, visibility enforcement and cleanup",
+          "services/greenfield-api/src/domains/stories/service.ts"
+        ]
       }
     },
     {

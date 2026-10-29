@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase/greenfield-functional-parity-01",
-      "sourceSha256": "7f6ce57f5290e6c24593cc9ba9b4be8aeeca2b4c21bebc735ad723c241980185",
-      "capturedAt": "2026-10-29T17:58:11.864Z",
+      "branch": "phase/greenfield-functional-parity-media-cleanup",
+      "sourceSha256": "9e3b72b355c73ebed12a6b4cdb8ad38f4ca9c75548cff6486d4fac1472b91902",
+      "capturedAt": "2026-10-29T20:54:12.233Z",
       "routeCount": 689
     },
     "status": "PASS"
@@ -19725,7 +19725,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -19842,7 +19843,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -19961,7 +19963,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -20080,7 +20083,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -20200,7 +20204,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -20315,7 +20320,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -20432,7 +20438,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -20545,7 +20552,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -20639,6 +20647,7 @@
       "data": {
         "reads": [
           "actors",
+          "attachments",
           "greenfield_comment_poll_votes",
           "greenfield_comment_reactions",
           "greenfield_comments",
@@ -20679,7 +20688,8 @@
           "scripts/verify-phase7c-social-core.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/phase6s.social.test.ts"
+          "services/greenfield-api/tests/phase6s.social.test.ts",
+          "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
       "automatedTest": true,
@@ -46591,6 +46601,7 @@
       "data": {
         "reads": [
           "actors",
+          "attachments",
           "greenfield_comment_poll_votes",
           "greenfield_comment_reactions",
           "greenfield_comments",
@@ -61026,13 +61037,19 @@
       ],
       "migrationIntroduced": "057_post04_attachment_platform.sql",
       "sourceReads": [
-        "services/greenfield-api/src/domains/attachments/service.ts"
+        "services/greenfield-api/src/domains/attachments/service.ts",
+        "services/greenfield-worker/src/media/cleanup.ts"
       ],
       "sourceWrites": [
-        "services/greenfield-api/src/domains/attachments/service.ts"
+        "services/greenfield-api/src/domains/attachments/service.ts",
+        "services/greenfield-worker/src/media/cleanup.ts"
       ],
-      "jobReads": [],
-      "jobWrites": [],
+      "jobReads": [
+        "services/greenfield-worker/src/media/cleanup.ts"
+      ],
+      "jobWrites": [
+        "services/greenfield-worker/src/media/cleanup.ts"
+      ],
       "routeReads": [
         "PUT /v1/attachments/uploads/:uploadId/content"
       ],
@@ -61209,28 +61226,37 @@
         "services/greenfield-api/src/app/register-attachment-routes.ts",
         "services/greenfield-api/src/domains/attachments/service.ts",
         "services/greenfield-api/src/domains/comments/media.ts",
+        "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/discovery/repository.ts",
         "services/greenfield-api/src/domains/posts/repository.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
         "services/greenfield-api/src/domains/stories/service.ts",
-        "services/greenfield-api/src/modules/media-binding-service.ts"
+        "services/greenfield-api/src/modules/media-binding-service.ts",
+        "services/greenfield-worker/src/media/cleanup.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/domains/attachments/service.ts",
+        "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
         "services/greenfield-api/src/domains/stories/service.ts",
-        "services/greenfield-api/src/modules/media-binding-service.ts"
+        "services/greenfield-api/src/modules/media-binding-service.ts",
+        "services/greenfield-worker/src/media/cleanup.ts"
       ],
-      "jobReads": [],
-      "jobWrites": [],
+      "jobReads": [
+        "services/greenfield-worker/src/media/cleanup.ts"
+      ],
+      "jobWrites": [
+        "services/greenfield-worker/src/media/cleanup.ts"
+      ],
       "routeReads": [
         "DELETE /v1/attachments/:attachmentId",
         "GET /v1/attachments/:attachmentId",
         "GET /v1/attachments/:attachmentId/content",
         "PUT /v1/attachments/uploads/:uploadId/content",
+        "POST /v1/comments/:commentId/replies",
         "GET /v1/discover",
         "GET /v1/feed/home",
         "GET /v1/feed/profile/:profileId",
@@ -61238,6 +61264,7 @@
         "POST /v1/modules/:moduleId/records/:collection/:recordId/media",
         "POST /v1/posts",
         "GET /v1/posts/:postId",
+        "POST /v1/posts/:postId/comments",
         "DELETE /v1/posts/:postId/like",
         "POST /v1/posts/:postId/like",
         "DELETE /v1/posts/:postId/repost",
@@ -66458,6 +66485,7 @@
         "services/greenfield-api/src/account-data/service.ts",
         "services/greenfield-api/src/app/register-attachment-routes.ts",
         "services/greenfield-api/src/app/register-composer-routes.ts",
+        "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/moderation/repository.ts",
         "services/greenfield-api/src/domains/policy/engine.ts",
@@ -82069,6 +82097,7 @@
       "migrationIntroduced": "069_module_platform_media_sharing.sql",
       "sourceReads": [
         "services/greenfield-api/src/app/register-attachment-routes.ts",
+        "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/modules/media-binding-service.ts"
       ],
       "sourceWrites": [
@@ -91706,6 +91735,7 @@
       "sourceReads": [
         "services/greenfield-api/src/app/register-attachment-routes.ts",
         "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
+        "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/domains/moderation/repository.ts",
         "services/greenfield-api/src/domains/stories/service.ts",
         "services/greenfield-api/src/settings-v2/service.ts"
@@ -96897,6 +96927,7 @@
       "migrationIntroduced": "057_post04_attachment_platform.sql",
       "sourceReads": [
         "services/greenfield-api/src/app/register-attachment-routes.ts",
+        "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/domains/posts/repository.ts"
       ],
       "sourceWrites": [
@@ -97930,6 +97961,7 @@
       "migrationIntroduced": "058_post05_profile_media.sql",
       "sourceReads": [
         "services/greenfield-api/src/app/register-attachment-routes.ts",
+        "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts"
       ],
       "sourceWrites": [

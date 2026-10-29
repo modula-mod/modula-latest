@@ -20,7 +20,7 @@
 3. Metadata and state are stored in PostgreSQL; bytes are atomically placed under the media root.
 4. Profile avatar/cover binding requires the same owner, ready state and image kind (`services/greenfield-api/src/domains/profiles/writes.ts:292`). Post content accepts up to ten ready owned attachments.
 5. `GET /v1/attachments/:attachmentId/content` resolves public/private/owner access and streams the file through nginx.
-6. Delete/cleanup support exists in the service, but no production scheduler invokes orphan cleanup.
+6. Candidate worker code schedules bounded orphan/expired-session cleanup with metrics and a dry-run default. The captured production revision predates it, so delete-mode activation remains deployment-gated.
 
 Current attachment states: ready=27, failed=1, created=2, expired=1. Ready linkage: 16/27 linked, 11 orphan candidates.
 
@@ -29,7 +29,7 @@ Current attachment states: ready=27, failed=1, created=2, expired=1. Ready linka
 | Class | Bytes | Metadata | URL and policy | Deletion/durability |
 | --- | --- | --- | --- | --- |
 | Avatar/cover | canonical attachment bytes or external URL | profile_media (cover=1, avatar=1) | canonical attachment URL is policy-checked; PATCH also accepts public HTTPS URL | binding removal does not establish object garbage collection |
-| Post attachments | attachment store | post_content (pdf=2, audio=1, image=8, video=2, document=1) | viewer visibility follows post plus attachment policy | soft post deletion; orphan cleanup unscheduled |
+| Post attachments | attachment store | post_content (pdf=2, audio=1, image=8, video=2, document=1) | viewer visibility follows post plus attachment policy | soft post deletion; candidate cleanup is dry-run by default and production-gated |
 | Legacy post image | posts directory | post_media count=16 | `/v1/media/:mediaFile`; public path follows post policy | 13/16 active rows have a URL; 20 MiB app limit conflicts with 1 MiB nginx default |
 | Stories | stories directory | story_items count=17 | `/v1/media/stories/:mediaFile` with story visibility | 17 inactive/deleted rows and 17 files remain |
 | Module packages | PostgreSQL release blob/ref metadata | 26/41 release blobs | public artifact route when blob is available; digest checked | immutable metadata, incomplete byte coverage |
@@ -39,6 +39,6 @@ Current attachment states: ready=27, failed=1, created=2, expired=1. Ready linka
 
 - Database paths can be non-servable: 7 module presentation records lack blobs; 3 active legacy post-media rows lack URLs.
 - Profile media has two competing trust/ownership paths: attachment binding and arbitrary public HTTPS URL.
-- Story upload checks declared labels/base64 length but does not reuse decoded-byte magic validation; deleting a story does not remove its file.
+- Candidate story publishing uses verified attachment bytes, size/signature checks and deletion cleanup; legacy inline upload remains compatibility-only. Captured production predates this candidate.
 - nginx is the delivery path; there is no separate CDN/object-store authorization layer. Registry assets alone receive immutable cache handling.
 - The attachment content endpoint returns 403 for an existing private object and 404 for unknown, exposing existence to a caller who learns an identifier.

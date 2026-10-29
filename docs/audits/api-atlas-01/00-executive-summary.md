@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 484 application / 689 runtime method routes
-Route evidence: local-candidate-runtime for feature branch phase/greenfield-functional-parity-01; not deployed
+Route evidence: local-candidate-runtime for feature branch phase/greenfield-functional-parity-media-cleanup; not deployed
 Public routes: 84
 Authenticated routes: 301
 Admin/internal routes: 99
@@ -78,7 +78,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 
 ### Missing for Posts/Media
 
-- Explicit link/poll contracts, aligned public upload limits, scheduled orphan/expired-file cleanup, and host-loss recovery/object replication.
+- Explicit link/poll contracts, aligned public upload limits, controlled activation of the candidate orphan/expired-file cleanup worker, and host-loss recovery/object replication.
 
 ### Missing for Product Hub
 
