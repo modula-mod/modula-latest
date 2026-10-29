@@ -5,6 +5,7 @@ import type {ModulaDb} from '../database/client.js'
 import {AttachmentService} from '../domains/attachments/service.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
+import {StoryService, storyItemLiveCutoff} from '../domains/stories/service.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {applyBrowserVisibleMediaHeaders} from './media-response.js'
@@ -31,6 +32,7 @@ export async function registerAttachmentRoutes(
   const attachments = new AttachmentService(db, config)
   const posts = new PostRepository(db, config.publicApiUrl)
   const profiles = new ProfileRepository(db)
+  const stories = new StoryService(db, config)
   const moduleAccess = new GreenfieldModuleRuntimeAccessService(db, config)
   const {writeConfig, feedConfig, mutationsAllowed} = options
 
@@ -118,6 +120,25 @@ export async function registerAttachmentRoutes(
         .limit(5).execute()
       for (const binding of commentBindings) {
         if (await posts.getById(binding.post_id, request.auth?.actorId ?? null)) { allowed = true; break }
+      }
+    }
+    if (!allowed) {
+      // Story media follows the story group's visibility and block policy. An
+      // attachment URL alone never grants access to private story content.
+      const storyBinding = await db.selectFrom('greenfield_story_items as item')
+        .innerJoin('greenfield_story_groups as group', 'group.group_id', 'item.group_id')
+        .select(['group.owner_actor_id', 'group.visibility', 'group.expires_at', 'group.deleted_at'])
+        .where('item.attachment_id', '=', attachmentId)
+        .where('item.status', '=', 'ready')
+        .where('item.deleted_at', 'is', null)
+        .where('item.created_at', '>', storyItemLiveCutoff())
+        .executeTakeFirst()
+      if (storyBinding && !storyBinding.deleted_at && storyBinding.expires_at > new Date()) {
+        allowed = await stories.canViewGroup(
+          request.auth?.actorId ?? null,
+          storyBinding.owner_actor_id,
+          storyBinding.visibility,
+        )
       }
     }
     if (!allowed && request.auth?.accountId) {

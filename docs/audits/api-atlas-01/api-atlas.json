@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "greenfield-gubic-foundation-01",
-      "sourceSha256": "38a560a14bff735f3632953dfcee58a82317d17ebab3ae4b289cb287ccd88548",
-      "capturedAt": "2026-10-29T10:11:35.727Z",
+      "branch": "phase/greenfield-functional-parity-01",
+      "sourceSha256": "7f6ce57f5290e6c24593cc9ba9b4be8aeeca2b4c21bebc735ad723c241980185",
+      "capturedAt": "2026-10-29T17:58:11.864Z",
       "routeCount": 689
     },
     "status": "PASS"
@@ -14042,7 +14042,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 79
+        "line": 81
       },
       "handler": "inline",
       "controllerServices": [
@@ -14130,10 +14130,12 @@
         "server": [
           "services/greenfield-api/src/domains/attachments/service.ts",
           "services/greenfield-api/src/domains/comments/media.ts",
-          "services/greenfield-api/src/domains/profiles/writes.ts"
+          "services/greenfield-api/src/domains/profiles/writes.ts",
+          "services/greenfield-api/src/domains/stories/service.ts"
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
@@ -14156,7 +14158,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 68
+        "line": 70
       },
       "handler": "inline",
       "controllerServices": [
@@ -14241,10 +14243,12 @@
         "server": [
           "services/greenfield-api/src/domains/attachments/service.ts",
           "services/greenfield-api/src/domains/comments/media.ts",
-          "services/greenfield-api/src/domains/profiles/writes.ts"
+          "services/greenfield-api/src/domains/profiles/writes.ts",
+          "services/greenfield-api/src/domains/stories/service.ts"
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
@@ -14267,7 +14271,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 92
+        "line": 94
       },
       "handler": "inline",
       "controllerServices": [
@@ -14277,7 +14281,8 @@
         "moduleAccess.enforceCapability",
         "moduleAccess.resolve",
         "posts.getById",
-        "profiles.getById"
+        "profiles.getById",
+        "stories.canViewGroup"
       ],
       "authentication": "none",
       "authorization": {
@@ -14296,7 +14301,7 @@
         "ownership": {
           "rule": "authenticated account id is passed into the service/repository scope",
           "accountScoped": true,
-          "actorScoped": false,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
           "evidenceStrength": "route-handler"
@@ -14347,6 +14352,8 @@
           "greenfield_module_versions",
           "greenfield_quote_posts",
           "greenfield_reactions",
+          "greenfield_story_groups",
+          "greenfield_story_items",
           "post_content",
           "post_media",
           "post_reposts",
@@ -14366,6 +14373,8 @@
           "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
           "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
           "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
           "services/greenfield-api/src/modules/runtime-access.ts#enforceCapability",
           "services/greenfield-api/src/modules/runtime-access.ts#resolve"
         ],
@@ -14383,10 +14392,12 @@
         "server": [
           "services/greenfield-api/src/domains/attachments/service.ts",
           "services/greenfield-api/src/domains/comments/media.ts",
-          "services/greenfield-api/src/domains/profiles/writes.ts"
+          "services/greenfield-api/src/domains/profiles/writes.ts",
+          "services/greenfield-api/src/domains/stories/service.ts"
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
@@ -14409,7 +14420,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 37
+        "line": 39
       },
       "handler": "inline",
       "controllerServices": [
@@ -14497,6 +14508,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
@@ -14519,7 +14531,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 50
+        "line": 52
       },
       "handler": "inline",
       "controllerServices": [
@@ -14618,6 +14630,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
       },
@@ -32652,7 +32665,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 133
+        "line": 137
       },
       "handler": "inline",
       "controllerServices": [
@@ -56444,6 +56457,8 @@
       ],
       "data": {
         "reads": [
+          "actors",
+          "attachments",
           "blocks",
           "follows",
           "greenfield_story_groups",
@@ -56452,12 +56467,14 @@
           "profiles"
         ],
         "writes": [
+          "attachments",
           "greenfield_story_groups",
           "greenfield_story_items"
         ],
         "evidence": [
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
           "services/greenfield-api/src/domains/stories/service.ts#create",
+          "services/greenfield-api/src/domains/stories/service.ts#findIdempotent",
           "services/greenfield-api/src/domains/stories/service.ts#getGroup",
           "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
         ],
@@ -56616,7 +56633,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 121
+        "line": 125
       },
       "handler": "inline",
       "controllerServices": [
@@ -56683,10 +56700,12 @@
       ],
       "data": {
         "reads": [
+          "attachments",
           "greenfield_story_groups",
           "greenfield_story_items"
         ],
         "writes": [
+          "attachments",
           "greenfield_story_groups",
           "greenfield_story_items"
         ],
@@ -56730,7 +56749,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 109
+        "line": 113
       },
       "handler": "inline",
       "controllerServices": [
@@ -58020,6 +58039,7 @@
         "POST /v1/posts/:postId/comments",
         "POST /v1/posts/:postId/quote",
         "PATCH /v1/profiles/me",
+        "POST /v1/stories",
         "GET /v1/stories/rail"
       ],
       "routeWrites": [
@@ -61193,6 +61213,7 @@
         "services/greenfield-api/src/domains/posts/repository.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
+        "services/greenfield-api/src/domains/stories/service.ts",
         "services/greenfield-api/src/modules/media-binding-service.ts"
       ],
       "sourceWrites": [
@@ -61200,6 +61221,7 @@
         "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
+        "services/greenfield-api/src/domains/stories/service.ts",
         "services/greenfield-api/src/modules/media-binding-service.ts"
       ],
       "jobReads": [],
@@ -61227,7 +61249,9 @@
         "POST /v1/profiles/me/avatar",
         "DELETE /v1/profiles/me/cover",
         "POST /v1/profiles/me/cover",
-        "GET /v1/reels"
+        "GET /v1/reels",
+        "POST /v1/stories",
+        "DELETE /v1/stories/items/:itemId"
       ],
       "routeWrites": [
         "DELETE /v1/attachments/:attachmentId",
@@ -61240,7 +61264,9 @@
         "DELETE /v1/profiles/me/avatar",
         "POST /v1/profiles/me/avatar",
         "DELETE /v1/profiles/me/cover",
-        "POST /v1/profiles/me/cover"
+        "POST /v1/profiles/me/cover",
+        "POST /v1/stories",
+        "DELETE /v1/stories/items/:itemId"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -91543,6 +91569,7 @@
       ],
       "migrationIntroduced": "028_phase7f_stories.sql",
       "sourceReads": [
+        "services/greenfield-api/src/app/register-attachment-routes.ts",
         "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
         "services/greenfield-api/src/domains/moderation/repository.ts",
         "services/greenfield-api/src/domains/stories/service.ts",
@@ -91556,6 +91583,7 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [
+        "GET /v1/attachments/:attachmentId/content",
         "GET /v1/creator/insights",
         "GET /v1/media/stories/:mediaFile",
         "POST /v1/reports",
@@ -91676,6 +91704,7 @@
       ],
       "migrationIntroduced": "028_phase7f_stories.sql",
       "sourceReads": [
+        "services/greenfield-api/src/app/register-attachment-routes.ts",
         "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
         "services/greenfield-api/src/domains/moderation/repository.ts",
         "services/greenfield-api/src/domains/stories/service.ts",
@@ -91688,6 +91717,7 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [
+        "GET /v1/attachments/:attachmentId/content",
         "GET /v1/creator/insights",
         "GET /v1/media/stories/:mediaFile",
         "POST /v1/reports",

@@ -6808,7 +6808,7 @@
         "ownership": {
           "rule": "authenticated account id is passed into the service/repository scope",
           "accountScoped": true,
-          "actorScoped": false,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
           "evidenceStrength": "route-handler"
@@ -6817,7 +6817,7 @@
       "ownership": {
         "rule": "authenticated account id is passed into the service/repository scope",
         "accountScoped": true,
-        "actorScoped": false,
+        "actorScoped": true,
         "workspaceScoped": false,
         "parameterizedResource": true,
         "evidenceStrength": "route-handler"

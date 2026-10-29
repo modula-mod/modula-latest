@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-10-29T10:11:35.727Z for branch `greenfield-gubic-foundation-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-29T17:58:11.864Z for branch `phase/greenfield-functional-parity-01`; this does not claim deployment.
 
 - Runtime method routes: 689
 - Application routes: 484
@@ -153,11 +153,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | AT Protocol | POST | `/v1/atproto/oauth/start` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2203` | candidate-registered-not-production-probed |
 | AT Protocol | GET | `/v1/atproto/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2294` | candidate-registered-not-production-probed |
 | AT Protocol | PATCH | `/v1/atproto/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2301` | candidate-registered-not-production-probed |
-| Media | DELETE | `/v1/attachments/:attachmentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:79` | candidate-registered-not-production-probed |
-| Media | GET | `/v1/attachments/:attachmentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:68` | candidate-registered-not-production-probed |
-| Media | GET | `/v1/attachments/:attachmentId/content` | PUBLIC | none | `services/greenfield-api/src/app/register-attachment-routes.ts:92` | candidate-registered-not-production-probed |
-| Media | POST | `/v1/attachments/uploads` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:37` | candidate-registered-not-production-probed |
-| Media | PUT | `/v1/attachments/uploads/:uploadId/content` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:50` | candidate-registered-not-production-probed |
+| Media | DELETE | `/v1/attachments/:attachmentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:81` | candidate-registered-not-production-probed |
+| Media | GET | `/v1/attachments/:attachmentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:70` | candidate-registered-not-production-probed |
+| Media | GET | `/v1/attachments/:attachmentId/content` | PUBLIC | none | `services/greenfield-api/src/app/register-attachment-routes.ts:94` | candidate-registered-not-production-probed |
+| Media | POST | `/v1/attachments/uploads` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:39` | candidate-registered-not-production-probed |
+| Media | PUT | `/v1/attachments/uploads/:uploadId/content` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-attachment-routes.ts:52` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/apple/link` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:732` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/apple/link/options` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:722` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/auth/apple/status` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:719` | candidate-registered-not-production-probed |
@@ -324,7 +324,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/me/verification/applications` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:83` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/me/verification/applications/:applicationId/appeals` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:89` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2154` | candidate-registered-not-production-probed |
-| Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:133` | candidate-registered-not-production-probed |
+| Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:137` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:106` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:116` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:128` | candidate-registered-not-production-probed |
@@ -507,8 +507,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/stickers/packs` | PUBLIC | none | `services/greenfield-api/src/app/register-composer-routes.ts:67` | candidate-registered-not-production-probed |
 | Media | POST | `/v1/stories` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:79` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/stories/:groupId` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:67` | candidate-registered-not-production-probed |
-| Media | DELETE | `/v1/stories/items/:itemId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:121` | candidate-registered-not-production-probed |
-| Media | POST | `/v1/stories/items/:itemId/viewed` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:109` | candidate-registered-not-production-probed |
+| Media | DELETE | `/v1/stories/items/:itemId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:125` | candidate-registered-not-production-probed |
+| Media | POST | `/v1/stories/items/:itemId/viewed` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:113` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/stories/rail` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:61` | candidate-registered-not-production-probed |
 | Support | GET | `/v1/support/cases` | AUTHENTICATED | none | `services/greenfield-api/src/support/routes.ts:53` | candidate-registered-not-production-probed |
 | Support | POST | `/v1/support/cases` | AUTHENTICATED | none | `services/greenfield-api/src/support/routes.ts:54` | candidate-registered-not-production-probed |
@@ -5170,7 +5170,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/attachments/:attachmentId`
 - Public URL: `https://api.modula.digital/v1/attachments/:attachmentId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:79`
+- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:81`
 - Handler: inline
 - Controller/service calls: `attachments.removeOrphan`
 - Authentication: legacy or bridged bearer session
@@ -5193,7 +5193,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -5209,7 +5209,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/attachments/:attachmentId`
 - Public URL: `https://api.modula.digital/v1/attachments/:attachmentId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:68`
+- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:70`
 - Handler: inline
 - Controller/service calls: `attachments.status`
 - Authentication: legacy or bridged bearer session
@@ -5232,7 +5232,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -5248,9 +5248,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/attachments/:attachmentId/content`
 - Public URL: `https://api.modula.digital/v1/attachments/:attachmentId/content`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:92`
+- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:94`
 - Handler: inline
-- Controller/service calls: `attachments.openStored`, `db.selectFrom`, `eb.or`, `moduleAccess.enforceCapability`, `moduleAccess.resolve`, `posts.getById`, `profiles.getById`
+- Controller/service calls: `attachments.openStored`, `db.selectFrom`, `eb.or`, `moduleAccess.enforceCapability`, `moduleAccess.resolve`, `posts.getById`, `profiles.getById`, `stories.canViewGroup`
 - Authentication: none
 - Authorization: PUBLIC
 - Ownership rule: authenticated account id is passed into the service/repository scope
@@ -5264,14 +5264,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
-- Database reads: `attachments`, `blocks`, `follows`, `greenfield_comments`, `greenfield_extension_installations`, `greenfield_module_permission_reviews`, `greenfield_module_record_media_bindings`, `greenfield_module_record_shares`, `greenfield_module_records`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_quote_posts`, `greenfield_reactions`, `post_content`, `post_media`, `post_reposts`, `post_saves`, `posts`, `profile_links`, `profile_media`, `profiles`
+- Database reads: `attachments`, `blocks`, `follows`, `greenfield_comments`, `greenfield_extension_installations`, `greenfield_module_permission_reviews`, `greenfield_module_record_media_bindings`, `greenfield_module_record_shares`, `greenfield_module_records`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_quote_posts`, `greenfield_reactions`, `greenfield_story_groups`, `greenfield_story_items`, `post_content`, `post_media`, `post_reposts`, `post_saves`, `posts`, `profile_links`, `profile_media`, `profiles`
 - Database writes: none observed
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`, `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -5287,7 +5287,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/attachments/uploads`
 - Public URL: `https://api.modula.digital/v1/attachments/uploads`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:37`
+- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:39`
 - Handler: inline
 - Controller/service calls: `attachments.createUpload`, `log.info`
 - Authentication: legacy or bridged bearer session
@@ -5310,7 +5310,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -5326,7 +5326,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/attachments/uploads/:uploadId/content`
 - Public URL: `https://api.modula.digital/v1/attachments/uploads/:uploadId/content`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:50`
+- Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:52`
 - Handler: inline
 - Controller/service calls: `attachments.upload`, `log.info`, `log.warn`
 - Authentication: legacy or bridged bearer session
@@ -5349,7 +5349,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11839,7 +11839,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/media/stories/:mediaFile`
 - Public URL: `https://api.modula.digital/v1/media/stories/:mediaFile`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:133`
+- Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:137`
 - Handler: inline
 - Controller/service calls: `i.exec`, `mediaFile.split`, `stories.canViewGroup`
 - Authentication: none
@@ -18914,8 +18914,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `follows`, `greenfield_story_groups`, `greenfield_story_items`, `greenfield_story_views`, `profiles`
-- Database writes: `greenfield_story_groups`, `greenfield_story_items`
+- Database reads: `actors`, `attachments`, `blocks`, `follows`, `greenfield_story_groups`, `greenfield_story_items`, `greenfield_story_views`, `profiles`
+- Database writes: `attachments`, `greenfield_story_groups`, `greenfield_story_items`
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`
 - Events produced: none observed
 - Jobs produced: none observed
@@ -18976,7 +18976,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/stories/items/:itemId`
 - Public URL: `https://api.modula.digital/v1/stories/items/:itemId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:121`
+- Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:125`
 - Handler: inline
 - Controller/service calls: `stories.deleteItem`
 - Authentication: legacy or bridged bearer session
@@ -18992,8 +18992,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_story_groups`, `greenfield_story_items`
-- Database writes: `greenfield_story_groups`, `greenfield_story_items`
+- Database reads: `attachments`, `greenfield_story_groups`, `greenfield_story_items`
+- Database writes: `attachments`, `greenfield_story_groups`, `greenfield_story_items`
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`
 - Events produced: none observed
 - Jobs produced: none observed
@@ -19015,7 +19015,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/stories/items/:itemId/viewed`
 - Public URL: `https://api.modula.digital/v1/stories/items/:itemId/viewed`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:109`
+- Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:113`
 - Handler: inline
 - Controller/service calls: `stories.markViewed`
 - Authentication: legacy or bridged bearer session

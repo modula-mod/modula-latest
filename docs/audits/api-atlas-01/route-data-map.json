@@ -1897,6 +1897,8 @@
       "greenfield_module_versions",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "greenfield_story_groups",
+      "greenfield_story_items",
       "post_content",
       "post_media",
       "post_reposts",
@@ -1919,6 +1921,8 @@
       "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
       "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
       "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
       "services/greenfield-api/src/modules/runtime-access.ts#enforceCapability",
       "services/greenfield-api/src/modules/runtime-access.ts#resolve"
     ]
@@ -8016,6 +8020,8 @@
   },
   "POST /v1/stories": {
     "reads": [
+      "actors",
+      "attachments",
       "blocks",
       "follows",
       "greenfield_story_groups",
@@ -8024,6 +8030,7 @@
       "profiles"
     ],
     "writes": [
+      "attachments",
       "greenfield_story_groups",
       "greenfield_story_items"
     ],
@@ -8033,6 +8040,7 @@
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
       "services/greenfield-api/src/domains/stories/service.ts#create",
+      "services/greenfield-api/src/domains/stories/service.ts#findIdempotent",
       "services/greenfield-api/src/domains/stories/service.ts#getGroup",
       "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
     ]
@@ -8058,10 +8066,12 @@
   },
   "DELETE /v1/stories/items/:itemId": {
     "reads": [
+      "attachments",
       "greenfield_story_groups",
       "greenfield_story_items"
     ],
     "writes": [
+      "attachments",
       "greenfield_story_groups",
       "greenfield_story_items"
     ],

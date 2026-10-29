@@ -138,13 +138,18 @@ export class AttachmentService {
       if (bytes !== Number(session.expected_byte_size)) throw domainError('Uploaded byte count does not match session', 'VALIDATION_FAILED')
       const digest = hash.digest('hex')
       if (session.expected_checksum && digest !== session.expected_checksum) throw domainError('Attachment checksum mismatch', 'VALIDATION_FAILED')
-      const prefix = await readPrefix(tempPath)
-      verifySignature(definition.mimeType, prefix)
+      const inspectionBytes = await readPrefix(tempPath, 64 * 1024)
+      verifyAttachmentSignature(definition.mimeType, inspectionBytes)
+      const dimensions = inspectImageDimensions(definition.mimeType, inspectionBytes)
+      if (['image/jpeg', 'image/png', 'image/webp'].includes(definition.mimeType) && !dimensions) {
+        throw domainError('Image dimensions are missing or outside policy', 'VALIDATION_FAILED')
+      }
       await rename(tempPath, finalPath)
       const completedAt = new Date()
       await this.db.transaction().execute(async trx => {
         await trx.updateTable('attachments').set({
-          byte_size: String(bytes), checksum: digest, storage_key: finalKey, status: 'ready', updated_at: completedAt,
+          byte_size: String(bytes), checksum: digest, storage_key: finalKey, status: 'ready',
+          width: dimensions?.width ?? null, height: dimensions?.height ?? null, updated_at: completedAt,
         }).where('attachment_id', '=', attachment.attachment_id).execute()
         await trx.updateTable('attachment_upload_sessions').set({
           state: 'completed', completed_at: completedAt, updated_at: completedAt,
@@ -252,10 +257,10 @@ export function toDto(row: any, publicApiUrl: string): AttachmentDto {
   }
 }
 
-async function readPrefix(path: string): Promise<Buffer> {
+async function readPrefix(path: string, byteCount = 32): Promise<Buffer> {
   const handle = await open(path, 'r')
   try {
-    const buffer = Buffer.alloc(32)
+    const buffer = Buffer.alloc(byteCount)
     const result = await handle.read(buffer, 0, buffer.length, 0)
     return buffer.subarray(0, result.bytesRead)
   } finally {
@@ -263,7 +268,7 @@ async function readPrefix(path: string): Promise<Buffer> {
   }
 }
 
-function verifySignature(mime: string, bytes: Buffer): void {
+export function verifyAttachmentSignature(mime: string, bytes: Buffer): void {
   const ascii = bytes.toString('ascii')
   const hex = bytes.toString('hex')
   const isoBrand = ascii.slice(8, 12)
@@ -286,6 +291,60 @@ function verifySignature(mime: string, bytes: Buffer): void {
     ((mime === 'text/rtf' || mime === 'application/rtf') && ascii.startsWith('{\\rtf')) ||
     (mime === 'text/plain' && !bytes.includes(0))
   if (!ok) throw domainError('Attachment bytes do not match declared MIME type', 'VALIDATION_FAILED')
+}
+
+/**
+ * Extract image dimensions from the uploaded bytes rather than trusting client
+ * metadata. The formats here cover every browser/native raster format whose
+ * dimensions can be obtained without a platform codec. HEIC remains valid but
+ * its dimensions stay unset until a media processor is available.
+ */
+export function inspectImageDimensions(mime: string, bytes: Buffer): {width: number; height: number} | null {
+  if (mime === 'image/png' && bytes.length >= 24 && bytes.subarray(12, 16).toString('ascii') === 'IHDR') {
+    return validDimensions(bytes.readUInt32BE(16), bytes.readUInt32BE(20))
+  }
+  if (mime === 'image/jpeg') {
+    let offset = 2
+    const startOfFrame = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf])
+    while (offset + 4 <= bytes.length) {
+      if (bytes[offset] !== 0xff) { offset += 1; continue }
+      while (offset < bytes.length && bytes[offset] === 0xff) offset += 1
+      const marker = bytes[offset]
+      offset += 1
+      if (marker === undefined || marker === 0xd9 || marker === 0xda) break
+      if (marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) continue
+      if (offset + 2 > bytes.length) break
+      const length = bytes.readUInt16BE(offset)
+      if (length < 2 || offset + length > bytes.length) break
+      if (startOfFrame.has(marker) && length >= 7) {
+        return validDimensions(bytes.readUInt16BE(offset + 5), bytes.readUInt16BE(offset + 3))
+      }
+      offset += length
+    }
+  }
+  if (mime === 'image/webp' && bytes.length >= 30) {
+    const chunk = bytes.subarray(12, 16).toString('ascii')
+    if (chunk === 'VP8X') {
+      const width = 1 + bytes.readUIntLE(24, 3)
+      const height = 1 + bytes.readUIntLE(27, 3)
+      return validDimensions(width, height)
+    }
+    if (chunk === 'VP8 ' && bytes.subarray(23, 26).toString('hex') === '9d012a') {
+      return validDimensions(bytes.readUInt16LE(26) & 0x3fff, bytes.readUInt16LE(28) & 0x3fff)
+    }
+    if (chunk === 'VP8L' && bytes[20] === 0x2f && bytes.length >= 25) {
+      const width = 1 + (bytes[21] ?? 0) + (((bytes[22] ?? 0) & 0x3f) << 8)
+      const height = 1 + (((bytes[22] ?? 0) & 0xc0) >> 6) + ((bytes[23] ?? 0) << 2) + (((bytes[24] ?? 0) & 0x0f) << 10)
+      return validDimensions(width, height)
+    }
+  }
+  return null
+}
+
+function validDimensions(width: number, height: number): {width: number; height: number} | null {
+  return Number.isSafeInteger(width) && Number.isSafeInteger(height) && width > 0 && height > 0 && width <= 100_000 && height <= 100_000
+    ? {width, height}
+    : null
 }
 
 function normalizeChecksum(value: unknown): string | null {
