@@ -213,6 +213,7 @@ jobs:
         run: >-
           CI=true pnpm --filter @modula/greenfield-worker exec vitest run
           tests/phase7e.notifications.test.ts
+          tests/media-cleanup.test.ts
           tests/module-trust-guard.test.ts
           tests/legacy-installation-data-migration.test.ts
           tests/phase7e.vault-notes-search-projector.test.ts

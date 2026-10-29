@@ -131,6 +131,8 @@ services:
       MODULA_RELEASE_ID: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
       MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-076_greenfield_premium_entitlements}
       MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
+    volumes:
+      - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     depends_on:

@@ -11,6 +11,11 @@ export interface MetricsSnapshot {
   outboxDrained: number
   ingestRuns: number
   ingestErrors: number
+  mediaCleanupRuns: number
+  mediaCleanupErrors: number
+  mediaCleanupExpiredSessions: number
+  mediaCleanupRemovedAttachments: number
+  mediaCleanupDryRunCandidates: number
 }
 
 class WorkerMetrics {
@@ -22,6 +27,11 @@ class WorkerMetrics {
     outboxDrained: 0,
     ingestRuns: 0,
     ingestErrors: 0,
+    mediaCleanupRuns: 0,
+    mediaCleanupErrors: 0,
+    mediaCleanupExpiredSessions: 0,
+    mediaCleanupRemovedAttachments: 0,
+    mediaCleanupDryRunCandidates: 0,
   }
 
   increment(key: keyof MetricsSnapshot, by = 1): void {

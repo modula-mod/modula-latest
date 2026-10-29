@@ -1,4 +1,6 @@
+import {resolve} from 'node:path'
 import {z} from 'zod'
+import {DEFAULT_ATTACHMENT_ORPHAN_RETENTION_MS} from './media/cleanup.js'
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -20,6 +22,12 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  MODULA_MEDIA_ROOT: z.string().min(1).optional(),
+  MODULA_WORKER_MEDIA_CLEANUP_MODE: z.enum(['disabled', 'dry-run', 'delete']).default('dry-run'),
+  MODULA_WORKER_MEDIA_CLEANUP_INTERVAL_MS: z.coerce.number().int().min(60_000).default(3_600_000),
+  MODULA_WORKER_MEDIA_CLEANUP_RETENTION_MS: z.coerce.number().int().min(86_400_000).default(DEFAULT_ATTACHMENT_ORPHAN_RETENTION_MS),
+  MODULA_WORKER_MEDIA_CLEANUP_ACTIVE_UPLOAD_GRACE_MS: z.coerce.number().int().min(60_000).default(3_600_000),
+  MODULA_WORKER_MEDIA_CLEANUP_BATCH_SIZE: z.coerce.number().int().min(1).max(1_000).default(200),
   MODULA_MAIL_TRANSPORT: z.enum(['disabled', 'log', 'smtp']).optional(),
   MODULA_MAIL_PROVISIONER_MODE: z.enum(['disabled', 'dry-run', 'hestia']).optional(),
   MODULA_MAIL_DOMAIN: z.string().min(1).default('modula.digital'),
@@ -90,6 +98,12 @@ export type WorkerConfig = {
   shutdownTimeoutMs: number
   ingestIntervalMs: number
   ingestEnabled: boolean
+  mediaRoot: string
+  mediaCleanupMode: 'disabled' | 'dry-run' | 'delete'
+  mediaCleanupIntervalMs: number
+  mediaCleanupRetentionMs: number
+  mediaCleanupActiveUploadGraceMs: number
+  mediaCleanupBatchSize: number
   mailTransport: 'disabled' | 'log' | 'smtp'
   mailProvisionerMode: 'disabled' | 'dry-run' | 'hestia'
   mailDomain: string
@@ -145,6 +159,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     refuse('GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES is only valid in development')
   }
   const mailTransport = raw.MODULA_MAIL_TRANSPORT ?? (environment === 'production' ? 'smtp' : 'disabled')
+  const mediaRoot = raw.MODULA_MEDIA_ROOT
+    ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media'
+      : environment === 'development' ? '.data/greenfield-media'
+        : '/var/lib/modula/greenfield-media')
   const mailProvisionerMode = raw.MODULA_MAIL_PROVISIONER_MODE ?? (environment === 'production' ? 'disabled' : 'dry-run')
   const mailRequired = raw.MODULA_MAIL_REQUIRED === true || environment === 'production'
   const smtpPort = raw.MODULA_SMTP_PORT ?? 587
@@ -201,6 +219,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     shutdownTimeoutMs: raw.MODULA_WORKER_SHUTDOWN_TIMEOUT_MS,
     ingestIntervalMs: raw.MODULA_WORKER_INGEST_INTERVAL_MS,
     ingestEnabled: Boolean(raw.MODULA_WORKER_INGEST_ENABLED),
+    mediaRoot: resolve(mediaRoot),
+    mediaCleanupMode: raw.MODULA_WORKER_MEDIA_CLEANUP_MODE,
+    mediaCleanupIntervalMs: raw.MODULA_WORKER_MEDIA_CLEANUP_INTERVAL_MS,
+    mediaCleanupRetentionMs: raw.MODULA_WORKER_MEDIA_CLEANUP_RETENTION_MS,
+    mediaCleanupActiveUploadGraceMs: raw.MODULA_WORKER_MEDIA_CLEANUP_ACTIVE_UPLOAD_GRACE_MS,
+    mediaCleanupBatchSize: raw.MODULA_WORKER_MEDIA_CLEANUP_BATCH_SIZE,
     mailTransport,
     mailProvisionerMode,
     mailDomain: raw.MODULA_MAIL_DOMAIN,

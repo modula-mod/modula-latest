@@ -147,13 +147,14 @@ export class AttachmentService {
       await rename(tempPath, finalPath)
       const completedAt = new Date()
       await this.db.transaction().execute(async trx => {
+        const completed = await trx.updateTable('attachment_upload_sessions').set({
+          state: 'completed', completed_at: completedAt, updated_at: completedAt,
+        }).where('upload_id', '=', uploadId).where('state', '=', 'uploading').executeTakeFirst()
+        if (completed.numUpdatedRows !== 1n) throw domainError('Upload session expired during transfer', 'CONFLICT')
         await trx.updateTable('attachments').set({
           byte_size: String(bytes), checksum: digest, storage_key: finalKey, status: 'ready',
           width: dimensions?.width ?? null, height: dimensions?.height ?? null, updated_at: completedAt,
         }).where('attachment_id', '=', attachment.attachment_id).execute()
-        await trx.updateTable('attachment_upload_sessions').set({
-          state: 'completed', completed_at: completedAt, updated_at: completedAt,
-        }).where('upload_id', '=', uploadId).execute()
       })
       return await this.requireDto(accountId, attachment.attachment_id)
     } catch (error) {
@@ -190,37 +191,6 @@ export class AttachmentService {
     await this.db.deleteFrom('attachments').where('attachment_id', '=', attachmentId).execute()
   }
 
-  /// Bounded cleanup entry point for the Greenfield worker/operations scheduler.
-  /// Row locks arbitrate safely with post publication, which locks the same
-  /// attachment before binding it.
-  async cleanupStaleOrphans(now = new Date(), limit = 200): Promise<{expiredSessions: number; removedAttachments: number}> {
-    const expired = await this.db.selectFrom('attachment_upload_sessions').select(['upload_id', 'attachment_id'])
-      .where('expires_at', '<', now).where('state', 'in', ['created', 'uploading']).limit(limit).execute()
-    for (const session of expired) await this.markExpired(session.attachment_id, session.upload_id)
-
-    const cutoff = new Date(now.getTime() - AttachmentPolicy.orphanRetentionMs)
-    const candidates = await this.db.selectFrom('attachments').select('attachment_id')
-      .where('attached_at', 'is', null)
-      .where('created_at', '<', cutoff)
-      .where('status', 'in', ['ready', 'failed', 'expired', 'rejected'])
-      .limit(limit).execute()
-    let removedAttachments = 0
-    for (const candidate of candidates) {
-      const removed = await this.db.transaction().execute(async trx => {
-        const current = await trx.selectFrom('attachments').select(['storage_key', 'attached_at'])
-          .where('attachment_id', '=', candidate.attachment_id).forUpdate().executeTakeFirst()
-        if (!current || current.attached_at) return {deleted: false, storageKey: null as string | null}
-        await trx.deleteFrom('attachments').where('attachment_id', '=', candidate.attachment_id).execute()
-        return {deleted: true, storageKey: current.storage_key}
-      })
-      if (removed.storageKey && /^[0-9a-f-]{36}\.[a-z0-9]+$/i.test(removed.storageKey)) {
-        await rm(join(this.config.mediaRoot, 'attachments', removed.storageKey), {force: true})
-      }
-      if (removed.deleted) removedAttachments += 1
-    }
-    return {expiredSessions: expired.length, removedAttachments}
-  }
-
   private async requireDto(accountId: string, attachmentId: string): Promise<AttachmentDto> {
     const row = await this.db.selectFrom('attachments').selectAll().where('attachment_id', '=', attachmentId).executeTakeFirst()
     if (!row) throw domainError('Attachment not found', 'NOT_FOUND')
@@ -231,8 +201,12 @@ export class AttachmentService {
   private async markFailed(attachmentId: string, uploadId: string) {
     const now = new Date()
     await this.db.transaction().execute(async trx => {
-      await trx.updateTable('attachments').set({status: 'failed', updated_at: now}).where('attachment_id', '=', attachmentId).execute()
-      await trx.updateTable('attachment_upload_sessions').set({state: 'failed', updated_at: now}).where('upload_id', '=', uploadId).execute()
+      const failed = await trx.updateTable('attachment_upload_sessions').set({state: 'failed', updated_at: now})
+        .where('upload_id', '=', uploadId).where('state', '=', 'uploading').executeTakeFirst()
+      if (failed.numUpdatedRows === 1n) {
+        await trx.updateTable('attachments').set({status: 'failed', updated_at: now})
+          .where('attachment_id', '=', attachmentId).where('status', '=', 'uploading').execute()
+      }
     })
   }
 

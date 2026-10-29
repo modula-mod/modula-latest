@@ -36,7 +36,6 @@ const definitions: AttachmentDefinition[] = [
 
 export class AttachmentPolicy {
   static readonly uploadSessionTtlMs = 30 * 60 * 1000
-  static readonly orphanRetentionMs = 7 * 24 * 60 * 60 * 1000
   static readonly absoluteMaxBytes = 100 * MiB
 
   static definition(mimeType: string): AttachmentDefinition {

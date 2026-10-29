@@ -1,4 +1,5 @@
 import type {ModulaDb} from '../../database/client.js'
+import {sql} from 'kysely'
 
 import {findSticker} from './stickers.js'
 
@@ -40,11 +41,12 @@ export async function normalizeCommentMedia(db: ModulaDb, accountId: string, raw
   for (const entry of raw as any[]) {
     if (entry?.type === 'attachment' && typeof entry.attachmentId === 'string') {
       const row = await db.selectFrom('attachments')
-        .select(['attachment_id', 'owner_account_id', 'kind', 'mime_type', 'status', 'width', 'height', 'original_filename', 'byte_size'])
+        .select(['attachment_id', 'owner_account_id', 'kind', 'mime_type', 'status', 'attached_at', 'width', 'height', 'original_filename', 'byte_size'])
         .where('attachment_id', '=', entry.attachmentId)
         .executeTakeFirst()
       if (!row || row.owner_account_id !== accountId) throw invalid('Attachment not found')
       if (row.status !== 'ready') throw invalid('Attachment is not ready')
+      if (row.attached_at) throw invalid('Attachment is already bound')
       if (row.kind === 'unknown') throw invalid('Unsupported attachment type')
       const item: CommentMediaItem = {type: 'attachment', attachmentId: row.attachment_id, kind: row.kind, mimeType: row.mime_type, width: row.width, height: row.height}
       if (row.kind === 'audio' || row.kind === 'pdf' || row.kind === 'document') {
@@ -99,4 +101,38 @@ export function presentCommentMedia(publicApiUrl: string | undefined, media: unk
   return media.map((item: any) => item?.type === 'attachment'
     ? {...item, url: `${base}/v1/attachments/${item.attachmentId}/content`}
     : item)
+}
+
+export function commentAttachmentIds(media: unknown): string[] {
+  if (!Array.isArray(media)) return []
+  return [...new Set(media.flatMap((item: any) => item?.type === 'attachment' && typeof item.attachmentId === 'string'
+    ? [item.attachmentId]
+    : []))]
+}
+
+/** Expires comment-owned media only when no other live binding still refers to it. */
+export async function expireUnreferencedCommentAttachments(
+  db: ModulaDb,
+  attachmentIds: string[],
+  commentId: string,
+  now: Date,
+): Promise<number> {
+  let expired = 0
+  for (const attachmentId of attachmentIds) {
+    const [post, profile, story, moduleRecord, comment] = await Promise.all([
+      db.selectFrom('post_content').select('content_id').where('attachment_id', '=', attachmentId).executeTakeFirst(),
+      db.selectFrom('profile_media').select('profile_id').where('attachment_id', '=', attachmentId).executeTakeFirst(),
+      db.selectFrom('greenfield_story_items').select('item_id').where('attachment_id', '=', attachmentId).executeTakeFirst(),
+      db.selectFrom('greenfield_module_record_media_bindings').select('binding_id').where('asset_id', '=', attachmentId).executeTakeFirst(),
+      db.selectFrom('greenfield_comments').select('comment_id')
+        .where('comment_id', '!=', commentId).where('deleted_at', 'is', null)
+        .where(sql<boolean>`media @> ${JSON.stringify([{type: 'attachment', attachmentId}])}::jsonb`)
+        .executeTakeFirst(),
+    ])
+    if (post || profile || story || moduleRecord || comment) continue
+    const updated = await db.updateTable('attachments').set({status: 'expired', attached_at: null, updated_at: now})
+      .where('attachment_id', '=', attachmentId).where('attached_at', 'is not', null).executeTakeFirst()
+    expired += Number(updated.numUpdatedRows ?? 0)
+  }
+  return expired
 }

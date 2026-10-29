@@ -56,6 +56,8 @@ services:
     restart: unless-stopped
     env_file:
       - /etc/modula/greenfield-worker.env
+    volumes:
+      - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
     depends_on:
       greenfield-postgres:
         condition: service_healthy

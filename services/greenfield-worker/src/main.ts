@@ -12,6 +12,7 @@ import {heartbeatDue, recordHeartbeat} from './heartbeat/heartbeat.js'
 import {DIGEST_PASS_INTERVAL_MS, runDigestPass} from './digests/digests.js'
 import {infrastructureBackoffMs} from './jobs/retry.js'
 import {metrics} from './observability/metrics.js'
+import {runAttachmentCleanup} from './media/cleanup.js'
 
 const METRICS_LOG_INTERVAL_MS = 60_000
 
@@ -42,6 +43,7 @@ async function main() {
   let lastBeat = 0
   let lastDigest = 0
   let lastMetricsLog = 0
+  let lastMediaCleanup = 0
   const startedAt = new Date()
   const releaseSha = process.env.MODULA_RELEASE_SHA ?? null
   let consecutiveInfrastructureFailures = 0
@@ -56,6 +58,30 @@ async function main() {
       if (now - lastMetricsLog >= METRICS_LOG_INTERVAL_MS) {
         log.info({operation: 'worker.metrics', metrics: metrics.read()}, 'worker metrics')
         lastMetricsLog = now
+      }
+      if (config.mediaCleanupMode !== 'disabled' && now - lastMediaCleanup >= config.mediaCleanupIntervalMs) {
+        lastMediaCleanup = now
+        try {
+          const result = await runAttachmentCleanup(db, {
+            mode: config.mediaCleanupMode,
+            mediaRoot: config.mediaRoot,
+            now: new Date(now),
+            retentionMs: config.mediaCleanupRetentionMs,
+            activeUploadGraceMs: config.mediaCleanupActiveUploadGraceMs,
+            batchSize: config.mediaCleanupBatchSize,
+          })
+          metrics.increment('mediaCleanupRuns')
+          metrics.increment('mediaCleanupExpiredSessions', result.expiredSessions)
+          metrics.increment('mediaCleanupRemovedAttachments', result.removedAttachments)
+          if (result.mode === 'dry-run') {
+            metrics.increment('mediaCleanupDryRunCandidates', result.expiredSessionCandidates + result.orphanCandidates)
+          }
+          const write = result.unsafeStorageKeys > 0 || result.unsupportedProviders > 0 ? log.warn.bind(log) : log.info.bind(log)
+          write({operation: 'media.cleanup', ...result}, 'attachment cleanup pass')
+        } catch (error) {
+          metrics.increment('mediaCleanupErrors')
+          log.error({operation: 'media.cleanup', error}, 'attachment cleanup pass failed')
+        }
       }
       if (now - lastDigest >= DIGEST_PASS_INTERVAL_MS) {
         lastDigest = now
