@@ -1,9 +1,11 @@
-import {randomUUID} from 'node:crypto'
-import {mkdir, writeFile} from 'node:fs/promises'
+import {createHash, randomUUID} from 'node:crypto'
+import {mkdir, rm, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
 
 import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
+import {AttachmentPolicy} from '../attachments/policy.js'
+import {inspectImageDimensions, verifyAttachmentSignature} from '../attachments/service.js'
 
 const STORY_TTL_MS = 24 * 60 * 60 * 1000
 const IMAGE_DURATION_MS = 5_000
@@ -62,13 +64,15 @@ export type StoryGroupDto = {
 
 type CreateStoryInput = {
   mediaKind: 'image' | 'video'
-  base64: string
-  contentType: string
+  attachmentId?: string
+  base64?: string
+  contentType?: string
   caption?: string | null
   visibility?: 'public' | 'followers' | 'close'
   width?: number
   height?: number
   durationMs?: number
+  idempotencyKey?: string
 }
 
 const SUPPORTED = {
@@ -278,92 +282,139 @@ export class StoryService {
   }
 
   async create(actorId: string, input: CreateStoryInput): Promise<StoryGroupDto> {
-    const definition = SUPPORTED[input.contentType as keyof typeof SUPPORTED]
-    if (!definition || definition.kind !== input.mediaKind) {
-      throw Object.assign(new Error('Unsupported story media type'), {code: 'VALIDATION_FAILED'})
+    if (input.mediaKind !== 'image' && input.mediaKind !== 'video') {
+      throw domainError('Unsupported story media kind', 'VALIDATION_FAILED')
     }
-    if (!input.base64 || input.base64.length < 32) {
-      throw Object.assign(new Error('Story media payload is required'), {code: 'VALIDATION_FAILED'})
+    const attachmentId = normalizeOptionalId(input.attachmentId)
+    const hasInlineMedia = typeof input.base64 === 'string' && input.base64.length > 0
+    if (Boolean(attachmentId) === hasInlineMedia) {
+      throw domainError('Provide exactly one story attachment or inline media payload', 'VALIDATION_FAILED')
+    }
+    const caption = normalizeCaption(input.caption)
+    const visibility = normalizeVisibility(input.visibility)
+    const durationMs = normalizeDuration(input.durationMs, input.mediaKind)
+    const idempotencyKey = normalizeIdempotencyKey(input.idempotencyKey)
+    const requestHash = idempotencyKey ? storyRequestHash({
+      attachmentId, base64: input.base64, contentType: input.contentType, mediaKind: input.mediaKind,
+      caption, visibility, durationMs,
+    }) : null
+    if (idempotencyKey) {
+      const existing = await this.findIdempotent(actorId, idempotencyKey)
+      if (existing) {
+        if (existing.request_hash !== requestHash) {
+          throw domainError('Story idempotency key was reused with a different request', 'CONFLICT')
+        }
+        const replay = await this.getGroup(existing.group_id, actorId)
+        if (replay) return replay
+        throw domainError('Story retry target is no longer available', 'CONFLICT')
+      }
     }
 
+    const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
+    if (!actor) throw domainError('Story owner not found', 'NOT_FOUND')
     const now = new Date()
     const expiresAt = new Date(now.getTime() + STORY_TTL_MS)
-    const visibility = input.visibility ?? 'followers'
+    const itemId = randomUUID()
+    const inline = hasInlineMedia ? prepareInlineMedia(input, itemId) : null
+    const directory = join(this.config.mediaRoot, 'stories')
+    if (inline) {
+      await mkdir(directory, {recursive: true})
+      await writeFile(join(directory, inline.fileName), inline.bytes, {flag: 'wx', mode: 0o600})
+    }
+    let groupId = ''
+    try {
+      groupId = await this.db.transaction().execute(async trx => {
+        if (idempotencyKey) {
+          const existing = await trx.selectFrom('greenfield_story_items as item')
+            .innerJoin('greenfield_story_groups as group', 'group.group_id', 'item.group_id')
+            .select(['item.group_id', 'item.request_hash'])
+            .where('group.owner_actor_id', '=', actorId)
+            .where('item.idempotency_key', '=', idempotencyKey)
+            .executeTakeFirst()
+          if (existing) {
+            if (existing.request_hash !== requestHash) {
+              throw domainError('Story idempotency key was reused with a different request', 'CONFLICT')
+            }
+            return existing.group_id
+          }
+        }
+        const attachment = attachmentId
+          ? await trx.selectFrom('attachments').selectAll().where('attachment_id', '=', attachmentId).forUpdate().executeTakeFirst()
+          : null
+        if (attachmentId) {
+          if (!attachment || attachment.owner_account_id !== actor.account_id) {
+            throw domainError('Cross-account story attachment binding denied', 'FORBIDDEN')
+          }
+          if (attachment.status !== 'ready' || attachment.attached_at) {
+            throw domainError('Story attachment is not ready for publication', 'CONFLICT')
+          }
+          if (attachment.kind !== input.mediaKind) {
+            throw domainError('Story attachment media kind mismatch', 'VALIDATION_FAILED')
+          }
+        }
 
-    let group = await this.db
-      .selectFrom('greenfield_story_groups')
-      .selectAll()
-      .where('owner_actor_id', '=', actorId)
-      .where('deleted_at', 'is', null)
-      .where('expires_at', '>', now)
-      .orderBy('created_at', 'desc')
-      .executeTakeFirst()
-
-    if (!group) {
-      const groupId = randomUUID()
-      await this.db
-        .insertInto('greenfield_story_groups')
-        .values({
-          group_id: groupId,
-          owner_actor_id: actorId,
-          visibility,
-          expires_at: expiresAt,
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-        })
-        .execute()
-      group = await this.db
-        .selectFrom('greenfield_story_groups')
-        .selectAll()
-        .where('group_id', '=', groupId)
-        .executeTakeFirstOrThrow()
-    } else {
-      await this.db
-        .updateTable('greenfield_story_groups')
-        .set({updated_at: now, visibility, expires_at: expiresAt})
-        .where('group_id', '=', group.group_id)
-        .execute()
+        let group = await trx.selectFrom('greenfield_story_groups').selectAll()
+          .where('owner_actor_id', '=', actorId).where('deleted_at', 'is', null).where('expires_at', '>', now)
+          .orderBy('created_at', 'desc').executeTakeFirst()
+        if (!group) {
+          const nextGroupId = randomUUID()
+          await trx.insertInto('greenfield_story_groups').values({
+            group_id: nextGroupId, owner_actor_id: actorId, visibility, expires_at: expiresAt,
+            created_at: now, updated_at: now, deleted_at: null,
+          }).execute()
+          group = await trx.selectFrom('greenfield_story_groups').selectAll()
+            .where('group_id', '=', nextGroupId).executeTakeFirstOrThrow()
+        } else {
+          await trx.updateTable('greenfield_story_groups').set({updated_at: now, visibility, expires_at: expiresAt})
+            .where('group_id', '=', group.group_id).execute()
+        }
+        const maxOrder = await trx.selectFrom('greenfield_story_items')
+          .select(eb => eb.fn.max('sort_order').as('max')).where('group_id', '=', group.group_id).executeTakeFirst()
+        const mediaUrl = attachmentId
+          ? this.config.publicApiUrl.replace(/\/+$/, '') + '/v1/attachments/' + attachmentId + '/content'
+          : this.config.publicApiUrl.replace(/\/+$/, '') + '/v1/media/stories/' + inline!.fileName
+        await trx.insertInto('greenfield_story_items').values({
+          item_id: itemId, owner_actor_id: actorId, group_id: group.group_id, media_kind: input.mediaKind, media_url: mediaUrl,
+          media_file_name: inline?.fileName ?? null, attachment_id: attachmentId, idempotency_key: idempotencyKey,
+          request_hash: requestHash, caption, status: 'ready', sort_order: (maxOrder?.max ?? -1) + 1,
+          duration_ms: input.mediaKind === 'video' ? durationMs : IMAGE_DURATION_MS,
+          created_at: now, deleted_at: null,
+        }).execute()
+        if (attachmentId) {
+          const bound = await trx.updateTable('attachments').set({attached_at: now, updated_at: now})
+            .where('attachment_id', '=', attachmentId).where('owner_account_id', '=', actor.account_id)
+            .where('status', '=', 'ready').where('attached_at', 'is', null).executeTakeFirst()
+          if (bound.numUpdatedRows !== 1n) throw domainError('Story attachment binding conflicted', 'CONFLICT')
+        }
+        return group.group_id
+      })
+    } catch (error) {
+      if (inline) await rm(join(directory, inline.fileName), {force: true})
+      if (idempotencyKey) {
+        const existing = await this.findIdempotent(actorId, idempotencyKey)
+        if (existing) {
+          if (existing.request_hash !== requestHash) {
+            throw domainError('Story idempotency key was reused with a different request', 'CONFLICT')
+          }
+          groupId = existing.group_id
+        }
+      }
+      if (!groupId) throw error
     }
 
-    const itemId = randomUUID()
-    const fileName = `${itemId}.${definition.extension}`
-    const directory = join(this.config.mediaRoot, 'stories')
-    await mkdir(directory, {recursive: true})
-    await writeFile(join(directory, fileName), Buffer.from(input.base64, 'base64'), {flag: 'wx'})
-    const mediaUrl = `${this.config.publicApiUrl.replace(/\/+$/, '')}/v1/media/stories/${fileName}`
-
-    const maxOrder = await this.db
-      .selectFrom('greenfield_story_items')
-      .select(eb => eb.fn.max('sort_order').as('max'))
-      .where('group_id', '=', group.group_id)
-      .executeTakeFirst()
-
-    await this.db
-      .insertInto('greenfield_story_items')
-      .values({
-        item_id: itemId,
-        group_id: group.group_id,
-        media_kind: input.mediaKind,
-        media_url: mediaUrl,
-        media_file_name: fileName,
-        caption: input.caption?.trim() ? input.caption.trim().slice(0, 500) : null,
-        status: 'ready',
-        sort_order: (maxOrder?.max ?? -1) + 1,
-        duration_ms:
-          input.mediaKind === 'video'
-            ? input.durationMs ?? 15_000
-            : IMAGE_DURATION_MS,
-        created_at: now,
-        deleted_at: null,
-      })
-      .execute()
-
-    const dto = await this.getGroup(group.group_id, actorId)
+    const dto = await this.getGroup(groupId, actorId)
     if (!dto) {
       throw Object.assign(new Error('Story group missing after create'), {code: 'SERVER_ERROR'})
     }
     return dto
+  }
+
+  private async findIdempotent(actorId: string, idempotencyKey: string) {
+    return this.db.selectFrom('greenfield_story_items as item')
+      .select(['item.group_id', 'item.request_hash'])
+      .where('item.owner_actor_id', '=', actorId)
+      .where('item.idempotency_key', '=', idempotencyKey)
+      .executeTakeFirst()
   }
 
   async markViewed(itemId: string, viewerActorId: string): Promise<void> {
@@ -397,7 +448,7 @@ export class StoryService {
     const item = await this.db
       .selectFrom('greenfield_story_items as i')
       .innerJoin('greenfield_story_groups as g', 'g.group_id', 'i.group_id')
-      .select(['i.item_id', 'i.group_id', 'g.owner_actor_id'])
+      .select(['i.item_id', 'i.group_id', 'i.attachment_id', 'i.media_file_name', 'g.owner_actor_id'])
       .where('i.item_id', '=', itemId)
       .where('i.deleted_at', 'is', null)
       .executeTakeFirst()
@@ -408,24 +459,43 @@ export class StoryService {
       throw Object.assign(new Error('Only the owner can delete a story'), {code: 'FORBIDDEN'})
     }
     const now = new Date()
-    await this.db
-      .updateTable('greenfield_story_items')
-      .set({deleted_at: now})
-      .where('item_id', '=', itemId)
-      .execute()
+    const cleanup = await this.db.transaction().execute(async trx => {
+      await trx.updateTable('greenfield_story_items').set({deleted_at: now})
+        .where('item_id', '=', itemId).where('deleted_at', 'is', null).execute()
+      let storageKey: string | null = null
+      if (item.attachment_id) {
+        const attachment = await trx.selectFrom('attachments').select('storage_key')
+          .where('attachment_id', '=', item.attachment_id).forUpdate().executeTakeFirst()
+        storageKey = attachment?.storage_key ?? null
+        await trx.updateTable('attachments').set({status: 'expired', attached_at: null, updated_at: now})
+          .where('attachment_id', '=', item.attachment_id).execute()
+      }
+      const remaining = await trx.selectFrom('greenfield_story_items').select('item_id')
+        .where('group_id', '=', item.group_id).where('deleted_at', 'is', null).limit(1).executeTakeFirst()
+      if (!remaining) {
+        await trx.updateTable('greenfield_story_groups').set({deleted_at: now, updated_at: now})
+          .where('group_id', '=', item.group_id).execute()
+      }
+      return {storageKey}
+    })
 
-    const remaining = await this.db
-      .selectFrom('greenfield_story_items')
-      .select('item_id')
-      .where('group_id', '=', item.group_id)
-      .where('deleted_at', 'is', null)
-      .execute()
-    if (remaining.length === 0) {
-      await this.db
-        .updateTable('greenfield_story_groups')
-        .set({deleted_at: now, updated_at: now})
-        .where('group_id', '=', item.group_id)
-        .execute()
+    if (cleanup.storageKey && /^[0-9a-f-]{36}\.[a-z0-9]+$/i.test(cleanup.storageKey)) {
+      try {
+        await rm(join(this.config.mediaRoot, 'attachments', cleanup.storageKey), {force: true})
+        await this.db.updateTable('attachments').set({storage_key: null, updated_at: new Date()})
+          .where('attachment_id', '=', item.attachment_id).where('status', '=', 'expired').execute()
+      } catch {
+        // The expired row keeps the storage key so bounded orphan cleanup can
+        // retry without making the bytes accessible through the API.
+      }
+    }
+    if (item.media_file_name && /^[0-9a-f-]{36}\.(jpg|png|webp|mp4)$/i.test(item.media_file_name)) {
+      try {
+        await rm(join(this.config.mediaRoot, 'stories', item.media_file_name), {force: true})
+      } catch {
+        // The deleted story is already inaccessible; operations can remove a
+        // residual legacy file without weakening authorization.
+      }
     }
   }
 
@@ -465,4 +535,91 @@ export class StoryService {
       .executeTakeFirst()
     return Boolean(row)
   }
+}
+
+function prepareInlineMedia(input: CreateStoryInput, itemId: string): {bytes: Buffer; fileName: string} {
+  const declared = typeof input.contentType === 'string'
+    ? input.contentType.toLowerCase().split(';', 1)[0]?.trim() ?? ''
+    : ''
+  const definition = SUPPORTED[declared as keyof typeof SUPPORTED]
+  if (!definition || definition.kind !== input.mediaKind) {
+    throw domainError('Unsupported story media type', 'VALIDATION_FAILED')
+  }
+  const encoded = input.base64 ?? ''
+  if (encoded.length < 4 || encoded.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) {
+    throw domainError('Story media payload is not valid base64', 'VALIDATION_FAILED')
+  }
+  const bytes = Buffer.from(encoded, 'base64')
+  if (bytes.toString('base64') !== encoded) {
+    throw domainError('Story media payload is not canonical base64', 'VALIDATION_FAILED')
+  }
+  const canonicalMime = declared === 'image/jpg' ? 'image/jpeg' : declared
+  const policy = AttachmentPolicy.definition(canonicalMime)
+  AttachmentPolicy.validateSize(policy, bytes.length)
+  verifyAttachmentSignature(canonicalMime, bytes)
+  if (input.mediaKind === 'image' && !inspectImageDimensions(canonicalMime, bytes)) {
+    throw domainError('Story image dimensions are missing or outside policy', 'VALIDATION_FAILED')
+  }
+  return {bytes, fileName: itemId + '.' + definition.extension}
+}
+
+function normalizeOptionalId(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
+    throw domainError('Valid story attachmentId required', 'VALIDATION_FAILED')
+  }
+  return value
+}
+
+function normalizeIdempotencyKey(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !/^[A-Za-z0-9._:-]{8,200}$/.test(value)) {
+    throw domainError('Invalid story idempotency key', 'VALIDATION_FAILED')
+  }
+  return value
+}
+
+function normalizeCaption(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string') throw domainError('Story caption must be text', 'VALIDATION_FAILED')
+  const caption = value.trim()
+  return caption ? caption.slice(0, 500) : null
+}
+
+function normalizeVisibility(value: unknown): 'public' | 'followers' | 'close' {
+  if (value === undefined || value === null || value === '') return 'followers'
+  if (value === 'public' || value === 'followers' || value === 'close') return value
+  throw domainError('Unsupported story visibility', 'VALIDATION_FAILED')
+}
+
+function normalizeDuration(value: unknown, mediaKind: 'image' | 'video'): number | undefined {
+  if (mediaKind === 'image' || value === undefined || value === null) return mediaKind === 'video' ? 15_000 : undefined
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 1_000 || value > 300_000) {
+    throw domainError('Story video duration is outside policy', 'VALIDATION_FAILED')
+  }
+  return value
+}
+
+function storyRequestHash(input: {
+  attachmentId: string | null
+  base64?: string
+  contentType?: string
+  mediaKind: 'image' | 'video'
+  caption: string | null
+  visibility: 'public' | 'followers' | 'close'
+  durationMs?: number
+}): string {
+  return createHash('sha256').update(JSON.stringify({
+    attachmentId: input.attachmentId,
+    inlineSha256: input.base64 ? createHash('sha256').update(input.base64).digest('hex') : null,
+    contentType: input.contentType ?? null,
+    mediaKind: input.mediaKind,
+    caption: input.caption,
+    visibility: input.visibility,
+    durationMs: input.durationMs ?? null,
+  })).digest('hex')
+}
+
+function domainError(message: string, code: 'VALIDATION_FAILED' | 'NOT_FOUND' | 'FORBIDDEN' | 'CONFLICT') {
+  return Object.assign(new Error(message), {code})
 }

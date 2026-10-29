@@ -41,7 +41,10 @@ describeIfDb('POST-04 attachment integration', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 10)
   const owner = identity('owner', suffix)
   const attacker = identity('attacker', suffix)
-  const png = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex')
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+    'base64',
+  )
 
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
@@ -71,7 +74,8 @@ describeIfDb('POST-04 attachment integration', () => {
     const checksum = createHash('sha256').update(png).digest('hex')
     const first = await service.createUpload(owner.accountId, {filename: 'first.png', mimeType: 'image/png', size: png.length, checksum})
     const second = await service.createUpload(owner.accountId, {filename: 'second.png', mimeType: 'image/png', size: png.length})
-    await service.upload(owner.accountId, first.uploadId, png)
+    const inspected = await service.upload(owner.accountId, first.uploadId, png)
+    expect(inspected).toMatchObject({width: 1, height: 1})
     await service.upload(owner.accountId, second.uploadId, png)
     const post = await posts.create(owner.actorId, {
       text: 'ordered content', idempotencyKey: `post04-${suffix}`,

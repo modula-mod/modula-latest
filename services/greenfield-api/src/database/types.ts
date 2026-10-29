@@ -1311,10 +1311,14 @@ export interface Database {
   }
   greenfield_story_items: {
     item_id: string
+    owner_actor_id: string
     group_id: string
     media_kind: 'image' | 'video'
     media_url: string | null
     media_file_name: string | null
+    attachment_id: Generated<string | null>
+    idempotency_key: Generated<string | null>
+    request_hash: Generated<string | null>
     caption: string | null
     status: 'uploading' | 'ready' | 'failed'
     sort_order: number

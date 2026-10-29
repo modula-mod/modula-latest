@@ -81,6 +81,7 @@ export async function registerPhase7fStoriesRoutes(
     if (!auth) return
     const body = (request.body ?? {}) as {
       mediaKind?: 'image' | 'video'
+      attachmentId?: string
       base64?: string
       contentType?: string
       caption?: string
@@ -88,17 +89,20 @@ export async function registerPhase7fStoriesRoutes(
       width?: number
       height?: number
       durationMs?: number
+      idempotencyKey?: string
     }
     try {
       const created = await stories.create(auth.actorId, {
         mediaKind: body.mediaKind ?? 'image',
-        base64: body.base64 ?? '',
-        contentType: body.contentType ?? 'image/jpeg',
+        attachmentId: body.attachmentId,
+        base64: body.base64,
+        contentType: body.contentType,
         caption: body.caption,
         visibility: body.visibility,
         width: body.width,
         height: body.height,
         durationMs: body.durationMs,
+        idempotencyKey: body.idempotencyKey,
       })
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error) {

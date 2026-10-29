@@ -10,6 +10,7 @@ describeIfDb('Phase 7I-F5 stories acceptance', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let runSuffix = ''
+  let reusableSessionUser: Awaited<ReturnType<typeof createVerifiedUser>> | null = null
 
   beforeAll(async () => {
     process.env.NODE_ENV = 'test'
@@ -142,6 +143,117 @@ describeIfDb('Phase 7I-F5 stories acceptance', () => {
     expect(expiredRail.json().data.items.some((item: any) => item.groupId === expiredGroupId)).toBe(false)
   })
 
+  it('publishes verified attachments with retry safety, visibility enforcement and cleanup', async () => {
+    const owner = await createVerifiedUser(`f5soa${runSuffix}`.slice(0, 20), 'F5B Attachment Owner')
+    const follower = await createVerifiedUser(`f5sob${runSuffix}`.slice(0, 20), 'F5B Attachment Follower')
+    reusableSessionUser = follower
+    const pixel = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+      'base64',
+    )
+
+    const uploadSession = await authed(owner.accessToken, 'POST', '/v1/attachments/uploads', {
+      filename: 'ar-composite.png', mimeType: 'image/png', size: pixel.length,
+    })
+    expect(uploadSession.statusCode, uploadSession.body).toBe(201)
+    const {uploadId, attachmentId} = uploadSession.json().data
+    const uploaded = await app.inject({
+      method: 'PUT',
+      url: `/v1/attachments/uploads/${uploadId}/content`,
+      headers: {authorization: `Bearer ${owner.accessToken}`, 'content-type': 'application/octet-stream'},
+      payload: pixel,
+    })
+    expect(uploaded.statusCode, uploaded.body).toBe(200)
+    expect(uploaded.json().data.attachment).toMatchObject({
+      id: attachmentId, status: 'ready', kind: 'image', width: 1, height: 1,
+    })
+
+    const crossAccount = await authed(follower.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', attachmentId, visibility: 'public',
+    })
+    expect(crossAccount.statusCode).toBe(403)
+    expect(crossAccount.json().error.code).toBe('FORBIDDEN')
+
+    const idempotencyKey = `story-attachment-${runSuffix}`
+    const request = {
+      mediaKind: 'image' as const,
+      attachmentId,
+      visibility: 'followers' as const,
+      caption: `AR composite ${runSuffix}`,
+      idempotencyKey,
+    }
+    const created = await authed(owner.accessToken, 'POST', '/v1/stories', request)
+    expect(created.statusCode, created.body).toBe(201)
+    const groupId = created.json().data.groupId
+    const itemId = created.json().data.items[0].itemId
+    expect(created.json().data.items[0].mediaUrl).toContain(`/v1/attachments/${attachmentId}/content`)
+
+    const replay = await authed(owner.accessToken, 'POST', '/v1/stories', request)
+    expect(replay.statusCode, replay.body).toBe(201)
+    expect(replay.json().data.groupId).toBe(groupId)
+    expect(replay.json().data.items).toHaveLength(1)
+    const mismatchedReplay = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      ...request, caption: 'different request',
+    })
+    expect(mismatchedReplay.statusCode).toBe(409)
+    expect(mismatchedReplay.json().error.code).toBe('CONFLICT')
+
+    const deniedBeforeFollow = await authed(
+      follower.accessToken, 'GET', `/v1/attachments/${attachmentId}/content`,
+    )
+    expect(deniedBeforeFollow.statusCode).toBe(403)
+    const followed = await authed(follower.accessToken, 'POST', `/v1/profiles/${owner.profileId}/follow`)
+    expect(followed.statusCode).toBe(200)
+    const visible = await authed(follower.accessToken, 'GET', `/v1/attachments/${attachmentId}/content`)
+    expect(visible.statusCode, visible.body).toBe(200)
+    expect(visible.rawPayload.equals(pixel)).toBe(true)
+
+    const blocked = await authed(owner.accessToken, 'POST', `/v1/profiles/${follower.profileId}/block`)
+    expect(blocked.statusCode).toBe(200)
+    const deniedWhileBlocked = await authed(
+      follower.accessToken, 'GET', `/v1/attachments/${attachmentId}/content`,
+    )
+    expect(deniedWhileBlocked.statusCode).toBe(403)
+    const unblocked = await authed(owner.accessToken, 'DELETE', `/v1/profiles/${follower.profileId}/block`)
+    expect(unblocked.statusCode).toBe(200)
+
+    const stored = await db.selectFrom('greenfield_story_items').selectAll().where('item_id', '=', itemId).executeTakeFirstOrThrow()
+    expect(stored).toMatchObject({attachment_id: attachmentId, media_file_name: null, owner_actor_id: owner.actorId})
+    const bound = await db.selectFrom('attachments').select(['attached_at', 'storage_key'])
+      .where('attachment_id', '=', attachmentId).executeTakeFirstOrThrow()
+    expect(bound.attached_at).not.toBeNull()
+    expect(bound.storage_key).not.toBeNull()
+
+    const deleted = await authed(owner.accessToken, 'DELETE', `/v1/stories/items/${itemId}`)
+    expect(deleted.statusCode, deleted.body).toBe(200)
+    const gone = await authed(owner.accessToken, 'GET', `/v1/attachments/${attachmentId}/content`)
+    expect(gone.statusCode).toBe(404)
+    const expired = await db.selectFrom('attachments').select(['status', 'attached_at', 'storage_key'])
+      .where('attachment_id', '=', attachmentId).executeTakeFirstOrThrow()
+    expect(expired).toMatchObject({status: 'expired', attached_at: null, storage_key: null})
+
+    const invalidMagic = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', contentType: 'image/png', base64: Buffer.from('not a png').toString('base64'),
+    })
+    expect(invalidMagic.statusCode).toBe(400)
+    expect(invalidMagic.json().error.code).toBe('VALIDATION_FAILED')
+    const invalidBase64 = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', contentType: 'image/png', base64: '!!!!',
+    })
+    expect(invalidBase64.statusCode).toBe(400)
+    expect(invalidBase64.json().error.code).toBe('VALIDATION_FAILED')
+    const invalidVisibility = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', contentType: 'image/png', base64: pixel.toString('base64'), visibility: 'everyone',
+    })
+    expect(invalidVisibility.statusCode).toBe(400)
+    expect(invalidVisibility.json().error.code).toBe('VALIDATION_FAILED')
+    const invalidCaption = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', contentType: 'image/png', base64: pixel.toString('base64'), caption: {unsafe: true},
+    })
+    expect(invalidCaption.statusCode).toBe(400)
+    expect(invalidCaption.json().error.code).toBe('VALIDATION_FAILED')
+  })
+
   it('expires items 24h after their own created_at and counts only live ready/pending items', async () => {
     const owner = await createVerifiedUser(`f5se${runSuffix}`.slice(0, 20), 'F5B Stories Expiry')
     const pixel = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII='
@@ -184,7 +296,7 @@ describeIfDb('Phase 7I-F5 stories acceptance', () => {
     await db
       .insertInto('greenfield_story_items')
       .values({
-        item_id: crypto.randomUUID(), group_id: groupId, media_kind: 'image', media_url: null,
+        item_id: crypto.randomUUID(), owner_actor_id: owner.actorId, group_id: groupId, media_kind: 'image', media_url: null,
         media_file_name: null, caption: null, status: 'failed', sort_order: 99, duration_ms: 5000,
         created_at: new Date(), deleted_at: null,
       })
@@ -215,7 +327,9 @@ describeIfDb('Phase 7I-F5 stories acceptance', () => {
     const anonymous = await app.inject({method: 'GET', url: '/v1/stories/rail'})
     expect(anonymous.statusCode).toBe(200)
 
-    const user = await createVerifiedUser(`f5sr${runSuffix}`.slice(0, 20), 'F5B Stories Revoked')
+    const user = reusableSessionUser
+    expect(user).not.toBeNull()
+    if (!user) throw new Error('Reusable story session fixture missing')
     const valid = await authed(user.accessToken, 'GET', '/v1/stories/rail')
     expect(valid.statusCode).toBe(200)
     const logout = await authed(user.accessToken, 'DELETE', '/v1/sessions/current')
