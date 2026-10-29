@@ -813,6 +813,24 @@
       "services/greenfield-api/src/developers/service.ts#setProgrammeState"
     ]
   },
+  "POST /v1/admin/gubic/games/:gameId/review": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_game_catalogue_entries"
+    ],
+    "writes": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_game_catalogue_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#requireAdmin",
+      "services/greenfield-api/src/modules/gubic-service.ts#reviewCatalogueEntry"
+    ]
+  },
   "GET /v1/admin/moderation/reports": {
     "reads": [
       "reports"
@@ -3291,6 +3309,27 @@
       "services/greenfield-api/src/developers/service.ts#listProducts"
     ]
   },
+  "PUT /v1/developer/gubic/games/:gameId": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_publisher_owners"
+    ],
+    "writes": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_game_catalogue_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#requirePublisherAccess",
+      "services/greenfield-api/src/modules/gubic-service.ts#upsertCatalogueEntry"
+    ]
+  },
   "POST /v1/developer/organisations": {
     "reads": [],
     "writes": [
@@ -4035,6 +4074,191 @@
     "evidence": [
       "services/greenfield-api/src/domains/gifs/service.ts#call",
       "services/greenfield-api/src/domains/gifs/service.ts#trending"
+    ]
+  },
+  "GET /v1/gubic/categories": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#categories",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames"
+    ]
+  },
+  "GET /v1/gubic/featured": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#featuredGames",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames"
+    ]
+  },
+  "GET /v1/gubic/games": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames"
+    ]
+  },
+  "GET /v1/gubic/games/:gameId": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#getGame",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames"
+    ]
+  },
+  "GET /v1/gubic/games/:gameId/eligibility": {
+    "reads": [
+      "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_offers",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#eligibility",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
+      "services/greenfield-api/src/modules/gubic-service.ts#getGame",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames"
+    ]
+  },
+  "POST /v1/gubic/games/:gameId/install-plan": {
+    "reads": [
+      "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_offers",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#eligibility",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
+      "services/greenfield-api/src/modules/gubic-service.ts#getGame",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames",
+      "services/greenfield-api/src/modules/gubic-service.ts#packageInstallPlan"
+    ]
+  },
+  "GET /v1/gubic/games/:gameId/versions": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#getGame",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames",
+      "services/greenfield-api/src/modules/gubic-service.ts#versions"
+    ]
+  },
+  "GET /v1/gubic/my-games": {
+    "reads": [
+      "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_offers",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#eligibility",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
+      "services/greenfield-api/src/modules/gubic-service.ts#getGame",
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames",
+      "services/greenfield-api/src/modules/gubic-service.ts#myGames"
+    ]
+  },
+  "GET /v1/gubic/new-releases": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames",
+      "services/greenfield-api/src/modules/gubic-service.ts#newReleases"
+    ]
+  },
+  "GET /v1/gubic/publishers/:publisherId": {
+    "reads": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_publishers",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#listGames",
+      "services/greenfield-api/src/modules/gubic-service.ts#publisherDetail"
     ]
   },
   "GET /v1/hashtags/suggest": {
@@ -5139,13 +5363,16 @@
   },
   "POST /v1/modules/:moduleId/install": {
     "reads": [
+      "greenfield_entitlements",
       "greenfield_extension_installations",
       "greenfield_extension_runtime_projection",
+      "greenfield_game_catalogue_entries",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
       "greenfield_module_release_signatures",
       "greenfield_module_releases",
       "greenfield_mps_ingestions",
+      "greenfield_offers",
       "greenfield_publishers",
       "greenfield_release_artifacts",
       "greenfield_release_asset_blobs",
@@ -5170,6 +5397,9 @@
       "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
+      "services/greenfield-api/src/modules/gubic-service.ts#assertCatalogueInstallAllowed",
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
@@ -5201,7 +5431,12 @@
   },
   "POST /v1/modules/:moduleId/install-plan": {
     "reads": [
+      "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
       "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_offers",
       "greenfield_release_artifacts",
       "greenfield_release_asset_blobs",
       "greenfield_release_frontends"
@@ -5216,11 +5451,19 @@
       "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#installPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#latestEligibleRelease",
-      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor"
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
+      "services/greenfield-api/src/modules/gubic-service.ts#assertCatalogueInstallAllowed",
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement"
     ]
   },
   "POST /v1/modules/:moduleId/install-preview": {
     "reads": [
+      "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
+      "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_offers",
       "greenfield_publishers"
     ],
     "writes": [],
@@ -5228,6 +5471,9 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/gubic-service.ts#assertCatalogueInstallAllowed",
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#installPreview"
     ]
@@ -5256,9 +5502,12 @@
   },
   "POST /v1/modules/:moduleId/package-install-plan": {
     "reads": [
+      "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
       "greenfield_module_release_signatures",
       "greenfield_module_releases",
       "greenfield_mps_ingestions",
+      "greenfield_offers",
       "greenfield_release_artifacts",
       "greenfield_release_asset_blobs",
       "greenfield_release_frontends"
@@ -5273,7 +5522,10 @@
       "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
-      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById"
+      "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
+      "services/greenfield-api/src/modules/gubic-service.ts#assertCatalogueInstallAllowed",
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement"
     ]
   },
   "POST /v1/modules/:moduleId/permissions/review": {

@@ -2,9 +2,6 @@
  * LOCAL ONLY — App Lock credential material never leaves this device and is
  * never sent to Modula servers. Hashes only; plaintext is never persisted.
  */
-import * as SecureStore from 'expo-secure-store'
-import {Platform} from 'react-native'
-
 import {createSalt, hashCredential} from '@/features/security/app-lock/hash'
 import {
   DEFAULT_APP_LOCK_CONFIG,
@@ -17,10 +14,15 @@ import {
 const CONFIG_KEY = 'modula.appLock.config.v1'
 const CREDENTIAL_PREFIX = 'modula.appLock.cred.v1.'
 
-const secureOptions: SecureStore.SecureStoreOptions =
-  Platform.OS === 'web'
-    ? {}
-    : {keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY}
+const fallbackStorage = new Map<string, string>()
+
+function browserStorage(): Storage | null {
+  try {
+    return typeof globalThis.localStorage === 'undefined' ? null : globalThis.localStorage
+  } catch {
+    return null
+  }
+}
 
 function credentialKey(method: Exclude<UnlockMethod, 'biometric'>): string {
   return `${CREDENTIAL_PREFIX}${method}`
@@ -45,23 +47,18 @@ function parseConfig(raw: string | null): AppLockConfig {
 }
 
 async function readItem(key: string): Promise<string | null> {
-  try {
-    return await SecureStore.getItemAsync(key, secureOptions)
-  } catch {
-    return null
-  }
+  return browserStorage()?.getItem(key) ?? fallbackStorage.get(key) ?? null
 }
 
 async function writeItem(key: string, value: string): Promise<void> {
-  await SecureStore.setItemAsync(key, value, secureOptions)
+  const storage = browserStorage()
+  if (storage) storage.setItem(key, value)
+  else fallbackStorage.set(key, value)
 }
 
 async function deleteItem(key: string): Promise<void> {
-  try {
-    await SecureStore.deleteItemAsync(key, secureOptions)
-  } catch {
-    // ignore
-  }
+  browserStorage()?.removeItem(key)
+  fallbackStorage.delete(key)
 }
 
 export async function loadAppLockConfig(): Promise<AppLockConfig> {

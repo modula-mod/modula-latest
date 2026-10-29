@@ -1,7 +1,6 @@
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 
 import {Stack, useGlobalSearchParams} from 'expo-router'
-import {StatusBar} from 'expo-status-bar'
 import {useEffect} from 'react'
 import {StyleSheet} from 'react-native'
 
@@ -14,15 +13,12 @@ import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePre
 import {AppLockGate, AppLockProvider} from '@/features/security/app-lock'
 import '@/features/social/registerExpansionDestinations'
 import {AccountPanelProvider} from '@/platform/ui/navigation/AccountPanelContext'
-import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 import {PersistentShellTabBar} from '@/platform/ui/navigation/persistent-shell-tab-bar'
 import {ShellBottomProgressiveBlur} from '@/platform/ui/navigation/shell-bottom-progressive-blur'
-import {ModulaSplashOverlay} from '@/platform/ui/splash/ModulaSplashOverlay'
 import {ModulaToastProvider} from '@/platform/ui/feedback'
 import {ModulaActionPresenterProvider} from '@/platform/ui/menus/modula-action-presenter-provider'
 import {ModulaConfirmationProvider} from '@/platform/ui/menus/modula-confirmation-provider'
 import {WebPresentationProvider} from '@/platform/ui/presentation'
-import {prepareModulaSplash} from '@/platform/ui/splash/modula-splash'
 import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ModulaDocumentHead} from '@/shell/ModulaDocumentHead'
@@ -30,10 +26,8 @@ import {ShellDrawerProvider, useShellDrawer} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-void prepareModulaSplash()
-
 function RootNavigator() {
-  const {scheme, colours} = useThemeTokens()
+  const {colours} = useThemeTokens()
   const {openDrawer} = useShellDrawer()
   const params = useGlobalSearchParams<{openDrawer?: string | string[]}>()
 
@@ -48,7 +42,6 @@ function RootNavigator() {
   return (
     <>
       <ModulaDocumentHead />
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -81,16 +74,11 @@ function RootNavigator() {
       <NavigationDrawer />
       <ShellBottomProgressiveBlur />
       <PersistentShellTabBar />
-      <ModulaSplashOverlay />
     </>
   )
 }
 
 export default function RootLayout() {
-  useEffect(() => {
-    hideExpoDevToolsButton()
-  }, [])
-
   return (
     <GestureHandlerRootView style={styles.root}>
       <AppErrorBoundary>

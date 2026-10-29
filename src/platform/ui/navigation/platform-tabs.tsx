@@ -1,6 +1,5 @@
 /**
  * TypeScript / non-platform fallback.
- * Metro resolves `platform-tabs.native.tsx` on iOS/Android and
- * `platform-tabs.web.tsx` on web — never silently bind the web tab rail on native.
+ * GreenField is a web host; the canonical Native client lives in modula-native.
  */
-export {PlatformTabs} from '@/platform/ui/navigation/platform-tabs.native'
+export {PlatformTabs} from '@/platform/ui/navigation/platform-tabs.web'

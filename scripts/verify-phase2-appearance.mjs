@@ -43,7 +43,6 @@ const requiredFiles = [
   'src/theme/accessibility/useSystemAccessibility.ts',
   'src/components/materials/MaterialSurface.tsx',
   'src/components/materials/BlurMaterialSurface.tsx',
-  'src/components/materials/NativeMaterialSurface.tsx',
   'src/app/settings/index.tsx',
   'src/app/settings/appearance.tsx',
   'src/app/settings/accessibility.tsx',

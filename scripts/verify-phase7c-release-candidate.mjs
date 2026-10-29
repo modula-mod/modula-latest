@@ -73,7 +73,6 @@ for (const verifier of [
   'verify-phase7c-product-complete.mjs',
   'verify-phase7c-api-parity.mjs',
   'verify-phase7c-placeholder-free.mjs',
-  'verify-phase7c-native-readiness.mjs',
 ]) {
   const output = maybeSh(['node', `scripts/${verifier}`])
   check(`${verifier} did not pass`, output.includes('passed'))

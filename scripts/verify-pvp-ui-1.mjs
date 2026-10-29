@@ -101,10 +101,8 @@ record(
   'SDK 57 APIS CHECKED',
   /"expo":\s*"~?57/.test(pkg) &&
     /"expo-router":\s*"~?57/.test(pkg) &&
-    /"@expo\/ui":\s*"~?57/.test(pkg) &&
     skills.includes('INSTALLED SDK INSPECTED') &&
-    skills.includes('57.0.15') &&
-    skills.includes('57.0.12'),
+    skills.includes('57.0.15'),
 )
 
 console.log('\n# ARCHITECTURE')
@@ -136,15 +134,6 @@ record(
     "CANONICAL_VAULT_NOTES_MODULE_ID = 'digital.modula.vault-notes'",
   ),
 )
-
-console.log('\n# NATIVE')
-const experiments = read('docs/research/pvp-ui-1-native-experiments.md')
-record('IOS NATIVE CONTROLS', experiments.includes('ModulaSegmentedPicker') && hub.includes('ProductHubSegmentedControl'))
-record('SEGMENTED CONTROL', read('src/features/modules/components/ProductHubSegmentedControl.tsx').includes('ModulaSegmentedPicker'))
-record('NATIVE SEARCH EVALUATED', experiments.includes('Stack.SearchBar') && experiments.includes('ADAPT'))
-record('LIQUID GLASS EVALUATED', experiments.includes('expo-glass-effect') && read('src/platform/ui/materials/liquid-glass-chrome.tsx').includes('isInteractive'))
-record('APPLE ZOOM EVALUATED', experiments.includes('Link.AppleZoom') && read('src/features/modules/components/presentation/ModuleEditorialHero.tsx').includes('Link.AppleZoom'))
-record('CUSTOM/NATIVE TABS EVALUATED', experiments.includes('NativeTabs') && experiments.includes('expo-router/ui') && experiments.includes('DEFER'))
 
 console.log('\n# WEB')
 record('RESPONSIVE MOBILE', hub.includes('useWindowDimensions') && hub.includes('ResponsiveContent'))
@@ -202,7 +191,6 @@ record('NATIVE EXPERIMENTS DOC', existsSync(file('docs/research/pvp-ui-1-native-
 record('MARKETPLACE REFERENCES', existsSync(file('docs/research/pvp-ui-1-marketplace-references.md')))
 record('EXPO UI EXAMPLES PROVENANCE', existsSync(file('docs/research/pvp-ui-1-expo-ui-examples-provenance.md')))
 record('UI LAB SPECIMENS', existsSync(file('src/platform/ui/dev/pvp-ui-1-lab.tsx')))
-record('NATIVE EXPERIMENTS ROUTE', read('src/app/settings/developer/pvp-native-experiments.tsx').includes('canAccessDeveloperLabs'))
 
 console.log('\n# PRESENTATION')
 spawn('PRESENTATION INVARIANTS', process.execPath, ['scripts/pvp-ui-1-presentation.test.mjs'])
@@ -218,12 +206,11 @@ if (ci) {
   spawn('EXPO INSTALL CHECK', 'pnpm', ['exec', 'expo', 'install', '--check'])
   const doctor = spawnSync('pnpm', ['exec', 'expo-doctor'], {cwd: root, encoding: 'utf8'})
   const doctorOut = `${doctor.stdout || ''}\n${doctor.stderr || ''}`
-  const expectedWarning = /CNG|native folder|prebuild/i.test(doctorOut)
-  const doctorOk = doctor.status === 0 || (doctor.status === 1 && expectedWarning)
+  const doctorOk = doctor.status === 0
   record(
     'EXPO DOCTOR',
     doctorOk,
-    doctor.status === 0 ? 'clean' : expectedWarning ? 'PASS_WITH_EXPECTED_WARNING' : doctorOut.trim().split('\n').slice(-4).join(' | '),
+    doctor.status === 0 ? 'clean' : doctorOut.trim().split('\n').slice(-4).join(' | '),
   )
   spawn('GIT DIFF CHECK', 'git', ['diff', '--check'])
 }

@@ -136,7 +136,7 @@ console.log('\n# MODULES')
 runNode('VAULT CANONICAL', 'scripts/verify-vault-notes-canonical.mjs')
 runNode('B9 VERIFIER', 'scripts/verify-phase7m-b9.mjs')
 runNode('B10 VERIFIER', 'scripts/verify-phase7m-b10.mjs')
-contains('package.json', '"expo-local-authentication": "~57.0.2"', 'SDK CORRECTION')
+absent('package.json', 'expo-local-authentication', 'NATIVE AUTH SDK RETIRED')
 record('RATING MIGRATION', existsSync(file('services/greenfield-api/migrations/038_phase7m_b10_module_marketplace.sql')))
 record('RATING MIGRATION DOWN', existsSync(file('services/greenfield-api/migrations/038_phase7m_b10_module_marketplace.down.sql')))
 

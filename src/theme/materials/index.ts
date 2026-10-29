@@ -1,7 +1,6 @@
 export * from '@/theme/materials/glassMaterial'
 export * from '@/theme/materials/glayMaterial'
 export * from '@/theme/materials/minimalSpatialMaterial'
-export * from '@/theme/materials/nativeMaterial'
 export * from '@/theme/materials/neomorphicMaterial'
 export * from '@/theme/materials/resolveMaterialTokens'
 export * from '@/theme/materials/skeuomorphicMaterial'

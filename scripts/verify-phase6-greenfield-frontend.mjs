@@ -113,19 +113,19 @@ if (create && !/AT Protocol|Bluesky|PDS|DID/i.test(create)) {
   ok('6. Registration onboarding omits AT Protocol')
 } else fail('6. Registration onboarding omits AT Protocol')
 
-// 7. SecureStore session bundle (not AsyncStorage for tokens)
+// 7. Web session bundle (not AsyncStorage for tokens)
 if (
   mustInclude(
-    'src/auth/storage/NativeSecureSessionStorage.ts',
-    ['expo-secure-store', 'SECURE_SESSION_BUNDLE_KEY', 'accessToken', 'refreshToken', 'sessionId'],
-    '7. SecureStore',
+    'src/auth/storage/WebPersistentSessionStorage.ts',
+    ['localStorage', 'accessToken', 'refreshToken', 'sessionId'],
+    '7. Web session storage',
   )
 ) {
-  const native = read('src/auth/storage/NativeSecureSessionStorage.ts')
-  if (native.includes('async-storage') || native.includes('AsyncStorage')) {
+  const web = read('src/auth/storage/WebPersistentSessionStorage.ts')
+  if (web.includes('async-storage') || web.includes('AsyncStorage')) {
     fail('7. Tokens must not use AsyncStorage')
   } else {
-    ok('7. SecureStore holds access/refresh/session/expiry bundle')
+    ok('7. Web storage holds access/refresh/session/expiry bundle')
   }
 }
 

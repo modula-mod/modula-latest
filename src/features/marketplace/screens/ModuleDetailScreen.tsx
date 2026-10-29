@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from 'react'
 import {Alert, Platform, ScrollView, StyleSheet, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href, Link} from 'expo-router'
-import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -59,7 +58,7 @@ export function ModuleDetailScreen() {
   const queryClient = useQueryClient()
   const insets = useSafeAreaInsets()
   const {width} = useHydrationSafeWindowDimensions()
-  const {colours, scheme, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const detail = useModuleDetailQuery(id)
   const relationships = useModuleRelationshipsQuery(id)
   const module = detail.data
@@ -298,7 +297,6 @@ export function ModuleDetailScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <StatusBar style={stickyProgress > 0.5 || scrollOffset >= 210 ? (scheme === 'dark' ? 'light' : 'dark') : 'light'} />
       <ResponsiveContent maxWidth={920}>
         <ScrollView
           ref={scrollRef}

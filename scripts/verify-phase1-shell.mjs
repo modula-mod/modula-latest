@@ -131,21 +131,13 @@ for (const file of sourceFiles) {
 }
 
 const config = text('app.config.ts')
-if (!/updates:\s*{\s*enabled:\s*false\s*,?\s*}/s.test(config)) {
-  fail('app.config.ts must keep updates.enabled set to false')
+if (!/output:\s*['"]static['"]/.test(config) || !/plugins:\s*\[['"]expo-router['"]\]/.test(config)) {
+  fail('app.config.ts must configure the static Expo Router web host')
 }
-if (!/['"]expo-dev-client['"]/.test(config)) {
-  fail('app.config.ts must configure expo-dev-client plugin')
-}
-if (!/Modula uses your photo library when you choose media for a post\./.test(config)) {
-  fail('expo-image-picker photos permission text is missing')
-}
-if (!/Modula uses your camera when you choose to capture media for a post\./.test(config)) {
-  fail('expo-image-picker camera permission text is missing')
-}
-
-if (!Object.prototype.hasOwnProperty.call(deps, 'expo-dev-client')) {
-  fail('expo-dev-client dependency is missing')
+for (const retired of ['expo-dev-client', 'expo-splash-screen', 'expo-status-bar']) {
+  if (Object.prototype.hasOwnProperty.call(deps, retired) || config.includes(retired)) {
+    fail(`Retired native application dependency/config remains: ${retired}`)
+  }
 }
 
 const routeFiles = walk('src/app')

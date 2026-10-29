@@ -6,6 +6,7 @@ import type {GreenfieldSessionService} from '../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {DeveloperService} from './service.js'
 import {DeveloperBuildCoordinator} from './build-coordinator.js'
+import {GreenfieldGubicService} from '../modules/gubic-service.js'
 
 export async function registerDeveloperRoutes(
   app: FastifyInstance,
@@ -16,6 +17,7 @@ export async function registerDeveloperRoutes(
 ) {
   const developers = new DeveloperService(db, config)
   const builds = new DeveloperBuildCoordinator(db)
+  const gubic = new GreenfieldGubicService(db, config)
   const authenticate = async (request: any, reply: any) => {
     const header = request.headers.authorization
     const auth = header?.startsWith('Bearer ') ? await sessions.resolveAccess(header.slice(7).trim()) : null
@@ -45,6 +47,8 @@ export async function registerDeveloperRoutes(
   app.patch('/v1/admin/developer/programme/:accountId', routeConfig.writeConfig, action((operatorAccountId, request) => developers.setProgrammeState(operatorAccountId, String(request.params.accountId), String(request.body?.state) as DeveloperProgrammeState, request.body?.reason)))
   app.post('/v1/admin/developer/namespaces/:namespace/verify', routeConfig.writeConfig, action((operatorAccountId, request) => developers.verifyNamespace(operatorAccountId, String(request.params.namespace))))
   app.put('/v1/admin/developer/build-services/:serviceId', routeConfig.writeConfig, action((operatorAccountId, request) => developers.registerBuildService(operatorAccountId, {...(request.body ?? {}), serviceId: String(request.params.serviceId)})))
+  app.put('/v1/developer/gubic/games/:gameId', routeConfig.writeConfig, action((accountId, request) => gubic.upsertCatalogueEntry(accountId, String(request.params.gameId), request.body ?? {})))
+  app.post('/v1/admin/gubic/games/:gameId/review', routeConfig.writeConfig, action((accountId, request) => gubic.reviewCatalogueEntry(accountId, String(request.params.gameId), request.body ?? {})))
   app.get('/v1/developer/products', routeConfig.profileConfig, action((accountId) => developers.listProducts(accountId)))
   app.post('/v1/developer/products', routeConfig.writeConfig, action((accountId, request) => developers.createProduct(accountId, request.body ?? {}), true))
   app.get('/v1/developer/products/:productId', routeConfig.profileConfig, action((accountId, request) => developers.productDetail(accountId, String(request.params.productId))))

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-27T21:37:36.993Z",
+  "capturedAt": "2026-10-29T10:11:35.727Z",
   "source": {
-    "branch": "codex/02r-package-revocation-errors",
-    "headAtCapture": "d916127ea0eeda382b3b0b2d40a531af55b43ae8",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "62260a7be7695a32d6cec1008b04ad7967b07e56428a1d5ae24b8eb0f55ae543"
+    "branch": "greenfield-gubic-foundation-01",
+    "headAtCapture": "a100f86f6b9be91c9f43bd91d505ef5d0e220d4d",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "38a560a14bff735f3632953dfcee58a82317d17ebab3ae4b289cb287ccd88548"
   },
   "runtimeRoutes": [
     {
@@ -537,6 +537,177 @@
       "method": "HEAD",
       "url": "/v1/registry/products",
       "path": "/v1/registry/products",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games",
+      "path": "/v1/gubic/games",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games",
+      "path": "/v1/gubic/games",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/featured",
+      "path": "/v1/gubic/featured",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/featured",
+      "path": "/v1/gubic/featured",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/new-releases",
+      "path": "/v1/gubic/new-releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/new-releases",
+      "path": "/v1/gubic/new-releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/categories",
+      "path": "/v1/gubic/categories",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/categories",
+      "path": "/v1/gubic/categories",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/publishers/:publisherId",
+      "path": "/v1/gubic/publishers/:publisherId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/publishers/:publisherId",
+      "path": "/v1/gubic/publishers/:publisherId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId",
+      "path": "/v1/gubic/games/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId",
+      "path": "/v1/gubic/games/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId/versions",
+      "path": "/v1/gubic/games/:gameId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId/versions",
+      "path": "/v1/gubic/games/:gameId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId/eligibility",
+      "path": "/v1/gubic/games/:gameId/eligibility",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId/eligibility",
+      "path": "/v1/gubic/games/:gameId/eligibility",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/games/:gameId/install-plan",
+      "path": "/v1/gubic/games/:gameId/install-plan",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/my-games",
+      "path": "/v1/gubic/my-games",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/my-games",
+      "path": "/v1/gubic/my-games",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -5910,6 +6081,24 @@
       "method": "PUT",
       "url": "/v1/admin/developer/build-services/:serviceId",
       "path": "/v1/admin/developer/build-services/:serviceId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/developer/gubic/games/:gameId",
+      "path": "/v1/developer/gubic/games/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/gubic/games/:gameId/review",
+      "path": "/v1/admin/gubic/games/:gameId/review",
       "prefix": "",
       "schema": null,
       "config": null,

@@ -12,7 +12,6 @@ import {AppState, type AppStateStatus} from 'react-native'
 
 import {
   disableAppLock,
-  enableBiometricMethod,
   loadAppLockConfig,
   saveAppLockConfig,
   saveCredential,
@@ -74,39 +73,11 @@ function autoLockDelayMs(policy: AutoLockPolicy): number {
 }
 
 async function probeBiometric(): Promise<BiometricStatus> {
-  try {
-    const LocalAuthentication = await import('expo-local-authentication')
-    const hasHardware = await LocalAuthentication.hasHardwareAsync()
-    const enrolled = hasHardware ? await LocalAuthentication.isEnrolledAsync() : false
-    const types = hasHardware
-      ? await LocalAuthentication.supportedAuthenticationTypesAsync()
-      : []
-    const hasFace = types.includes(
-      LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
-    )
-    const hasFinger = types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)
-    const label = hasFace
-      ? 'Face ID'
-      : hasFinger
-        ? 'Touch ID'
-        : 'Device biometrics'
-    return {
-      available: hasHardware && enrolled,
-      enrolled,
-      label,
-      error: !hasHardware
-        ? 'Biometrics are not available on this device.'
-        : !enrolled
-          ? 'No biometrics enrolled in system settings.'
-          : undefined,
-    }
-  } catch {
-    return {
-      available: false,
-      enrolled: false,
-      label: 'Biometric',
-      error: 'Biometric unlock is unavailable in this build.',
-    }
+  return {
+    available: false,
+    enrolled: false,
+    label: 'Biometric',
+    error: 'Biometric unlock is unavailable in the GreenField web host.',
   }
 }
 
@@ -207,35 +178,11 @@ export function AppLockProvider({children}: PropsWithChildren) {
   )
 
   const biometricUnlock = useCallback(async () => {
-    if (!config.configuredMethods.includes('biometric')) {
-      return {ok: false, message: 'Biometric unlock is not configured.'}
+    return {
+      ok: false,
+      message: biometric.error ?? 'Biometric unlock is unavailable.',
     }
-    try {
-      const LocalAuthentication = await import('expo-local-authentication')
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Unlock Modula',
-        cancelLabel: 'Cancel',
-        disableDeviceFallback: true,
-      })
-      if (!result.success) {
-        return {ok: false, message: 'Biometric authentication failed.'}
-      }
-      const next: AppLockConfig = {
-        ...config,
-        failCount: 0,
-        lockoutUntil: undefined,
-        lastUnlockedAt: new Date().toISOString(),
-      }
-      await saveAppLockConfig(next)
-      markUnlocked(next)
-      return {ok: true}
-    } catch {
-      return {
-        ok: false,
-        message: biometric.error ?? 'Biometric unlock is unavailable.',
-      }
-    }
-  }, [biometric.error, config, markUnlocked])
+  }, [biometric.error])
 
   const setEnabled = useCallback(
     async (enabled: boolean) => {
@@ -293,26 +240,8 @@ export function AppLockProvider({children}: PropsWithChildren) {
   const setupBiometric = useCallback(async () => {
     const bio = await probeBiometric()
     setBiometric(bio)
-    if (!bio.available) {
-      return {ok: false, message: bio.error ?? 'Biometric unlock is unavailable.'}
-    }
-    try {
-      const LocalAuthentication = await import('expo-local-authentication')
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Enable biometric App Lock',
-        cancelLabel: 'Cancel',
-      })
-      if (!result.success) {
-        return {ok: false, message: 'Biometric confirmation was cancelled.'}
-      }
-      const next = await enableBiometricMethod(config)
-      setConfig(next)
-      setLocked(false)
-      return {ok: true}
-    } catch {
-      return {ok: false, message: 'Biometric unlock is unavailable in this build.'}
-    }
-  }, [config])
+    return {ok: false, message: bio.error ?? 'Biometric unlock is unavailable.'}
+  }, [])
 
   const requireFor = useCallback(
     (scope: AppLockStepUpScope) => {

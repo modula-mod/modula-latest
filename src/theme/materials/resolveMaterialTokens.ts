@@ -8,7 +8,6 @@ import {SURFACE_ROLES} from '@/theme/contracts'
 import {createGlassMaterial} from '@/theme/materials/glassMaterial'
 import {createGlayMaterial} from '@/theme/materials/glayMaterial'
 import {createMinimalSpatialMaterial} from '@/theme/materials/minimalSpatialMaterial'
-import {createNativeMaterial} from '@/theme/materials/nativeMaterial'
 import {createNeomorphicMaterial} from '@/theme/materials/neomorphicMaterial'
 import {createSkeuomorphicMaterial} from '@/theme/materials/skeuomorphicMaterial'
 import {createSolidMaterial} from '@/theme/materials/solidMaterial'
@@ -45,7 +44,7 @@ function resolveRoleMaterial(
 ) {
   const token =
     surfaceType === 'native'
-      ? createNativeMaterial(role, colours, isDark)
+      ? createGlassMaterial(role, colours, isDark)
       : surfaceType === 'glass'
         ? createGlassMaterial(role, colours, isDark)
         : surfaceType === 'glay'

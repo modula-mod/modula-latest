@@ -1,6 +1,5 @@
 import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useReducer, useState} from 'react'
-import {StatusBar} from 'expo-status-bar'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
@@ -140,7 +139,6 @@ export function ProductHeroLabScreen({
 
   return (
     <View style={[styles.heroSpecimen, {backgroundColor: colours.canvas}]}>
-      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={{paddingBottom: spacing[10]}}
         contentOffset={initialOverviewOffset ? {x: 0, y: 780} : undefined}

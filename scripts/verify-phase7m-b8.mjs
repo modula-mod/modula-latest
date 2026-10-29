@@ -54,7 +54,7 @@ contains('docs/design/phase7m-b8-component-reconstruction-matrix.md', 'UNKNOWN |
 
 console.log('\n# App Lock (local-only)')
 contains('src/features/security/app-lock/app-lock-storage.ts', 'LOCAL ONLY', 'APPLOCK LOCAL BANNER')
-contains('src/features/security/app-lock/app-lock-storage.ts', 'expo-secure-store', 'APPLOCK SECURE STORE')
+contains('src/features/security/app-lock/app-lock-storage.ts', 'browserStorage', 'APPLOCK WEB STORAGE')
 for (const [label, name] of [
   ['APPLOCK PIN', 'src/features/security/app-lock/UnlockPinScreen.tsx'],
   ['APPLOCK PATTERN', 'src/features/security/app-lock/UnlockPatternScreen.tsx'],
@@ -68,8 +68,7 @@ for (const [label, name] of [
 }
 contains('src/features/settings/screens/SettingsExtraScreens.tsx', 'Local App Lock', 'SECURITY SETTINGS LINK')
 contains('src/app/_layout.tsx', 'AppLockProvider', 'APPLOCK PROVIDER')
-contains('package.json', 'expo-local-authentication', 'BIOMETRIC PACKAGE')
-contains('docs/architecture/dependency-register.md', 'expo-local-authentication', 'BIOMETRIC REGISTERED')
+contains('src/features/security/app-lock/app-lock-context.tsx', 'unavailable in the GreenField web host', 'BIOMETRIC WEB BOUNDARY')
 
 console.log('\n# Module identity + Vault Notes honesty')
 contains('src/features/modules/identity/moduleIdentitySubtext.ts', 'moduleIdentitySubtext', 'IDENTITY HELPER')
