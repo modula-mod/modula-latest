@@ -66,7 +66,7 @@ record('CANONICAL VERIFIER', canonical.status === 0, canonical.status === 0 ? 'o
 const identity = read('packages/greenfield-contracts/src/canonical-module-identity.ts')
 record('CANONICAL MODULE ID', identity.includes("CANONICAL_VAULT_NOTES_MODULE_ID = 'digital.modula.vault-notes'"))
 record('CANONICAL SOURCE REPO', identity.includes("CANONICAL_VAULT_NOTES_REPOSITORY = 'modula-mod/modula-vault-notes'"))
-record('CURRENT IMMUTABLE RELEASE', identity.includes("CANONICAL_VAULT_NOTES_CURRENT_VERSION = '1.2.0'"))
+record('CURRENT IMMUTABLE RELEASE', identity.includes("CANONICAL_VAULT_NOTES_CURRENT_VERSION = '2.0.2'"))
 contains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', '!isLegacyVaultNotesModuleId(item.moduleId)', 'LEGACY PRODUCT FILTERED')
 
 console.log('\n# Product-detail components')

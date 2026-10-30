@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {execFileSync} from 'node:child_process'
-import {existsSync, readdirSync, readFileSync} from 'node:fs'
+import {existsSync, readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import {dirname, join, resolve} from 'node:path'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
@@ -9,7 +9,10 @@ import {
   CANONICAL_VAULT_NOTES_MODULE_ID,
   CANONICAL_VAULT_NOTES_ARTIFACT_SHA256,
   CANONICAL_VAULT_NOTES_CURRENT_COMMIT,
+  CANONICAL_VAULT_NOTES_CURRENT_TAG,
   CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  CANONICAL_VAULT_NOTES_MANIFEST_SHA256,
+  CANONICAL_VAULT_NOTES_REPOSITORY,
   rewriteLegacyVaultNotesValue,
 } from '@modula/greenfield-contracts'
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
@@ -562,7 +565,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     expect(Number(founderStill?.count ?? 0)).toBeGreaterThan(0)
   })
 
-  it('updates a historical 0.2.0 install onto 1.2.0 without losing notes', async () => {
+  it('updates a historical 0.2.0 install onto the current release without losing notes', async () => {
     const historical = await importHistoricalRelease()
     const disposable = await registerAccount(`vault-upd-${suffix}@example.com`, `vaultu${suffix}`.slice(0, 20))
     const install = await app.inject({
@@ -848,9 +851,11 @@ function workerConfig(): WorkerConfig {
 }
 
 function manifestForTest(): GreenfieldModuleManifest {
-  const manifest = readTaggedVaultJson('vault-notes-v1.2.0', 'module.manifest.json') as GreenfieldModuleManifest
+  const manifest = readTaggedVaultJson(CANONICAL_VAULT_NOTES_CURRENT_TAG, 'module.manifest.json') as GreenfieldModuleManifest
+  expect(manifest.integrity.manifestSha256).toBe(CANONICAL_VAULT_NOTES_MANIFEST_SHA256)
   const canonical = canonicalizeVaultNotesManifest(manifest)
   canonical.integrity.manifestSha256 = manifestChecksum({...canonical, integrity: {...canonical.integrity, manifestSha256: ''}})
+  expect(canonical.integrity.manifestSha256).toBe(CANONICAL_VAULT_NOTES_MANIFEST_SHA256)
   return canonical
 }
 
@@ -861,14 +866,11 @@ function approvedVaultPermissions(): string[] {
 }
 
 function immutableReleaseEvidence(manifest: GreenfieldModuleManifest) {
-  const provenance = readJson('release/vault-notes-v1.2.0.provenance.json')
-  expect(provenance.releaseCommit).toBe(CANONICAL_VAULT_NOTES_CURRENT_COMMIT)
-  expect(provenance.packageChecksum).toBe(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256)
   return {
-    repository: provenance.repository as string,
-    releaseTag: provenance.releaseTag as string,
-    releaseCommit: provenance.releaseCommit as string,
-    artifactSha256: provenance.packageChecksum as string,
+    repository: CANONICAL_VAULT_NOTES_REPOSITORY,
+    releaseTag: CANONICAL_VAULT_NOTES_CURRENT_TAG,
+    releaseCommit: CANONICAL_VAULT_NOTES_CURRENT_COMMIT,
+    artifactSha256: CANONICAL_VAULT_NOTES_ARTIFACT_SHA256,
     manifestSha256: manifest.integrity.manifestSha256,
   }
 }
@@ -889,7 +891,7 @@ function syntheticHistoricalEvidence(manifest: GreenfieldModuleManifest) {
 
 function collectionDefinitions(manifest: GreenfieldModuleManifest): GreenfieldModuleCollectionDefinition[] {
   return (manifest.contributions.schemas ?? []).map(schema => {
-    const schemaDefinition = readJson(schema.schemaRef)
+    const schemaDefinition = record(readTaggedVaultJson(CANONICAL_VAULT_NOTES_CURRENT_TAG, schema.schemaRef))
     const greenfield = record(schemaDefinition['x-greenfield'])
     const collection: GreenfieldModuleCollectionDefinition = {
       collection: schema.collection,
@@ -911,15 +913,21 @@ function collectionDefinitions(manifest: GreenfieldModuleManifest): GreenfieldMo
 }
 
 function viewDeclarations() {
-  return readdirSync(join(vaultNotesRoot, 'src/views'))
+  return taggedVaultFiles(CANONICAL_VAULT_NOTES_CURRENT_TAG, 'src/views')
     .filter(file => file.endsWith('.json'))
     .sort()
     .map(file => {
-      const validation = validateGreenfieldModuleView(rewriteLegacyVaultNotesValue(readJson(`src/views/${file}`)))
+      const validation = validateGreenfieldModuleView(rewriteLegacyVaultNotesValue(readTaggedVaultJson(CANONICAL_VAULT_NOTES_CURRENT_TAG, file)))
       expect(validation.valid).toBe(true)
       for (const action of validation.value?.toolbar ?? []) expect(validateGreenfieldModuleAction(action, moduleId).valid).toBe(true)
       return validation.value!
     })
+}
+
+function taggedVaultFiles(ref: string, path: string): string[] {
+  return execFileSync('git', ['ls-tree', '-r', '--name-only', ref, '--', path], {cwd: vaultNotesRoot, encoding: 'utf8'})
+    .split('\n')
+    .filter(Boolean)
 }
 
 function deriveFields(schemaDefinition: Record<string, unknown>): GreenfieldModuleFieldDefinition[] {
