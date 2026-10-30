@@ -66,7 +66,10 @@ const acceptedProductionEvidence = productionCloseoutMarker?.apiSourceSha256 ===
   && snapshot.repository.head === snapshot.containers.api.revision
   && snapshot.repository.originMain === snapshot.containers.api.revision
   && isAncestor(productionCloseoutMarker.runtimeSha, snapshot.containers.api.revision)
+const candidateSourceMatches = candidate?.source?.apiSourceSha256 === apiSourceFingerprint()
+const sourceIdenticalFeatureBranch = candidateRequested && currentBranch !== 'main' && candidateSourceMatches
 const candidateApplies = Boolean(candidate) && (currentBranch === candidate.source?.branch
+  || sourceIdenticalFeatureBranch
   || (candidateRequested && currentBranch === 'main' && !acceptedProductionEvidence))
 if (candidateRequested && !candidate) throw new Error(`Missing ${candidatePath}; run pnpm api:atlas:capture-candidate first`)
 if (candidateApplies && candidate.evidenceKind !== 'local-candidate-runtime') throw new Error('Invalid candidate runtime evidence kind')
