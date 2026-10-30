@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: modula-mod/modula-vault-notes
-          ref: c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce
+          ref: bd5440278831cf97dfa2a6882125d207af013def
           path: modula-mod/modula-vault-notes
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:

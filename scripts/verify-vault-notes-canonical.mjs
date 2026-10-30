@@ -33,7 +33,7 @@ function read(file) {
 const identity = read('packages/greenfield-contracts/src/canonical-module-identity.ts')
 record('CANONICAL ID DECLARED', identity.includes("CANONICAL_VAULT_NOTES_MODULE_ID = 'digital.modula.vault-notes'"))
 record('CANONICAL REPO DECLARED', identity.includes("CANONICAL_VAULT_NOTES_REPOSITORY = 'modula-mod/modula-vault-notes'"))
-record('ARTIFACT SHA DECLARED', identity.includes('98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935'))
+record('ARTIFACT SHA DECLARED', identity.includes('2134d04aee1f3f59408f1fbab28c6de2a85aab314515941e16239a74a694c789'))
 record('LEGACY ALIAS DECLARED', identity.includes("'modula.vault-notes'"))
 record('NO THIRD PRODUCT', !identity.includes('vault-notes-something') && !identity.includes('modula-module-vault-notes/current'))
 
@@ -42,11 +42,16 @@ record('DECISION DOC', decision.includes('CANONICAL MODULE ID:') && decision.inc
 record('ONE PRODUCT LANGUAGE', decision.includes('There is one Vault Notes') && !decision.includes('both are technically valid'))
 
 const lineage = read('docs/architecture/vault-notes-release-lineage.md')
-record('LINEAGE DOC', lineage.includes('Selected current version: 1.2.0'))
-record('REAL 1.2.0 RELEASE', lineage.includes('vault-notes-v1.2.0') && lineage.includes('98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935'))
+record('LINEAGE DOC', lineage.includes('Selected current version: 2.0.2'))
+record('REAL 2.0.2 RELEASE', lineage.includes('vault-notes-v2.0.2') && lineage.includes('2134d04aee1f3f59408f1fbab28c6de2a85aab314515941e16239a74a694c789'))
 
 const policy = read('services/greenfield-api/src/modules/beta-catalogue-policy.ts')
-record('LEGACY PRODUCT HIDDEN', policy.includes("'modula.vault-notes': 'digital.modula.vault-notes'"))
+record(
+  'LEGACY PRODUCT HIDDEN',
+  policy.includes('isModuleIdentityAlias') &&
+    policy.includes('resolveCanonicalModuleId') &&
+    policy.includes('visibleInBeta: false'),
+)
 
 const overlay = read('services/greenfield-api/src/modules/canonical-manifest.ts')
 record('IMPORT OVERLAY', overlay.includes('canonicalizeVaultNotesManifest'))
@@ -72,7 +77,7 @@ record(
   'CARD HAS INSTALL ACTION',
   card.includes('onAction') &&
     card.includes('ModuleRow') &&
-    moduleAction.includes("shown === 'Install'") &&
+    moduleAction.includes("label === 'Install'") &&
     moduleAction.includes('onPress'),
 )
 

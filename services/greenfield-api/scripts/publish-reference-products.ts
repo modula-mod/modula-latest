@@ -3,6 +3,11 @@ import {execFileSync} from 'node:child_process'
 import {readFileSync} from 'node:fs'
 import {join, resolve} from 'node:path'
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
+import {
+  CANONICAL_VAULT_NOTES_CURRENT_TAG,
+  CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  CANONICAL_VAULT_NOTES_MODULE_ID,
+} from '@modula/greenfield-contracts'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 
@@ -30,9 +35,9 @@ type ReferenceProduct = {
 const definitions: Array<Omit<ReferenceProduct, 'root' | 'manifest' | 'provenance'>> = [
   {
     name: 'notes',
-    moduleId: 'digital.modula.vault-notes',
-    version: '1.2.0',
-    provenanceFile: 'vault-notes-v1.2.0.provenance.json',
+    moduleId: CANONICAL_VAULT_NOTES_MODULE_ID,
+    version: CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+    provenanceFile: `${CANONICAL_VAULT_NOTES_CURRENT_TAG}.provenance.json`,
   },
   {
     name: 'formatting',
@@ -158,7 +163,7 @@ async function inspectRegistry(db: ModulaDb, products: ReferenceProduct[]) {
     .selectFrom('greenfield_module_releases')
     .select(['release_id', 'module_id', 'version', 'release_state'])
     .where('module_id', '=', 'digital.modula.vault-notes')
-    .where('version', '!=', '1.2.0')
+    .where('version', '!=', products[0]!.version)
     .where('release_state', '=', 'published')
     .orderBy('version')
     .execute()

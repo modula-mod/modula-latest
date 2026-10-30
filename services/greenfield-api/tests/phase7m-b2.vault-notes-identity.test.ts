@@ -4,6 +4,7 @@ import {
   CANONICAL_VAULT_NOTES_CURRENT_COMMIT,
   CANONICAL_VAULT_NOTES_CURRENT_TAG,
   CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  CANONICAL_VAULT_NOTES_MANIFEST_SHA256,
   CANONICAL_VAULT_NOTES_DATA_NAMESPACE,
   CANONICAL_VAULT_NOTES_MODULE_ID,
   CANONICAL_VAULT_NOTES_REPOSITORY,
@@ -113,16 +114,17 @@ describe('Vault Notes canonical identity', () => {
   it('records canonical source provenance for the current release', () => {
     expect(isCanonicalVaultNotesRepository(CANONICAL_VAULT_NOTES_REPOSITORY)).toBe(true)
     expect(isLegacyVaultNotesRepository('modula-mod/modula-module-vault-notes')).toBe(true)
-    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('1.2.0')
-    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v1.2.0')
-    expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toBe('c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('2.0.2')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v2.0.2')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toBe('bd5440278831cf97dfa2a6882125d207af013def')
   })
 
   it('records the current release artifact checksum', () => {
     expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toMatch(/^[0-9a-f]{64}$/)
     expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toBe(
-      '98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935',
+      '2134d04aee1f3f59408f1fbab28c6de2a85aab314515941e16239a74a694c789',
     )
+    expect(CANONICAL_VAULT_NOTES_MANIFEST_SHA256).toBe('b51470ea0ec8a3802557ac776675a12ec5f0bc9e13e6b885af3277d3cc78eae0')
   })
 
   it('treats an old family installation as an alias of the canonical product', () => {
@@ -133,9 +135,9 @@ describe('Vault Notes canonical identity', () => {
     expect(upgraded!.version).toBe('1.1.0')
   })
 
-  it('uses the real immutable 1.2.0 release created for the extension-point contract', () => {
-    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('1.2.0')
-    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v1.2.0')
+  it('uses the real immutable 2.0.2 release created for the current product contract', () => {
+    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('2.0.2')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v2.0.2')
     expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toMatch(/^[0-9a-f]{40}$/)
     expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toMatch(/^[0-9a-f]{64}$/)
   })
