@@ -265,8 +265,8 @@ function eventsAndJobs(handlerText) {
   }
 }
 
-export function extractSourceRoutes() {
-  const root = join(repoRoot, 'services/greenfield-api/src')
+export function extractSourceRoutes(sourceRepoRoot = repoRoot) {
+  const root = join(sourceRepoRoot, 'services/greenfield-api/src')
   const files = walk(root, path => extname(path) === '.ts')
   const routes = []
   for (const file of files) {
@@ -293,7 +293,7 @@ export function extractSourceRoutes() {
               if (!tuple || !ts.isArrayLiteralExpression(tuple)) continue
               const method = literal(unwrapExpression(tuple.elements[methodIndex]), sourceFile)
               if (method && ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'].includes(method.toLowerCase())) {
-                routes.push(sourceRoute({file, sourceFile, node, methods: [method.toUpperCase()], path, handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null}))
+                routes.push(sourceRoute({file, sourceFile, node, methods: [method.toUpperCase()], path, handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null, sourceRepoRoot}))
               }
             }
           }
@@ -310,9 +310,9 @@ export function extractSourceRoutes() {
             const loopName = declaration && ts.isIdentifier(declaration.name) ? declaration.name.text : null
             const values = loopLiteralValues(loop, sourceFile)
             if (loopName && values.length && path.includes(`{${loopName}}`)) {
-              for (const value of values) routes.push(sourceRoute({file, sourceFile, node, methods: [methodName.toUpperCase()], path: path.replaceAll(`{${loopName}}`, value), handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null}))
+              for (const value of values) routes.push(sourceRoute({file, sourceFile, node, methods: [methodName.toUpperCase()], path: path.replaceAll(`{${loopName}}`, value), handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null, sourceRepoRoot}))
             } else {
-              routes.push(sourceRoute({file, sourceFile, node, methods: [methodName.toUpperCase()], path, handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null}))
+              routes.push(sourceRoute({file, sourceFile, node, methods: [methodName.toUpperCase()], path, handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null, sourceRepoRoot}))
             }
           }
         }
@@ -338,7 +338,7 @@ export function extractSourceRoutes() {
                   if (!tuple || !ts.isArrayLiteralExpression(tuple)) continue
                   const method = literal(unwrapExpression(tuple.elements[methodIndex]), sourceFile)
                   const path = literal(unwrapExpression(tuple.elements[pathIndex]), sourceFile)
-                  if (method && path) routes.push(sourceRoute({file, sourceFile, node, methods: [method.toUpperCase()], path, handler: propertyValue(handlerProp), config: object}))
+                  if (method && path) routes.push(sourceRoute({file, sourceFile, node, methods: [method.toUpperCase()], path, handler: propertyValue(handlerProp), config: object, sourceRepoRoot}))
                 }
                 expanded = true
               }
@@ -347,7 +347,7 @@ export function extractSourceRoutes() {
           if (!expanded) {
             const methods = methodProp ? arrayStrings(propertyValue(methodProp), sourceFile).map(value => value.toUpperCase()) : []
             const path = pathProp ? literal(propertyValue(pathProp), sourceFile) : null
-            if (methods.length && path) routes.push(sourceRoute({file, sourceFile, node, methods, path, handler: propertyValue(handlerProp), config: object}))
+            if (methods.length && path) routes.push(sourceRoute({file, sourceFile, node, methods, path, handler: propertyValue(handlerProp), config: object, sourceRepoRoot}))
           }
         }
       }
@@ -367,9 +367,9 @@ function findAncestor(node, predicate) {
   return null
 }
 
-function sourceRoute({file, sourceFile, node, methods, path, handler, config}) {
+function sourceRoute({file, sourceFile, node, methods, path, handler, config, sourceRepoRoot = repoRoot}) {
   const handlerText = handler?.getText(sourceFile) ?? ''
-  const relativeFile = relative(repoRoot, file)
+  const relativeFile = relative(sourceRepoRoot, file)
   const auth = routeAuth(handlerText, path, relativeFile)
   const tables = operationTables(handlerText)
   const asyncEffects = eventsAndJobs(handlerText)

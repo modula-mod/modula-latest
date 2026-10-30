@@ -123,7 +123,10 @@ if (candidate) {
   const candidateSelected = atlas?.metadata?.runtimeEvidence?.kind === 'local-candidate-runtime'
   if (candidateSelected) {
     const explicitMainPredeploy = process.env.API_ATLAS_RUNTIME_EVIDENCE === 'candidate' && currentBranch === 'main'
-    check('candidate branch matches current branch or explicit main predeploy', Boolean(currentBranch) && (candidate.source?.branch === currentBranch || explicitMainPredeploy), `${candidate.source?.branch ?? 'missing'} != ${currentBranch || 'missing'}`)
+    const sourceIdenticalFeatureBranch = process.env.API_ATLAS_RUNTIME_EVIDENCE === 'candidate'
+      && currentBranch !== 'main'
+      && candidate.source?.apiSourceSha256 === apiSourceFingerprint()
+    check('candidate branch matches current branch or source-identical predeploy', Boolean(currentBranch) && (candidate.source?.branch === currentBranch || explicitMainPredeploy || sourceIdenticalFeatureBranch), `${candidate.source?.branch ?? 'missing'} != ${currentBranch || 'missing'}`)
     check('candidate source fingerprint is fresh', candidate.source?.apiSourceSha256 === apiSourceFingerprint())
     check('candidate atlas is not marked public edge', atlas.routes.every(route => route.publicEdge === false && route.status === 'candidate-registered-not-production-probed'))
   }

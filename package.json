@@ -73,6 +73,7 @@
     "api:atlas:lineage": "node tools/api-atlas/release-lineage.mjs",
     "api:atlas:capture": "node tools/api-atlas/capture.mjs && node tools/api-atlas/generate.mjs",
     "api:atlas:probe": "node tools/api-atlas/probe.mjs && node tools/api-atlas/generate.mjs",
+    "api:functional-parity:reconcile": "node tools/api-atlas/reconcile-functional-parity.mjs",
     "verify:module-distribution-nginx": "node scripts/verify-module-distribution-nginx.mjs",
     "verify:api-atlas": "node tools/api-atlas/verify.mjs",
     "start": "EXPO_UNSTABLE_MCP_SERVER=1 expo start --web",
