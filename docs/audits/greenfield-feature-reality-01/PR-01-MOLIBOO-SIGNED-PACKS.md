@@ -3,9 +3,9 @@
 MISSION ITEM: PR-01 — MOLIBOO SERIES 2 SIGNED PACK DELIVERY
 STATUS: PARTIAL
 BRANCH: `feat/qa-moliboo-series2-packs`
-PR URL: Pending draft PR creation
+PR URL: `https://github.com/modula-mod/modula-latest/pull/147`
 BASE SHA: `bae20cebb48685c56ed5ccfe5537f121e3f36110`
-HEAD SHA: The exact live branch tip is maintained in the draft PR description; a Git commit cannot embed its own SHA.
+HEAD SHA: Implementation commit `7b1a61a094e45446feb3cdd27235692329062d4a`; the exact live metadata tip is maintained in the draft PR description because a Git commit cannot embed its own SHA.
 ROUTES ADDED: 9
 ROUTES MODIFIED: 1
 ATLAS UPDATED: YES
