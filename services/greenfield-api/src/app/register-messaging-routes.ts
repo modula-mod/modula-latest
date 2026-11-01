@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify'
 
 import type {ModulaDb} from '../database/client.js'
 import {MessagingService} from '../domains/messaging/service.js'
+import {enqueuePush} from '../domains/push/service.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 
@@ -85,6 +86,8 @@ export async function registerMessagingRoutes(
     const body = (request.body ?? {}) as {text?: unknown}
     try {
       const message = await messaging.send(auth.actorId, id, body)
+      await notifyConversationMembers(db, auth.actorId, id, typeof body.text === 'string' ? body.text : '')
+        .catch(error => request.log.warn({error: error?.message}, 'message push enqueue failed'))
       return reply.code(201).send(successEnvelope({message}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Unable to send message')
@@ -183,4 +186,31 @@ export async function registerMessagingRoutes(
       return mapDomainError(reply, error, request.id, 'Unable to send reply')
     }
   })
+}
+
+/** Best-effort push fan-out for a new direct message / In-Mail reply. */
+async function notifyConversationMembers(db: ModulaDb, senderActorId: string, conversationId: string, text: string): Promise<void> {
+  const [members, sender] = await Promise.all([
+    db.selectFrom('greenfield_conversation_members')
+      .select(['actor_id', 'state'])
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '<>', senderActorId)
+      .where('state', 'in', ['active', 'pending'])
+      .execute(),
+    db.selectFrom('profiles').select(['handle', 'display_name']).where('actor_id', '=', senderActorId).executeTakeFirst(),
+  ])
+  const name = (sender as any)?.display_name || (sender?.handle ? `@${sender.handle}` : 'Someone')
+  const preview = text.trim().replace(/\s+/g, ' ').slice(0, 160) || 'sent you a message'
+  for (const member of members) {
+    await enqueuePush(db, {
+      recipientActorId: member.actor_id,
+      category: 'messages',
+      actorId: senderActorId,
+      title: member.state === 'pending' ? `Message request from ${name}` : name,
+      body: preview,
+      deepLink: `modula://messages/${conversationId}`,
+      threadId: `messages:${conversationId}`,
+      data: {conversationId, type: 'message'},
+    })
+  }
 }

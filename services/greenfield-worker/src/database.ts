@@ -354,6 +354,64 @@ export interface Database {
     created_at: Date
     updated_at: Date
   }
+  push_device_tokens: {
+    id: string
+    account_id: string
+    actor_id: string
+    token: string
+    platform: 'ios'
+    environment: 'development' | 'production'
+    bundle_id: string
+    app_version: string | null
+    device_name: string | null
+    locale: string | null
+    timezone: string | null
+    created_at: Date
+    updated_at: Date
+    last_seen_at: Date
+    disabled_at: Date | null
+    disabled_reason: string | null
+  }
+  push_notification_preferences: {
+    actor_id: string
+    push_enabled: boolean
+    likes_enabled: boolean
+    comments_enabled: boolean
+    replies_enabled: boolean
+    mentions_enabled: boolean
+    follows_enabled: boolean
+    messages_enabled: boolean
+    stories_enabled: boolean
+    moliboo_care_enabled: boolean
+    gubic_invites_enabled: boolean
+    quiet_hours_enabled: boolean
+    quiet_hours_start: string
+    quiet_hours_end: string
+    timezone: string
+    version: number
+    created_at: Date
+    updated_at: Date
+  }
+  push_deliveries: {
+    id: string
+    recipient_actor_id: string
+    notification_id: string | null
+    category: string
+    actor_id: string | null
+    title: string | null
+    body: string
+    deep_link: string | null
+    thread_id: string | null
+    data: unknown
+    status: 'queued' | 'sending' | 'sent' | 'suppressed' | 'failed' | 'dead_letter'
+    attempts: number
+    next_attempt_at: Date
+    lease_expires_at: Date | null
+    last_error: string | null
+    sent_count: number
+    created_at: Date
+    updated_at: Date
+  }
   notification_preferences: {
     id: string
     actor_id: string
