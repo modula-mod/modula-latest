@@ -9,6 +9,7 @@ const envSchema = z.object({
   MODULA_PUBLIC_API_URL: z.string().url(),
   MODULA_PUBLIC_WEB_URL: z.string().url().optional(),
   MODULA_DATABASE_URL: z.string().min(1),
+  APNS_BUNDLE_ID: z.string().min(1).default('digital.modula.app.native'),
   MODULA_DATABASE_MIGRATOR_URL: z.string().min(1).optional(),
   MODULA_ALLOWED_ORIGINS: z.string().min(1),
   MODULA_LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
@@ -163,6 +164,7 @@ export type AppConfig = {
   host: string
   port: number
   publicApiUrl: string
+  pushBundleId: string
   publicWebUrl: string
   databaseUrl: string
   migratorDatabaseUrl: string
@@ -450,6 +452,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     host: raw.MODULA_API_HOST,
     port: raw.MODULA_API_PORT,
     publicApiUrl: raw.MODULA_PUBLIC_API_URL,
+    pushBundleId: raw.APNS_BUNDLE_ID,
     publicWebUrl,
     databaseUrl: raw.MODULA_DATABASE_URL,
     migratorDatabaseUrl: raw.MODULA_DATABASE_MIGRATOR_URL ?? raw.MODULA_DATABASE_URL,
