@@ -26,6 +26,13 @@ if (!existsSync(snapshotPath)) throw new Error(`Missing ${snapshotPath}; run pnp
 const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'))
 const candidatePath = join(evidenceDir, 'candidate-runtime.json')
 const candidate = existsSync(candidatePath) ? JSON.parse(readFileSync(candidatePath, 'utf8')) : null
+const contractOverridesPath = join(outputDir, 'contract-overrides.json')
+const contractOverrides = existsSync(contractOverridesPath)
+  ? JSON.parse(readFileSync(contractOverridesPath, 'utf8'))
+  : {schemaVersion: 1, routes: {}}
+if (contractOverrides.schemaVersion !== 1 || !contractOverrides.routes || typeof contractOverrides.routes !== 'object') {
+  throw new Error('Invalid API Atlas contract-overrides.json')
+}
 const currentBranch = process.env.GITHUB_HEAD_REF || commandOr('git', ['branch', '--show-current'])
 const candidateRequested = process.env.API_ATLAS_RUNTIME_EVIDENCE === 'candidate'
 // A docs-only production closeout must not inherit a candidate captured for a
@@ -246,8 +253,16 @@ const atlas = applicationRuntime.map(runtimeRoute => {
         ? 'Fastify route schema is registered.'
         : 'No Fastify request/response schema is registered; validation, if present, is handler/service-level.'}`
       : 'Runtime route has no matched static route; investigate dynamic/plugin registration.',
+    contract: contractOverrides.routes[key] ?? null,
   }
 }).sort((a, b) => a.effectiveRoute.localeCompare(b.effectiveRoute) || a.method.localeCompare(b.method))
+
+for (const [id, contract] of Object.entries(contractOverrides.routes)) {
+  const route = atlas.find(item => item.id === id)
+  if (!route) throw new Error(`Contract override does not match a selected runtime route: ${id}`)
+  const required = ['purpose', 'owningDomain', 'authentication', 'authorization', 'request', 'success', 'errors', 'pagination', 'idempotencyConcurrency', 'versioningCompatibility']
+  if (!contract || required.some(field => !(field in contract))) throw new Error(`Contract override is incomplete: ${id}`)
+}
 
 const sourceOnly = source.filter(route => !runtimeByKey.has(`${route.method} ${route.path}`)).map(route => ({method: route.method, path: route.path, source: `${route.file}:${route.line}`}))
 const runtimeOnly = atlas.filter(route => !route.sourceRegistration)
@@ -343,6 +358,7 @@ const contractBaseline = atlas.map(route => ({
   ownership: route.authorization.ownership,
   request: route.request,
   response: route.response,
+  contract: route.contract,
   sourceContractSha256: sourceContractFingerprint(sourceByKey.get(route.id)),
 }))
 const workerJobMap = scanWorkerJobMap()
@@ -379,6 +395,7 @@ write('10-live-probe-results.md', renderLiveProbes())
 write('11-gap-register.md', renderGapRegister())
 write('12-remediation-roadmap.md', renderRoadmap())
 write('13-verification-results.md', renderVerificationResults())
+execFileSync(process.execPath, [join(repoRoot, 'tools/api-atlas/generate-docx.mjs')], {cwd: repoRoot, stdio: 'pipe'})
 process.stdout.write(`Generated ${atlas.length} application routes; ${frameworkRuntime.length} framework-derived routes explicitly excluded.\n`)
 process.stdout.write(`Source-only: ${sourceOnly.length}; runtime-only: ${runtimeOnly.length}; tables: ${tables.length}.\n`)
 
@@ -702,7 +719,7 @@ function routeStats() {
 }
 
 function renderCsv(routes) {
-  const columns = ['domain','method','effectiveRoute','publicUrl','apiVersion','source','handler','visibility','authentication','capabilities','rateLimit','requestSchema','responseSchema','reads','writes','events','jobs','knownClients','tests','runtime','publicEdge','featureState','liveProbe','status','notes']
+  const columns = ['domain','method','effectiveRoute','publicUrl','apiVersion','source','handler','visibility','authentication','capabilities','rateLimit','requestSchema','responseSchema','purpose','owningDomain','requestContract','successContract','errorContract','paginationContract','idempotencyConcurrency','versioningCompatibility','reads','writes','events','jobs','knownClients','tests','runtime','publicEdge','featureState','liveProbe','status','notes']
   const rows = routes.map(route => ({
     domain: route.domain,
     method: route.method,
@@ -717,6 +734,14 @@ function renderCsv(routes) {
     rateLimit: route.rateLimit ? `${route.rateLimit.max}/${route.rateLimit.timeWindow}` : 'none',
     requestSchema: route.request.explicitFastifySchema,
     responseSchema: route.response.explicitFastifySchema,
+    purpose: route.contract?.purpose ?? '',
+    owningDomain: route.contract?.owningDomain ?? '',
+    requestContract: route.contract?.request ? JSON.stringify(route.contract.request) : '',
+    successContract: route.contract?.success ? JSON.stringify(route.contract.success) : '',
+    errorContract: route.contract?.errors ? JSON.stringify(route.contract.errors) : '',
+    paginationContract: route.contract?.pagination ? JSON.stringify(route.contract.pagination) : '',
+    idempotencyConcurrency: route.contract?.idempotencyConcurrency ?? '',
+    versioningCompatibility: route.contract?.versioningCompatibility ?? '',
     reads: route.data.reads,
     writes: route.data.writes,
     events: route.eventsProduced,
@@ -737,7 +762,7 @@ function renderHttpAtlas(routes, reconciliation, sourceOnlyRoutes, runtimeOnlyRo
   const summary = `# Complete HTTP API Atlas\n\nProduction facts captured: ${snapshot.capturedAt}\nRoute evidence: ${runtimeEvidence.kind} captured ${runtimeEvidence.capturedAt}${candidateApplies ? ` for branch \`${runtimeEvidence.branch}\`; this does not claim deployment` : ''}.\n\n- Runtime method routes: ${reconciliation.runtimeMethodRoutes}\n- Application routes: ${reconciliation.applicationRuntimeRoutes}\n- Automatically generated HEAD routes: ${reconciliation.frameworkRoutes.filter(route => route.method === 'HEAD').length}\n- Framework CORS routes: ${reconciliation.frameworkRoutes.filter(route => route.method === 'OPTIONS').length}\n- Source-only: ${sourceOnlyRoutes.length}\n- Runtime-only: ${runtimeOnlyRoutes.length}\n- Reconciliation: \`${reconciliation.equation}\`\n\nEvery selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in \`api-atlas.json\`. The JSON file is canonical for machine use.\n\n## Three-way reconciliation\n\n| Source | Runtime | Public edge | Status | Count |\n| --- | --- | --- | --- | ---: |\n| yes | yes | ${candidateApplies ? 'not yet' : 'yes'} | ${candidateApplies ? 'candidate-registered' : 'reachable or feature-gated'} | ${routes.filter(route => route.sourceRegistration).length} |\n| yes | no | no | source-only | ${sourceOnlyRoutes.length} |\n| no | yes | ${candidateApplies ? 'not yet' : 'yes'} | dynamically registered / investigate | ${runtimeOnlyRoutes.length} |\n| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | ${reconciliation.explicitlyExcludedFrameworkRoutes} |\n\n## Endpoint index\n\n| Domain | Method | Effective route | Access | Rate | Source | Runtime status |\n| --- | --- | --- | --- | --- | --- | --- |\n${routes.map(route => `| ${route.domain} | ${route.method} | \`${route.effectiveRoute}\` | ${route.authorization.visibility} | ${route.rateLimit ? `${route.rateLimit.max}/${route.rateLimit.timeWindow}` : 'none'} | ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'unmatched'} | ${route.status} |`).join('\n')}\n\n## Endpoint records\n\n`
   const contractNotes = `## Error contract\n\nThe canonical envelope is \`{ok,data,meta:{requestId,serverTime}}\` or \`{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta}\` (\`services/greenfield-api/src/transport/envelope.ts:9\`). Status mapping is 400 for validation/schema/abstention, 401 for authentication/session/step-up, 403 for authorization/policy denial, 404 for unknown resources, 409 for conflicts/approval state, 429 for explicit rate-limit codes and 500 by default. Fastify-generated 413 body-limit and 415 content-parser errors can bypass this envelope because no global custom error handler exists. No canonical 422 mapping was found. Binary media, OAuth redirects and SSE are deliberate specialized responses.\n\n## Pagination contract\n\nShared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque cursor, stable route-specific ordering, \`nextCursor\`, and no previous cursor (\`services/greenfield-api/src/transport/pagination.ts:1\`). Every route's machine record includes \`request.pagination\`; \`none observed\` exposes unpaginated or non-list handlers rather than inventing a contract. Discover/activity unbounded behavior is a registered gap.\n\n`
   const enrichedSummary = summary.replace('\n## Endpoint index', `\n${contractNotes}## Endpoint index`)
-  return enrichedSummary + routes.map(route => `<details>\n<summary><code>${route.id}</code> — ${route.status}</summary>\n\n- Domain: ${route.domain}\n- Method: ${route.method}\n- Effective route: \`${route.effectiveRoute}\`\n- Public URL: \`${route.publicUrl}\`\n- API version: ${route.apiVersion}\n- Source file: ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'UNMATCHED'}\n- Handler: ${route.handler}\n- Controller/service calls: ${list(route.controllerServices)}\n- Authentication: ${route.authentication}\n- Authorization: ${route.authorization.visibility}\n- Ownership rule: ${route.authorization.ownership.rule}\n- Workspace rule: ${route.authorization.ownership.workspaceScoped ? 'workspace identifier observed; downstream enforcement requires service evidence' : 'none observed'}\n- Capability/permission: ${list([...route.authorization.capabilities, ...route.authorization.serviceOperations])}\n- Rate limit: ${route.rateLimit ? `${route.rateLimit.max} per ${route.rateLimit.timeWindow}` : 'none registered'}\n- Request params: ${list(route.request.params)}\n- Request query: ${list(route.request.query)}\n- Request body: ${list(route.request.body)}\n- Pagination: ${route.request.pagination.style}${route.request.pagination.maximumPageSize ? `; default ${route.request.pagination.defaultPageSize}, max ${route.request.pagination.maximumPageSize}, next cursor ${route.request.pagination.nextCursor ? 'yes' : 'no'}` : ''}\n- Response schema: ${route.response.explicitFastifySchema ? JSON.stringify(route.response.schema) : 'not declared in Fastify'}\n- Success codes: ${list(route.successCodes)}\n- Expected errors: ${list(route.expectedErrors)}\n- Database reads: ${list(route.data.reads)}\n- Database writes: ${list(route.data.writes)}\n- Storage: ${list(route.storage)}\n- Events produced: ${list(route.eventsProduced)}\n- Jobs produced: ${list(route.jobsProduced)}\n- External integrations: ${list(route.externalIntegrations)}\n- Known clients: ${list(route.callers.clients)}\n- Tests: ${list(route.callers.tests)}\n- Runtime registration: yes\n- Live probe: ${route.liveProbe ? `${route.liveProbe.result} (${route.liveProbe.status})` : 'not executed'}\n- Status: ${route.status}\n- Notes: ${route.notes}\n\n</details>\n\n`).join('')
+  return enrichedSummary + routes.map(route => `<details>\n<summary><code>${route.id}</code> — ${route.status}</summary>\n\n- Domain: ${route.domain}\n- Method: ${route.method}\n- Effective route: \`${route.effectiveRoute}\`\n- Public URL: \`${route.publicUrl}\`\n- API version: ${route.apiVersion}\n- Source file: ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'UNMATCHED'}\n- Handler: ${route.handler}\n- Controller/service calls: ${list(route.controllerServices)}\n- Authentication: ${route.authentication}\n- Authorization: ${route.authorization.visibility}\n- Ownership rule: ${route.authorization.ownership.rule}\n- Workspace rule: ${route.authorization.ownership.workspaceScoped ? 'workspace identifier observed; downstream enforcement requires service evidence' : 'none observed'}\n- Capability/permission: ${list([...route.authorization.capabilities, ...route.authorization.serviceOperations])}\n- Rate limit: ${route.rateLimit ? `${route.rateLimit.max} per ${route.rateLimit.timeWindow}` : 'none registered'}\n- Request params: ${list(route.request.params)}\n- Request query: ${list(route.request.query)}\n- Request body: ${list(route.request.body)}\n- Pagination: ${route.request.pagination.style}${route.request.pagination.maximumPageSize ? `; default ${route.request.pagination.defaultPageSize}, max ${route.request.pagination.maximumPageSize}, next cursor ${route.request.pagination.nextCursor ? 'yes' : 'no'}` : ''}\n- Response schema: ${route.response.explicitFastifySchema ? JSON.stringify(route.response.schema) : 'not declared in Fastify'}\n- Success codes: ${list(route.successCodes)}\n- Expected errors: ${list(route.expectedErrors)}\n- Database reads: ${list(route.data.reads)}\n- Database writes: ${list(route.data.writes)}\n- Storage: ${list(route.storage)}\n- Events produced: ${list(route.eventsProduced)}\n- Jobs produced: ${list(route.jobsProduced)}\n- External integrations: ${list(route.externalIntegrations)}\n- Known clients: ${list(route.callers.clients)}\n- Tests: ${list(route.callers.tests)}\n- Runtime registration: yes\n- Live probe: ${route.liveProbe ? `${route.liveProbe.result} (${route.liveProbe.status})` : 'not executed'}\n- Status: ${route.status}\n- Contract purpose: ${route.contract?.purpose ?? 'no mission-specific override; static/runtime record is authoritative'}\n- Contract owner: ${route.contract?.owningDomain ?? route.domain}\n- Contract authentication: ${route.contract?.authentication ?? route.authentication}\n- Contract authorization: ${route.contract?.authorization ?? route.authorization.visibility}\n- Contract request: ${route.contract?.request ? JSON.stringify(route.contract.request) : 'see static request evidence above'}\n- Contract success: ${route.contract?.success ? JSON.stringify(route.contract.success) : `status ${route.successCodes.join(', ') || 'not observed'}; see response evidence above`}\n- Contract errors: ${route.contract?.errors ? JSON.stringify(route.contract.errors) : route.expectedErrors.join(', ') || 'none observed'}\n- Contract pagination/filtering: ${route.contract?.pagination ? JSON.stringify(route.contract.pagination) : route.request.pagination.style}\n- Idempotency/concurrency: ${route.contract?.idempotencyConcurrency ?? 'not separately declared; implementation semantics remain authoritative'}\n- Versioning/compatibility: ${route.contract?.versioningCompatibility ?? `HTTP ${route.apiVersion}; no mission-specific compatibility override`}\n- Notes: ${route.notes}\n\n</details>\n\n`).join('')
 }
 
 function list(values) {
@@ -762,7 +787,7 @@ function renderOpenApi(routes, production) {
     const openPath = route.effectiveRoute.replaceAll(/:([A-Za-z0-9_]+)/g, '{$1}')
     const operation = {
       operationId: `${route.method.toLowerCase()}_${route.effectiveRoute.replaceAll(/[^A-Za-z0-9]+/g, '_').replaceAll(/^_|_$/g, '')}`,
-      summary: `${route.domain}: ${route.method} ${route.effectiveRoute}`,
+      summary: route.contract?.purpose ?? `${route.domain}: ${route.method} ${route.effectiveRoute}`,
       tags: [route.domain],
       parameters: [...route.effectiveRoute.matchAll(/:([A-Za-z0-9_]+)/g)].map(match => ({name: match[1], in: 'path', required: true, schema: {}})),
       responses: Object.fromEntries(route.successCodes.map(code => [String(code), {description: 'Implementation response; schema is not registered'}])),
@@ -770,6 +795,7 @@ function renderOpenApi(routes, production) {
       'x-modula-auth': route.authentication,
       'x-modula-rate-limit': route.rateLimit,
       'x-contract-completeness': route.request.explicitFastifySchema && route.response.explicitFastifySchema ? 'schema-declared' : 'schema-missing',
+      'x-modula-contract': route.contract,
     }
     if (route.authorization.sessionRequired) operation.security = [{bearerAuth: []}]
     if (route.authorization.serviceAssertionRequired || route.authorization.serviceOperations.length) operation.security = [{serviceAssertion: []}]
