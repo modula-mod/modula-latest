@@ -18677,6 +18677,1703 @@
       "sourceContractSha256": "ef075d43361901183d236c3997868832043d0ea6f8018495db5c39be11fa3f91"
     },
     {
+      "id": "GET /v1/me/collections",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "List the authenticated actor's named Saved collections and authoritative active item counts.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Collection owner is resolved from the authenticated actor; another actor's collections are never returned.",
+        "request": {
+          "params": {},
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional updated-at/collection-id cursor"
+          },
+          "body": {},
+          "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data CursorPage<SavedCollectionDto>."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "updated_at descending then collection_id descending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only; itemCount is derived from active collection-item rows.",
+        "versioningCompatibility": "HTTP v1 additive route. This is named organization over existing Saved rows, not a replacement bookmarking system."
+      },
+      "sourceContractSha256": "eeb25b1c10d2105fe4201d2f35f0c2fbaa2a14748a477a4ab16c4379da837836"
+    },
+    {
+      "id": "POST /v1/me/collections",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "{name: string}).name, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Create an authenticated actor-owned named Saved collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Owner identity is server-derived; client owner fields are rejected.",
+        "request": {
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "required trimmed name, 1-120 characters"
+          },
+          "validation": "Unknown fields and blank names are rejected; active names are case-insensitively unique per owner."
+        },
+        "success": {
+          "status": "201",
+          "body": "Envelope data {collection:SavedCollectionDto} with itemCount=0 and version=1."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "A partial unique index on owner and normalized active name prevents concurrent duplicates; state and audit commit together.",
+        "versioningCompatibility": "HTTP v1 new route. Collection IDs are immutable UUIDs and version starts at 1."
+      },
+      "sourceContractSha256": "78adb1eca7fd5449abc1bbadac55054910dc1dcd97842f785d1c60838822dbe9"
+    },
+    {
+      "id": "DELETE /v1/me/collections/:collectionId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [
+          "{expectedVersion: number}).expectedVersion)"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Soft-delete an authenticated actor-owned collection without deleting source posts or Saved rows.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Only the owner may delete; cross-user IDs return NOT_FOUND.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {
+            "expectedVersion": "required positive integer"
+          },
+          "body": {},
+          "validation": "Unknown query fields and stale revisions are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {deleted:true}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Soft delete is version-guarded and auditable. Collection-item rows may cascade only during physical recovery cleanup; posts and post_saves are never cascaded.",
+        "versioningCompatibility": "HTTP v1 new route. Deletion does not unsave or delete underlying content."
+      },
+      "sourceContractSha256": "806cc0a17324c0c10ca48fd15ffcc112919d80341b47db7f93e976eb4476ea60"
+    },
+    {
+      "id": "GET /v1/me/collections/:collectionId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Load one authenticated actor-owned named Saved collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Cross-user and deleted collection IDs return NOT_FOUND without ownership disclosure.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {},
+          "body": {},
+          "validation": "collectionId is schema-validated."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {collection:SavedCollectionDto}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Read-only; item count is server-derived.",
+        "versioningCompatibility": "HTTP v1 new route."
+      },
+      "sourceContractSha256": "d9362386829ddaf6db7f7ed16e4cb2271cab2749881fd0bd99b8c9283d7df8bc"
+    },
+    {
+      "id": "PATCH /v1/me/collections/:collectionId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{name: string"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Optimistically rename an authenticated actor-owned Saved collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Only the owner may rename; owner identity and version are not inferred from client object state.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {},
+          "body": {
+            "name": "required 1-120 characters",
+            "expectedVersion": "required positive integer"
+          },
+          "validation": "Unknown fields, blank names and duplicate active owner/name pairs are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {collection:SavedCollectionDto} with incremented version."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "UPDATE is guarded by owner and expectedVersion; stale or competing renames return CONFLICT.",
+        "versioningCompatibility": "HTTP v1 new route with optimistic revision semantics."
+      },
+      "sourceContractSha256": "3658b419d1c208a4cb9d1d874519704f575d06712b1bcf307127d72d92b48d21"
+    },
+    {
+      "id": "GET /v1/me/collections/:collectionId/items",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "List stable ordered items in one actor-owned collection while retaining unavailable source references safely.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Collection ownership is required. Post hydration applies existing post visibility policy.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional position/item-id cursor"
+          },
+          "body": {},
+          "validation": "Malformed UUID, cursor and limit values are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data CursorPage<SavedCollectionItemDto>; unavailable or unsaved sources return available=false and post=null."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "position ascending then item_id ascending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only; positions are uniquely constrained among active rows per collection.",
+        "versioningCompatibility": "HTTP v1 new route. Unavailable items remain identifiable for explicit removal and can become available after re-save."
+      },
+      "sourceContractSha256": "9965dd987abcae1f8e8ca3ab4bd1966f6c65f909dc06fb00bce95d293d37e847"
+    },
+    {
+      "id": "POST /v1/me/collections/:collectionId/items",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{postId: string}).postId, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Add an already-Saved post to an actor-owned named collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "The collection and active post_saves row must both belong to the authenticated actor.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {},
+          "body": {
+            "postId": "required UUID of an existing currently Saved post"
+          },
+          "validation": "Unknown fields, cross-user collections and posts not present in the caller's active Saved rows are rejected."
+        },
+        "success": {
+          "status": "201 when added; 200 for an existing active membership",
+          "body": "Envelope data {item:SavedCollectionItemDto}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The collection row serializes position allocation and UNIQUE(collection_id,save_id) prevents duplicate membership. Concurrent identical requests converge on one item ID.",
+        "versioningCompatibility": "HTTP v1 new route. postId references the canonical existing Saved system."
+      },
+      "sourceContractSha256": "309a1b05a5d1556caf8a636590591c4c3afbc46f2089a35694f7b0b5af6417f3"
+    },
+    {
+      "id": "DELETE /v1/me/collections/:collectionId/items/:itemId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Remove one item membership from an actor-owned collection without unsaving or deleting its source post.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Both collection ownership and item-to-collection association are enforced.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID",
+            "itemId": "required collection item UUID"
+          },
+          "query": {},
+          "body": {},
+          "validation": "Both UUIDs are schema-validated and cross-associated server-side."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {deleted:true}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The item is soft-deleted under a collection lock; a missing/already-removed item returns NOT_FOUND and no source rows are changed.",
+        "versioningCompatibility": "HTTP v1 new route."
+      },
+      "sourceContractSha256": "9643070299a708170b23fb30efaf30d3268635a12edfdecaae62da6ebe5d8c96"
+    },
+    {
+      "id": "GET /v1/me/drafts",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "List the authenticated actor's editable post drafts for multi-device reconciliation.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Only owner_actor_id matching the authenticated actor is queried.",
+        "request": {
+          "params": {},
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional updated-at/draft-id cursor"
+          },
+          "body": {},
+          "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data CursorPage<PostDraftDto>; each draft includes version and updatedAt for reconciliation."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "updated_at descending then draft_id descending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only; only editing drafts are listed. Published drafts remain addressable by ID for retry confirmation.",
+        "versioningCompatibility": "HTTP v1 additive route. Initial server contract is post drafts only; Story and In-Mail drafts remain separate Native gaps."
+      },
+      "sourceContractSha256": "eeb25b1c10d2105fe4201d2f35f0c2fbaa2a14748a477a4ab16c4379da837836"
+    },
+    {
+      "id": "POST /v1/me/drafts",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "CreatePostDraftInput, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Persist a post-composer draft and reserve its uploaded attachment references for the authenticated actor.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Owner is server-derived. Every attachment must be ready, unattached and owned by the authenticated account.",
+        "request": {
+          "params": {},
+          "query": {},
+          "body": {
+            "idempotencyKey": "optional 1-200 character retry identity",
+            "text": "required string up to 5000 characters; may be empty when content is present",
+            "feed": "optional following, forYou or modules",
+            "audience": "optional public, followers or private",
+            "replyPermission": "optional everyone, followers, mentioned or none",
+            "content": "optional array of at most 10 typed uploaded attachment references with captions up to 1000 characters",
+            "publishToAtproto": "optional boolean; attachments are not supported when true"
+          },
+          "validation": "Unknown/privileged fields, empty text+content, duplicate/cross-account/unready/reserved attachments and legacy base64 media are rejected."
+        },
+        "success": {
+          "status": "201 when created; 200 for an identical idempotent retry",
+          "body": "Envelope data {draft:PostDraftDto} with state=editing and version=1."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "An optional owner/idempotency-key unique index converges retries; key reuse with a different normalized payload returns CONFLICT. Draft and attachment references commit together.",
+        "versioningCompatibility": "HTTP v1 new route. Uses the canonical CreatePost content/feed/audience/reply contract; clients must upload local media before syncing."
+      },
+      "sourceContractSha256": "6075abc7fd5dc236c94f04350025119e0a61c52b6ce414e08715a3141fe99519"
+    },
+    {
+      "id": "DELETE /v1/me/drafts/:draftId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [
+          "{expectedVersion: number}).expectedVersion), contextFor(request))"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Soft-delete an owned draft and release any unpublished attachment reservations.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Only the authenticated owner may delete; cross-user IDs return NOT_FOUND.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {
+            "expectedVersion": "required positive integer"
+          },
+          "body": {},
+          "validation": "Unknown query fields and stale revisions are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {deleted:true}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Draft deletion is row-locked and revision-guarded. It never deletes a published post or attachment bytes.",
+        "versioningCompatibility": "HTTP v1 new route. A draft is never deleted automatically before post publication is confirmed."
+      },
+      "sourceContractSha256": "690dc7d1046ce990b4b2c6cf84982d81b96ff8ba8000ca4ddd7c09b6044045c6"
+    },
+    {
+      "id": "GET /v1/me/drafts/:draftId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Load one owned editing or published post draft for synchronization or publish retry recovery.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Cross-user and deleted draft IDs return NOT_FOUND.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {},
+          "body": {},
+          "validation": "draftId is schema-validated."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {draft:PostDraftDto}, including state, publishedPostId, version and updatedAt."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Read-only. Published state is retained so a lost publish response can be reconciled safely.",
+        "versioningCompatibility": "HTTP v1 new route."
+      },
+      "sourceContractSha256": "ebba3eb4227195e71441eebf32c311badb41b2dbe98b4ef8ccc209ae0d31076f"
+    },
+    {
+      "id": "PATCH /v1/me/drafts/:draftId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [
+          "UpdatePostDraftInput, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Optimistically synchronize changes to an owned editable post draft.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Only the authenticated owner may edit; published drafts reject edits.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {},
+          "body": {
+            "expectedVersion": "required positive integer",
+            "text": "optional string up to 5000 characters",
+            "feed": "optional following, forYou or modules",
+            "audience": "optional public, followers or private",
+            "replyPermission": "optional everyone, followers, mentioned or none",
+            "content": "optional complete replacement array of up to 10 uploaded attachment references",
+            "publishToAtproto": "optional boolean"
+          },
+          "validation": "At least one change is required. Unknown fields, stale revisions and invalid/cross-account/unready/reserved attachments are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {draft:PostDraftDto} with incremented version and updatedAt."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The draft row is locked and expectedVersion must match. Stale two-device edits return CONFLICT; no newer server revision is overwritten silently.",
+        "versioningCompatibility": "HTTP v1 new route. Clients should surface conflicts for user resolution and reload the latest draft."
+      },
+      "sourceContractSha256": "56d141f9ca44ebfe45f6ab5419260e81e8d8be3d8e5179ef32b432ba6f4015ea"
+    },
+    {
+      "id": "POST /v1/me/drafts/:draftId/publish",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{expectedVersion: number}).expectedVersion, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Validate and publish an owned post draft exactly once through the canonical post creation pipeline.",
+        "owningDomain": "Post drafts integrated with canonical posts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Draft owner and attachment ownership are resolved server-side; another actor cannot redirect or publish the draft.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {},
+          "body": {
+            "expectedVersion": "required current positive draft version"
+          },
+          "validation": "Unknown fields, stale revisions, invalid composer state and unavailable attachments are rejected before commit."
+        },
+        "success": {
+          "status": "201 for the committing publication; 200 for an already-published or concurrent retry",
+          "body": "Envelope data {draft:PostDraftDto,postId:string,created:boolean}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The server derives idempotency key draft-publish:<draftId>. The existing unique post author/key invariant converges concurrent retries, and post creation, attachment activation, outbox/events/audit and draft state/publishedPostId update commit in one database transaction. A stale finalizer rolls back the post; failed publication leaves state=editing.",
+        "versioningCompatibility": "HTTP v1 new route. The created post is a normal SocialPostDto record consumable without a fake draft post type."
+      },
+      "sourceContractSha256": "8f0fa2537dbbc1ea650d866b743b59a1cfbb475bd74feb9d682fc2897f12c6fc"
+    },
+    {
       "id": "GET /v1/me/entitlements",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -28131,15 +29828,15 @@
         "params": [],
         "query": [],
         "body": [],
-        "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
         "pagination": {
-          "style": "none observed",
-          "defaultPageSize": null,
-          "maximumPageSize": null,
-          "nextCursor": false,
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
           "previousCursor": false,
-          "stability": "not a list or unpaginated"
+          "stability": "route-specific stable ordering; inspect repository order fields"
         }
       },
       "response": {
@@ -28147,8 +29844,61 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
-      "sourceContractSha256": "93819bb7ed05628c2083721e7ce6ee16cdbded4942e8cddce433b6f193234cfe"
+      "contract": {
+        "purpose": "List the authenticated actor's existing Saved posts with bounded stable pagination.",
+        "owningDomain": "Saved posts",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Only the authenticated actor's private post_saves rows are queried; inaccessible or deleted source posts are omitted.",
+        "request": {
+          "params": {},
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional opaque created-at/save-id cursor"
+          },
+          "body": {},
+          "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {items:SocialPostDto[],nextCursor:string|null,hasMore:boolean}; the existing items field is preserved for older clients."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "post_saves.created_at descending then save id descending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only. Cursor identity is based on immutable save creation time and save ID; saving/unsaving continues through the existing post engagement routes.",
+        "versioningCompatibility": "HTTP v1 additive pagination metadata. Existing consumers that read data.items remain compatible."
+      },
+      "sourceContractSha256": "15026030fe69a4afe7f57f0c3d46ff25d65d3f1db9308184d73a45fae1911387"
     },
     {
       "id": "GET /v1/search",

@@ -234,10 +234,24 @@
     },
     {
       "file": "services/greenfield-api/src/database/types.ts",
-      "line": 178,
+      "line": 179,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/drafts/service.ts",
+      "line": 154,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!draft.publishedPostId) throw new Error('Published draft is missing its post identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/drafts/service.ts",
+      "line": 185,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Draft publication did not commit atomically')"
     },
     {
       "file": "services/greenfield-api/src/domains/gifs/service.ts",
@@ -248,7 +262,14 @@
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 291,
+      "line": 312,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Failed to load idempotent post replay')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/posts/writes.ts",
+      "line": 328,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!created) throw new Error('Failed to load created post')"
@@ -2266,10 +2287,24 @@
     },
     {
       "file": "services/greenfield-api/src/database/types.ts",
-      "line": 178,
+      "line": 179,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/drafts/service.ts",
+      "line": 154,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!draft.publishedPostId) throw new Error('Published draft is missing its post identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/drafts/service.ts",
+      "line": 185,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Draft publication did not commit atomically')"
     },
     {
       "file": "services/greenfield-api/src/domains/gifs/service.ts",
@@ -2280,7 +2315,14 @@
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 291,
+      "line": 312,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Failed to load idempotent post replay')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/posts/writes.ts",
+      "line": 328,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!created) throw new Error('Failed to load created post')"
