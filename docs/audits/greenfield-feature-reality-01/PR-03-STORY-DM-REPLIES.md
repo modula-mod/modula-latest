@@ -3,7 +3,7 @@
 MISSION ITEM: PR-03 — STORY REPLIES INTO DIRECT MESSAGES  
 STATUS: PARTIAL  
 BRANCH: `feat/qa-story-dm-replies`  
-PR URL: Pending draft creation  
+PR URL: `https://github.com/modula-mod/modula-latest/pull/149`  
 BASE SHA: Stacked review base `828173171147e2bc033142b413d3f7d4d8b1f410`; underlying GreenField main baseline `bae20cebb48685c56ed5ccfe5537f121e3f36110`  
 HEAD SHA: Implementation commit `cd1e1dbd7e73f990166774dc0ed15fb196f5125b`; the exact review tip is maintained in the draft PR description  
 ROUTES ADDED: 1 — `POST /v1/stories/:storyId/replies`  
