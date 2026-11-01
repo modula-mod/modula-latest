@@ -123,7 +123,70 @@ describeIfDb('Messaging: conversations, requests and In-Mail', () => {
     expect(alphaInbox.items[0].unreadCount).toBe(0)
 
     const again = await authed(alpha.accessToken, 'POST', '/v1/conversations', {handle: `@${beta.handle}`})
+    expect(again.statusCode).toBe(200)
+    expect(again.json().data.created).toBe(false)
     expect(again.json().data.conversation.id).toBe(conversationId)
+  })
+
+  it('creates one direct conversation and one initial message under concurrent retries', async () => {
+    const suffix = `${runSuffix}${Math.random().toString(36).slice(2, 7)}`
+    const sender = await createVerifiedUser(`racea${suffix}`.slice(0, 20), 'Race Sender')
+    const recipient = await createVerifiedUser(`raceb${suffix}`.slice(0, 20), 'Race Recipient')
+
+    const responses = await Promise.all(
+      Array.from({length: 12}, () => authed(sender.accessToken, 'POST', '/v1/conversations', {handle: recipient.handle, text: 'Initial message'})),
+    )
+    expect(responses.map(response => response.statusCode).sort()).toEqual([200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 201])
+    expect(responses.filter(response => response.json().data.created)).toHaveLength(1)
+    const ids = new Set(responses.map(response => response.json().data.conversation.id))
+    expect(ids.size).toBe(1)
+    const [conversationId] = ids
+
+    const conversations = await db
+      .selectFrom('greenfield_conversations')
+      .select('conversation_id')
+      .where('direct_key', '=', [sender.actorId, recipient.actorId].sort().join(':'))
+      .execute()
+    expect(conversations).toEqual([{conversation_id: conversationId}])
+    expect(await db.selectFrom('greenfield_conversation_members').selectAll().where('conversation_id', '=', conversationId).execute()).toHaveLength(2)
+    expect(await db.selectFrom('greenfield_conversation_messages').selectAll().where('conversation_id', '=', conversationId).execute()).toHaveLength(1)
+
+    const retryWithText = await authed(sender.accessToken, 'POST', '/v1/conversations', {handle: recipient.handle, text: 'Initial message'})
+    expect(retryWithText.statusCode).toBe(200)
+    expect(retryWithText.json().data).toMatchObject({created: false, conversation: {id: conversationId}})
+    expect(await db.selectFrom('greenfield_conversation_messages').selectAll().where('conversation_id', '=', conversationId).execute()).toHaveLength(1)
+  })
+
+  it('rejects blocked, inactive and malformed conversation targets without trusting client identity fields', async () => {
+    const {alpha: sender, gamma: recipient} = await users()
+    const suffix = `${runSuffix}${Math.random().toString(36).slice(2, 7)}`
+    const now = new Date()
+    await db.insertInto('blocks').values({
+      id: `block-${suffix}`,
+      blocker_actor_id: recipient.actorId,
+      blocked_actor_id: sender.actorId,
+      created_at: now,
+      updated_at: now,
+      deleted_at: null,
+      version: 1,
+    }).execute()
+
+    const blocked = await authed(sender.accessToken, 'POST', '/v1/conversations', {handle: recipient.handle})
+    expect(blocked.statusCode).toBe(403)
+    expect(blocked.json().error.code).toBe('FORBIDDEN')
+
+    await db.updateTable('blocks').set({deleted_at: new Date(), updated_at: new Date()}).where('id', '=', `block-${suffix}`).execute()
+    await db.updateTable('greenfield_accounts').set({status: 'suspended', updated_at: new Date()}).where('account_id', '=', recipient.accountId).execute()
+    const inactive = await authed(sender.accessToken, 'POST', '/v1/conversations', {handle: recipient.handle})
+    const unknown = await authed(sender.accessToken, 'POST', '/v1/conversations', {handle: `missing${suffix}`.slice(0, 20)})
+    const forged = await authed(sender.accessToken, 'POST', '/v1/conversations', {handle: recipient.handle, actorId: recipient.actorId})
+    await db.updateTable('greenfield_accounts').set({status: 'active', updated_at: new Date()}).where('account_id', '=', recipient.accountId).execute()
+
+    expect(inactive.statusCode).toBe(404)
+    expect(inactive.json().error).toMatchObject({code: 'NOT_FOUND', message: 'Recipient not found'})
+    expect(unknown.json().error).toMatchObject({code: 'NOT_FOUND', message: 'Recipient not found'})
+    expect(forged.statusCode).toBe(400)
+    expect(forged.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'Invalid conversation request'})
   })
 
   it('declines requests and hides them', async () => {

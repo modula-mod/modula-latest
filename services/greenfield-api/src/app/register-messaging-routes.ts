@@ -19,6 +19,23 @@ const idParams = {
   },
 }
 
+const startConversationBody = {
+  attachValidation: true,
+  schema: {
+    body: {
+      type: 'object',
+      // Fastify's default Ajv configuration removes unknown fields when this
+      // is false. Keep them for the authenticated handler to reject instead.
+      additionalProperties: true,
+      required: ['handle'],
+      properties: {
+        handle: {type: 'string', minLength: 1, maxLength: 80},
+        text: {type: 'string', maxLength: 5_000},
+      },
+    },
+  },
+}
+
 /**
  * Direct messages, message requests and In-Mail. Every route requires an
  * authenticated actor; membership is enforced in MessagingService.
@@ -54,13 +71,20 @@ export async function registerMessagingRoutes(
     }
   })
 
-  app.post('/v1/conversations', write(), async (request, reply) => {
+  app.post('/v1/conversations', write(startConversationBody), async (request, reply) => {
     const auth = requireCapability(request, reply, 'post:engage')
     if (!auth) return
+    if (request.validationError) {
+      return reply.code(statusForError('VALIDATION_FAILED')).send(failureEnvelope('VALIDATION_FAILED', 'Invalid conversation request', request.id))
+    }
     const body = (request.body ?? {}) as {handle?: unknown; text?: unknown}
+    if (Object.keys(body).some(key => key !== 'handle' && key !== 'text')) {
+      return reply.code(statusForError('VALIDATION_FAILED')).send(failureEnvelope('VALIDATION_FAILED', 'Invalid conversation request', request.id))
+    }
     try {
-      const conversation = await messaging.startConversation(auth.actorId, body)
-      return reply.code(201).send(successEnvelope({conversation}, request.id))
+      const result = await messaging.startConversation(auth.actorId, body)
+      if (result.created) return reply.code(201).send(successEnvelope(result, request.id))
+      return reply.code(200).send(successEnvelope(result, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Unable to start conversation')
     }
