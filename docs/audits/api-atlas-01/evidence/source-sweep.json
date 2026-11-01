@@ -234,7 +234,7 @@
     },
     {
       "file": "services/greenfield-api/src/database/types.ts",
-      "line": 173,
+      "line": 178,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
@@ -248,7 +248,7 @@
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 219,
+      "line": 291,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!created) throw new Error('Failed to load created post')"
@@ -2266,7 +2266,7 @@
     },
     {
       "file": "services/greenfield-api/src/database/types.ts",
-      "line": 173,
+      "line": 178,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
@@ -2280,7 +2280,7 @@
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 219,
+      "line": 291,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!created) throw new Error('Failed to load created post')"

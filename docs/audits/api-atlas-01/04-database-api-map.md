@@ -1,13 +1,13 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 79 ordered up migrations, latest `079_story_attachment_pipeline.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 80 ordered up migrations, latest `081_greenfield_communities.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 321
-- Tables with API/worker source references: 307
+- Production tables: 329
+- Tables with API/worker source references: 315
 - Orphan candidates requiring manual confirmation: 14
 - Write-only candidates: 38
 - Read-only candidates: 26
@@ -42,9 +42,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: deleted_at
 - Timestamps: `created_at`, `updated_at`, `deleted_at`
 - Migration introduced: `001_init_schema.sql`
-- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/accounts/me/blocks`, `POST /v1/accounts/me/handle`, `GET /v1/accounts/me/mutes`, `GET /v1/accounts/me/notification-preferences`, `PATCH /v1/accounts/me/notification-preferences`, `POST /v1/admin/ops/policy/evaluate`, `PUT /v1/admin/qa/premium/:handle`, `POST /v1/admin/qa/verification/appeals/:appealId/transitions`, `POST /v1/admin/qa/verification/applications/:applicationId/transitions`, `POST /v1/ai/requests`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/conversations`, `GET /v1/creator/insights`, `POST /v1/in-mail`, `PATCH /v1/me/membership/badge-visibility`, `POST /v1/me/verification/applications`, `POST /v1/modules/:moduleId/ai/requests`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `POST /v1/posts/:postId/quote`, `PATCH /v1/profiles/me`, `POST /v1/stories`, `POST /v1/stories/:storyId/replies`, `GET /v1/stories/rail`
+- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/accounts/me/blocks`, `POST /v1/accounts/me/handle`, `GET /v1/accounts/me/mutes`, `GET /v1/accounts/me/notification-preferences`, `PATCH /v1/accounts/me/notification-preferences`, `POST /v1/admin/ops/policy/evaluate`, `PUT /v1/admin/qa/premium/:handle`, `POST /v1/admin/qa/verification/appeals/:appealId/transitions`, `POST /v1/admin/qa/verification/applications/:applicationId/transitions`, `POST /v1/ai/requests`, `POST /v1/comments/:commentId/replies`, `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `POST /v1/communities/:communityId/polls`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/conversations`, `GET /v1/creator/insights`, `POST /v1/in-mail`, `PATCH /v1/me/membership/badge-visibility`, `POST /v1/me/verification/applications`, `POST /v1/modules/:moduleId/ai/requests`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `POST /v1/posts/:postId/quote`, `PATCH /v1/profiles/me`, `POST /v1/stories`, `POST /v1/stories/:storyId/replies`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/verify-email`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/ai/gateway-service.ts`, `services/greenfield-api/src/ai/provider-runtime-service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/mentions/service.ts`, `services/greenfield-api/src/domains/messaging/service.ts`, `services/greenfield-api/src/domains/notifications/preferences.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/premium/badges.ts`, `services/greenfield-api/src/premium/service.ts`, `services/greenfield-api/src/premium/verification-service.ts`, `services/greenfield-api/src/security/session.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/ai/gateway-service.ts`, `services/greenfield-api/src/ai/provider-runtime-service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/mentions/service.ts`, `services/greenfield-api/src/domains/messaging/service.ts`, `services/greenfield-api/src/domains/notifications/preferences.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/premium/badges.ts`, `services/greenfield-api/src/premium/service.ts`, `services/greenfield-api/src/premium/verification-service.ts`, `services/greenfield-api/src/security/session.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -416,10 +416,10 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `attached_at`, `created_at`, `updated_at`
 - Migration introduced: `057_post04_attachment_platform.sql`
-- Routes reading: `DELETE /v1/attachments/:attachmentId`, `GET /v1/attachments/:attachmentId`, `GET /v1/attachments/:attachmentId/content`, `PUT /v1/attachments/uploads/:uploadId/content`, `POST /v1/comments/:commentId/replies`, `GET /v1/discover`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/media/:mediaFile`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `POST /v1/posts`, `GET /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `GET /v1/reels`, `POST /v1/stories`, `DELETE /v1/stories/items/:itemId`
-- Routes writing: `DELETE /v1/attachments/:attachmentId`, `POST /v1/attachments/uploads`, `PUT /v1/attachments/uploads/:uploadId/content`, `POST /v1/comments/:commentId/replies`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `POST /v1/posts`, `POST /v1/posts/:postId/comments`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `POST /v1/stories`, `DELETE /v1/stories/items/:itemId`
-- API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/attachments/service.ts`, `services/greenfield-api/src/domains/comments/media.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/discovery/repository.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-worker/src/media/cleanup.ts`
-- API/worker source writes: `services/greenfield-api/src/domains/attachments/service.ts`, `services/greenfield-api/src/domains/comments/media.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-worker/src/media/cleanup.ts`
+- Routes reading: `DELETE /v1/attachments/:attachmentId`, `GET /v1/attachments/:attachmentId`, `GET /v1/attachments/:attachmentId/content`, `PUT /v1/attachments/uploads/:uploadId/content`, `POST /v1/comments/:commentId/replies`, `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`, `GET /v1/discover`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/media/:mediaFile`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `POST /v1/posts`, `GET /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `GET /v1/reels`, `POST /v1/stories`, `DELETE /v1/stories/items/:itemId`
+- Routes writing: `DELETE /v1/attachments/:attachmentId`, `POST /v1/attachments/uploads`, `PUT /v1/attachments/uploads/:uploadId/content`, `POST /v1/comments/:commentId/replies`, `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `POST /v1/posts`, `POST /v1/posts/:postId/comments`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `POST /v1/stories`, `DELETE /v1/stories/items/:itemId`
+- API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/attachments/service.ts`, `services/greenfield-api/src/domains/comments/media.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/discovery/repository.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-worker/src/media/cleanup.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/attachments/service.ts`, `services/greenfield-api/src/domains/comments/media.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-worker/src/media/cleanup.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `audit_events`
@@ -1118,6 +1118,142 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source reads: `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: none observed
 - Disposition: READ-ONLY APPLICATION CANDIDATE
+
+### `greenfield_communities`
+
+- Purpose: application state for greenfield communities
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `GET /v1/communities`, `POST /v1/communities`, `GET /v1/communities/:communityId`, `PATCH /v1/communities/:communityId`, `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`, `POST /v1/communities/:communityId/join`, `GET /v1/communities/:communityId/members`, `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`, `GET /v1/communities/:communityId/posts`, `GET /v1/communities/:communityId/settings`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/posts`
+- Routes writing: `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `POST /v1/communities/:communityId/polls`, `PATCH /v1/communities/:communityId/settings`
+- API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_event_responses`
+
+- Purpose: application state for greenfield community event responses
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`
+- Routes writing: `PUT /v1/communities/:communityId/events/:eventId/response`
+- API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_events`
+
+- Purpose: application state for greenfield community events
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`
+- Routes writing: `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`
+- API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_memberships`
+
+- Purpose: application state for greenfield community memberships
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `GET /v1/communities`, `POST /v1/communities`, `GET /v1/communities/:communityId`, `PATCH /v1/communities/:communityId`, `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `GET /v1/communities/:communityId/members`, `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`, `GET /v1/communities/:communityId/posts`, `GET /v1/communities/:communityId/settings`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/posts`, `PATCH /v1/posts/:postId`
+- Routes writing: `POST /v1/communities`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `PATCH /v1/communities/:communityId/settings`
+- API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_poll_options`
+
+- Purpose: application state for greenfield community poll options
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`
+- Routes writing: `POST /v1/communities/:communityId/polls`
+- API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_poll_votes`
+
+- Purpose: application state for greenfield community poll votes
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`
+- Routes writing: `PUT /v1/communities/:communityId/polls/:pollId/vote`
+- API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_polls`
+
+- Purpose: application state for greenfield community polls
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`
+- Routes writing: `POST /v1/communities/:communityId/polls`, `PATCH /v1/communities/:communityId/polls/:pollId`
+- API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_community_settings`
+
+- Purpose: application state for greenfield community settings
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_greenfield_communities.sql`
+- Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/communities/:communityId/settings`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/posts`, `PATCH /v1/posts/:postId`
+- Routes writing: `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `PATCH /v1/communities/:communityId/settings`
+- API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/communities/service.ts`
+- Disposition: active read/write or ledger/schema table
 
 ### `greenfield_connection_credentials`
 
@@ -5176,9 +5312,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: deleted_at
 - Timestamps: `created_at`, `updated_at`, `deleted_at`
 - Migration introduced: `001_init_schema.sql`
-- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `DELETE /v1/comments/:commentId/pin`, `PUT /v1/comments/:commentId/pin`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/creator/insights`, `GET /v1/discover`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/hashtags/suggest`, `GET /v1/media/:mediaFile`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `GET /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `POST /v1/posts/:postId/quote`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `GET /v1/posts/:postId/reactions`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `POST /v1/posts/:postId/share`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `PATCH /v1/profiles/me`, `GET /v1/reels`, `POST /v1/reports`
+- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `DELETE /v1/comments/:commentId/pin`, `PUT /v1/comments/:commentId/pin`, `POST /v1/comments/:commentId/replies`, `POST /v1/communities/:communityId/posts`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/creator/insights`, `GET /v1/discover`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/hashtags/suggest`, `GET /v1/media/:mediaFile`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `GET /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `POST /v1/posts/:postId/quote`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `GET /v1/posts/:postId/reactions`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `POST /v1/posts/:postId/share`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `PATCH /v1/profiles/me`, `GET /v1/reels`, `POST /v1/reports`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/moderation/reports/:reportId/actions`, `DELETE /v1/comments/:commentId`, `POST /v1/comments/:commentId/replies`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `POST /v1/posts/:postId/quote`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-composer-routes.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/discovery/repository.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/quotes/service.ts`, `services/greenfield-api/src/domains/reactions/service.ts`, `services/greenfield-api/src/domains/saves/service.ts`, `services/greenfield-api/src/domains/shares/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-composer-routes.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/discovery/repository.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/quotes/service.ts`, `services/greenfield-api/src/domains/reactions/service.ts`, `services/greenfield-api/src/domains/saves/service.ts`, `services/greenfield-api/src/domains/shares/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/quotes/service.ts`, `services/greenfield-api/src/domains/reactions/service.ts`
 - Disposition: active read/write or ledger/schema table
 
