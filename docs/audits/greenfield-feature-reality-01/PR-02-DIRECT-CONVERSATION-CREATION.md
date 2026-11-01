@@ -3,7 +3,7 @@
 MISSION ITEM: PR-02 — DIRECT CONVERSATION CREATION
 STATUS: PARTIAL
 BRANCH: `fix/qa-conversation-create-contract`
-PR URL: Pending draft PR creation
+PR URL: `https://github.com/modula-mod/modula-latest/pull/148`
 BASE SHA: `bae20cebb48685c56ed5ccfe5537f121e3f36110`
 HEAD SHA: Implementation commit `b69c14adef1287f6d1f4ca2fec39a1e95fe492ff`; the exact review tip is maintained in the draft PR description.
 ROUTES ADDED: 0
