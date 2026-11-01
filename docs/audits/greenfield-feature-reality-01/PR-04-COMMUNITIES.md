@@ -1,22 +1,39 @@
 # GREENFIELD FEATURE REALITY 01 — PR-04 Complete Communities backend
 
-MISSION ITEM: PR-04 — COMPLETE COMMUNITIES BACKEND  
-STATUS: PARTIAL  
-BRANCH: `feat/qa-communities`  
-PR URL: Pending draft PR creation  
-BASE SHA: Stacked review base `e2da717950ded407edbba3ab8cca44b6c56bf08a`; underlying GreenField main baseline `bae20cebb48685c56ed5ccfe5537f121e3f36110`  
-HEAD SHA: Implementation commit `102a310195373fb3ff810d0f55b90e67883f8982`; the exact review tip is maintained in the draft PR description  
-ROUTES ADDED: 21 — Communities discovery/identity, membership, posts, settings, events and polls  
-ROUTES MODIFIED: Shared attachment-content, canonical post-write/read/edit/delete, comment and reaction policy behavior now enforces Community visibility and settings  
-ATLAS UPDATED: YES — JSON, CSV, DOCX, Markdown and OpenAPI; 720 runtime methods reconcile to 506 application routes plus 214 framework routes  
-MIGRATIONS: `081_greenfield_communities` with tested down migration; `080` remains reserved for PR-01  
-TESTS PASSED: 24 persisted integration/regression tests, canonical workspace typecheck and 103 Atlas checks  
-TESTS FAILED: 0 final acceptance tests  
-TESTS SKIPPED: 0 in the reported final suites  
-SECURITY RESULTS: PASS for authentication, role enforcement, private-Community non-disclosure, attachment access, banned/restricted members, unknown fields, ownership, policy enforcement, rate-limit configuration, cross-user isolation and stale writes  
-QA INTEGRATION RESULTS: PASS for the complete persisted API journey and idempotent QA fixture on disposable PostgreSQL; no deployed QA service or Native runtime is claimed  
-NATIVE COMPATIBILITY: API contracts cover the current screens and preference names, but latest Native main remains a preview shell backed by fixtures and `UserDefaults`  
-BLOCKERS: Native API wiring and a deployed isolated-QA service/device journey remain required for full end-to-end acceptance  
+MISSION ITEM: PR-04 — COMPLETE COMMUNITIES BACKEND
+
+STATUS: PARTIAL
+
+BRANCH: `feat/qa-communities`
+
+PR URL: `https://github.com/modula-mod/modula-latest/pull/150`
+
+BASE SHA: Stacked review base `e2da717950ded407edbba3ab8cca44b6c56bf08a`; underlying GreenField main baseline `bae20cebb48685c56ed5ccfe5537f121e3f36110`
+
+HEAD SHA: Implementation commit `102a310195373fb3ff810d0f55b90e67883f8982`; the exact review tip is maintained in the draft PR description
+
+ROUTES ADDED: 21 — Communities discovery/identity, membership, posts, settings, events and polls
+
+ROUTES MODIFIED: Shared attachment-content, canonical post-write/read/edit/delete, comment and reaction policy behavior now enforces Community visibility and settings
+
+ATLAS UPDATED: YES — JSON, CSV, DOCX, Markdown and OpenAPI; 720 runtime methods reconcile to 506 application routes plus 214 framework routes
+
+MIGRATIONS: `081_greenfield_communities` with tested down migration; `080` remains reserved for PR-01
+
+TESTS PASSED: 24 persisted integration/regression tests, canonical workspace typecheck and 103 Atlas checks
+
+TESTS FAILED: 0 final acceptance tests
+
+TESTS SKIPPED: 0 in the reported final suites
+
+SECURITY RESULTS: PASS for authentication, role enforcement, private-Community non-disclosure, attachment access, banned/restricted members, unknown fields, ownership, policy enforcement, rate-limit configuration, cross-user isolation and stale writes
+
+QA INTEGRATION RESULTS: PASS for the complete persisted API journey and idempotent QA fixture on disposable PostgreSQL; no deployed QA service or Native runtime is claimed
+
+NATIVE COMPATIBILITY: API contracts cover the current screens and preference names, but latest Native main remains a preview shell backed by fixtures and `UserDefaults`
+
+BLOCKERS: Native API wiring and a deployed isolated-QA service/device journey remain required for full end-to-end acceptance
+
 APPROVAL REQUIRED: Andy must approve merge and any QA deployment
 
 ## Outcome
