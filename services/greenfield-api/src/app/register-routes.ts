@@ -84,6 +84,7 @@ import {registerIntelligenceRoutes} from '../intelligence/index.js'
 import {registerAttachmentRoutes} from './register-attachment-routes.js'
 import {registerComposerRoutes} from './register-composer-routes.js'
 import {registerCommunitiesRoutes} from './register-communities-routes.js'
+import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -251,6 +252,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   await registerAttachmentRoutes(app, db, config, {writeConfig, feedConfig, mutationsAllowed})
   await registerComposerRoutes(app, db, {feedConfig})
   await registerCommunitiesRoutes(app, db, config, {profileConfig, writeConfig, mutationsAllowed})
+  await registerCollectionsDraftsRoutes(app, db, config, {profileConfig, writeConfig, mutationsAllowed})
 
   app.get('/version.json', healthConfig, async (_request, reply) => {
     return reply.header('Cache-Control', 'no-store').send(releaseIdentity(config))

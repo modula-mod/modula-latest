@@ -1,7 +1,9 @@
 import {randomUUID} from 'node:crypto'
 import type {CreatePostInput, SocialPostDto, UpdatePostInput} from '@modula/api-contracts'
+import {sql, type Transaction} from 'kysely'
 import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
+import type {Database} from '../../database/types.js'
 import {GreenfieldEventBus} from '../../events/index.js'
 import {AuditRepository} from '../audit/repository.js'
 import {PostMediaStorage} from '../media/post-media-storage.js'
@@ -14,6 +16,10 @@ export type PostWriteContext = {
   correlationId?: string | null
   /** Trusted server-side association. Never populated from the generic post body. */
   communityId?: string | null
+  /** Trusted reservation identity used only by the draft publication service. */
+  draftId?: string | null
+  /** Trusted same-transaction finalizer for server-owned workflows such as draft publication. */
+  transactionalFinalize?: (trx: Transaction<Database>, postId: string, now: Date) => Promise<void>
 }
 
 export class PostWriteService {
@@ -77,8 +83,22 @@ export class PostWriteService {
     const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
     const persistedMedia = await this.mediaStorage.persistPostMedia({postId: id, media: mediaInput})
     const kind = persistedMedia.length > 0 || contentInput.length > 0 ? 'media' : 'text'
+    let replayedPostId: string | null = null
     try {
       await this.db.transaction().execute(async trx => {
+        if (idempotencyKey) {
+          await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`post-create:${actorId}:${idempotencyKey}`}, 0))`.execute(trx)
+          const existing = await trx.selectFrom('posts').select(['id', 'community_id', 'text'])
+            .where('author_actor_id', '=', actorId).where('idempotency_key', '=', idempotencyKey)
+            .where('deleted_at', 'is', null).executeTakeFirst()
+          if (existing) {
+            if ((existing.community_id ?? null) !== (context.communityId ?? null) || (existing.text ?? '') !== text) {
+              throw Object.assign(new Error('Idempotency key was reused with a different post payload or context'), {code: 'CONFLICT'})
+            }
+            replayedPostId = existing.id
+            return
+          }
+        }
         let audience = requestedAudience
         let communityId: string | null = null
         if (context.communityId) {
@@ -123,6 +143,12 @@ export class PostWriteService {
           throw Object.assign(new Error('One or more attachments are unavailable'), {code: 'VALIDATION_FAILED'})
         }
         const byId = new Map(attachments.map(item => [item.attachment_id, item]))
+        const draftReservations = contentInput.length === 0 ? [] : await trx
+          .selectFrom('greenfield_post_draft_content')
+          .select(['attachment_id', 'draft_id'])
+          .where('attachment_id', 'in', contentInput.map(item => item.attachmentId))
+          .execute()
+        const reservationsByAttachment = new Map(draftReservations.map(item => [item.attachment_id, item.draft_id]))
         for (const item of contentInput) {
           const attachment = byId.get(item.attachmentId)
           if (!attachment || attachment.owner_account_id !== actor.account_id) {
@@ -133,6 +159,10 @@ export class PostWriteService {
           }
           if (attachment.kind !== item.type) {
             throw Object.assign(new Error('Attachment content type mismatch'), {code: 'VALIDATION_FAILED'})
+          }
+          const reservedByDraft = reservationsByAttachment.get(item.attachmentId)
+          if (reservedByDraft && reservedByDraft !== context.draftId) {
+            throw Object.assign(new Error('Attachment is reserved by a draft'), {code: 'CONFLICT'})
           }
         }
         await trx
@@ -273,7 +303,14 @@ export class PostWriteService {
             occurredAt: now,
           })
         }
+        await context.transactionalFinalize?.(trx, id, now)
       })
+      if (replayedPostId) {
+        await this.mediaStorage.removePersistedMedia(persistedMedia)
+        const replayed = await this.posts.getById(replayedPostId, actorId)
+        if (replayed) return replayed
+        throw new Error('Failed to load idempotent post replay')
+      }
     } catch (error) {
       await this.mediaStorage.removePersistedMedia(persistedMedia)
       if (idempotencyKey && (error as {code?: string})?.code === '23505') {
