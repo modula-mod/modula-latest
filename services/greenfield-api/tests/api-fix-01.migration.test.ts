@@ -266,7 +266,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
-      '079_story_attachment_pipeline',
+      '079_story_attachment_pipeline', '080_moliboo_game_systems',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
