@@ -86,7 +86,10 @@ try {
     utimesSync(target, fixedDate, fixedDate)
   }
   rmSync(outputPath, {force: true})
-  execFileSync('zip', ['-X', '-q', outputPath, ...Object.keys(files).sort()], {cwd: temporaryDirectory})
+  execFileSync('zip', ['-0', '-X', '-q', outputPath, ...Object.keys(files).sort()], {
+    cwd: temporaryDirectory,
+    env: {...process.env, TZ: 'UTC'},
+  })
 } finally {
   rmSync(temporaryDirectory, {recursive: true, force: true})
 }

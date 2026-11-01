@@ -10,6 +10,7 @@ ALTER TABLE greenfield_release_asset_blobs
     'image/svg+xml','image/png','image/webp','image/jpeg','video/mp4','video/webm',
     'application/gzip','application/x-gzip','application/octet-stream',
     'application/json','application/schema+json','application/vnd.modula.frontend+json',
+    'application/vnd.modula.web-runtime+tgz',
     'application/vnd.modula.moliboo-asset-pack+json'
   ));
 

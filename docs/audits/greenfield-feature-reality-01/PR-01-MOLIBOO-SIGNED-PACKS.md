@@ -10,7 +10,7 @@ ROUTES ADDED: 9
 ROUTES MODIFIED: 1
 ATLAS UPDATED: YES
 MIGRATIONS: `080_moliboo_signed_packs`
-TESTS PASSED: 40 tests plus 103 Atlas checks
+TESTS PASSED: 96 distinct tests (111 command-level executions) plus 103 Atlas checks
 TESTS FAILED: 0 final acceptance tests
 TESTS SKIPPED: 0 in the reported suites
 SECURITY RESULTS: PASS for implemented server boundaries
@@ -181,11 +181,17 @@ PASS: 2 files, 11 tests
 CI=true pnpm --filter @modula/greenfield-api exec vitest run --fileParallelism=false tests/phase6s.social.test.ts tests/registry-trust.assets.test.ts tests/registry-trust.signing.test.ts
 PASS: 3 files, 29 tests
 
+CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/settings-v2.integration.test.ts tests/greenfield-backend-v1.migration-ledger-security.test.ts tests/api-fix-01.migration.test.ts tests/api-fix-01.reaction-dead-letter-retry.test.ts tests/api-baseline-02.security-acceptance.test.ts tests/api-fix-01.follow-privacy.test.ts tests/registry-trust.signing.test.ts tests/registry-release-retrofit-signing.test.ts tests/registry-trust.trust-block.test.ts tests/module-version-switch.test.ts --maxWorkers=1 --no-file-parallelism
+PASS: 10 files, 71 tests
+
 CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true pnpm api:atlas:capture-candidate
 PASS: 704 runtime method routes
 
 CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
 PASS: 103/103 checks
+
+TZ=Pacific/Auckland API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate.mjs
+PASS: DOCX SHA-256 unchanged from the UTC generation
 
 CI=true pnpm --filter @modula/greenfield-api qa:seed-moliboo-series2
 PASS: immutable-source dry run, 100 packages
@@ -198,6 +204,8 @@ PASS
 ```
 
 Two preliminary command invocations were not acceptance runs and were corrected without state loss: the first migration CLI invocation refused missing loopback URL/origin configuration before connecting, and a `tsx -e` runtime smoke hit CommonJS package-export resolution before server creation. The configured migration sequence and compiled-ESM smoke subsequently passed and are the evidence reported above.
+
+The first GitHub CI run also truthfully failed four migration-ledger assertions that still ended at 079 and found that migration 080 had replaced, rather than extended, the migration-077 release-media constraint. A first local remediation run passed 69/71 and exposed the two media-type regressions. Migration 080 now preserves `application/vnd.modula.web-runtime+tgz` in both its up and down constraints, the ledger tests cover 080 and empty-state rollback, and the exact CI database suite passes 71/71. The Atlas job's cross-host DOCX mismatch was removed by storing uncompressed entries under a forced UTC timezone; same-input generation is now byte-identical across timezone settings.
 
 ## Files changed
 
@@ -220,6 +228,8 @@ QA fixtures and tests:
 - `services/greenfield-api/scripts/seed-sprout-stickers-qa.ts`
 - `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
 - `services/greenfield-api/tests/sticker-packs.integration.test.ts`
+- `services/greenfield-api/tests/api-fix-01.migration.test.ts`
+- `services/greenfield-api/tests/greenfield-backend-v1.migration-ledger-security.test.ts`
 
 Atlas generation and contracts:
 
