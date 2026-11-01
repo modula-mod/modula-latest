@@ -1922,7 +1922,8 @@
       "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
       "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
       "services/greenfield-api/src/modules/runtime-access.ts#enforceCapability",
       "services/greenfield-api/src/modules/runtime-access.ts#resolve"
     ]
@@ -3155,7 +3156,9 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
-      "services/greenfield-api/src/domains/messaging/service.ts#follows",
+      "services/greenfield-api/src/domains/messaging/service.ts#ensureDirectConversationInTransaction",
+      "services/greenfield-api/src/domains/messaging/service.ts#insertDirectMessageInTransaction",
+      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -3171,6 +3174,7 @@
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_domain_events",
       "profiles"
     ],
     "writes": [],
@@ -3182,7 +3186,8 @@
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
-      "services/greenfield-api/src/domains/messaging/service.ts#participants"
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#storyContexts"
     ]
   },
   "POST /v1/conversations/:id/messages": {
@@ -3203,6 +3208,7 @@
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
       "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
+      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -4333,6 +4339,7 @@
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#composeInMail",
       "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
+      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -4382,6 +4389,7 @@
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
       "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
+      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -4729,7 +4737,8 @@
     "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
     ]
   },
   "GET /v1/message-requests": {
@@ -8042,10 +8051,11 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
       "services/greenfield-api/src/domains/stories/service.ts#create",
       "services/greenfield-api/src/domains/stories/service.ts#findIdempotent",
       "services/greenfield-api/src/domains/stories/service.ts#getGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
     ]
   },
   "GET /v1/stories/:groupId": {
@@ -8063,8 +8073,30 @@
     "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
       "services/greenfield-api/src/domains/stories/service.ts#getGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
+    ]
+  },
+  "POST /v1/stories/:storyId/replies": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "idempotency_keys"
+    ],
+    "writes": [
+      "idempotency_keys"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
+      "services/greenfield-api/src/domains/stories/service.ts#reply"
     ]
   },
   "DELETE /v1/stories/items/:itemId": {
@@ -8100,7 +8132,8 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
       "services/greenfield-api/src/domains/stories/service.ts#markViewed"
     ]
   },
@@ -8120,7 +8153,8 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
       "services/greenfield-api/src/domains/stories/service.ts#listRail"
     ]
   },

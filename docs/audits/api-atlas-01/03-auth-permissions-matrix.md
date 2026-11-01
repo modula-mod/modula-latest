@@ -294,7 +294,7 @@ This matrix distinguishes transport reachability from application authorization.
 | POST | `/v1/me/verification/applications` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/premium/routes.ts:83` |
 | POST | `/v1/me/verification/applications/:applicationId/appeals` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/premium/routes.ts:89` |
 | GET | `/v1/media/:mediaFile` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-routes.ts:2154` |
-| GET | `/v1/media/stories/:mediaFile` | yes | no | no | yes | no | none | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:137` |
+| GET | `/v1/media/stories/:mediaFile` | yes | no | no | yes | no | none | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:179` |
 | GET | `/v1/message-requests` | no | yes | no | yes | no | social:read | no | no | no | `services/greenfield-api/src/app/register-messaging-routes.ts:130` |
 | POST | `/v1/message-requests/:id/accept` | no | yes | no | yes | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-messaging-routes.ts:140` |
 | POST | `/v1/message-requests/:id/decline` | no | yes | no | yes | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-messaging-routes.ts:152` |
@@ -475,11 +475,12 @@ This matrix distinguishes transport reachability from application authorization.
 | POST | `/v1/sessions/refresh` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-routes.ts:1037` |
 | GET | `/v1/status` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/support/routes.ts:20` |
 | GET | `/v1/stickers/packs` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-composer-routes.ts:67` |
-| POST | `/v1/stories` | no | yes | no | yes | no | post:create | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:79` |
-| GET | `/v1/stories/:groupId` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:67` |
-| DELETE | `/v1/stories/items/:itemId` | no | yes | no | yes | no | post:create | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:125` |
-| POST | `/v1/stories/items/:itemId/viewed` | no | yes | no | yes | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:113` |
-| GET | `/v1/stories/rail` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:61` |
+| POST | `/v1/stories` | no | yes | no | yes | no | post:create | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:102` |
+| GET | `/v1/stories/:groupId` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:90` |
+| POST | `/v1/stories/:storyId/replies` | no | yes | no | yes | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:148` |
+| DELETE | `/v1/stories/items/:itemId` | no | yes | no | yes | no | post:create | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:167` |
+| POST | `/v1/stories/items/:itemId/viewed` | no | yes | no | yes | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:136` |
+| GET | `/v1/stories/rail` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:84` |
 | GET | `/v1/support/cases` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/support/routes.ts:53` |
 | POST | `/v1/support/cases` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/support/routes.ts:54` |
 | GET | `/v1/support/contact` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/support/routes.ts:29` |
