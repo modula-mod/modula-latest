@@ -1,8 +1,9 @@
 import {randomUUID} from 'node:crypto'
-import {sql} from 'kysely'
+import {sql, type Transaction} from 'kysely'
 import {badgesForActors, NO_BADGES, type PublicBadgeFields} from '../../premium/badges.js'
 
 import type {ModulaDb} from '../../database/client.js'
+import type {Database} from '../../database/types.js'
 
 export type ParticipantDto = {id: string; handle: string; displayName: string; avatarUrl: string | null} & Partial<PublicBadgeFields>
 export type MessagePreviewDto = {id: string; body: string; sentAt: string; senderId: string}
@@ -25,6 +26,16 @@ export type MessageDto = {
   createdAt: string
   isOwn: boolean
   delivery: 'sent' | 'read'
+  storyContext?: StoryMessageContext
+}
+export type StoryMessageContext = {
+  type: 'story'
+  storyId: string
+  groupId: string
+  ownerActorId: string
+  mediaKind: 'image' | 'video'
+  createdAt: string
+  expiresAt: string
 }
 export type MessageRequestDto = {
   id: string
@@ -46,6 +57,12 @@ export type Page<T> = {items: T[]; nextCursor: string | null; hasMore: boolean}
 export const MESSAGE_MAX = 5_000
 export const INMAIL_BODY_MAX = 20_000
 export const SUBJECT_MAX = 180
+
+type DirectConversationRecord = {
+  conversationId: string
+  created: boolean
+  recipientState: 'active' | 'pending' | 'declined'
+}
 
 function fail(code: string, message: string): never {
   throw Object.assign(new Error(message), {code})
@@ -79,6 +96,10 @@ function cleanText(raw: unknown, max: number, label: string): string {
   if (!text) fail('VALIDATION_FAILED', `${label} is required`)
   if (text.length > max) fail('VALIDATION_FAILED', `${label} is too long`)
   return text
+}
+
+export function normalizeMessageText(raw: unknown): string {
+  return cleanText(raw, MESSAGE_MAX, 'Message')
 }
 
 export class MessagingService {
@@ -121,7 +142,11 @@ export class MessagingService {
   }
 
   private async isBlockedEitherWay(a: string, b: string): Promise<boolean> {
-    const row = await this.db
+    return this.isBlockedEitherWayWith(this.db, a, b)
+  }
+
+  private async isBlockedEitherWayWith(db: ModulaDb | Transaction<Database>, a: string, b: string): Promise<boolean> {
+    const row = await db
       .selectFrom('blocks')
       .select('id')
       .where('deleted_at', 'is', null)
@@ -131,17 +156,6 @@ export class MessagingService {
           eb.and([eb('blocker_actor_id', '=', b), eb('blocked_actor_id', '=', a)]),
         ]),
       )
-      .executeTakeFirst()
-    return Boolean(row)
-  }
-
-  private async follows(follower: string, followed: string): Promise<boolean> {
-    const row = await this.db
-      .selectFrom('follows')
-      .select('id')
-      .where('follower_actor_id', '=', follower)
-      .where('followed_actor_id', '=', followed)
-      .where('deleted_at', 'is', null)
       .executeTakeFirst()
     return Boolean(row)
   }
@@ -191,6 +205,24 @@ export class MessagingService {
     return map
   }
 
+  private async storyContexts(messageIds: string[]): Promise<Map<string, StoryMessageContext>> {
+    const contexts = new Map<string, StoryMessageContext>()
+    if (messageIds.length === 0) return contexts
+    const rows = await this.db
+      .selectFrom('greenfield_domain_events')
+      .select(['aggregate_id', 'payload'])
+      .where('event_type', '=', 'message.story-replied')
+      .where('aggregate_type', '=', 'conversation-message')
+      .where('aggregate_id', 'in', messageIds)
+      .execute()
+    for (const row of rows) {
+      const payload = asRecord(row.payload)
+      const context = storyMessageContext(payload.storyContext)
+      if (context) contexts.set(row.aggregate_id, context)
+    }
+    return contexts
+  }
+
   private async unreadCounts(rows: {conversation_id: string; last_read_at: Date | null}[], viewer: string) {
     const map = new Map<string, number>()
     for (const row of rows) {
@@ -227,6 +259,38 @@ export class MessagingService {
         .execute()
     })
     return {messageId, now}
+  }
+
+  /**
+   * Transaction-scoped primitive used by other authenticated domains. The
+   * caller must first obtain the conversation through
+   * ensureDirectConversationInTransaction so the actor-pair moderation lock
+   * and recipient checks cover this write.
+   */
+  async insertDirectMessageInTransaction(
+    trx: Transaction<Database>,
+    conversationId: string,
+    sender: string,
+    body: string,
+    messageId: string = randomUUID(),
+    now: Date = new Date(),
+  ): Promise<{messageId: string; createdAt: Date}> {
+    await trx
+      .insertInto('greenfield_conversation_messages')
+      .values({message_id: messageId, conversation_id: conversationId, sender_actor_id: sender, subject: null, body, created_at: now})
+      .execute()
+    await trx
+      .updateTable('greenfield_conversations')
+      .set({last_message_at: now, updated_at: now})
+      .where('conversation_id', '=', conversationId)
+      .execute()
+    await trx
+      .updateTable('greenfield_conversation_members')
+      .set({last_read_at: now, updated_at: now})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', sender)
+      .execute()
+    return {messageId, createdAt: now}
   }
 
   private async listForViewer(viewer: string, kind: 'direct' | 'inmail', state: 'active' | 'pending', cursorRaw: unknown, limitRaw: unknown) {
@@ -314,79 +378,89 @@ export class MessagingService {
   async startDirectConversation(viewer: string, recipient: string, initialText?: unknown): Promise<StartConversationResult> {
     if (recipient === viewer) fail('VALIDATION_FAILED', 'You cannot message yourself')
     const text = initialText === undefined || initialText === '' ? null : cleanText(initialText, MESSAGE_MAX, 'Message')
-    const directKey = [viewer, recipient].sort().join(':')
-    const recipientState = (await this.follows(recipient, viewer)) ? 'active' : 'pending'
     const result = await this.db.transaction().execute(async trx => {
-      // Moderation block/unblock uses this same actor-pair lock. Whichever
-      // operation commits first becomes authoritative for this creation.
-      await sql`SELECT pg_advisory_xact_lock(hashtextextended(${directKey}, 0))`.execute(trx)
-      const activeRecipient = await trx
-        .selectFrom('actors as a')
-        .innerJoin('greenfield_accounts as ga', 'ga.account_id', 'a.account_id')
-        .select('a.id')
-        .where('a.id', '=', recipient)
-        .where('a.deleted_at', 'is', null)
-        .where('ga.status', '=', 'active')
-        .executeTakeFirst()
-      if (!activeRecipient) fail('NOT_FOUND', 'Recipient not found')
-      const blocked = await trx
-        .selectFrom('blocks')
-        .select('id')
-        .where('deleted_at', 'is', null)
-        .where(eb =>
-          eb.or([
-            eb.and([eb('blocker_actor_id', '=', viewer), eb('blocked_actor_id', '=', recipient)]),
-            eb.and([eb('blocker_actor_id', '=', recipient), eb('blocked_actor_id', '=', viewer)]),
-          ]),
-        )
-        .executeTakeFirst()
-      if (blocked) fail('FORBIDDEN', 'You cannot message this account')
-
-      const conversationId = randomUUID()
-      const now = new Date()
-      const inserted = await trx
-        .insertInto('greenfield_conversations')
-        .values({conversation_id: conversationId, kind: 'direct', subject: null, direct_key: directKey, created_by_actor_id: viewer, created_at: now, updated_at: now, last_message_at: now})
-        .onConflict(oc => oc.column('direct_key').doNothing())
-        .returning('conversation_id')
-        .executeTakeFirst()
-
-      if (inserted) {
-        await trx
-          .insertInto('greenfield_conversation_members')
-          .values([
-            {conversation_id: conversationId, actor_id: viewer, state: 'active', last_read_at: now, joined_at: now, updated_at: now},
-            {conversation_id: conversationId, actor_id: recipient, state: recipientState, last_read_at: null, joined_at: now, updated_at: now},
-          ])
-          .execute()
-
-        if (text) {
-          await trx
-            .insertInto('greenfield_conversation_messages')
-            .values({message_id: randomUUID(), conversation_id: conversationId, sender_actor_id: viewer, subject: null, body: text, created_at: now})
-            .execute()
-        }
-        return {conversationId, created: true}
+      const ensured = await this.ensureDirectConversationInTransaction(trx, viewer, recipient)
+      if (ensured.created && text) {
+        await this.insertDirectMessageInTransaction(trx, ensured.conversationId, viewer, text)
       }
-
-      // PostgreSQL waits for the winning unique-key transaction before the
-      // conflict is resolved, so this statement sees its committed row and
-      // members without an advisory lock or retry loop.
-      const existing = await trx
-        .selectFrom('greenfield_conversations')
-        .select('conversation_id')
-        .where('direct_key', '=', directKey)
-        .executeTakeFirstOrThrow()
-      // Re-opening by the viewer reactivates their side if they had declined.
-      await trx
-        .updateTable('greenfield_conversation_members')
-        .set({state: 'active', updated_at: new Date()})
-        .where('conversation_id', '=', existing.conversation_id)
-        .where('actor_id', '=', viewer)
-        .execute()
-      return {conversationId: existing.conversation_id, created: false}
+      return ensured
     })
     return {conversation: await this.conversationFor(viewer, result.conversationId), created: result.created}
+  }
+
+  /**
+   * Create or reuse the canonical direct conversation while holding the same
+   * actor-pair advisory lock used by moderation block/unblock writes. Trusted
+   * domain integrations can keep their message, event and outbox records in
+   * the same database transaction as this operation.
+   */
+  async ensureDirectConversationInTransaction(
+    trx: Transaction<Database>,
+    viewer: string,
+    recipient: string,
+  ): Promise<DirectConversationRecord> {
+    if (recipient === viewer) fail('VALIDATION_FAILED', 'You cannot message yourself')
+    const directKey = [viewer, recipient].sort().join(':')
+    await sql`SELECT pg_advisory_xact_lock(hashtextextended(${directKey}, 0))`.execute(trx)
+    const activeRecipient = await trx
+      .selectFrom('actors as a')
+      .innerJoin('greenfield_accounts as ga', 'ga.account_id', 'a.account_id')
+      .select('a.id')
+      .where('a.id', '=', recipient)
+      .where('a.deleted_at', 'is', null)
+      .where('ga.status', '=', 'active')
+      .executeTakeFirst()
+    if (!activeRecipient) fail('NOT_FOUND', 'Recipient not found')
+    if (await this.isBlockedEitherWayWith(trx, viewer, recipient)) {
+      fail('FORBIDDEN', 'You cannot message this account')
+    }
+
+    const follows = await trx
+      .selectFrom('follows')
+      .select('id')
+      .where('follower_actor_id', '=', recipient)
+      .where('followed_actor_id', '=', viewer)
+      .where('deleted_at', 'is', null)
+      .executeTakeFirst()
+    const newRecipientState: 'active' | 'pending' = follows ? 'active' : 'pending'
+    const conversationId = randomUUID()
+    const now = new Date()
+    const inserted = await trx
+      .insertInto('greenfield_conversations')
+      .values({conversation_id: conversationId, kind: 'direct', subject: null, direct_key: directKey, created_by_actor_id: viewer, created_at: now, updated_at: now, last_message_at: now})
+      .onConflict(oc => oc.column('direct_key').doNothing())
+      .returning('conversation_id')
+      .executeTakeFirst()
+
+    if (inserted) {
+      await trx
+        .insertInto('greenfield_conversation_members')
+        .values([
+          {conversation_id: conversationId, actor_id: viewer, state: 'active', last_read_at: now, joined_at: now, updated_at: now},
+          {conversation_id: conversationId, actor_id: recipient, state: newRecipientState, last_read_at: null, joined_at: now, updated_at: now},
+        ])
+        .execute()
+      return {conversationId, created: true, recipientState: newRecipientState}
+    }
+
+    const existing = await trx
+      .selectFrom('greenfield_conversations')
+      .select('conversation_id')
+      .where('direct_key', '=', directKey)
+      .executeTakeFirstOrThrow()
+    await trx
+      .updateTable('greenfield_conversation_members')
+      .set({state: 'active', updated_at: now})
+      .where('conversation_id', '=', existing.conversation_id)
+      .where('actor_id', '=', viewer)
+      .execute()
+    const recipientMember = await trx
+      .selectFrom('greenfield_conversation_members')
+      .select('state')
+      .where('conversation_id', '=', existing.conversation_id)
+      .where('actor_id', '=', recipient)
+      .executeTakeFirstOrThrow()
+    return {conversationId: existing.conversation_id, created: false, recipientState: recipientMember.state}
   }
 
   async conversationFor(viewer: string, conversationId: string): Promise<ConversationDto> {
@@ -436,9 +510,12 @@ export class MessagingService {
       .where('actor_id', '!=', viewer)
       .execute()
     const othersReadAt = otherReads.map(r => r.last_read_at?.getTime() ?? 0)
-    const people = await this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id)])
+    const [people, contexts] = await Promise.all([
+      this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id)]),
+      this.storyContexts(page.map(row => row.message_id)),
+    ])
     void member
-    const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt))
+    const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt, contexts.get(row.message_id)))
     return {items, nextCursor: hasMore && oldest ? encodeCursor(oldest.created_at, oldest.message_id) : null, hasMore}
   }
 
@@ -447,6 +524,7 @@ export class MessagingService {
     viewer: string,
     people: Map<string, ParticipantDto>,
     othersReadAt: number[] = [],
+    storyContext?: StoryMessageContext,
   ): MessageDto {
     const isOwn = row.sender_actor_id === viewer
     const read = isOwn && othersReadAt.length > 0 && othersReadAt.every(t => t >= row.created_at.getTime())
@@ -460,6 +538,7 @@ export class MessagingService {
       createdAt: row.created_at.toISOString(),
       isOwn,
       delivery: read ? 'read' : 'sent',
+      ...(storyContext ? {storyContext} : {}),
     }
   }
 
@@ -642,5 +721,31 @@ export class MessagingService {
       viewer,
       people,
     )
+  }
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+}
+
+function storyMessageContext(value: unknown): StoryMessageContext | null {
+  const context = asRecord(value)
+  if (
+    context.type !== 'story' ||
+    typeof context.storyId !== 'string' ||
+    typeof context.groupId !== 'string' ||
+    typeof context.ownerActorId !== 'string' ||
+    (context.mediaKind !== 'image' && context.mediaKind !== 'video') ||
+    typeof context.createdAt !== 'string' ||
+    typeof context.expiresAt !== 'string'
+  ) return null
+  return {
+    type: 'story',
+    storyId: context.storyId,
+    groupId: context.groupId,
+    ownerActorId: context.ownerActorId,
+    mediaKind: context.mediaKind,
+    createdAt: context.createdAt,
+    expiresAt: context.expiresAt,
   }
 }

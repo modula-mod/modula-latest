@@ -50,6 +50,7 @@ export interface NotificationCreatePayload {
   resourceType?: string
   resourceId?: string
   body?: string
+  deliveryMode?: 'aggregate' | 'idempotent'
 }
 
 function parsePayload(payload: unknown): NotificationCreatePayload {
@@ -77,6 +78,7 @@ function parsePayload(payload: unknown): NotificationCreatePayload {
     resourceType: typeof p.resourceType === 'string' ? p.resourceType : undefined,
     resourceId: typeof p.resourceId === 'string' ? p.resourceId : undefined,
     body: typeof p.body === 'string' ? p.body : undefined,
+    deliveryMode: p.deliveryMode === 'idempotent' ? 'idempotent' : 'aggregate',
   }
 }
 
@@ -109,10 +111,10 @@ export async function handleNotificationCreate(db: ModulaWorkerDb, rawPayload: u
 
   const now = new Date()
   const body = payload.body ?? DEFAULT_BODIES[payload.type]
-  if (payload.type === 'follow' && payload.dedupeKey) {
-    // Follow-request lifecycle keys identify one transition, not an aggregate
-    // family. At-least-once delivery must therefore converge without changing
-    // counts, body, or read state when the same outbox job is retried.
+  if (payload.dedupeKey && (payload.type === 'follow' || payload.deliveryMode === 'idempotent')) {
+    // Lifecycle keys and explicitly idempotent delivery keys identify one
+    // transition, not an aggregate family. At-least-once worker retries must
+    // therefore converge without changing counts, body, or read state.
     await db
       .insertInto('notifications')
       .values({
