@@ -75,6 +75,7 @@ import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
 import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
 import {registerDeveloperRoutes} from '../developers/routes.js'
+import {registerGubicPlayRoutes} from '../gubic/routes.js'
 import {registerEntitlementRoutes} from '../entitlements/routes.js'
 import {registerAccountDataRoutes} from '../account-data/routes.js'
 import {registerSupportRoutes} from '../support/routes.js'
@@ -2710,6 +2711,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  await registerGubicPlayRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerEntitlementRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerAccountDataRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerSupportRoutes(app, db, config, greenfieldSessions, {healthConfig, profileConfig, writeConfig})

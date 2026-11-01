@@ -129,6 +129,11 @@ const envSchema = z.object({
     .transform(v => v !== 'false'),
   /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
   MODULA_ADMIN_HANDLES: z.string().optional(),
+  /** GUBIC play platform routes (library, sessions, lobbies, achievements, submissions). Off by default. */
+  MODULA_GUBIC_PLAY_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   /** Modula Premium entitlement routes and public badge fields. Off by default. */
   MODULA_PREMIUM_ENTITLEMENTS_ENABLED: z
     .string()
@@ -237,6 +242,9 @@ export type AppConfig = {
   aiGatewayEnabled: boolean
   /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
   adminHandles: string[]
+  gubic: {
+    playEnabled: boolean
+  }
   premium: {
     enabled: boolean
     qaAssignmentsEnabled: boolean
@@ -518,6 +526,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       .split(',')
       .map(h => h.trim().toLowerCase())
       .filter(Boolean),
+    gubic: {playEnabled: Boolean(raw.MODULA_GUBIC_PLAY_ENABLED)},
     premium: premiumConfig(raw),
   }
 }
