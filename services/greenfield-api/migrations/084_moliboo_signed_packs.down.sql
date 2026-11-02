@@ -9,7 +9,7 @@ BEGIN
      OR EXISTS (SELECT 1 FROM greenfield_moliboo_pack_releases)
      OR EXISTS (SELECT 1 FROM greenfield_sticker_pack_releases)
      OR EXISTS (SELECT 1 FROM greenfield_release_artifact_signatures) THEN
-    RAISE EXCEPTION 'cannot roll back 080 while Moliboo release, signature, ownership, or outfit state exists; restore a pre-080 backup instead';
+    RAISE EXCEPTION 'cannot roll back 084 while Moliboo release, signature, ownership, or outfit state exists; restore a pre-084 backup instead';
   END IF;
 END;
 $$;
@@ -39,5 +39,5 @@ ALTER TABLE greenfield_release_asset_blobs
     'application/vnd.modula.web-runtime+tgz'
   ));
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '079')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '083')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

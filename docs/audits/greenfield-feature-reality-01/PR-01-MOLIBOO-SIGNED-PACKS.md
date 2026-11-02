@@ -4,12 +4,12 @@ MISSION ITEM: PR-01 — MOLIBOO SERIES 2 SIGNED PACK DELIVERY
 STATUS: PARTIAL
 BRANCH: `feat/qa-moliboo-series2-packs`
 PR URL: `https://github.com/modula-mod/modula-latest/pull/147`
-BASE SHA: `bae20cebb48685c56ed5ccfe5537f121e3f36110`
+BASE SHA: Initial implementation base `bae20cebb48685c56ed5ccfe5537f121e3f36110`; reconciled review base is current main `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
 HEAD SHA: Implementation commit `7b1a61a094e45446feb3cdd27235692329062d4a`; the exact live metadata tip is maintained in the draft PR description because a Git commit cannot embed its own SHA.
 ROUTES ADDED: 9
 ROUTES MODIFIED: 1
 ATLAS UPDATED: YES
-MIGRATIONS: `080_moliboo_signed_packs`
+MIGRATIONS: `084_moliboo_signed_packs`
 TESTS PASSED: 96 distinct tests (111 command-level executions) plus 103 Atlas checks
 TESTS FAILED: 0 final acceptance tests
 TESTS SKIPPED: 0 in the reported suites
@@ -59,7 +59,7 @@ The server implementation and isolated QA evidence pass. The mission item remain
 
 ## Data model and migration
 
-Migration `080_moliboo_signed_packs` adds:
+Migration `084_moliboo_signed_packs` adds:
 
 - immutable direct artifact-signature evidence bound to the existing publisher key registry;
 - Moliboo character and signed release projections;
@@ -69,16 +69,16 @@ Migration `080_moliboo_signed_packs` adds:
 - bounded catalogue/access indexes and database uniqueness constraints;
 - the Moliboo content media type in the existing immutable artifact blob inventory.
 
-The down migration is deliberately empty-state-only. It refuses to run when release, signature, ownership or outfit data exists. Persistent recovery is a pre-080 database backup plus prior retained application images, not destructive down migration.
+The down migration is deliberately empty-state-only. It refuses to run when release, signature, ownership or outfit data exists. Persistent recovery is a pre-084 database backup plus prior retained application images, not destructive down migration.
 
 Recovery evidence:
 
-1. A new database applied migrations 001 through 080.
-2. Status reported migration 080 applied, with zero pending or unknown migrations.
-3. Empty migration 080 rolled back to 079.
-4. Migration 080 reapplied successfully.
-5. A rollback attempt against the seeded database failed closed with `cannot roll back 080 while Moliboo release, signature, ownership, or outfit state exists`.
-6. Seeded status still reported 080 applied with zero pending or unknown migrations.
+1. A new database applied the full current-main chain plus migration 084.
+2. Status reported migration 084 applied, with zero pending or unknown migrations.
+3. Empty migration 084 rolled back to 083.
+4. Migration 084 reapplied successfully.
+5. A rollback attempt against the seeded database failed closed while Moliboo release, signature, ownership or outfit state existed.
+6. Seeded status still reported 084 applied with zero pending or unknown migrations.
 
 ## Package and artwork evidence
 
@@ -205,14 +205,14 @@ PASS
 
 Two preliminary command invocations were not acceptance runs and were corrected without state loss: the first migration CLI invocation refused missing loopback URL/origin configuration before connecting, and a `tsx -e` runtime smoke hit CommonJS package-export resolution before server creation. The configured migration sequence and compiled-ESM smoke subsequently passed and are the evidence reported above.
 
-The first GitHub CI run also truthfully failed four migration-ledger assertions that still ended at 079 and found that migration 080 had replaced, rather than extended, the migration-077 release-media constraint. A first local remediation run passed 69/71 and exposed the two media-type regressions. Migration 080 now preserves `application/vnd.modula.web-runtime+tgz` in both its up and down constraints, the ledger tests cover 080 and empty-state rollback, and the exact CI database suite passes 71/71. The Atlas job's cross-host DOCX mismatch was removed by storing uncompressed entries under a forced UTC timezone; same-input generation is now byte-identical across timezone settings.
+The first GitHub CI run also truthfully failed four migration-ledger assertions that still ended at 079 and found that the then-numbered migration 080 had replaced, rather than extended, the migration-077 release-media constraint. A first local remediation run passed 69/71 and exposed the two media-type regressions. The reconciled migration 084 preserves `application/vnd.modula.web-runtime+tgz` in both its up and down constraints. Its ledger assertions and exact CI totals are revalidated against current main before this report is finalized. The Atlas DOCX generator now pins both timestamps and archive member modes for cross-host byte stability.
 
 ## Files changed
 
 Implementation and migration:
 
-- `services/greenfield-api/migrations/080_moliboo_signed_packs.sql`
-- `services/greenfield-api/migrations/080_moliboo_signed_packs.down.sql`
+- `services/greenfield-api/migrations/084_moliboo_signed_packs.sql`
+- `services/greenfield-api/migrations/084_moliboo_signed_packs.down.sql`
 - `services/greenfield-api/src/app/register-moliboo-routes.ts`
 - `services/greenfield-api/src/app/register-routes.ts`
 - `services/greenfield-api/src/app/register-composer-routes.ts`

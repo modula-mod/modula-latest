@@ -198,5 +198,5 @@ GRANT SELECT, INSERT, UPDATE ON greenfield_moliboo_characters,
   greenfield_stickers TO modula_api;
 GRANT SELECT, INSERT ON greenfield_moliboo_pack_release_events TO modula_api;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '080')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '084')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
