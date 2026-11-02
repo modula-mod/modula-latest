@@ -232,6 +232,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:81` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:94` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:47` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
+| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts` | candidate-added-messaging-v2-not-deployed |
 | Platform | GET | `/v1/creator/insights` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:44` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/payouts` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |

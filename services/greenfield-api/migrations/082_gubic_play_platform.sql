@@ -152,5 +152,5 @@ GRANT SELECT ON greenfield_gubic_library_items, greenfield_gubic_play_sessions, 
   greenfield_gubic_lobby_members, greenfield_gubic_achievements, greenfield_gubic_achievement_unlocks,
   greenfield_gubic_submissions TO modula_worker, modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '080')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '082')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

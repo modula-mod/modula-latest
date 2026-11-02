@@ -12,4 +12,4 @@ DROP TABLE IF EXISTS greenfield_gubic_lobbies;
 DROP TABLE IF EXISTS greenfield_gubic_play_sessions;
 DROP TABLE IF EXISTS greenfield_gubic_library_items;
 
-UPDATE schema_metadata SET value = '079', updated_at = NOW() WHERE key = 'schema_version';
+UPDATE schema_metadata SET value = '081', updated_at = NOW() WHERE key = 'schema_version';

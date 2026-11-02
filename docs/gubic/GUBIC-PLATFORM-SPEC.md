@@ -45,7 +45,7 @@ Product Hub ─▶ GUBIC hub (Discover │ Library │ Create)
 * **Games never get account credentials, wallet writes or inventory writes.** They talk only to the
   host bridge, which validates and calls Greenfield with the user's session.
 
-### 2.1 Data model (`080_gubic_play_platform`)
+### 2.1 Data model (`082_gubic_play_platform`)
 
 | Table | Purpose | Notes |
 |---|---|---|
