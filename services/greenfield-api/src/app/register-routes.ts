@@ -69,6 +69,7 @@ import {registerModuleRoutes} from '../modules/routes/index.js'
 import {registerAiRoutes} from '../ai/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
+import {registerPushRoutes} from './register-push-routes.js'
 import {registerMessagingRoutes} from './register-messaging-routes.js'
 import {registerMolibooGameRoutes} from './register-moliboo-game-routes.js'
 import {registerPremiumRoutes} from '../premium/routes.js'
@@ -76,6 +77,7 @@ import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
 import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
 import {registerDeveloperRoutes} from '../developers/routes.js'
+import {registerGubicPlayRoutes} from '../gubic/routes.js'
 import {registerEntitlementRoutes} from '../entitlements/routes.js'
 import {registerAccountDataRoutes} from '../account-data/routes.js'
 import {registerSupportRoutes} from '../support/routes.js'
@@ -2707,11 +2709,13 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     writeConfig,
   })
   await registerMessagingRoutes(app, db, {feedConfig, writeConfig})
+  await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  await registerGubicPlayRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerEntitlementRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerAccountDataRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerSupportRoutes(app, db, config, greenfieldSessions, {healthConfig, profileConfig, writeConfig})

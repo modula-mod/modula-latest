@@ -19,7 +19,7 @@ Sources: Master Bible §04 (access and fairness), §05 (Wardrobe, 250-SKU target
 | `access` | `free, earnable, premium` (Bible §4.3 access states map to inventory `status`: `free, owned, earnable_locked, premium_locked`) |
 | `family`, `setId`, `iconKey`, `palette` | Family theming and set membership. `iconKey` matches `Moliboo/Items/<iconKey>.png` in native |
 
-Seed v1 (`docs/moliboo/game-catalogue.v1.json`, also in migration 080): **88 items** (36 free, 27 earnable, 25 premium) and **15 full outfits**, 3 per family (Angels, Underground, Enchanted, Stardust, Dreamers). Each family has one free, one earnable and one premium outfit. This catalogue is separate from the 194 production Wardrobe SKUs. Bible §05 asks for reconciliation before freezing, so no existing SKU is renamed.
+Seed v1 (`docs/moliboo/game-catalogue.v1.json`, also in migration 083): **88 items** (36 free, 27 earnable, 25 premium) and **15 full outfits**, 3 per family (Angels, Underground, Enchanted, Stardust, Dreamers). Each family has one free, one earnable and one premium outfit. This catalogue is separate from the 194 production Wardrobe SKUs. Bible §05 asks for reconciliation before freezing, so no existing SKU is renamed.
 
 ## 2. Inventory
 `GET /v1/moliboo/inventory` returns every visible item with its `status`, its `source` (`free_access` for free items) and, for locked earnables, the `unlockQuestId`. Locked items appear as previews, never as purchase prompts. Revocation uses `revoked_at` and never deletes anything, so prior grants survive migrations (Bible §4.3).
@@ -86,7 +86,7 @@ Dark patterns excluded: hidden odds, countdown pressure, streak loss, confirm-sh
 
 Character ids look like `moliboo.<family>.<name>` (e.g. `moliboo.angels.aura`). Character *ownership/unlock* is still owned by the existing Moliboo access system. These routes do not grant characters.
 
-## 9. Data model (migration `080_moliboo_game_systems`)
+## 9. Data model (migration `083_moliboo_game_systems`)
 Catalogue tables: `greenfield_moliboo_items, _outfit_sets, _buff_definitions, _skills, _quests`.
 Per-account tables: `_inventory, _user_outfits, _equipped, _active_buffs, _events` (append-only, unique idempotency key), `_quest_progress` (period keys `d:YYYY-MM-DD`, `w:YYYY-Www`, `all`), `_friendship`.
 

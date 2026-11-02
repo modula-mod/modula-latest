@@ -11,4 +11,4 @@ DROP TABLE IF EXISTS greenfield_moliboo_buff_definitions;
 DROP TABLE IF EXISTS greenfield_moliboo_outfit_sets;
 DROP TABLE IF EXISTS greenfield_moliboo_items;
 
-UPDATE schema_metadata SET value = '079', updated_at = NOW() WHERE key = 'schema_version';
+UPDATE schema_metadata SET value = '082', updated_at = NOW() WHERE key = 'schema_version';

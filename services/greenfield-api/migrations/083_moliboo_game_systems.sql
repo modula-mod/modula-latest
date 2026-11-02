@@ -388,5 +388,5 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON greenfield_moliboo_inventory, greenfield
 GRANT SELECT, INSERT ON greenfield_moliboo_events TO modula_api, modula_worker;
 GRANT SELECT ON greenfield_moliboo_items, greenfield_moliboo_outfit_sets, greenfield_moliboo_buff_definitions, greenfield_moliboo_skills, greenfield_moliboo_quests, greenfield_moliboo_inventory, greenfield_moliboo_user_outfits, greenfield_moliboo_equipped, greenfield_moliboo_active_buffs, greenfield_moliboo_quest_progress, greenfield_moliboo_friendship, greenfield_moliboo_events TO modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '080')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '083')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();
