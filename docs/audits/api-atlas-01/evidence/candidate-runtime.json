@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-02T09:09:37.863Z",
+  "capturedAt": "2026-11-02T15:51:37.382Z",
   "source": {
     "branch": "feat/qa-moliboo-series2-packs",
-    "headAtCapture": "bb47b8bf5970788a56eaaca09973db341fbc8211",
-    "worktreeDirtyAtCapture": true,
+    "headAtCapture": "0223925435da4876e2d841be2bf4d69e5fe0f3d1",
+    "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "4e7839d0540032934bce14723950445e83cad6c0328e1118d9860f1ae2b3d3bc"
   },
   "runtimeRoutes": [

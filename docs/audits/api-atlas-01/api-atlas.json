@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "feat/qa-moliboo-series2-packs",
       "sourceSha256": "4e7839d0540032934bce14723950445e83cad6c0328e1118d9860f1ae2b3d3bc",
-      "capturedAt": "2026-11-02T09:09:37.863Z",
+      "capturedAt": "2026-11-02T15:51:37.382Z",
       "routeCount": 773
     },
     "status": "PASS"
