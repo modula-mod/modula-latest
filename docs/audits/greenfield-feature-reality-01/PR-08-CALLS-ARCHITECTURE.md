@@ -13,9 +13,9 @@ Production deployment: prohibited and not performed
 MISSION ITEM: PR-08 — CALLS ARCHITECTURE DESIGN ONLY
 STATUS: PASS — design deliverable only; no runtime capability is claimed
 BRANCH: `docs/qa-calls-signalling`
-PR URL: pending draft PR publication
+PR URL: https://github.com/modula-mod/modula-latest/pull/159
 BASE SHA: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
-HEAD SHA: The draft PR head is authoritative after publication
+HEAD SHA: `04c84f4aaeaa51bd2806e7e0fd23720e7ec6eb19` (initial design commit; the report-link follow-up is the final draft head)
 ROUTES ADDED: 0 implemented routes; 14 HTTP proposals and 1 WebSocket proposal are isolated as design vocabulary
 ROUTES MODIFIED: 0
 ATLAS UPDATED: NO — intentional; proposed calls contracts are not implemented capabilities
