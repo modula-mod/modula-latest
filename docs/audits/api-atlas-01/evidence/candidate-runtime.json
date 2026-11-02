@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-02T09:50:00.964Z",
+  "capturedAt": "2026-11-02T09:54:40.147Z",
   "source": {
-    "branch": "fix/qa-conversation-create-contract",
-    "headAtCapture": "828173171147e2bc033142b413d3f7d4d8b1f410",
+    "branch": "feat/qa-story-dm-replies",
+    "headAtCapture": "e2da717950ded407edbba3ab8cca44b6c56bf08a",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "ca3d6c385435eedfd929644ea2dd7c4aa975069a88c90b494db1d7904e8b1beb"
+    "apiSourceSha256": "951d1ea13dbc3d2caa924a06401e8ddb42e4cc2bac25bc1bf7da8c9c6a2f5440"
   },
   "runtimeRoutes": [
     {
@@ -5383,6 +5383,50 @@
       "path": "/v1/stories/items/:itemId/viewed",
       "prefix": "",
       "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/stories/:storyId/replies",
+      "path": "/v1/stories/:storyId/replies",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "storyId"
+          ],
+          "properties": {
+            "storyId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "text",
+            "idempotencyKey"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 5000
+            },
+            "idempotencyKey": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 200,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },

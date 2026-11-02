@@ -11335,7 +11335,68 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
+      "contract": {
+        "purpose": "List a bounded page of messages for an authenticated member of a direct conversation, including optional minimal Story context for real Story-reply messages.",
+        "owningDomain": "Direct messaging",
+        "authentication": "Bearer session required with social:read capability.",
+        "authorization": "The authenticated actor must be a non-declined member of the requested direct conversation. Non-members and declined members receive NOT_FOUND without participant disclosure.",
+        "request": {
+          "params": {
+            "id": "required conversation ID, 1-64 characters"
+          },
+          "query": {
+            "cursor": "optional opaque base64url cursor for the oldest item in the previous page",
+            "limit": "optional positive integer; default 40, maximum 100"
+          },
+          "body": {},
+          "validation": "Malformed cursors are rejected. Conversation kind and membership are verified server-side."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {items:[{id,conversationId,sender,body,subject,sentAt,createdAt,isOwn,delivery,storyContext?}],nextCursor:string|null,hasMore:boolean}. storyContext, when present, is {type:'story',storyId,groupId,ownerActorId,mediaKind,createdAt,expiresAt} and intentionally excludes media URLs and captions."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "created_at descending then message_id descending for selection; items are returned oldest-to-newest within each page",
+          "defaultLimit": 40,
+          "maximumLimit": 100
+        },
+        "idempotencyConcurrency": "Read-only. The optional Story context is joined from the append-only message.story-replied event whose aggregate ID is the message ID; at most one context event exists for an idempotent Story reply.",
+        "versioningCompatibility": "HTTP v1. Existing message fields and pagination behavior are unchanged. storyContext is optional additive response data; clients that do not render Story context continue to display the ordinary body text."
+      },
       "sourceContractSha256": "ba0469879f470266397fc90aa623959ac9a437f1caebb9b7d0fe8833c22b6399"
     },
     {
@@ -29863,6 +29924,136 @@
       },
       "contract": null,
       "sourceContractSha256": "5f2af78ad3f228c32dcf91864410c3ea2955ed8cf888496d1377cecba916cd75"
+    },
+    {
+      "id": "POST /v1/stories/:storyId/replies",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{storyId?: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": {
+        "purpose": "Deliver an authenticated viewer's reply to a concrete live Story item as a persistent message in the Story author's canonical one-to-one conversation.",
+        "owningDomain": "Stories integrated with direct messaging",
+        "authentication": "Bearer session required with post:engage capability; the replying actor is resolved only from the authenticated session.",
+        "authorization": "The Story item must be ready, undeleted and unexpired and must remain visible to the replying actor. The author is resolved from the Story and cannot be redirected by request data. Self replies, either-direction blocks, inactive authors and previously declined recipient message requests are rejected. When no active thread exists, the existing message-request policy determines whether the author's membership is active or pending.",
+        "request": {
+          "params": {
+            "storyId": "required UUID of a greenfield_story_items item; this is not a Story group ID"
+          },
+          "query": {},
+          "body": {
+            "text": "required non-blank reply text, string maximum 5000 characters after trimming",
+            "idempotencyKey": "required client retry key, 8-200 characters from A-Z, a-z, 0-9, dot, underscore, colon or hyphen"
+          },
+          "validation": "Unknown fields, including recipient or author identifiers, are rejected. Invalid or inaccessible Story identifiers return the same NOT_FOUND contract. Story media URLs and captions are not copied into the retained DM context."
+        },
+        "success": {
+          "status": "201 when the reply message is first created; 200 when the same idempotent request is replayed",
+          "body": "Envelope data {conversationId:string, messageId:string, created:boolean, conversationCreated:boolean}. The message is an ordinary direct-message row; a private append-only event provides optional minimal Story context on message reads."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The server namespaces the supplied key to the authenticated actor, stores a SHA-256 request hash, and serializes identical retries with a transaction-scoped advisory lock. Story authorization, canonical conversation creation/reuse, message insertion, private context event, idempotent notification outbox job and stored response commit in one PostgreSQL transaction. Identical retries return the original IDs without another message or event; reuse with different Story text or ID returns CONFLICT. The sorted actor pair retains the direct_key uniqueness invariant.",
+        "versioningCompatibility": "HTTP v1 additive route. storyId means the concrete Story item ID already exposed as StoryItem.itemId. The DM body remains a normal message consumable by existing conversation clients. Optional storyContext fields on message reads are additive and may be ignored by older clients. Deleted or expired Stories cannot receive new replies, while an already-created DM and its non-media context remain readable under normal conversation retention."
+      },
+      "sourceContractSha256": "b5751962a56770a70c223732d1afa5cea79ffe4a2da1fca1021e3b6a29359a09"
     },
     {
       "id": "DELETE /v1/stories/items/:itemId",
