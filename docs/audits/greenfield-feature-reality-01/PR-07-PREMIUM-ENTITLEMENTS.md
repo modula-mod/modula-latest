@@ -13,7 +13,7 @@ Production deployment: prohibited and not performed
 MISSION ITEM: PR-07 — PREMIUM ENTITLEMENTS AND BILLING QA  
 STATUS: PARTIAL  
 BRANCH: `feat/qa-premium-entitlements`  
-PR URL: Pending draft PR creation  
+PR URL: https://github.com/modula-mod/modula-latest/pull/158  
 BASE SHA: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`  
 HEAD SHA: The draft PR head is authoritative after publication  
 ROUTES ADDED: 4  
@@ -199,4 +199,3 @@ The backend contract is documented for this work, but those Native and live-sand
 - App Store Server Notification URL registration was not changed.
 - The workspace-wide pre-existing dependency audit is not clean, although the new Apple dependency path has no reported advisory.
 - Production acceptance, real billing and deployment are explicitly excluded.
-
