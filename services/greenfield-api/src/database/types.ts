@@ -1339,6 +1339,9 @@ export interface Database {
     last_read_at: Date | null
     joined_at: Date
     updated_at: Date
+    muted_until: Date | null
+    archived_at: Date | null
+    typing_at: Date | null
   }
   greenfield_conversation_messages: {
     message_id: string
@@ -1346,6 +1349,15 @@ export interface Database {
     sender_actor_id: string
     subject: string | null
     body: string
+    created_at: Date
+    reply_to_message_id: string | null
+    edited_at: Date | null
+    deleted_at: Date | null
+  }
+  greenfield_message_reactions: {
+    message_id: string
+    actor_id: string
+    emoji: string
     created_at: Date
   }
   greenfield_premium_catalogue_versions: {catalogue_version: number; status: 'active' | 'retired'; effective_at: Date; metadata: unknown; created_at: Date}
