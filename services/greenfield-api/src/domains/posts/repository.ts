@@ -208,6 +208,61 @@ export class PostRepository {
     return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
   }
 
+  async listForCommunity(
+    communityId: string,
+    limit: number,
+    cursor: string | null,
+    viewerActorId: string | null,
+  ): Promise<Array<{row: PostRow; post: SocialPostDto}>> {
+    let query = this.db
+      .selectFrom('posts')
+      .selectAll()
+      .where('community_id', '=', communityId)
+      .where('community_moderation_state', '=', 'visible')
+      .where('deleted_at', 'is', null)
+      .orderBy(sql`community_featured_at desc nulls last`)
+      .orderBy('created_at', 'desc')
+      .orderBy('id', 'desc')
+      .limit(limit + 1)
+    if (cursor) {
+      const [featuredAtRaw, createdAtRaw, id] = cursor.split('|')
+      if (!featuredAtRaw || !createdAtRaw || !id) {
+        throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
+      }
+      const featuredAt = featuredAtRaw === '-' ? null : new Date(featuredAtRaw)
+      const createdAt = new Date(createdAtRaw)
+      if ((featuredAt && Number.isNaN(featuredAt.getTime())) || Number.isNaN(createdAt.getTime())) {
+        throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
+      }
+      query = query.where(({eb, or, and}) => featuredAt
+        ? or([
+            eb('community_featured_at', 'is', null),
+            eb('community_featured_at', '<', featuredAt),
+            and([eb('community_featured_at', '=', featuredAt), eb('created_at', '<', createdAt)]),
+            and([
+              eb('community_featured_at', '=', featuredAt),
+              eb('created_at', '=', createdAt),
+              eb('id', '<', id),
+            ]),
+          ])
+        : or([
+            and([eb('community_featured_at', 'is', null), eb('created_at', '<', createdAt)]),
+            and([
+              eb('community_featured_at', 'is', null),
+              eb('created_at', '=', createdAt),
+              eb('id', '<', id),
+            ]),
+          ]))
+    }
+    const rows = await query.execute()
+    const posts = await this.hydrateMany(rows, viewerActorId)
+    const byId = new Map(posts.map(post => [post.id, post]))
+    return rows.flatMap(row => {
+      const post = byId.get(row.id)
+      return post ? [{row, post}] : []
+    })
+  }
+
   
   private async hydrateMany(rows: PostRow[], viewerActorId: string | null): Promise<SocialPostDto[]> {
     // Pre-warm the bounded identity cache with one batched lookup so feed

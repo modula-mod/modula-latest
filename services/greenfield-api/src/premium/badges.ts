@@ -9,11 +9,11 @@ export type VerificationMark = 'blue_identity_seal' | 'ink_squircle' | 'slate_he
 export type PublicIdentitySummary = {
   schemaVersion: 1
   verification: {status: 'unverified' | 'verified'; type: VerificationType | null; mark: VerificationMark | null}
-  membership: {tier: PremiumTier; status: 'core' | 'active' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
+  membership: {tier: PremiumTier; status: 'core' | 'active' | 'grace' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
   publicIdentity: {
     schemaVersion: 1
     verification: {status: 'unverified' | 'verified'; type: VerificationType | null; mark: VerificationMark | null}
-    membership: {tier: PremiumTier; status: 'core' | 'active' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
+    membership: {tier: PremiumTier; status: 'core' | 'active' | 'grace' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
   }
   premiumTier: Exclude<PremiumTier, 'core'> | null
   premiumSince: string | null
@@ -106,17 +106,17 @@ export async function publicIdentitiesForActors(db: ModulaDb, actorIds: string[]
       const current = values.get(row.actor_id) ?? structuredClone(EMPTY_PUBLIC_IDENTITY)
       const tier = (row.tier_id ?? 'core') as PremiumTier
       const recordedStatus = row.subscription_status ?? 'core'
-      const active = recordedStatus === 'active'
+      const active = (recordedStatus === 'active' || recordedStatus === 'grace')
         && row.effective_at !== null
         && row.effective_at.getTime() <= now.getTime()
         && (!row.expires_at || row.expires_at.getTime() > now.getTime())
       const effectiveTier = active ? tier : 'core'
-      const effectiveStatus = recordedStatus === 'active' && !active ? 'expired' : recordedStatus
+      const effectiveStatus = (recordedStatus === 'active' || recordedStatus === 'grace') && !active ? 'expired' : recordedStatus
       const badgeVisible = active && effectiveTier !== 'core' && row.badge_visible !== false
       values.set(row.actor_id, {
         ...current,
-        membership: {tier: effectiveTier, status: active ? 'active' : effectiveStatus, badgeVisible, mark: badgeVisible ? 'modula_unit' : null},
-        publicIdentity: {...current.publicIdentity, membership: {tier: effectiveTier, status: active ? 'active' : effectiveStatus, badgeVisible, mark: badgeVisible ? 'modula_unit' : null}},
+        membership: {tier: effectiveTier, status: active ? recordedStatus : effectiveStatus, badgeVisible, mark: badgeVisible ? 'modula_unit' : null},
+        publicIdentity: {...current.publicIdentity, membership: {tier: effectiveTier, status: active ? recordedStatus : effectiveStatus, badgeVisible, mark: badgeVisible ? 'modula_unit' : null}},
         premiumTier: effectiveTier === 'core' ? null : effectiveTier,
         premiumSince: effectiveTier === 'core' ? null : row.membership_since?.toISOString() ?? null,
         premiumBadgeVisible: badgeVisible,

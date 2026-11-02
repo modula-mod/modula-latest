@@ -68,6 +68,7 @@ export function domainFor(path) {
     [/^\/v1\/repositories\b/, 'Account'],
     [/^\/v1\/(board)\b/, 'Account'],
     [/^\/v1\/saves\b/, 'Posts'],
+    [/^\/v1\/stories\b/, 'Media'],
     [/\/comments?(?:\/|$)|\/replies(?:\/|$)/, 'Comments'],
     [/\/reactions?(?:\/|$)|\/likes?(?:\/|$)/, 'Reactions'],
     [/\/(?:followers|following|follow|unfollow|relationships?|blocks?|mutes?)(?:\/|$)/, 'Social'],
@@ -603,6 +604,11 @@ await db.destroy()
       MODULA_DATABASE_URL: 'postgresql://candidate-runtime@127.0.0.1:1/candidate-runtime',
       MODULA_ALLOWED_ORIGINS: 'http://127.0.0.1:8081',
       MODULA_RATE_LIMIT_ENABLED: 'false',
+      MODULA_GUBIC_PLAY_ENABLED: 'true',
+      MODULA_PREMIUM_ENTITLEMENTS_ENABLED: 'true',
+      MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED: 'true',
+      MODULA_VERIFICATION_ENABLED: 'true',
+      MODULA_VERIFICATION_QA_REVIEW_ENABLED: 'true',
     },
   })
   if (result.status !== 0) throw new Error(`candidate runtime capture failed: ${result.stderr}`)

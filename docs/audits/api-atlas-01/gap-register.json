@@ -478,7 +478,7 @@
       "affectedFiles": [
         "services/greenfield-api/src"
       ],
-      "productionImpact": "All 484 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
+      "productionImpact": "All 584 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
       "recommendedFix": "Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.",
       "dependencies": [
         "API contract ownership"
@@ -949,7 +949,7 @@
       "domain": "testing",
       "type": "untested endpoint",
       "severity": "P2",
-      "title": "76 application routes have no statically matched automated test",
+      "title": "89 application routes have no statically matched automated test",
       "evidence": [
         "api-atlas.json#/routes"
       ],

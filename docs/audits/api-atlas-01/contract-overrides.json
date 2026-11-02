@@ -1,0 +1,3468 @@
+{
+  "schemaVersion": 1,
+  "mission": "GREENFIELD-FEATURE-REALITY-01",
+  "workstream": "PR-01 through PR-07 disposable integration composition",
+  "routes": {
+    "DELETE /v1/me/collections/:collectionId": {
+      "purpose": "Soft-delete an authenticated actor-owned collection without deleting source posts or Saved rows.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Only the owner may delete; cross-user IDs return NOT_FOUND.",
+      "request": {
+        "params": {
+          "collectionId": "required collection UUID"
+        },
+        "query": {
+          "expectedVersion": "required positive integer"
+        },
+        "body": {},
+        "validation": "Unknown query fields and stale revisions are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {deleted:true}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Soft delete is version-guarded and auditable. Collection-item rows may cascade only during physical recovery cleanup; posts and post_saves are never cascaded.",
+      "versioningCompatibility": "HTTP v1 new route. Deletion does not unsave or delete underlying content."
+    },
+    "DELETE /v1/me/collections/:collectionId/items/:itemId": {
+      "purpose": "Remove one item membership from an actor-owned collection without unsaving or deleting its source post.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Both collection ownership and item-to-collection association are enforced.",
+      "request": {
+        "params": {
+          "collectionId": "required collection UUID",
+          "itemId": "required collection item UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "Both UUIDs are schema-validated and cross-associated server-side."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {deleted:true}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "The item is soft-deleted under a collection lock; a missing/already-removed item returns NOT_FOUND and no source rows are changed.",
+      "versioningCompatibility": "HTTP v1 new route."
+    },
+    "DELETE /v1/me/drafts/:draftId": {
+      "purpose": "Soft-delete an owned draft and release any unpublished attachment reservations.",
+      "owningDomain": "Post drafts",
+      "authentication": "Bearer session with post:create capability required.",
+      "authorization": "Only the authenticated owner may delete; cross-user IDs return NOT_FOUND.",
+      "request": {
+        "params": {
+          "draftId": "required draft UUID"
+        },
+        "query": {
+          "expectedVersion": "required positive integer"
+        },
+        "body": {},
+        "validation": "Unknown query fields and stale revisions are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {deleted:true}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Draft deletion is row-locked and revision-guarded. It never deletes a published post or attachment bytes.",
+      "versioningCompatibility": "HTTP v1 new route. A draft is never deleted automatically before post publication is confirmed."
+    },
+    "GET /v1/communities": {
+      "purpose": "Discover public Communities and list the authenticated viewer's joined Communities with stable server-backed membership state.",
+      "owningDomain": "Communities",
+      "authentication": "Public route with optional Bearer session. Authentication adds private joined Communities and viewer membership/role fields.",
+      "authorization": "Anonymous callers see only undeleted public discoverable Communities. Authenticated callers additionally see private Communities only when their membership is active; banned and left memberships never grant access.",
+      "request": {
+        "params": {},
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional opaque stable cursor",
+          "query": "optional name, description or slug search, 1-120 characters",
+          "category": "optional exact case-insensitive category, 1-80 characters",
+          "membership": "optional joined or notJoined filter"
+        },
+        "body": {},
+        "validation": "Unknown query keys and malformed limits/cursors are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<CommunitySummaryDto> with id, slug, identity, category, visibility, artwork, memberCount, membership, viewerRole, recentActivityAt and version."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "featured descending, recent activity descending, community ID descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50,
+        "filtering": "query, category and viewer membership"
+      },
+      "idempotencyConcurrency": "Read-only. The cursor contains the complete stable ordering tuple; member counts are derived from active membership rows.",
+      "versioningCompatibility": "HTTP v1 additive route. Fields are camelCase and additive response fields may be ignored by older clients. Private Communities are deliberately indistinguishable from absent records without active membership."
+    },
+    "GET /v1/communities/:communityId": {
+      "purpose": "Load one Community with authoritative membership, role, policy and member-count state.",
+      "owningDomain": "Communities",
+      "authentication": "Public for public Communities; optional Bearer session supplies viewer state and is required for private Communities.",
+      "authorization": "Private Communities require an active membership. Inaccessible private, deleted and unknown IDs all return NOT_FOUND.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "Malformed UUIDs are rejected by the route schema."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {community:CommunityDto}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Read-only; counts are derived from active membership rows at read time.",
+      "versioningCompatibility": "HTTP v1 additive route. Private Community existence is not disclosed to unauthorized callers."
+    },
+    "GET /v1/communities/:communityId/events": {
+      "purpose": "List scheduled and cancelled events for an accessible Community with aggregate and viewer RSVP state.",
+      "owningDomain": "Community events",
+      "authentication": "Public for public Communities; optional Bearer session supplies viewer response and private access.",
+      "authorization": "Private Communities require active membership. Deleted events are excluded.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional schedule cursor"
+        },
+        "body": {},
+        "validation": "Malformed UUID, cursor and limits are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<CommunityEventDto> including location metadata, capacity, status, participant counts and viewerResponse."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "starts_at ascending then event_id ascending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only; counts are derived from one response row per event and actor.",
+      "versioningCompatibility": "HTTP v1 additive route. This contract is RSVP/event discovery only and does not imply ticketing or payment support."
+    },
+    "GET /v1/communities/:communityId/events/:eventId": {
+      "purpose": "Load one accessible Community event and authoritative RSVP counts/state.",
+      "owningDomain": "Community events",
+      "authentication": "Public for public Communities; optional Bearer session is required for private access and viewerResponse.",
+      "authorization": "Event must belong to the path Community. Private Communities require active membership; inaccessible IDs return NOT_FOUND.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID",
+          "eventId": "required event UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "Both UUIDs are schema-validated and cross-associated server-side."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {event:CommunityEventDto}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Read-only; response counts are transactionally constrained by one response per actor.",
+      "versioningCompatibility": "HTTP v1 new route. eventId is scoped to communityId to prevent cross-Community object access."
+    },
+    "GET /v1/communities/:communityId/members": {
+      "purpose": "List the privacy-filtered active member directory for an accessible Community.",
+      "owningDomain": "Community membership",
+      "authentication": "Public for public Communities; optional Bearer session is required for private Community access and viewer-relative profile privacy.",
+      "authorization": "Private membership is required for private Communities. Only active memberships are returned; normal profile visibility and block rules still apply.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional stable member cursor"
+        },
+        "body": {},
+        "validation": "Malformed UUID, cursor and limit values are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<CommunityMemberDto> containing communityId, actorId, role, status, joinedAt and privacy-safe profile."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "joined_at descending then actor_id descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only; cursor ordering remains stable under inserts. Members hidden by profile privacy or blocking are omitted without leaking identity.",
+      "versioningCompatibility": "HTTP v1 additive route. actorId is included for stable directory identity; account IDs are never exposed."
+    },
+    "GET /v1/communities/:communityId/polls": {
+      "purpose": "List single-choice polls for an accessible Community with results visibility enforced per viewer.",
+      "owningDomain": "Community polls",
+      "authentication": "Public for public Communities; optional Bearer session is required for private access and viewer vote state.",
+      "authorization": "Private Communities require active membership. Deleted polls are excluded; results may be hidden until vote or close according to server policy.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional stable poll cursor"
+        },
+        "body": {},
+        "validation": "Malformed UUID, cursor and limit values are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<CommunityPollDto>; voteCount and totalVotes are null when results are not visible."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "created_at descending then poll_id descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only; aggregates are derived from the unique per-actor vote table.",
+      "versioningCompatibility": "HTTP v1 additive route. Initial contract is single-choice only; results suppression uses null rather than fabricated zero counts."
+    },
+    "GET /v1/communities/:communityId/polls/:pollId": {
+      "purpose": "Load one Community poll with viewer vote and policy-filtered results.",
+      "owningDomain": "Community polls",
+      "authentication": "Public for public Communities; optional Bearer session is required for private access and viewerOptionId.",
+      "authorization": "Poll must belong to the path Community. Private access requires active membership and inaccessible IDs return NOT_FOUND.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID",
+          "pollId": "required poll UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "UUIDs and Community association are validated server-side."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {poll:CommunityPollDto}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Read-only; closed is derived from status or closesAt and counts derive from constrained votes.",
+      "versioningCompatibility": "HTTP v1 new route. Hidden aggregate fields are null until results policy allows them."
+    },
+    "GET /v1/communities/:communityId/posts": {
+      "purpose": "List canonical social posts associated with a Community without creating a second post store.",
+      "owningDomain": "Communities integrated with social posts",
+      "authentication": "Public for public Communities; optional Bearer session is required for private Community content and viewer social state.",
+      "authorization": "Private Communities require active membership. Hidden, removed and deleted posts are excluded. Existing post/profile block and visibility policy remains authoritative.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional stable post cursor"
+        },
+        "body": {},
+        "validation": "Malformed UUID, cursor and limits are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<CommunityPostDto>; each item wraps one existing SocialPostDto with communityId, moderationState and featuredAt."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "featured_at descending nulls last, created_at descending, post ID descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only. Post identities are the canonical posts.id values used by reactions, comments, saves and shares.",
+      "versioningCompatibility": "HTTP v1 additive route. The embedded SocialPostDto is the established social contract, so native clients do not require a fake Community-only post type."
+    },
+    "GET /v1/communities/:communityId/settings": {
+      "purpose": "Load authoritative Community policy plus the authenticated member's persisted notification preferences.",
+      "owningDomain": "Community settings",
+      "authentication": "Bearer session required.",
+      "authorization": "Any active, non-restricted member may read settings. Private Community existence is not disclosed without active membership.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "Malformed UUIDs are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {settings:{communityId,canManage,membershipPolicy,postingPolicy,inviteLinksEnabled,allowAttachments,reactionsEnabled,featuredPostsEnabled,blockedWords,notificationPreferences:{notifyMentions,weeklyDigest,eventReminders},version,updatedAt}}. blockedWords is null unless canManage is true."
+      },
+      "errors": [
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Read-only. Global policy and the caller's notification preferences are read from authoritative server records.",
+      "versioningCompatibility": "HTTP v1 new route. inviteLinksEnabled is policy metadata only and does not issue an invite. canManage tells the client whether global mutations are available; sensitive blockedWords are returned only to owners and administrators."
+    },
+    "GET /v1/conversations/:id/messages": {
+      "purpose": "List a bounded page of messages for an authenticated member of a direct conversation, including optional minimal Story context for real Story-reply messages.",
+      "owningDomain": "Direct messaging",
+      "authentication": "Bearer session required with social:read capability.",
+      "authorization": "The authenticated actor must be a non-declined member of the requested direct conversation. Non-members and declined members receive NOT_FOUND without participant disclosure.",
+      "request": {
+        "params": {
+          "id": "required conversation ID, 1-64 characters"
+        },
+        "query": {
+          "cursor": "optional opaque base64url cursor for the oldest item in the previous page",
+          "limit": "optional positive integer; default 40, maximum 100"
+        },
+        "body": {},
+        "validation": "Malformed cursors are rejected. Conversation kind and membership are verified server-side."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {items:[{id,conversationId,sender,body,subject,sentAt,createdAt,isOwn,delivery,storyContext?}],nextCursor:string|null,hasMore:boolean}. storyContext, when present, is {type:'story',storyId,groupId,ownerActorId,mediaKind,createdAt,expiresAt} and intentionally excludes media URLs and captions."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "created_at descending then message_id descending for selection; items are returned oldest-to-newest within each page",
+        "defaultLimit": 40,
+        "maximumLimit": 100
+      },
+      "idempotencyConcurrency": "Read-only. The optional Story context is joined from the append-only message.story-replied event whose aggregate ID is the message ID; at most one context event exists for an idempotent Story reply.",
+      "versioningCompatibility": "HTTP v1. Existing message fields and pagination behavior are unchanged. storyContext is optional additive response data; clients that do not render Story context continue to display the ordinary body text."
+    },
+    "GET /v1/me/collections": {
+      "purpose": "List the authenticated actor's named Saved collections and authoritative active item counts.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Collection owner is resolved from the authenticated actor; another actor's collections are never returned.",
+      "request": {
+        "params": {},
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional updated-at/collection-id cursor"
+        },
+        "body": {},
+        "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<SavedCollectionDto>."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "updated_at descending then collection_id descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only; itemCount is derived from active collection-item rows.",
+      "versioningCompatibility": "HTTP v1 additive route. This is named organization over existing Saved rows, not a replacement bookmarking system."
+    },
+    "GET /v1/me/collections/:collectionId": {
+      "purpose": "Load one authenticated actor-owned named Saved collection.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Cross-user and deleted collection IDs return NOT_FOUND without ownership disclosure.",
+      "request": {
+        "params": {
+          "collectionId": "required collection UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "collectionId is schema-validated."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {collection:SavedCollectionDto}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Read-only; item count is server-derived.",
+      "versioningCompatibility": "HTTP v1 new route."
+    },
+    "GET /v1/me/collections/:collectionId/items": {
+      "purpose": "List stable ordered items in one actor-owned collection while retaining unavailable source references safely.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Collection ownership is required. Post hydration applies existing post visibility policy.",
+      "request": {
+        "params": {
+          "collectionId": "required collection UUID"
+        },
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional position/item-id cursor"
+        },
+        "body": {},
+        "validation": "Malformed UUID, cursor and limit values are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<SavedCollectionItemDto>; unavailable or unsaved sources return available=false and post=null."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "position ascending then item_id ascending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only; positions are uniquely constrained among active rows per collection.",
+      "versioningCompatibility": "HTTP v1 new route. Unavailable items remain identifiable for explicit removal and can become available after re-save."
+    },
+    "GET /v1/me/drafts": {
+      "purpose": "List the authenticated actor's editable post drafts for multi-device reconciliation.",
+      "owningDomain": "Post drafts",
+      "authentication": "Bearer session with post:create capability required.",
+      "authorization": "Only owner_actor_id matching the authenticated actor is queried.",
+      "request": {
+        "params": {},
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional updated-at/draft-id cursor"
+        },
+        "body": {},
+        "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data CursorPage<PostDraftDto>; each draft includes version and updatedAt for reconciliation."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "updated_at descending then draft_id descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only; only editing drafts are listed. Published drafts remain addressable by ID for retry confirmation.",
+      "versioningCompatibility": "HTTP v1 additive route. Initial server contract is post drafts only; Story and In-Mail drafts remain separate Native gaps."
+    },
+    "GET /v1/me/drafts/:draftId": {
+      "purpose": "Load one owned editing or published post draft for synchronization or publish retry recovery.",
+      "owningDomain": "Post drafts",
+      "authentication": "Bearer session with post:create capability required.",
+      "authorization": "Cross-user and deleted draft IDs return NOT_FOUND.",
+      "request": {
+        "params": {
+          "draftId": "required draft UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "draftId is schema-validated."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {draft:PostDraftDto}, including state, publishedPostId, version and updatedAt."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Read-only. Published state is retained so a lost publish response can be reconciled safely.",
+      "versioningCompatibility": "HTTP v1 new route."
+    },
+    "GET /v1/me/entitlements": {
+      "purpose": "Evaluate every Premium capability for the authenticated account from the active catalogue and effective membership state.",
+      "owningDomain": "Premium entitlement evaluation",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped; the server derives account and actor identity from the bearer session.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No route parameters, query parameters or request body."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{schemaVersion:1,catalogueVersion,tier,subscriptionStatus,capabilities:[{id,available,value,mode,reason}]}"
+      },
+      "errors": {
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only deterministic evaluation for a catalogue and membership revision. A client flag such as premium=true is never consulted.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "GET /v1/me/entitlements/:capabilityId": {
+      "purpose": "Evaluate one named Premium capability for the authenticated account.",
+      "owningDomain": "Premium entitlement evaluation",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped; the server derives account and actor identity from the bearer session.",
+      "request": {
+        "path": {
+          "capabilityId": "Required lowercase identifier matching ^[a-z][a-z0-9_]{2,79}$."
+        },
+        "query": {},
+        "body": null,
+        "validation": "Fastify rejects malformed capability identifiers; the service resolves the identifier only from the active server catalogue."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{id,available,value,mode,reason,catalogueVersion,tier}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for a malformed capabilityId."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "404": [
+          "NOT_FOUND when capabilityId is absent from the active catalogue."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only deterministic evaluation for a catalogue and membership revision.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "GET /v1/me/membership": {
+      "purpose": "Return the authenticated account's effective server-authoritative membership, billing status, badge preference and purchase availability.",
+      "owningDomain": "Premium memberships",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped. The account and actor identifiers are resolved from the authenticated session; no client-supplied owner identifier is accepted.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No route parameters, query parameters or request body."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{schemaVersion:1,accountId,tier,recordedTier,subscriptionStatus,entitlementSource,effectiveAt,expiresAt,membershipSince,badgeVisible,revision,renewal,purchase,publicIdentity,serverTime}"
+      },
+      "errors": {
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only account projection. Expired active/grace records are projected as Core without deleting historical membership or user data.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "GET /v1/me/moliboos/outfit": {
+      "purpose": "Return the authenticated account's persisted equipped Moliboo items and revision.",
+      "owningDomain": "Moliboo ownership and wardrobe",
+      "authentication": "Bearer session required with social:read capability.",
+      "authorization": "Account ID is resolved from the authenticated session.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No request fields."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {revision: integer, updatedAt: ISO timestamp|null, items: OutfitItem[]}."
+      },
+      "errors": [
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "maximum": 16
+      },
+      "idempotencyConcurrency": "Safe account-scoped read.",
+      "versioningCompatibility": "HTTP v1; revision is required for optimistic synchronization across devices."
+    },
+    "GET /v1/me/moliboos/ownership": {
+      "purpose": "Return the authenticated account's server-authoritative Moliboo ownership inventory.",
+      "owningDomain": "Moliboo ownership and wardrobe",
+      "authentication": "Bearer session required with social:read capability.",
+      "authorization": "Account ID is resolved from the authenticated session; no client-supplied owner is accepted.",
+      "request": {
+        "params": {},
+        "query": {
+          "cursor": "optional opaque cursor, max 512 bytes",
+          "limit": "integer 1-50, default 20"
+        },
+        "body": null,
+        "validation": "Unknown keys and invalid cursors are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {items: OwnershipItem[], nextCursor: string|null, hasMore: boolean}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED",
+            "INVALID_CURSOR"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "grantedAt descending, itemId ascending",
+        "default": 20,
+        "maximum": 50
+      },
+      "idempotencyConcurrency": "Safe account-scoped read; duplicate grants are prevented by (accountId,itemId) and grantId uniqueness.",
+      "versioningCompatibility": "HTTP v1; additive ownership item fields only."
+    },
+    "GET /v1/moliboos/packs": {
+      "purpose": "List the latest cryptographically trusted, approved Moliboo content-pack release for each package.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public approved-release catalogue; no session required.",
+      "authorization": "Only approved, published or superseded first-party releases with live publisher and signer trust are projected.",
+      "request": {
+        "params": {},
+        "query": {
+          "cursor": "optional opaque cursor, max 256 bytes",
+          "limit": "integer 1-50, default 20",
+          "familyId": "optional lowercase slug",
+          "series": "optional integer 1-99",
+          "availability": "optional; only approved is accepted"
+        },
+        "body": null,
+        "validation": "Unknown query keys and non-approved availability values are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {items: MolibooPackageDescriptor[], nextCursor: string|null, hasMore: boolean}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED",
+            "INVALID_CURSOR"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "packageId ascending after latest-version projection",
+        "default": 20,
+        "maximum": 50
+      },
+      "idempotencyConcurrency": "Safe read. Invalid or concurrently withdrawn releases fail closed and are omitted.",
+      "versioningCompatibility": "HTTP v1; descriptor schema modula.package.1; native catalogue schema modula.moliboo.catalog.1; additive descriptor fields only."
+    },
+    "GET /v1/moliboos/packs/:packId/download": {
+      "purpose": "Deliver exact immutable bytes for a trusted Moliboo content pack.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public immutable content; no session required.",
+      "authorization": "Pack selection and trust checks are identical to the manifest endpoint; clients cannot choose storage paths.",
+      "request": {
+        "params": {
+          "packId": "moliboo.character.<1-4 digit number>"
+        },
+        "query": {
+          "version": "optional semantic version"
+        },
+        "body": null,
+        "validation": "Unknown fields, malformed IDs and malformed versions are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Raw application/vnd.modula.moliboo-asset-pack+json bytes with immutable cache, ETag, content length and X-Modula-Artifact-Sha256 headers."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "UNTRUSTED_RELEASE",
+            "RELEASE_REVOKED",
+            "SIGNER_REVOKED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "ARTIFACT_DIGEST_MISMATCH"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none"
+      },
+      "idempotencyConcurrency": "Safe immutable read; content address and release identity never change.",
+      "versioningCompatibility": "Content-only JSON container schema modula.moliboo.assetpack.1; maximum 6 MiB artifact, 8 MiB decoded, 16 files, 4 MiB per file; JSON and PNG only."
+    },
+    "GET /v1/moliboos/packs/:packId/manifest": {
+      "purpose": "Resolve a trusted install descriptor for a requested Moliboo package and optional immutable version.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public content metadata; no session required.",
+      "authorization": "The selected release must be approved and pass live publisher, release-signature, artifact-signature, revocation and quarantine checks.",
+      "request": {
+        "params": {
+          "packId": "moliboo.character.<1-4 digit number>"
+        },
+        "query": {
+          "version": "optional semantic version; omitted selects newest approved version"
+        },
+        "body": null,
+        "validation": "Unknown fields, malformed IDs and malformed versions are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {manifest: MolibooPackageDescriptor}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "UNTRUSTED_RELEASE",
+            "RELEASE_REVOKED",
+            "SIGNER_REVOKED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "ARTIFACT_DIGEST_MISMATCH"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none"
+      },
+      "idempotencyConcurrency": "Safe read. Explicit withdrawn versions fail; an unversioned request falls back to the newest still-approved version.",
+      "versioningCompatibility": "HTTP v1; descriptor schema modula.package.1; artifact runtimeVersion 1 and minimumHostVersion are enforced by PackageManager."
+    },
+    "GET /v1/moliboos/packs/catalog.json": {
+      "purpose": "Return the exact raw catalogue shape consumed by the existing native Moliboo PackageManager.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public approved-release catalogue; no session required.",
+      "authorization": "Same live release, publisher, signer, revocation and quarantine checks as the paginated catalogue.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No request fields."
+      },
+      "success": {
+        "status": 200,
+        "body": "Raw {schemaVersion:'modula.moliboo.catalog.1', packages: MolibooPackageDescriptor[]} with Cache-Control: no-cache."
+      },
+      "errors": [
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "ordering": "packageId ascending",
+        "maximum": "Registry bounded to approved Moliboo identities."
+      },
+      "idempotencyConcurrency": "Safe read; every request re-evaluates current trust and withdrawal state.",
+      "versioningCompatibility": "Compatibility endpoint for native PackageManager; catalogue schema is fixed at modula.moliboo.catalog.1."
+    },
+    "GET /v1/premium/tiers": {
+      "purpose": "Return the active server-maintained Premium tier and capability catalogue, mission-supplied display-price labels, and the currently configured Apple sandbox purchase products.",
+      "owningDomain": "Premium catalogue and entitlements",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Any authenticated account may read the catalogue. Product mappings are server-selected; clients cannot submit tier, price or entitlement facts.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No route parameters, query parameters or request body."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{schemaVersion:1,catalogueVersion,pricingStatus:'supplied_display_only',purchase:{enabled,environment:'sandbox',reason,products[]},tiers:[{id,displayName,rank,paid,price:null,displayPrice,products[],metadata}],capabilities:[{id,displayName,minimumRank,availabilityMode,metadata}]}"
+      },
+      "errors": {
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only. Repeated and concurrent reads do not mutate entitlement state; Cache-Control no-store prevents stale commercial state.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Display prices are labels only and do not declare a billing period or purchasable App Store product."
+    },
+    "GET /v1/saves": {
+      "purpose": "List the authenticated actor's existing Saved posts with bounded stable pagination.",
+      "owningDomain": "Saved posts",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Only the authenticated actor's private post_saves rows are queried; inaccessible or deleted source posts are omitted.",
+      "request": {
+        "params": {},
+        "query": {
+          "limit": "optional integer 1-50, default 20",
+          "cursor": "optional opaque created-at/save-id cursor"
+        },
+        "body": {},
+        "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {items:SocialPostDto[],nextCursor:string|null,hasMore:boolean}; the existing items field is preserved for older clients."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "post_saves.created_at descending then save id descending",
+        "defaultLimit": 20,
+        "maximumLimit": 50
+      },
+      "idempotencyConcurrency": "Read-only. Cursor identity is based on immutable save creation time and save ID; saving/unsaving continues through the existing post engagement routes.",
+      "versioningCompatibility": "HTTP v1 additive pagination metadata. Existing consumers that read data.items remain compatible."
+    },
+    "GET /v1/stickers/packs": {
+      "purpose": "List backward-compatible emoji packs plus approved signed Sprout image packs for composer, message and reaction consumers.",
+      "owningDomain": "Composer sticker content",
+      "authentication": "Public approved content catalogue; no session required.",
+      "authorization": "Database packs are returned only when the signed manifest, publisher, signer, release, revocation/quarantine state and every image digest match.",
+      "request": {
+        "params": {},
+        "query": {
+          "cursor": "optional opaque cursor, max 256 bytes",
+          "limit": "integer 1-50, default 20",
+          "series": "optional integer 1-99; filters signed packs and excludes legacy emoji packs"
+        },
+        "body": null,
+        "validation": "Unknown fields, invalid cursors and invalid bounds are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {packs: StickerPack[], nextCursor: string|null, hasMore: boolean}; signed packs include version, releaseId, package signature/download and per-sticker immutable PNG asset metadata."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED",
+            "INVALID_CURSOR"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "cursor",
+        "ordering": "packId ascending",
+        "default": 20,
+        "maximum": 50
+      },
+      "idempotencyConcurrency": "Safe read. Invalid or withdrawn database releases are omitted. Comment writes resolve sticker label, emoji and pack server-side and reject unknown IDs.",
+      "versioningCompatibility": "HTTP v1; existing {id,title,icon,stickers:[{id,emoji,label}]} fields remain; signed package and asset fields are additive."
+    },
+    "PATCH /v1/communities/:communityId": {
+      "purpose": "Optimistically update Community identity, discovery and membership/posting policies.",
+      "owningDomain": "Communities",
+      "authentication": "Bearer session required.",
+      "authorization": "Only an active owner or administrator may update the Community. Owner identity and featured status cannot be supplied.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {
+          "expectedVersion": "required positive integer",
+          "slug": "optional normalized unique slug",
+          "name": "optional 1-120 characters",
+          "description": "optional maximum 5000 characters",
+          "category": "optional 1-80 characters",
+          "visibility": "optional public or private",
+          "discoverable": "optional boolean, ignored as true when private",
+          "membershipPolicy": "optional open or approval",
+          "postingPolicy": "optional members or moderators",
+          "iconAttachmentId": "optional image attachment UUID or null",
+          "coverAttachmentId": "optional image attachment UUID or null"
+        },
+        "validation": "At least one change is required. Unknown fields are rejected. New artwork must be owned, ready, unattached image content."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {community:CommunityDto} with incremented version."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "UPDATE includes expectedVersion and increments the version atomically; stale writers receive CONFLICT. Membership/posting policy changes serialize with PATCH /settings and also advance the settings revision. Slug uniqueness is database-enforced.",
+      "versioningCompatibility": "HTTP v1 new route using explicit optimistic concurrency. Changing to private forces discoverable=false without changing immutable Community or owner IDs."
+    },
+    "PATCH /v1/communities/:communityId/events/:eventId": {
+      "purpose": "Optimistically edit or cancel a Community event.",
+      "owningDomain": "Community events",
+      "authentication": "Bearer session required.",
+      "authorization": "The event creator or an active owner, administrator or moderator may edit. Event and Community path association is enforced.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID",
+          "eventId": "required event UUID"
+        },
+        "query": {},
+        "body": {
+          "expectedVersion": "required positive integer",
+          "title": "optional 1-160 characters",
+          "description": "optional maximum 10000 characters",
+          "startsAt": "optional ISO date-time",
+          "endsAt": "optional ISO date-time",
+          "timezone": "optional valid IANA timezone",
+          "location": "optional validated location object",
+          "coverAttachmentId": "optional image UUID or null",
+          "capacity": "optional positive integer or null",
+          "status": "optional scheduled or cancelled"
+        },
+        "validation": "At least one change is required; unknown fields, invalid time ranges/timezones, non-HTTPS online URLs, invalid cover attachments and capacity below the current Going count are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {event:CommunityEventDto} with incremented version."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "UPDATE locks the event and is guarded by expectedVersion. Stale concurrent edits return CONFLICT. Capacity updates serialize with responses and cannot make existing Going state invalid. Cancellation retains the event and existing response history but rejects new response mutations.",
+      "versioningCompatibility": "HTTP v1 new route. Cancellation is a status transition, not destructive deletion."
+    },
+    "PATCH /v1/communities/:communityId/polls/:pollId": {
+      "purpose": "Optimistically cancel a Community poll without deleting votes or audit history.",
+      "owningDomain": "Community polls",
+      "authentication": "Bearer session required.",
+      "authorization": "The poll creator or an active owner, administrator or moderator may cancel it.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID",
+          "pollId": "required poll UUID"
+        },
+        "query": {},
+        "body": {
+          "status": "required literal cancelled",
+          "expectedVersion": "required positive integer"
+        },
+        "validation": "Unknown fields are rejected and poll/Community association is enforced."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {poll:CommunityPollDto} with status=cancelled and incremented version."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "UPDATE includes expectedVersion and increments atomically. Stale cancellations receive CONFLICT; vote history is retained.",
+      "versioningCompatibility": "HTTP v1 new route. Editing poll choices or close times is intentionally not supported after publication."
+    },
+    "PATCH /v1/communities/:communityId/settings": {
+      "purpose": "Update member-owned notification preferences and, for authorized operators, optimistic Community policy settings.",
+      "owningDomain": "Community settings",
+      "authentication": "Bearer session required.",
+      "authorization": "Active non-restricted members may mutate only their own notifyMentions, weeklyDigest and eventReminders fields. Only active owners and administrators may mutate global settings. Client role and target-user fields are not accepted.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {
+          "expectedVersion": "required positive integer when any global setting changes; omitted for notification-only updates",
+          "membershipPolicy": "optional open or approval, owner/admin only",
+          "postingPolicy": "optional members or moderators, owner/admin only",
+          "inviteLinksEnabled": "optional boolean policy flag, owner/admin only",
+          "allowAttachments": "optional boolean, owner/admin only",
+          "reactionsEnabled": "optional boolean, owner/admin only",
+          "featuredPostsEnabled": "optional boolean, owner/admin only",
+          "blockedWords": "optional unique array up to 100 normalized strings, each 1-80 characters, owner/admin only",
+          "notifyMentions": "optional boolean for authenticated member",
+          "weeklyDigest": "optional boolean for authenticated member",
+          "eventReminders": "optional boolean for authenticated member"
+        },
+        "validation": "At least one change is required. Unknown fields are rejected. Blocked words are normalized and deduplicated. A member cannot select another actor or submit role fields."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {settings:CommunitySettingsDto}. Global changes increment settings.version; notification-only changes preserve that global version while updating the caller's membership revision."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Global settings UPDATE includes expectedVersion and increments atomically; stale devices receive CONFLICT. Membership/posting policy changes serialize with the Community PATCH contract and advance both Community and settings revisions in the same transaction. Notification patches update only supplied columns on the authenticated membership, so disjoint device writes do not overwrite other fields.",
+      "versioningCompatibility": "HTTP v1 new route using optimistic concurrency for global policy. Disabling reactions is enforced by the shared post/comment policy engine, including post authors. Invite issuance remains outside this contract."
+    },
+    "PATCH /v1/me/collections/:collectionId": {
+      "purpose": "Optimistically rename an authenticated actor-owned Saved collection.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Only the owner may rename; owner identity and version are not inferred from client object state.",
+      "request": {
+        "params": {
+          "collectionId": "required collection UUID"
+        },
+        "query": {},
+        "body": {
+          "name": "required 1-120 characters",
+          "expectedVersion": "required positive integer"
+        },
+        "validation": "Unknown fields, blank names and duplicate active owner/name pairs are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {collection:SavedCollectionDto} with incremented version."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "UPDATE is guarded by owner and expectedVersion; stale or competing renames return CONFLICT.",
+      "versioningCompatibility": "HTTP v1 new route with optimistic revision semantics."
+    },
+    "PATCH /v1/me/drafts/:draftId": {
+      "purpose": "Optimistically synchronize changes to an owned editable post draft.",
+      "owningDomain": "Post drafts",
+      "authentication": "Bearer session with post:create capability required.",
+      "authorization": "Only the authenticated owner may edit; published drafts reject edits.",
+      "request": {
+        "params": {
+          "draftId": "required draft UUID"
+        },
+        "query": {},
+        "body": {
+          "expectedVersion": "required positive integer",
+          "text": "optional string up to 5000 characters",
+          "feed": "optional following, forYou or modules",
+          "audience": "optional public, followers or private",
+          "replyPermission": "optional everyone, followers, mentioned or none",
+          "content": "optional complete replacement array of up to 10 uploaded attachment references",
+          "publishToAtproto": "optional boolean"
+        },
+        "validation": "At least one change is required. Unknown fields, stale revisions and invalid/cross-account/unready/reserved attachments are rejected."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {draft:PostDraftDto} with incremented version and updatedAt."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "The draft row is locked and expectedVersion must match. Stale two-device edits return CONFLICT; no newer server revision is overwritten silently.",
+      "versioningCompatibility": "HTTP v1 new route. Clients should surface conflicts for user resolution and reload the latest draft."
+    },
+    "PATCH /v1/me/membership/badge-visibility": {
+      "purpose": "Set whether the authenticated account's eligible Premium membership badge is publicly visible, independently of membership entitlement and identity verification.",
+      "owningDomain": "Premium membership preferences",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped; the account and actor are resolved from the bearer session. The request cannot alter tier, payment state or identity verification.",
+      "request": {
+        "body": {
+          "visible": "Required boolean; the only accepted field."
+        },
+        "validation": "A JSON object is required. Unknown fields, missing visible and non-boolean values are rejected."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "Updated membership projection with badgeVisible and incremented preference audit state."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for missing, non-boolean or unknown body fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "A transaction upserts the account preference and appends an audit event. Last committed write is authoritative; repeating the same value is safe but creates another auditable preference event.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "POST /v1/admin/qa/moliboos/packs/:packId/restore": {
+      "purpose": "Restore a QA-withdrawn Moliboo release only while its release and signer trust remain valid.",
+      "owningDomain": "Moliboo signed distribution operations",
+      "authentication": "Bearer session required with admin:ops capability; route is not registered in production.",
+      "authorization": "QA/development only. Revoked, quarantined, invalidly signed or signer-revoked releases cannot be restored.",
+      "request": {
+        "params": {
+          "packId": "Moliboo package ID"
+        },
+        "query": {},
+        "body": {
+          "version": "optional semantic version; omitted selects latest",
+          "reason": "optional string, max 500"
+        },
+        "validation": "Unknown fields and malformed identities are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {packageId, version, availability:'approved', revision}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN",
+            "RELEASE_REVOKED",
+            "SIGNER_REVOKED",
+            "UNTRUSTED_RELEASE"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none"
+      },
+      "idempotencyConcurrency": "Release row is locked. Repeating an already-approved transition returns current state without a duplicate event; restore appends an immutable audit event only on change.",
+      "versioningCompatibility": "QA-only HTTP v1 operations contract; never present in production runtime."
+    },
+    "POST /v1/admin/qa/moliboos/packs/:packId/withdraw": {
+      "purpose": "Withdraw one approved Moliboo release from QA advertisement while retaining its immutable bytes and prior releases.",
+      "owningDomain": "Moliboo signed distribution operations",
+      "authentication": "Bearer session required with admin:ops capability; route is not registered in production.",
+      "authorization": "QA/development only. Release, publisher and signer facts remain immutable; a reason is mandatory.",
+      "request": {
+        "params": {
+          "packId": "Moliboo package ID"
+        },
+        "query": {},
+        "body": {
+          "version": "optional semantic version; omitted selects latest",
+          "reason": "required non-empty string, max 500"
+        },
+        "validation": "Unknown fields and malformed identities are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {packageId, version, availability:'withdrawn', revision}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none"
+      },
+      "idempotencyConcurrency": "Release row is locked. Repeating an already-withdrawn transition returns the current revision without a duplicate event; transitions append immutable audit events.",
+      "versioningCompatibility": "QA-only HTTP v1 operations contract; never present in production runtime."
+    },
+    "POST /v1/communities": {
+      "purpose": "Create a persistent Community and atomically establish its settings and authenticated owner membership.",
+      "owningDomain": "Communities",
+      "authentication": "Bearer session required; owner actor and account are resolved server-side.",
+      "authorization": "Any authenticated active actor may create a Community while preview mutations are enabled. featured and owner fields are never client-controlled.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": {
+          "name": "required 1-120 characters",
+          "category": "required 1-80 characters",
+          "slug": "optional URL slug, normalized and unique",
+          "description": "optional maximum 5000 characters",
+          "visibility": "public or private; default public",
+          "discoverable": "optional boolean; forced false for private Communities",
+          "membershipPolicy": "open or approval",
+          "postingPolicy": "members or moderators",
+          "iconAttachmentId": "optional owned ready image attachment UUID",
+          "coverAttachmentId": "optional owned ready image attachment UUID"
+        },
+        "validation": "Unknown and privileged fields are rejected before schema sanitization. Artwork must belong to the authenticated account, be ready, unattached and image content."
+      },
+      "success": {
+        "status": "201",
+        "body": "Envelope data {community:CommunityDto}; the caller is an active owner and memberCount is 1."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Community, settings and owner membership commit in one transaction. A case-insensitive partial unique slug index prevents concurrent duplicate active slugs.",
+      "versioningCompatibility": "HTTP v1 new route. Community IDs are immutable UUIDs. version starts at 1 for optimistic updates. Private discoverability is server-enforced."
+    },
+    "POST /v1/communities/:communityId/events": {
+      "purpose": "Create a persistent Community event.",
+      "owningDomain": "Community events",
+      "authentication": "Bearer session required.",
+      "authorization": "Active owner, administrator or moderator role required.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {
+          "title": "required 1-160 characters",
+          "description": "optional maximum 10000 characters",
+          "startsAt": "required ISO date-time",
+          "endsAt": "required ISO date-time after startsAt",
+          "timezone": "required valid IANA timezone string maximum 100 characters",
+          "location": "required {type:online|inPerson|tba,name?,onlineUrl?}; online requires HTTPS URL",
+          "coverAttachmentId": "optional owned ready image UUID",
+          "capacity": "optional positive integer up to 1000000"
+        },
+        "validation": "Unknown fields are rejected. Times, IANA timezone, HTTPS online URL, capacity and cover ownership/readiness/type are validated server-side."
+      },
+      "success": {
+        "status": "201",
+        "body": "Envelope data {event:CommunityEventDto}; status=scheduled and version=1."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Event, cover binding, audit and domain event commit in one transaction. Event IDs are server-generated UUIDs.",
+      "versioningCompatibility": "HTTP v1 new route. Location and capacity are bounded metadata; no ticketing, purchasing or attendee identity list is introduced."
+    },
+    "POST /v1/communities/:communityId/join": {
+      "purpose": "Join a public Community or submit a pending membership when approval is required.",
+      "owningDomain": "Community membership",
+      "authentication": "Bearer session required; member actor is resolved server-side.",
+      "authorization": "Only public Communities accept self-service joins. Banned memberships are rejected and private IDs return NOT_FOUND. Open Communities activate immediately; approval Communities create pending membership.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "Client role, status and actor identifiers are not accepted."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {membership:{communityId,role,status,joinedAt,version}}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "A transaction advisory lock plus primary key (community_id,actor_id) serializes retries. Active or pending retries return the same membership without duplicate rows or events.",
+      "versioningCompatibility": "HTTP v1 new route. Self-service private joining is intentionally absent until an invitation/approval contract is approved."
+    },
+    "POST /v1/communities/:communityId/leave": {
+      "purpose": "Persistently leave a Community without deleting Community content or the membership audit history.",
+      "owningDomain": "Community membership",
+      "authentication": "Bearer session required.",
+      "authorization": "The authenticated member may leave their own membership. Owners must transfer ownership first; banned membership state cannot be rewritten by the banned actor.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {},
+        "validation": "No client actor or role fields are accepted."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {left:true}."
+      },
+      "errors": [
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "A transaction advisory lock serializes leave/join for one member. Repeated leave calls are successful no-ops. The row is retained with status=left and incremented version.",
+      "versioningCompatibility": "HTTP v1 new route. Leaving never deletes posts, polls, events or the Community."
+    },
+    "POST /v1/communities/:communityId/polls": {
+      "purpose": "Create a persistent single-choice Community poll.",
+      "owningDomain": "Community polls",
+      "authentication": "Bearer session required.",
+      "authorization": "Active owner, administrator or moderator role required.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {
+          "question": "required 1-500 characters",
+          "options": "required 2-10 unique strings, each 1-200 characters",
+          "closesAt": "required future ISO date-time",
+          "allowVoteChanges": "optional boolean, default true",
+          "resultsVisibility": "optional always, afterVote or afterClose; default afterVote"
+        },
+        "validation": "Unknown fields, duplicate normalized options and non-future close times are rejected."
+      },
+      "success": {
+        "status": "201",
+        "body": "Envelope data {poll:CommunityPollDto}; status=open and version=1."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Poll and all options commit in one transaction. Poll, option and position database constraints prevent partial or conflicting option sets.",
+      "versioningCompatibility": "HTTP v1 new route. Multi-choice and anonymous voting are not supported by this initial contract."
+    },
+    "POST /v1/communities/:communityId/posts": {
+      "purpose": "Create a canonical social post in a Community with server-derived visibility and Community authorization.",
+      "owningDomain": "Communities integrated with social posts",
+      "authentication": "Bearer session required with post:create capability.",
+      "authorization": "The actor must have active non-restricted membership. The Community posting policy allows members or restricts to owner/admin/moderator. Audience and Community association are server-derived.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID"
+        },
+        "query": {},
+        "body": {
+          "text": "required unless supported media/content is supplied; maximum 5000 characters",
+          "media": "optional legacy image media array",
+          "content": "optional attachment content array, maximum 10",
+          "idempotencyKey": "optional retry key maximum 200 characters"
+        },
+        "validation": "Unknown and privileged fields are rejected. Blocked words, attachment ownership/readiness, allowAttachments, membership and posting policy are revalidated inside the post transaction."
+      },
+      "success": {
+        "status": "201",
+        "body": "Envelope data {item:CommunityPostDto}. Public Community posts use audience=public; private Community posts use audience=private."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN",
+            "CAPABILITY_DISABLED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "posts has a unique (author_actor_id,idempotency_key) invariant. Identical concurrent retries return the committed canonical post; a key reused across Community/generic context or with changed text returns CONFLICT. Post, attachments, audit and domain events commit atomically.",
+      "versioningCompatibility": "HTTP v1 new route reusing CreatePost and SocialPost contracts. Community packs no new feed identity into normal posts, and Community posts are never AT Protocol cross-posted implicitly."
+    },
+    "POST /v1/conversations": {
+      "purpose": "Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.",
+      "owningDomain": "Direct messaging",
+      "authentication": "Bearer session required with post:engage capability; the sender actor is resolved only from the authenticated session.",
+      "authorization": "The target handle must resolve to a live profile on an active account. Self-conversations and either-direction account blocks are rejected. A new recipient becomes active only when they follow the sender; otherwise the conversation is a message request.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": {
+          "handle": "required target profile handle, string 1-80 characters; an optional leading @ is normalized away",
+          "text": "optional initial message, string maximum 5000 characters; blank non-empty values are rejected"
+        },
+        "validation": "Unknown fields, including client-supplied sender or actor identifiers, are rejected. The target is resolved server-side and must remain active. Subsequent messages to a reused conversation use POST /v1/conversations/:id/messages."
+      },
+      "success": {
+        "status": "201 when created; 200 when an existing conversation is reused",
+        "body": "Envelope data {created:boolean, conversation:{id,kind,participants,lastMessage,unreadCount,updatedAt}}. The conversation ID and participant fields are sufficient for native thread navigation."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "The sorted authenticated-sender/target actor pair forms the unique direct_key database invariant. Concurrent inserts use INSERT ON CONFLICT and return the same committed conversation. Optional text is creation-only and commits atomically with the conversation and two members, so retry after a lost response cannot duplicate it. A reused conversation returns 200 and does not append text.",
+      "versioningCompatibility": "HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged."
+    },
+    "POST /v1/me/collections": {
+      "purpose": "Create an authenticated actor-owned named Saved collection.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "Owner identity is server-derived; client owner fields are rejected.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": {
+          "name": "required trimmed name, 1-120 characters"
+        },
+        "validation": "Unknown fields and blank names are rejected; active names are case-insensitively unique per owner."
+      },
+      "success": {
+        "status": "201",
+        "body": "Envelope data {collection:SavedCollectionDto} with itemCount=0 and version=1."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "A partial unique index on owner and normalized active name prevents concurrent duplicates; state and audit commit together.",
+      "versioningCompatibility": "HTTP v1 new route. Collection IDs are immutable UUIDs and version starts at 1."
+    },
+    "POST /v1/me/collections/:collectionId/items": {
+      "purpose": "Add an already-Saved post to an actor-owned named collection.",
+      "owningDomain": "Saved collections",
+      "authentication": "Bearer session with saved:manage capability required.",
+      "authorization": "The collection and active post_saves row must both belong to the authenticated actor.",
+      "request": {
+        "params": {
+          "collectionId": "required collection UUID"
+        },
+        "query": {},
+        "body": {
+          "postId": "required UUID of an existing currently Saved post"
+        },
+        "validation": "Unknown fields, cross-user collections and posts not present in the caller's active Saved rows are rejected."
+      },
+      "success": {
+        "status": "201 when added; 200 for an existing active membership",
+        "body": "Envelope data {item:SavedCollectionItemDto}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "The collection row serializes position allocation and UNIQUE(collection_id,save_id) prevents duplicate membership. Concurrent identical requests converge on one item ID.",
+      "versioningCompatibility": "HTTP v1 new route. postId references the canonical existing Saved system."
+    },
+    "POST /v1/me/drafts": {
+      "purpose": "Persist a post-composer draft and reserve its uploaded attachment references for the authenticated actor.",
+      "owningDomain": "Post drafts",
+      "authentication": "Bearer session with post:create capability required.",
+      "authorization": "Owner is server-derived. Every attachment must be ready, unattached and owned by the authenticated account.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": {
+          "idempotencyKey": "optional 1-200 character retry identity",
+          "text": "required string up to 5000 characters; may be empty when content is present",
+          "feed": "optional following, forYou or modules",
+          "audience": "optional public, followers or private",
+          "replyPermission": "optional everyone, followers, mentioned or none",
+          "content": "optional array of at most 10 typed uploaded attachment references with captions up to 1000 characters",
+          "publishToAtproto": "optional boolean; attachments are not supported when true"
+        },
+        "validation": "Unknown/privileged fields, empty text+content, duplicate/cross-account/unready/reserved attachments and legacy base64 media are rejected."
+      },
+      "success": {
+        "status": "201 when created; 200 for an identical idempotent retry",
+        "body": "Envelope data {draft:PostDraftDto} with state=editing and version=1."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "An optional owner/idempotency-key unique index converges retries; key reuse with a different normalized payload returns CONFLICT. Draft and attachment references commit together.",
+      "versioningCompatibility": "HTTP v1 new route. Uses the canonical CreatePost content/feed/audience/reply contract; clients must upload local media before syncing."
+    },
+    "POST /v1/me/drafts/:draftId/publish": {
+      "purpose": "Validate and publish an owned post draft exactly once through the canonical post creation pipeline.",
+      "owningDomain": "Post drafts integrated with canonical posts",
+      "authentication": "Bearer session with post:create capability required.",
+      "authorization": "Draft owner and attachment ownership are resolved server-side; another actor cannot redirect or publish the draft.",
+      "request": {
+        "params": {
+          "draftId": "required draft UUID"
+        },
+        "query": {},
+        "body": {
+          "expectedVersion": "required current positive draft version"
+        },
+        "validation": "Unknown fields, stale revisions, invalid composer state and unavailable attachments are rejected before commit."
+      },
+      "success": {
+        "status": "201 for the committing publication; 200 for an already-published or concurrent retry",
+        "body": "Envelope data {draft:PostDraftDto,postId:string,created:boolean}."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "The server derives idempotency key draft-publish:<draftId>. The existing unique post author/key invariant converges concurrent retries, and post creation, attachment activation, outbox/events/audit and draft state/publishedPostId update commit in one database transaction. A stale finalizer rolls back the post; failed publication leaves state=editing.",
+      "versioningCompatibility": "HTTP v1 new route. The created post is a normal SocialPostDto record consumable without a fake draft post type."
+    },
+    "POST /v1/me/membership/apple-purchase-context": {
+      "purpose": "Create or return the authenticated account's stable Apple appAccountToken and the operator-confirmed sandbox products to pass into StoreKit purchase operations.",
+      "owningDomain": "Premium Apple sandbox billing",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped. The server generates and binds the UUID to the authenticated account; client-supplied account IDs, tokens, products and tiers are rejected.",
+      "request": {
+        "body": "Required empty JSON object {}.",
+        "validation": "Unknown fields and non-object bodies are rejected."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{environment:'sandbox',appAccountToken:<UUID>,products:[{productId,tier,billingPeriod,environment:'sandbox',state:'active'}]}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for unknown body fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the Apple verifier is disabled, the catalogue is unavailable or no sandbox products are configured."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Idempotent per account. Database uniqueness on account_id and app_account_token makes concurrent initialization return one stable binding.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Products must be explicitly confirmed and configured by a QA operator; no product identifiers are seeded."
+    },
+    "POST /v1/modules/:moduleId/package-install-plan": {
+      "purpose": "Resolve an authenticated, signed and compatible package dependency closure for a module without installing it, subtract already-cached public immutable artifacts, and return a canonical lock digest for install-time concurrency checking.",
+      "owningDomain": "Modules / signed package distribution",
+      "authentication": "Required GreenField bearer access session; the authenticated account is resolved server-side.",
+      "authorization": "The requested module must be catalogue-installable for the authenticated account. Every paid package in the resolved closure requires that account to hold a current TRIAL, ACTIVE or GRACE entitlement. Client-supplied account or ownership fields are rejected.",
+      "request": {
+        "path": {
+          "moduleId": "Required canonical module or package identifier; aliases are normalized by the server. It never selects a storage path."
+        },
+        "body": {
+          "version": "Optional exact semantic version; null or omission selects the highest compatible signed release.",
+          "hostVersion": "Required semantic host version.",
+          "platform": "Required: ios, android, web, desktop or server.",
+          "moduleSdkVersion": "Optional semantic SDK version reported by the host.",
+          "productUiContractVersion": "Optional semantic product UI contract version reported by the host.",
+          "hostCapabilities": "Optional array of at most 256 validated host capability descriptors: id, version, status, provenance and optional renderer/provider/fallback/constraints.",
+          "cachedPublicDigests": "Optional array of at most 4096 lowercase SHA-256 digests for public immutable artifacts already verified by PackageManager."
+        },
+        "validation": "A JSON object is required. Unknown fields, malformed semantic versions, unsupported platforms, invalid capability descriptors, uppercase/non-SHA digests and limit violations are rejected. Package metadata and dependency graphs are validated server-side; clients cannot supply releases, signatures, storage paths, publisher trust or entitlement facts."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "private, no-store"
+        },
+        "envelope": "{ok:true,data:{lock,lockSha256},meta:{requestId,serverTime}}",
+        "lock": {
+          "schemaVersion": "modula.package-lock.1",
+          "requested": "Canonical requested package IDs.",
+          "packages": "Topologically valid exact releases. Each entry contains schemaVersion, packageId, publisherId, category, version, releaseId, SHA-256 artifact metadata and bounded sizes, server-selected download reference and authorization mode, Ed25519 signature evidence, verified/revoked trust state, host/platform/capability requirements, dependency ranges, cache policy, sharing class and optional execution provider.",
+          "aggregateCompressedBytes": "Total compressed bytes in the closure.",
+          "aggregateInstalledEstimateBytes": "Total declared installed-size estimate.",
+          "newDownloadBytes": "Bytes not represented by cachedPublicDigests.",
+          "reusedArtifactDigests": "Verified public immutable digests reused from the client cache."
+        },
+        "lockSha256": "Lowercase SHA-256 of canonical JSON for the complete lock; the install request must return this digest when an optional package closure exists."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed or unknown request fields, invalid versions/capabilities/digests, invalid dependency constraints or graph-bound violations."
+        ],
+        "401": [
+          "UNAUTHENTICATED for a missing, invalid or expired bearer session."
+        ],
+        "403": [
+          "FORBIDDEN when the account lacks catalogue access or an active entitlement for any paid closure member.",
+          "UNTRUSTED_RELEASE, RELEASE_REVOKED or SIGNER_REVOKED when declared package bytes cannot satisfy the signed trust chain."
+        ],
+        "404": [
+          "NOT_FOUND when the module has no declared optional modula.package.1 distribution release. This permits the separate historical standard-install path; it does not advertise an installable package closure."
+        ],
+        "409": [
+          "CONFLICT for dependency cycles, missing dependencies, incompatible constraints, unsupported capabilities/platforms or unavailable execution providers.",
+          "HOST_VERSION_TOO_OLD for an incompatible host.",
+          "ARTIFACT_DIGEST_MISMATCH if retained artifact bytes fail read-time integrity verification."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; secrets and private account facts are not returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated. Resolution is bounded to 128 selected packages, 16,384 resolver visits, 256 supplied capabilities and 4,096 cached digests.",
+      "idempotencyConcurrency": "Read-only and deterministic for the same registry, entitlement and request snapshot. No Idempotency-Key is used. lockSha256 is the optimistic concurrency token: install rejects a changed closure instead of silently installing different bytes. Duplicate cached digests do not alter ownership or registry state.",
+      "versioningCompatibility": "HTTP v1. Lock schema is modula.package-lock.1 and package schema is modula.package.1. Only Ed25519-signed releases compatible with the supplied host version, platform, Module SDK, Product UI contract and available capabilities are selected. Unknown/revoked signers and unsupported package metadata fail closed."
+    },
+    "POST /v1/premium/apple/notifications": {
+      "purpose": "Receive, verify and replay-protect Apple App Store Server Notifications V2 for sandbox Premium subscriptions.",
+      "owningDomain": "Premium Apple sandbox billing",
+      "authentication": "No user bearer session. Authorization is the verified Apple JWS certificate chain, signature, bundle identity and Sandbox environment.",
+      "authorization": "Only cryptographically verified Apple notifications are processed. Embedded transaction and renewal JWS values are independently verified. Account binding is resolved only from verified appAccountToken or an existing original-transaction ownership record.",
+      "request": {
+        "body": {
+          "signedPayload": "Required App Store Server Notifications V2 compact JWS, 16 to 200000 characters; the only accepted field."
+        },
+        "validation": "Outer notification and nested transaction/renewal signatures, bundle ID, environment, identifiers, dates and stored product mappings are validated. Raw JWS data is redacted and never stored."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "Either {accepted:true,replay,notificationUuid,notificationType,state:'processed|ignored|unbound',reasonCode,transactionId} or the verified transaction projection response."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed/unknown input, signature/certificate failure or invalid verified fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN for non-Sandbox or unsupported verified transaction ownership/type."
+        ],
+        "409": [
+          "CONFLICT when a notification UUID is replayed with different signed evidence."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when sandbox verification or required catalogue/product state is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "notificationUUID is the replay key. Same UUID plus same evidence returns replay=true; same UUID with different evidence is rejected. Transaction evidence uniqueness and per-account advisory locks prevent duplicate entitlement side effects.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. App Store Server Notifications V2 Sandbox only; no production notification URL is activated by this PR."
+    },
+    "POST /v1/premium/apple/transactions": {
+      "purpose": "Verify an Apple StoreKit 2 sandbox signed transaction and transactionally project the authenticated account's Premium membership.",
+      "owningDomain": "Premium Apple sandbox billing",
+      "authentication": "Required GreenField bearer access session plus a cryptographically valid Apple signed transaction.",
+      "authorization": "The verified appAccountToken and original transaction chain must belong to the authenticated account. Only PURCHASED auto-renewable sandbox subscriptions mapped to active server products are accepted; family-shared, production, forged and cross-account transactions fail closed.",
+      "request": {
+        "body": {
+          "signedTransaction": "Required compact JWS string, 16 to 200000 characters; the only accepted field."
+        },
+        "validation": "Apple certificate chain, signature, bundle ID, Sandbox environment, transaction type, ownership, product mapping, dates and account binding are validated server-side. Raw signed data is redacted from logs and not persisted."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{accepted:true,replay,environment:'sandbox',transactionId,originalTransactionId,productId,tier,status:'active|grace|expired|revoked',expiresAt,membershipRevision}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed/unknown input, signature or certificate failure, invalid verified fields, inconsistent dates or a future signedDate."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN for production/family-shared/unsupported transactions, absent or mismatched account binding, or an original transaction owned by another account."
+        ],
+        "409": [
+          "CONFLICT for a transaction concurrency invariant violation."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when verification is disabled, the product is not enabled or the Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "The signed evidence SHA-256 and unique (transaction_id,evidence_sha256) event constraint make exact retries idempotent. A per-account PostgreSQL advisory transaction lock serializes projection updates; revision changes only when effective membership changes.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Uses Apple App Store Server Library signed-data verification in Sandbox only. Production transactions are rejected."
+    },
+    "POST /v1/stories/:storyId/replies": {
+      "purpose": "Deliver an authenticated viewer's reply to a concrete live Story item as a persistent message in the Story author's canonical one-to-one conversation.",
+      "owningDomain": "Stories integrated with direct messaging",
+      "authentication": "Bearer session required with post:engage capability; the replying actor is resolved only from the authenticated session.",
+      "authorization": "The Story item must be ready, undeleted and unexpired and must remain visible to the replying actor. The author is resolved from the Story and cannot be redirected by request data. Self replies, either-direction blocks, inactive authors and previously declined recipient message requests are rejected. When no active thread exists, the existing message-request policy determines whether the author's membership is active or pending.",
+      "request": {
+        "params": {
+          "storyId": "required UUID of a greenfield_story_items item; this is not a Story group ID"
+        },
+        "query": {},
+        "body": {
+          "text": "required non-blank reply text, string maximum 5000 characters after trimming",
+          "idempotencyKey": "required client retry key, 8-200 characters from A-Z, a-z, 0-9, dot, underscore, colon or hyphen"
+        },
+        "validation": "Unknown fields, including recipient or author identifiers, are rejected. Invalid or inaccessible Story identifiers return the same NOT_FOUND contract. Story media URLs and captions are not copied into the retained DM context."
+      },
+      "success": {
+        "status": "201 when the reply message is first created; 200 when the same idempotent request is replayed",
+        "body": "Envelope data {conversationId:string, messageId:string, created:boolean, conversationCreated:boolean}. The message is an ordinary direct-message row; a private append-only event provides optional minimal Story context on message reads."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "The server namespaces the supplied key to the authenticated actor, stores a SHA-256 request hash, and serializes identical retries with a transaction-scoped advisory lock. Story authorization, canonical conversation creation/reuse, message insertion, private context event, idempotent notification outbox job and stored response commit in one PostgreSQL transaction. Identical retries return the original IDs without another message or event; reuse with different Story text or ID returns CONFLICT. The sorted actor pair retains the direct_key uniqueness invariant.",
+      "versioningCompatibility": "HTTP v1 additive route. storyId means the concrete Story item ID already exposed as StoryItem.itemId. The DM body remains a normal message consumable by existing conversation clients. Optional storyContext fields on message reads are additive and may be ignored by older clients. Deleted or expired Stories cannot receive new replies, while an already-created DM and its non-media context remain readable under normal conversation retention."
+    },
+    "PUT /v1/admin/qa/premium/:handle": {
+      "purpose": "Assign an auditable synthetic Premium membership fixture to a test account in isolated QA.",
+      "owningDomain": "Premium QA administration",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Requires admin:ops. The route is registered only when the non-production QA assignment flag is enabled and is refused by configuration in production.",
+      "request": {
+        "path": {
+          "handle": "Required account handle, 1 to 80 characters."
+        },
+        "headers": {
+          "Idempotency-Key": "Required non-empty key, maximum 200 characters."
+        },
+        "body": {
+          "tier": "Required: core, plus, horizon, horizon_plus or studio.",
+          "subscriptionStatus": "Optional: active, expired, revoked or downgraded; defaults active.",
+          "effectiveAt": "Optional ISO date-time.",
+          "expiresAt": "Optional ISO date-time later than effectiveAt.",
+          "membershipSince": "Optional ISO date-time."
+        },
+        "validation": "Unknown and privileged fields are rejected; the target account is resolved server-side."
+      },
+      "success": {
+        "status": 200,
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "Updated target membership projection; entitlementSource is qa_fixture."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed fields, invalid timestamps, invalid tier/status, expiry ordering or missing Idempotency-Key."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN without admin:ops."
+        ],
+        "404": [
+          "NOT_FOUND when the handle or account actor does not exist."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Idempotency-Key is unique in the membership event ledger. Exact retries return the current membership without a duplicate fixture event; membership revision advances on a new assignment.",
+      "versioningCompatibility": "HTTP v1, QA-only synthetic operation. It cannot process payment, grant identity verification or be enabled in production."
+    },
+    "PUT /v1/admin/qa/premium/apple-products/:productId": {
+      "purpose": "Configure or disable one operator-confirmed Apple sandbox product-to-tier mapping for QA purchase verification.",
+      "owningDomain": "Premium Apple sandbox administration",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Requires admin:ops. The route is available only with QA assignments and Apple sandbox verification enabled; both are refused in production.",
+      "request": {
+        "path": {
+          "productId": "Required App Store product identifier matching ^[A-Za-z0-9][A-Za-z0-9._-]{2,159}$."
+        },
+        "body": {
+          "tier": "Required paid tier: plus, horizon, horizon_plus or studio.",
+          "billingPeriod": "Required: monthly or annual.",
+          "state": "Optional: active or disabled; defaults active."
+        },
+        "validation": "Unknown fields, Core mappings, invented billing periods and malformed identifiers are rejected. The server selects the active Premium catalogue."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{productId,tier,billingPeriod,environment:'sandbox',state:'active|disabled'}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed path/body values or unknown fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN without admin:ops."
+        ],
+        "409": [
+          "CONFLICT when another active product already maps to the same catalogue tier and billing period."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when sandbox verification or the active catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Upsert by productId. A PostgreSQL advisory lock and partial unique index allow only one active product per catalogue tier, billing period and Sandbox environment.",
+      "versioningCompatibility": "HTTP v1, QA Sandbox only. Product identifiers are never seeded or inferred; App Store Connect confirmation is an external prerequisite."
+    },
+    "PUT /v1/communities/:communityId/events/:eventId/response": {
+      "purpose": "Set or clear the authenticated member's Going or Interested state for a Community event.",
+      "owningDomain": "Community events",
+      "authentication": "Bearer session required.",
+      "authorization": "Active non-restricted Community membership required. Cancelled events reject response changes.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID",
+          "eventId": "required event UUID"
+        },
+        "query": {},
+        "body": {
+          "response": "required going, interested or null to remove"
+        },
+        "validation": "Unknown fields and invalid response values are rejected. Event/Community association and capacity are server-validated."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {event:CommunityEventDto} with updated counts and viewerResponse."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Primary key (event_id,actor_id) permits one response per actor. A transaction advisory lock serializes capacity checks; identical retries are no-ops and concurrent final Going slots cannot exceed capacity.",
+      "versioningCompatibility": "HTTP v1 PUT replacement semantics. null removes the response without deleting the event or membership."
+    },
+    "PUT /v1/communities/:communityId/polls/:pollId/vote": {
+      "purpose": "Set the authenticated member's single choice in an open Community poll.",
+      "owningDomain": "Community polls",
+      "authentication": "Bearer session required.",
+      "authorization": "Active non-restricted Community membership required. The option must belong to the path poll and Community.",
+      "request": {
+        "params": {
+          "communityId": "required Community UUID",
+          "pollId": "required poll UUID"
+        },
+        "query": {},
+        "body": {
+          "optionId": "required poll option UUID"
+        },
+        "validation": "Unknown fields, closed/cancelled polls and options from another poll are rejected. allowVoteChanges is server-enforced."
+      },
+      "success": {
+        "status": "200",
+        "body": "Envelope data {poll:CommunityPollDto} with viewerOptionId and visible results according to policy."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 404,
+          "codes": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 429,
+          "codes": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none",
+        "filtering": "none"
+      },
+      "idempotencyConcurrency": "Primary key (poll_id,actor_id) and composite option foreign key enforce one valid choice. A per-poll/actor advisory lock serializes retries and changes; the same option is an idempotent no-op.",
+      "versioningCompatibility": "HTTP v1 PUT replacement semantics. Vote changes are supported only when allowVoteChanges=true; aggregate results remain server-derived."
+    },
+    "PUT /v1/me/moliboos/outfit": {
+      "purpose": "Atomically replace the authenticated account's equipped Moliboo items after ownership and wearability checks.",
+      "owningDomain": "Moliboo ownership and wardrobe",
+      "authentication": "Bearer session required with profile:customize capability.",
+      "authorization": "Every item must belong to the authenticated account, match its server-owned slot, remain wearable and not be revoked; Legends 101-115 are non-wearable.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": {
+          "expectedRevision": "optional integer >=0",
+          "items": "required array, maximum 16, unique slot and itemId; each {slot,itemId}"
+        },
+        "validation": "Unknown privileged fields, invalid slots, duplicates, unowned items and revoked/non-wearable items are rejected."
+      },
+      "success": {
+        "status": 200,
+        "body": "Envelope data {revision, updatedAt, items}; ownership and equipped state commit in one transaction."
+      },
+      "errors": [
+        {
+          "status": 400,
+          "codes": [
+            "VALIDATION_FAILED"
+          ]
+        },
+        {
+          "status": 401,
+          "codes": [
+            "UNAUTHENTICATED",
+            "SESSION_EXPIRED"
+          ]
+        },
+        {
+          "status": 403,
+          "codes": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "status": 409,
+          "codes": [
+            "REVISION_CONFLICT",
+            "CONFLICT"
+          ]
+        },
+        {
+          "status": 500,
+          "codes": [
+            "SERVER_ERROR"
+          ]
+        }
+      ],
+      "pagination": {
+        "style": "none"
+      },
+      "idempotencyConcurrency": "Outfit row is locked in a transaction. expectedRevision makes competing writes deterministic: one succeeds and stale writes return REVISION_CONFLICT without partial state.",
+      "versioningCompatibility": "HTTP v1; clients should persist the returned revision and send it on subsequent writes."
+    }
+  }
+}

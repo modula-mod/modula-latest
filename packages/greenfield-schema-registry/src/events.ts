@@ -82,6 +82,17 @@ export const greenfieldEventSchemas: readonly GreenfieldEventSchemaDefinition[] 
   event('reaction.removed', 'social', 'reaction', 'internal', 'safe-idempotent'),
   event('follow.created', 'social', 'follow', 'internal', 'safe-idempotent'),
   event('follow.removed', 'social', 'follow', 'internal', 'safe-idempotent'),
+  event('message.story-replied', 'messaging', 'conversation-message', 'private', 'safe-idempotent', 'messaging-retention'),
+
+  event('community.created', 'communities', 'community', 'internal'),
+  event('community.updated', 'communities', 'community', 'internal'),
+  event('community.member-joined', 'communities', 'communityMembership', 'private', 'safe-idempotent', 'standard-social-retention'),
+  event('community.member-left', 'communities', 'communityMembership', 'private', 'safe-idempotent', 'standard-social-retention'),
+  event('community.post-created', 'communities', 'communityPost', 'internal'),
+  event('community.poll-created', 'communities', 'communityPoll', 'internal'),
+  event('community.poll-voted', 'communities', 'communityPollVote', 'private', 'safe-idempotent', 'standard-social-retention'),
+  event('community.event-created', 'communities', 'communityEvent', 'internal'),
+  event('community.event-responded', 'communities', 'communityEventResponse', 'private', 'safe-idempotent', 'standard-social-retention'),
 
   event('module.discovered', 'modules', 'moduleRelease', 'internal'),
   event('module.install-requested', 'modules', 'moduleInstallation', 'private', 'manual-approval-required'),

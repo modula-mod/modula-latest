@@ -17,6 +17,7 @@
     "db:status": "tsx scripts/db-status.ts",
     "db:rollback": "tsx scripts/db-rollback.ts",
     "db:seed": "tsx scripts/db-seed.ts",
+    "db:seed:communities-qa": "tsx scripts/seed-communities-qa.ts",
     "api-atlas:identities": "node dist/cli/api-atlas-identities.js",
     "registry:publish-reference-products": "tsx scripts/publish-reference-products.ts",
     "registry:ingest-mps-products": "tsx scripts/ingest-mps-products.ts",
@@ -27,12 +28,15 @@
     "registry:trust-bootstrap": "tsx scripts/trust-bootstrap.ts",
     "registry:migrate-legacy-installs": "tsx scripts/migrate-legacy-installations.ts",
     "registry:trust-cutover-gate": "tsx scripts/trust-cutover-gate.ts",
+    "qa:seed-moliboo-series2": "tsx scripts/seed-moliboo-series2-qa.ts",
+    "qa:seed-sprout-stickers": "tsx scripts/seed-sprout-stickers-qa.ts",
     "permissions:reconcile": "tsx scripts/reconcile-module-permissions.ts",
     "ops:api-fix-01d-crypto-acceptance": "tsx scripts/api-fix-01d-crypto-acceptance.ts",
     "ops:replay-reaction-dead-letters": "tsx scripts/replay-reaction-dead-letters.ts",
     "ops:closeout-terminal-jobs": "tsx scripts/closeout-terminal-jobs.ts"
   },
   "dependencies": {
+    "@apple/app-store-server-library": "3.1.0",
     "@atproto/oauth-client-node": "^0.3.2",
     "@fastify/cors": "^11.0.1",
     "@fastify/helmet": "^13.0.1",

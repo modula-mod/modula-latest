@@ -9,6 +9,12 @@ export type Audience = 'public' | 'followers' | 'private'
 export type ReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'none'
 export type AttachmentKind = 'image' | 'video' | 'audio' | 'pdf' | 'document' | 'unknown'
 export type AttachmentStatus = 'created' | 'uploading' | 'uploaded' | 'processing' | 'ready' | 'failed' | 'expired' | 'rejected'
+export type CommunityVisibility = 'public' | 'private'
+export type CommunityMembershipPolicy = 'open' | 'approval'
+export type CommunityPostingPolicy = 'members' | 'moderators'
+export type CommunityRole = 'owner' | 'admin' | 'moderator' | 'member' | 'restricted'
+export type CommunityMembershipStatus = 'active' | 'pending' | 'banned' | 'left'
+export type PostDraftState = 'editing' | 'published'
 
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended'
 export type AuthenticationMethodType = 'passkey' | 'password' | 'email_otp' | 'totp' | 'recovery_code' | 'apple' | 'oidc'
@@ -326,6 +332,9 @@ export interface Database {
     quote_count: number
     reply_count: number
     repost_count: number
+    community_id: string | null
+    community_moderation_state: 'visible' | 'hidden' | 'removed' | null
+    community_featured_at: Date | null
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
@@ -1360,12 +1369,157 @@ export interface Database {
     emoji: string
     created_at: Date
   }
+  greenfield_communities: {
+    community_id: string
+    slug: string
+    owner_actor_id: string
+    name: string
+    description: string
+    category: string
+    visibility: CommunityVisibility
+    discoverable: boolean
+    featured: boolean
+    membership_policy: CommunityMembershipPolicy
+    posting_policy: CommunityPostingPolicy
+    icon_attachment_id: string | null
+    cover_attachment_id: string | null
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_community_settings: {
+    community_id: string
+    allow_attachments: boolean
+    reactions_enabled: boolean
+    featured_posts_enabled: boolean
+    invite_links_enabled: boolean
+    blocked_words: string[]
+    version: number
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_community_memberships: {
+    community_id: string
+    actor_id: string
+    role: CommunityRole
+    status: CommunityMembershipStatus
+    notify_mentions: boolean
+    weekly_digest: boolean
+    event_reminders: boolean
+    joined_at: Date | null
+    created_at: Date
+    updated_at: Date
+    version: number
+  }
+  greenfield_community_events: {
+    event_id: string
+    community_id: string
+    creator_actor_id: string
+    title: string
+    description: string
+    starts_at: Date
+    ends_at: Date
+    timezone: string
+    location_type: 'online' | 'inPerson' | 'tba'
+    location_name: string | null
+    online_url: string | null
+    cover_attachment_id: string | null
+    capacity: number | null
+    status: 'scheduled' | 'cancelled'
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_community_event_responses: {
+    event_id: string
+    actor_id: string
+    response: 'going' | 'interested'
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_community_polls: {
+    poll_id: string
+    community_id: string
+    creator_actor_id: string
+    question: string
+    closes_at: Date
+    allow_vote_changes: boolean
+    results_visibility: 'always' | 'afterVote' | 'afterClose'
+    status: 'open' | 'cancelled'
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_community_poll_options: {
+    poll_id: string
+    option_id: string
+    position: number
+    text: string
+  }
+  greenfield_community_poll_votes: {
+    poll_id: string
+    option_id: string
+    actor_id: string
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_saved_collections: {
+    collection_id: string
+    owner_actor_id: string
+    name: string
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_saved_collection_items: {
+    item_id: string
+    collection_id: string
+    save_id: string
+    position: number
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_post_drafts: {
+    draft_id: string
+    owner_actor_id: string
+    idempotency_key: string | null
+    text: string
+    feed: FeedMode
+    audience: Audience
+    reply_permission: ReplyPermission
+    publish_to_atproto: boolean
+    state: PostDraftState
+    published_post_id: string | null
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_post_draft_content: {
+    draft_id: string
+    attachment_id: string
+    content_type: Exclude<AttachmentKind, 'unknown'>
+    caption: string | null
+    position: number
+    created_at: Date
+  }
   greenfield_premium_catalogue_versions: {catalogue_version: number; status: 'active' | 'retired'; effective_at: Date; metadata: unknown; created_at: Date}
   greenfield_premium_tiers: {catalogue_version: number; tier_id: 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'; display_name: string; rank: number; paid: boolean; metadata: unknown}
   greenfield_premium_capabilities: {catalogue_version: number; capability_id: string; display_name: string; minimum_rank: number; availability_mode: 'existing_free' | 'qa_only' | 'future_disabled'; value_by_tier: unknown; metadata: unknown}
-  greenfield_premium_memberships: {account_id: string; catalogue_version: number; tier_id: 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'; subscription_status: 'active' | 'expired' | 'revoked' | 'downgraded'; entitlement_source: 'qa_fixture' | 'apple_verified' | 'migration' | 'promotion'; effective_at: Date; expires_at: Date | null; membership_since: Date | null; revision: number; provider_reference_hash: string | null; audit_metadata: unknown; created_at: Date; updated_at: Date}
+  greenfield_premium_memberships: {account_id: string; catalogue_version: number; tier_id: 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'; subscription_status: 'active' | 'grace' | 'expired' | 'revoked' | 'downgraded'; entitlement_source: 'qa_fixture' | 'apple_verified' | 'migration' | 'promotion'; effective_at: Date; expires_at: Date | null; membership_since: Date | null; revision: number; provider_reference_hash: string | null; audit_metadata: unknown; created_at: Date; updated_at: Date}
   greenfield_premium_preferences: {account_id: string; badge_visible: boolean; revision: number; updated_by_actor_id: string; updated_at: Date}
-  greenfield_premium_membership_events: {event_id: string; account_id: string; event_type: 'assigned' | 'renewed' | 'expired' | 'revoked' | 'downgraded' | 'badge_visibility_changed'; previous_tier_id: string | null; tier_id: string; previous_status: string | null; subscription_status: string; source: string; idempotency_key: string; actor_id: string | null; audit_metadata: unknown; occurred_at: Date}
+  greenfield_premium_membership_events: {event_id: string; account_id: string; event_type: 'assigned' | 'purchased' | 'restored' | 'renewed' | 'upgraded' | 'downgraded' | 'grace_started' | 'grace_ended' | 'expired' | 'revoked' | 'badge_visibility_changed'; previous_tier_id: string | null; tier_id: string; previous_status: string | null; subscription_status: string; source: string; idempotency_key: string; actor_id: string | null; audit_metadata: unknown; occurred_at: Date}
+  greenfield_premium_apple_products: {product_id: string; catalogue_version: number; tier_id: 'plus' | 'horizon' | 'horizon_plus' | 'studio'; billing_period: 'monthly' | 'annual'; environment: 'Sandbox'; state: 'active' | 'disabled'; configured_by_actor_id: string; created_at: Date; updated_at: Date}
+  greenfield_premium_apple_accounts: {account_id: string; app_account_token: string; created_at: Date}
+  greenfield_premium_apple_transactions: {transaction_id: string; original_transaction_id: string; web_order_line_item_id: string | null; account_id: string; app_account_token: string; product_id: string; purchase_at: Date; original_purchase_at: Date; expires_at: Date | null; grace_expires_at: Date | null; revoked_at: Date | null; environment: 'Sandbox'; ownership_type: 'PURCHASED'; is_upgraded: boolean; status: 'active' | 'grace' | 'expired' | 'revoked'; latest_signed_at: Date; evidence_sha256: string; created_at: Date; updated_at: Date}
+  greenfield_premium_apple_transaction_events: {event_id: string; transaction_id: string; account_id: string; source: 'client' | 'notification'; notification_uuid: string | null; status: 'active' | 'grace' | 'expired' | 'revoked'; signed_at: Date; evidence_sha256: string; reason_code: string; occurred_at: Date}
+  greenfield_premium_apple_notifications: {notification_uuid: string; notification_type: string; subtype: string | null; environment: 'Sandbox'; signed_at: Date; evidence_sha256: string; transaction_id: string | null; state: 'processed' | 'ignored' | 'unbound'; reason_code: string; processed_at: Date}
   greenfield_verification_applications: {application_id: string; account_id: string; requested_type: 'person' | 'notable_person' | 'organization' | 'public_body' | 'official_module_developer'; state: 'pending' | 'under_review' | 'verified' | 'paused' | 'denied' | 'revoked'; statement: string | null; submitted_by_actor_id: string; reviewer_actor_id: string | null; review_reason: string | null; reverification_due_at: Date | null; revision: number; created_at: Date; updated_at: Date}
   greenfield_verification_statuses: {account_id: string; state: 'unverified' | 'pending' | 'under_review' | 'verified' | 'paused' | 'denied' | 'revoked'; verification_type: 'person' | 'notable_person' | 'organization' | 'public_body' | 'official_module_developer' | null; active_application_id: string | null; effective_at: Date; reverification_due_at: Date | null; revision: number; updated_at: Date}
   greenfield_verification_appeals: {appeal_id: string; application_id: string; account_id: string; state: 'pending' | 'under_review' | 'accepted' | 'denied'; statement: string; submitted_by_actor_id: string; reviewer_actor_id: string | null; review_reason: string | null; revision: number; created_at: Date; updated_at: Date}
@@ -1410,6 +1564,28 @@ export interface Database {
   greenfield_release_presentation_assets: {asset_id: string; ingestion_id: string; release_id: string | null; product_id: string; version: string; role: string; artifact_path: string; media_type: string; width: number | null; height: number | null; sha256: string | null; development_asset: boolean; alt_text: string | null; presentation_slot: string | null; sort_order: number; created_at: Date}
   greenfield_release_asset_blobs: {sha256: string; media_type: string; byte_size: number; bytes: Buffer; created_at: Date}
   greenfield_release_artifacts: {artifact_id: string; release_id: string; kind: 'module-package' | 'frontend' | 'asset' | 'icon' | 'cover' | 'screenshot' | 'schema' | 'other'; sha256: string; filename: string; access_class: 'public' | 'installation'; required_for_offline_launch: boolean; created_at: Date}
+  greenfield_release_artifact_signatures: {artifact_signature_id: string; artifact_id: string; signature_key_id: string; algorithm: 'Ed25519'; signed_digest: string; signature: string; verification_state: 'verified' | 'invalid' | 'unknownKey' | 'revokedKey'; verified_at: Date; created_at: Date}
+  greenfield_moliboo_characters: {character_id: string; character_number: number; character_key: string; display_name: string; family_id: string; series: number; wearable: boolean; created_at: Date; updated_at: Date}
+  greenfield_moliboo_pack_releases: {release_id: string; artifact_id: string; package_id: string; version: string; character_id: string; family_id: string; minimum_host_version: string; runtime_version: number; asset_capabilities: unknown; rollback_compatible: boolean; availability: 'approved' | 'withdrawn'; state_revision: number; approved_at: Date; withdrawn_at: Date | null; withdrawal_reason: string | null; created_at: Date; updated_at: Date}
+  greenfield_moliboo_pack_release_events: {event_id: string; release_id: string; event_type: 'approved' | 'withdrawn' | 'restored'; state_revision: number; actor_account_id: string | null; reason: string | null; occurred_at: Date}
+  greenfield_moliboo_items: {
+    item_id: string; name: string; slot: string; rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+    access: 'free' | 'earnable' | 'premium'; family: string | null; set_id: string | null; icon_key: string
+    palette: unknown; sort_order: Generated<number>; active: Generated<boolean>; created_at: Generated<Date>
+    item_type: Generated<'character' | 'cosmetic'>; character_id: string | null; wearable: Generated<boolean>
+    revoked_at: Date | null; updated_at: Generated<Date>
+  }
+  greenfield_moliboo_inventory: {
+    account_id: string; item_id: string
+    source: 'quest' | 'achievement' | 'collection' | 'premium_entitlement' | 'admin_grant' | 'gift' | 'qa_fixture' | 'purchase' | 'promotion' | 'migration' | 'system'
+    source_ref: string; acquired_at: Generated<Date>; revoked_at: Date | null; grant_id: Generated<string | null>
+  }
+  greenfield_moliboo_equipped: {
+    account_id: string; character_id: string; item_ids: Generated<unknown>; source_set_id: string | null
+    source_outfit_id: string | null; revision: Generated<number>; updated_at: Generated<Date>; is_active: Generated<boolean>
+  }
+  greenfield_sticker_pack_releases: {release_id: string; manifest_artifact_id: string; pack_id: string; version: string; title: string; icon: string; series: number | null; availability: 'approved' | 'withdrawn'; sort_order: number; approved_at: Date; withdrawn_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_stickers: {release_id: string; sticker_id: string; label: string; emoji: string; artifact_id: string; sort_order: number; created_at: Date}
   greenfield_game_catalogue_entries: {game_id: string; publisher_id: string; origin_type: 'modula-developed' | 'external-open-source' | 'independent-publisher' | 'commercial-publisher'; genre: string; categories: unknown; runtime_category: 'html5-javascript' | 'phaser' | 'playcanvas' | 'browser-runtime' | 'streamed'; age_classification: unknown; availability: 'available' | 'coming-soon' | 'unavailable' | 'region-restricted'; publication_status: 'draft' | 'in-review' | 'published' | 'rejected' | 'retired'; featured: boolean; featured_rank: number | null; created_by_account_id: string | null; updated_by_account_id: string | null; created_at: Date; updated_at: Date}
   greenfield_game_catalogue_events: {event_id: string; game_id: string; publisher_id: string; event_type: 'registered' | 'metadata-updated' | 'submitted' | 'published' | 'rejected' | 'retired' | 'featured' | 'unfeatured'; actor_account_id: string | null; previous_status: string | null; publication_status: string; evidence: unknown; occurred_at: Date}
   greenfield_gubic_library_items: {account_id: string; game_id: string; added_at: Date; hidden: boolean; favourite: boolean; last_played_at: Date | null; play_count: number; total_play_seconds: string | number; updated_at: Date}

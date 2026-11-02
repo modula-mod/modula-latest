@@ -5,8 +5,19 @@ import {invalidatePublicIdentity, PREMIUM_TIERS, publicIdentityForActor, type Pr
 
 export type MembershipStatus = 'active' | 'expired' | 'revoked' | 'downgraded'
 
+type PurchaseStatus = {
+  enabled: boolean
+  environment: 'sandbox'
+  reason: string | null
+  products: Array<{productId: string; tier: Exclude<PremiumTier, 'core'>; billingPeriod: 'monthly' | 'annual'; environment: 'sandbox'; state: 'active' | 'disabled'}>
+}
+
 export class PremiumService {
-  constructor(private readonly db: ModulaDb, private readonly qaCapabilityEvaluation: boolean) {}
+  constructor(
+    private readonly db: ModulaDb,
+    private readonly qaCapabilityEvaluation: boolean,
+    private readonly loadPurchaseStatus: () => Promise<PurchaseStatus>,
+  ) {}
 
   async catalogue() {
     const version = await this.activeCatalogueVersion()
@@ -14,12 +25,25 @@ export class PremiumService {
       this.db.selectFrom('greenfield_premium_tiers').selectAll().where('catalogue_version', '=', version).orderBy('rank').execute(),
       this.db.selectFrom('greenfield_premium_capabilities').selectAll().where('catalogue_version', '=', version).orderBy('capability_id').execute(),
     ])
+    const purchase = await this.loadPurchaseStatus()
     return {
       schemaVersion: 1,
       catalogueVersion: version,
-      pricingStatus: 'provisional',
-      purchase: {enabled: false, reason: 'premium_purchase_disabled'},
-      tiers: tiers.map(row => ({id: row.tier_id, displayName: row.display_name, rank: row.rank, paid: row.paid, price: null, metadata: row.metadata})),
+      pricingStatus: 'supplied_display_only',
+      purchase,
+      tiers: tiers.map(row => {
+        const metadata = objectValue(row.metadata)
+        return {
+          id: row.tier_id,
+          displayName: row.display_name,
+          rank: row.rank,
+          paid: row.paid,
+          price: null,
+          displayPrice: typeof metadata.displayPrice === 'string' ? metadata.displayPrice : null,
+          products: purchase.products.filter(product => product.tier === row.tier_id),
+          metadata,
+        }
+      }),
       capabilities: capabilities.map(row => ({id: row.capability_id, displayName: row.display_name, minimumRank: row.minimum_rank, availabilityMode: row.availability_mode, metadata: row.metadata})),
     }
   }
@@ -28,15 +52,15 @@ export class PremiumService {
     const row = await this.db.selectFrom('greenfield_premium_memberships').selectAll().where('account_id', '=', accountId).executeTakeFirst()
     const preference = await this.db.selectFrom('greenfield_premium_preferences').select('badge_visible').where('account_id', '=', accountId).executeTakeFirst()
     const now = new Date()
-    const active = Boolean(row && row.subscription_status === 'active' && row.effective_at <= now && (!row.expires_at || row.expires_at > now))
+    const active = Boolean(row && (row.subscription_status === 'active' || row.subscription_status === 'grace') && row.effective_at <= now && (!row.expires_at || row.expires_at > now))
     const tier: PremiumTier = active && row ? row.tier_id : 'core'
-    const effectiveStatus = row?.subscription_status === 'active' && !active ? 'expired' : row?.subscription_status ?? 'core'
+    const effectiveStatus = (row?.subscription_status === 'active' || row?.subscription_status === 'grace') && !active ? 'expired' : row?.subscription_status ?? 'core'
     return {
       schemaVersion: 1,
       accountId,
       tier,
       recordedTier: row?.tier_id ?? 'core',
-      subscriptionStatus: active ? 'active' : effectiveStatus,
+      subscriptionStatus: active ? row!.subscription_status : effectiveStatus,
       entitlementSource: row?.entitlement_source ?? 'platform_default',
       effectiveAt: row?.effective_at.toISOString() ?? null,
       expiresAt: row?.expires_at?.toISOString() ?? null,
@@ -44,7 +68,7 @@ export class PremiumService {
       badgeVisible: preference?.badge_visible ?? true,
       revision: row?.revision ?? 0,
       renewal: {known: false, renewsAt: null},
-      purchase: {enabled: false, reason: 'premium_purchase_disabled'},
+      purchase: await this.loadPurchaseStatus(),
       publicIdentity: await publicIdentityForActor(this.db, actorId),
       serverTime: now.toISOString(),
     }
@@ -71,7 +95,11 @@ export class PremiumService {
           value: valueForTier(capability.value_by_tier, membership.tier),
           mode: capability.availability_mode,
           reason: available
-            ? capability.availability_mode === 'existing_free' ? 'existing_free_feature' : 'qa_membership_entitlement'
+            ? capability.availability_mode === 'existing_free'
+              ? 'existing_free_feature'
+              : membership.entitlementSource === 'apple_verified'
+                ? 'verified_apple_sandbox_entitlement'
+                : 'qa_membership_entitlement'
             : capability.availability_mode === 'future_disabled' ? 'future_feature_disabled' : 'tier_or_environment_not_eligible',
         }
       }),
@@ -167,6 +195,10 @@ export class PremiumService {
 function valueForTier(value: unknown, tier: string) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null
   return (value as Record<string, unknown>)[tier] ?? null
+}
+
+function objectValue(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 }
 
 function parseDate(value: unknown, fallback?: Date) {
