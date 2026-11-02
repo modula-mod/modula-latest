@@ -13,6 +13,8 @@ export type ConversationDto = {
   lastMessage: MessagePreviewDto | null
   unreadCount: number
   updatedAt: string
+  muted?: boolean
+  archived?: boolean
 }
 export type StartConversationResult = {conversation: ConversationDto; created: boolean}
 export type MessageDto = {
@@ -25,6 +27,10 @@ export type MessageDto = {
   createdAt: string
   isOwn: boolean
   delivery: 'sent' | 'read'
+  replyTo?: ReplyPreviewDto | null
+  reactions?: ReactionDto[]
+  editedAt?: string | null
+  deleted?: boolean
 }
 export type MessageRequestDto = {
   id: string
@@ -41,6 +47,27 @@ export type InMailThreadDto = {
   unread: boolean
   updatedAt: string
 }
+export type ReactionDto = {emoji: string; count: number; mine: boolean}
+export type ReplyPreviewDto = {id: string; senderId: string; senderName: string; body: string; deleted: boolean}
+type MessageExtras = {reactions: Map<string, ReactionDto[]>; replies: Map<string, ReplyPreviewDto>}
+type MessageRow = {
+  message_id: string
+  conversation_id: string
+  sender_actor_id: string
+  subject: string | null
+  body: string
+  created_at: Date
+  reply_to_message_id?: string | null
+  edited_at?: Date | null
+  deleted_at?: Date | null
+}
+
+/** Own messages can be edited for 15 minutes (like iMessage). */
+export const EDIT_WINDOW_MS = 15 * 60 * 1000
+/** A typing ping counts for 6 seconds. */
+export const TYPING_TTL_MS = 6_000
+export const REACTION_MAX = 16
+
 export type Page<T> = {items: T[]; nextCursor: string | null; hasMore: boolean}
 
 export const MESSAGE_MAX = 5_000
@@ -135,17 +162,6 @@ export class MessagingService {
     return Boolean(row)
   }
 
-  private async follows(follower: string, followed: string): Promise<boolean> {
-    const row = await this.db
-      .selectFrom('follows')
-      .select('id')
-      .where('follower_actor_id', '=', follower)
-      .where('followed_actor_id', '=', followed)
-      .where('deleted_at', 'is', null)
-      .executeTakeFirst()
-    return Boolean(row)
-  }
-
   private async membership(conversationId: string, actorId: string, kind: 'direct' | 'inmail') {
     const row = await this.db
       .selectFrom('greenfield_conversation_members as m')
@@ -176,11 +192,11 @@ export class MessagingService {
   }
 
   private async latestMessages(conversationIds: string[]) {
-    const map = new Map<string, {message_id: string; body: string; created_at: Date; sender_actor_id: string}>()
+    const map = new Map<string, {message_id: string; body: string; created_at: Date; sender_actor_id: string; deleted_at: Date | null}>()
     if (conversationIds.length === 0) return map
     const rows = await this.db
       .selectFrom('greenfield_conversation_messages')
-      .select(['conversation_id', 'message_id', 'body', 'created_at', 'sender_actor_id'])
+      .select(['conversation_id', 'message_id', 'body', 'created_at', 'sender_actor_id', 'deleted_at'])
       .distinctOn('conversation_id')
       .where('conversation_id', 'in', conversationIds)
       .orderBy('conversation_id')
@@ -206,13 +222,13 @@ export class MessagingService {
     return map
   }
 
-  private async insertMessage(conversationId: string, sender: string, body: string, subject: string | null = null) {
+  private async insertMessage(conversationId: string, sender: string, body: string, subject: string | null = null, replyTo: string | null = null) {
     const now = new Date()
     const messageId = randomUUID()
     await this.db.transaction().execute(async trx => {
       await trx
         .insertInto('greenfield_conversation_messages')
-        .values({message_id: messageId, conversation_id: conversationId, sender_actor_id: sender, subject, body, created_at: now})
+        .values({message_id: messageId, conversation_id: conversationId, sender_actor_id: sender, subject, body, created_at: now, reply_to_message_id: replyTo})
         .execute()
       await trx
         .updateTable('greenfield_conversations')
@@ -229,16 +245,18 @@ export class MessagingService {
     return {messageId, now}
   }
 
-  private async listForViewer(viewer: string, kind: 'direct' | 'inmail', state: 'active' | 'pending', cursorRaw: unknown, limitRaw: unknown) {
+  private async listForViewer(viewer: string, kind: 'direct' | 'inmail', state: 'active' | 'pending', cursorRaw: unknown, limitRaw: unknown, archived: boolean | null = null) {
     const limit = clampLimit(limitRaw, 30, 50)
     const cursor = decodeCursor(typeof cursorRaw === 'string' ? cursorRaw : null)
     let query = this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['c.conversation_id', 'c.subject', 'c.last_message_at', 'c.created_at', 'm.last_read_at'])
+      .select(['c.conversation_id', 'c.subject', 'c.last_message_at', 'c.created_at', 'm.last_read_at', 'm.muted_until', 'm.archived_at'])
       .where('m.actor_id', '=', viewer)
       .where('m.state', '=', state)
       .where('c.kind', '=', kind)
+    if (archived === true) query = query.where('m.archived_at', 'is not', null)
+    if (archived === false) query = query.where('m.archived_at', 'is', null)
     if (cursor) {
       query = query.where(eb =>
         eb.or([
@@ -260,8 +278,8 @@ export class MessagingService {
 
   // ---- direct conversations ------------------------------------------
 
-  async listConversations(viewer: string, cursor: unknown, limit: unknown): Promise<Page<ConversationDto>> {
-    const {page, hasMore, nextCursor} = await this.listForViewer(viewer, 'direct', 'active', cursor, limit)
+  async listConversations(viewer: string, cursor: unknown, limit: unknown, archived: unknown = undefined): Promise<Page<ConversationDto>> {
+    const {page, hasMore, nextCursor} = await this.listForViewer(viewer, 'direct', 'active', cursor, limit, archived === 'true' || archived === true)
     const ids = page.map(row => row.conversation_id)
     const [others, latest, unread] = await Promise.all([
       this.otherMembers(ids, viewer),
@@ -276,10 +294,12 @@ export class MessagingService {
         kind: 'direct' as const,
         participants: (others.get(row.conversation_id) ?? []).map(id => people.get(id)!),
         lastMessage: lastRow
-          ? {id: lastRow.message_id, body: lastRow.body, sentAt: lastRow.created_at.toISOString(), senderId: lastRow.sender_actor_id}
+          ? {id: lastRow.message_id, body: lastRow.deleted_at ? '' : lastRow.body, sentAt: lastRow.created_at.toISOString(), senderId: lastRow.sender_actor_id}
           : null,
         unreadCount: unread.get(row.conversation_id) ?? 0,
         updatedAt: row.last_message_at.toISOString(),
+        muted: Boolean(row.muted_until && row.muted_until.getTime() > Date.now()),
+        archived: Boolean(row.archived_at),
       }
     })
     return {items, nextCursor, hasMore}
@@ -315,10 +335,9 @@ export class MessagingService {
     if (recipient === viewer) fail('VALIDATION_FAILED', 'You cannot message yourself')
     const text = initialText === undefined || initialText === '' ? null : cleanText(initialText, MESSAGE_MAX, 'Message')
     const directKey = [viewer, recipient].sort().join(':')
-    const recipientState = (await this.follows(recipient, viewer)) ? 'active' : 'pending'
     const result = await this.db.transaction().execute(async trx => {
-      // Moderation block/unblock uses this same actor-pair lock. Whichever
-      // operation commits first becomes authoritative for this creation.
+      // Moderation block creation uses this same actor-pair lock. Whichever
+      // transaction commits first becomes authoritative for this creation.
       await sql`SELECT pg_advisory_xact_lock(hashtextextended(${directKey}, 0))`.execute(trx)
       const activeRecipient = await trx
         .selectFrom('actors as a')
@@ -341,6 +360,14 @@ export class MessagingService {
         )
         .executeTakeFirst()
       if (blocked) fail('FORBIDDEN', 'You cannot message this account')
+      const recipientFollowsViewer = await trx
+        .selectFrom('follows')
+        .select('id')
+        .where('follower_actor_id', '=', recipient)
+        .where('followed_actor_id', '=', viewer)
+        .where('deleted_at', 'is', null)
+        .executeTakeFirst()
+      const recipientState = recipientFollowsViewer ? 'active' : 'pending'
 
       const conversationId = randomUUID()
       const now = new Date()
@@ -369,9 +396,8 @@ export class MessagingService {
         return {conversationId, created: true}
       }
 
-      // PostgreSQL waits for the winning unique-key transaction before the
-      // conflict is resolved, so this statement sees its committed row and
-      // members without an advisory lock or retry loop.
+      // The actor-pair lock makes this existing-row lookup deterministic and
+      // the unique direct_key remains the final database invariant.
       const existing = await trx
         .selectFrom('greenfield_conversations')
         .select('conversation_id')
@@ -438,15 +464,17 @@ export class MessagingService {
     const othersReadAt = otherReads.map(r => r.last_read_at?.getTime() ?? 0)
     const people = await this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id)])
     void member
-    const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt))
+    const extras = await this.messageExtras(page, viewer)
+    const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt, extras))
     return {items, nextCursor: hasMore && oldest ? encodeCursor(oldest.created_at, oldest.message_id) : null, hasMore}
   }
 
   private messageDto(
-    row: {message_id: string; conversation_id: string; sender_actor_id: string; subject: string | null; body: string; created_at: Date},
+    row: MessageRow,
     viewer: string,
     people: Map<string, ParticipantDto>,
     othersReadAt: number[] = [],
+    extras?: MessageExtras,
   ): MessageDto {
     const isOwn = row.sender_actor_id === viewer
     const read = isOwn && othersReadAt.length > 0 && othersReadAt.every(t => t >= row.created_at.getTime())
@@ -454,16 +482,20 @@ export class MessagingService {
       id: row.message_id,
       conversationId: row.conversation_id,
       sender: people.get(row.sender_actor_id) ?? {id: row.sender_actor_id, handle: '', displayName: 'Member', avatarUrl: null},
-      body: row.body,
+      body: row.deleted_at ? '' : row.body,
       subject: row.subject,
       sentAt: row.created_at.toISOString(),
       createdAt: row.created_at.toISOString(),
       isOwn,
       delivery: read ? 'read' : 'sent',
+      replyTo: row.reply_to_message_id ? (extras?.replies.get(row.reply_to_message_id) ?? null) : null,
+      reactions: extras?.reactions.get(row.message_id) ?? [],
+      editedAt: row.edited_at ? row.edited_at.toISOString() : null,
+      deleted: Boolean(row.deleted_at),
     }
   }
 
-  async send(viewer: string, conversationId: string, input: {text?: unknown}): Promise<MessageDto> {
+  async send(viewer: string, conversationId: string, input: {text?: unknown; replyToMessageId?: unknown}): Promise<MessageDto> {
     const member = await this.membership(conversationId, viewer, 'direct')
     if (member.state !== 'active') fail('FORBIDDEN', 'Accept this request before replying')
     const text = cleanText(input.text, MESSAGE_MAX, 'Message')
@@ -471,13 +503,185 @@ export class MessagingService {
     for (const other of others.get(conversationId) ?? []) {
       if (await this.isBlockedEitherWay(viewer, other)) fail('FORBIDDEN', 'You cannot message this account')
     }
-    const {messageId, now} = await this.insertMessage(conversationId, viewer, text)
+    let replyTo: string | null = null
+    if (typeof input.replyToMessageId === 'string' && input.replyToMessageId) {
+      const parent = await this.db
+        .selectFrom('greenfield_conversation_messages')
+        .select('message_id')
+        .where('message_id', '=', input.replyToMessageId)
+        .where('conversation_id', '=', conversationId)
+        .executeTakeFirst()
+      if (!parent) fail('VALIDATION_FAILED', 'Reply target not found')
+      replyTo = parent!.message_id
+    }
+    const {messageId, now} = await this.insertMessage(conversationId, viewer, text, null, replyTo)
     const people = await this.participants([viewer])
-    return this.messageDto(
-      {message_id: messageId, conversation_id: conversationId, sender_actor_id: viewer, subject: null, body: text, created_at: now},
-      viewer,
-      people,
-    )
+    const row = {message_id: messageId, conversation_id: conversationId, sender_actor_id: viewer, subject: null, body: text, created_at: now, reply_to_message_id: replyTo}
+    return this.messageDto(row, viewer, people, [], await this.messageExtras([row], viewer))
+  }
+
+  // ---- messaging v2: reactions, edit, unsend, typing, mute, archive ----
+
+  private async messageExtras(rows: Array<{message_id: string; reply_to_message_id?: string | null}>, viewer: string): Promise<MessageExtras> {
+    const reactions = new Map<string, ReactionDto[]>()
+    const replies = new Map<string, ReplyPreviewDto>()
+    const ids = rows.map(row => row.message_id)
+    if (ids.length > 0) {
+      const found = await this.db
+        .selectFrom('greenfield_message_reactions')
+        .select(['message_id', 'actor_id', 'emoji'])
+        .where('message_id', 'in', ids)
+        .orderBy('created_at')
+        .execute()
+      for (const r of found) {
+        const list = reactions.get(r.message_id) ?? []
+        let item = list.find(i => i.emoji === r.emoji)
+        if (!item) {
+          item = {emoji: r.emoji, count: 0, mine: false}
+          list.push(item)
+        }
+        item.count += 1
+        if (r.actor_id === viewer) item.mine = true
+        reactions.set(r.message_id, list)
+      }
+    }
+    const parentIds = [...new Set(rows.map(row => row.reply_to_message_id).filter((id): id is string => Boolean(id)))]
+    if (parentIds.length > 0) {
+      const parents = await this.db
+        .selectFrom('greenfield_conversation_messages')
+        .select(['message_id', 'sender_actor_id', 'body', 'deleted_at'])
+        .where('message_id', 'in', parentIds)
+        .execute()
+      const people = await this.participants(parents.map(p => p.sender_actor_id))
+      for (const p of parents) {
+        replies.set(p.message_id, {
+          id: p.message_id,
+          senderId: p.sender_actor_id,
+          senderName: people.get(p.sender_actor_id)?.displayName ?? 'Member',
+          body: p.deleted_at ? '' : p.body.slice(0, 200),
+          deleted: Boolean(p.deleted_at),
+        })
+      }
+    }
+    return {reactions, replies}
+  }
+
+  private async liveMessage(viewer: string, conversationId: string, messageId: string) {
+    const member = await this.membership(conversationId, viewer, 'direct')
+    const row = await this.db
+      .selectFrom('greenfield_conversation_messages')
+      .selectAll()
+      .where('message_id', '=', messageId)
+      .where('conversation_id', '=', conversationId)
+      .executeTakeFirst()
+    if (!row || row.deleted_at) fail('NOT_FOUND', 'Message not found')
+    return {member, row: row!}
+  }
+
+  async editMessage(viewer: string, conversationId: string, messageId: string, input: {text?: unknown}): Promise<MessageDto> {
+    const {row} = await this.liveMessage(viewer, conversationId, messageId)
+    if (row.sender_actor_id !== viewer) fail('FORBIDDEN', 'You can only edit your own messages')
+    if (Date.now() - row.created_at.getTime() > EDIT_WINDOW_MS) fail('CONFLICT', 'This message can no longer be edited')
+    const text = cleanText(input.text, MESSAGE_MAX, 'Message')
+    const now = new Date()
+    await this.db
+      .updateTable('greenfield_conversation_messages')
+      .set({body: text, edited_at: now})
+      .where('message_id', '=', messageId)
+      .execute()
+    const people = await this.participants([viewer])
+    const updated = {...row, body: text, edited_at: now}
+    return this.messageDto(updated, viewer, people, [], await this.messageExtras([updated], viewer))
+  }
+
+  /** Unsend: the text is wiped server-side and the message shows as removed for everyone. */
+  async unsendMessage(viewer: string, conversationId: string, messageId: string): Promise<void> {
+    const {row} = await this.liveMessage(viewer, conversationId, messageId)
+    if (row.sender_actor_id !== viewer) fail('FORBIDDEN', 'You can only unsend your own messages')
+    await this.db.transaction().execute(async trx => {
+      await trx
+        .updateTable('greenfield_conversation_messages')
+        .set({body: '-', deleted_at: new Date(), edited_at: null})
+        .where('message_id', '=', messageId)
+        .execute()
+      await trx.deleteFrom('greenfield_message_reactions').where('message_id', '=', messageId).execute()
+    })
+  }
+
+  async react(viewer: string, conversationId: string, messageId: string, input: {emoji?: unknown}, on: boolean): Promise<{reactions: ReactionDto[]}> {
+    const {member} = await this.liveMessage(viewer, conversationId, messageId)
+    if (member.state !== 'active') fail('FORBIDDEN', 'Accept this request before reacting')
+    const emoji = cleanText(input.emoji, REACTION_MAX, 'Reaction')
+    if (on) {
+      await this.db
+        .insertInto('greenfield_message_reactions')
+        .values({message_id: messageId, actor_id: viewer, emoji, created_at: new Date()})
+        .onConflict(oc => oc.doNothing())
+        .execute()
+    } else {
+      await this.db
+        .deleteFrom('greenfield_message_reactions')
+        .where('message_id', '=', messageId)
+        .where('actor_id', '=', viewer)
+        .where('emoji', '=', emoji)
+        .execute()
+    }
+    const extras = await this.messageExtras([{message_id: messageId}], viewer)
+    return {reactions: extras.reactions.get(messageId) ?? []}
+  }
+
+  async setTyping(viewer: string, conversationId: string): Promise<void> {
+    const member = await this.membership(conversationId, viewer, 'direct')
+    if (member.state !== 'active') return
+    await this.db
+      .updateTable('greenfield_conversation_members')
+      .set({typing_at: new Date()})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', viewer)
+      .execute()
+  }
+
+  async typing(viewer: string, conversationId: string): Promise<{typing: ParticipantDto[]}> {
+    await this.membership(conversationId, viewer, 'direct')
+    const rows = await this.db
+      .selectFrom('greenfield_conversation_members')
+      .select('actor_id')
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '!=', viewer)
+      .where('state', '=', 'active')
+      .where('typing_at', '>', new Date(Date.now() - TYPING_TTL_MS))
+      .execute()
+    const people = await this.participants(rows.map(r => r.actor_id))
+    return {typing: rows.map(r => people.get(r.actor_id)!)}
+  }
+
+  async setMuted(viewer: string, conversationId: string, input: {muted?: unknown; until?: unknown}): Promise<{muted: boolean; mutedUntil: string | null}> {
+    await this.membership(conversationId, viewer, 'direct')
+    const muted = input.muted === true
+    let until: Date | null = null
+    if (muted) {
+      const parsed = typeof input.until === 'string' ? new Date(input.until) : null
+      until = parsed && !Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now() ? parsed : new Date('9999-12-31T00:00:00Z')
+    }
+    await this.db
+      .updateTable('greenfield_conversation_members')
+      .set({muted_until: until, updated_at: new Date()})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', viewer)
+      .execute()
+    return {muted, mutedUntil: until ? until.toISOString() : null}
+  }
+
+  async setArchived(viewer: string, conversationId: string, input: {archived?: unknown}): Promise<{archived: boolean}> {
+    await this.membership(conversationId, viewer, 'direct')
+    const archived = input.archived !== false
+    await this.db
+      .updateTable('greenfield_conversation_members')
+      .set({archived_at: archived ? new Date() : null, updated_at: new Date()})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', viewer)
+      .execute()
+    return {archived}
   }
 
   async markRead(viewer: string, conversationId: string): Promise<void> {

@@ -9,6 +9,7 @@ const envSchema = z.object({
   MODULA_PUBLIC_API_URL: z.string().url(),
   MODULA_PUBLIC_WEB_URL: z.string().url().optional(),
   MODULA_DATABASE_URL: z.string().min(1),
+  APNS_BUNDLE_ID: z.string().min(1).default('digital.modula.app.native'),
   MODULA_DATABASE_MIGRATOR_URL: z.string().min(1).optional(),
   MODULA_ALLOWED_ORIGINS: z.string().min(1),
   MODULA_LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
@@ -129,6 +130,11 @@ const envSchema = z.object({
     .transform(v => v !== 'false'),
   /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
   MODULA_ADMIN_HANDLES: z.string().optional(),
+  /** GUBIC play platform routes (library, sessions, lobbies, achievements, submissions). Off by default. */
+  MODULA_GUBIC_PLAY_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   /** Modula Premium entitlement routes and public badge fields. Off by default. */
   MODULA_PREMIUM_ENTITLEMENTS_ENABLED: z
     .string()
@@ -163,6 +169,7 @@ export type AppConfig = {
   host: string
   port: number
   publicApiUrl: string
+  pushBundleId: string
   publicWebUrl: string
   databaseUrl: string
   migratorDatabaseUrl: string
@@ -237,6 +244,9 @@ export type AppConfig = {
   aiGatewayEnabled: boolean
   /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
   adminHandles: string[]
+  gubic: {
+    playEnabled: boolean
+  }
   premium: {
     enabled: boolean
     qaAssignmentsEnabled: boolean
@@ -450,6 +460,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     host: raw.MODULA_API_HOST,
     port: raw.MODULA_API_PORT,
     publicApiUrl: raw.MODULA_PUBLIC_API_URL,
+    pushBundleId: raw.APNS_BUNDLE_ID,
     publicWebUrl,
     databaseUrl: raw.MODULA_DATABASE_URL,
     migratorDatabaseUrl: raw.MODULA_DATABASE_MIGRATOR_URL ?? raw.MODULA_DATABASE_URL,
@@ -518,6 +529,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       .split(',')
       .map(h => h.trim().toLowerCase())
       .filter(Boolean),
+    gubic: {playEnabled: Boolean(raw.MODULA_GUBIC_PLAY_ENABLED)},
     premium: premiumConfig(raw),
   }
 }
