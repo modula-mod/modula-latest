@@ -317,7 +317,7 @@ export class GreenfieldModuleDistributionService {
    * This uses the existing release and artifact tables; it does not create a
    * second registry or accept caller-supplied release metadata.
    */
-  async packageInstallPlan(moduleId: string, version: string | null, context: DistributionHostContext,
+  async packageInstallPlan(accountId: string | null, moduleId: string, version: string | null, context: DistributionHostContext,
                            cachedPublicDigests: readonly string[] = []): Promise<{lock: PackageLockfile; lockSha256: string}> {
     if (cachedPublicDigests.length > 4096 || cachedPublicDigests.some(digest => !/^[a-f0-9]{64}$/.test(digest))) {
       throw moduleError('VALIDATION_FAILED', 'Invalid cached artifact digest list')
@@ -377,6 +377,7 @@ export class GreenfieldModuleDistributionService {
       trustedPublishers: new Set(available.filter(item => item.trust.publisherVerified).map(item => item.publisherId)),
       installedPublicDigests: new Set(cachedPublicDigests),
     })
+    await this.assertPackageEntitlements(accountId, lock.packages.map(item => item.packageId))
     const lockSha256 = createHash('sha256').update(canonicalJsonStringify(lock)).digest('hex')
     return {lock, lockSha256}
   }
@@ -794,18 +795,66 @@ export class GreenfieldModuleDistributionService {
       .execute()
     if (!rows.length) throw moduleError('NOT_FOUND', 'Artifact not found')
     const publicArtifact = rows.find(row => row.access_class === 'public')
-    if (publicArtifact) return publicArtifact
+    if (publicArtifact) return this.verifyStoredArtifact(publicArtifact)
     if (accountId) {
       for (const artifact of rows) {
         const installed = await this.installations.getInstalled(accountId, artifact.module_id)
         if (!installed) continue
         const release = await this.registry.getVersion(artifact.module_id, artifact.version)
-        if ((await this.trust.forRelease(release)).verified) return artifact
+        if ((await this.trust.forRelease(release)).verified) return this.verifyStoredArtifact(artifact)
       }
     }
     await new AuditRepository(this.db).append('module.artifact.authorization-denied', {digest: sha256, authenticated: Boolean(accountId)}, {type: 'releaseArtifact', id: sha256})
     // Do not reveal whether a private/module-restricted digest exists.
     throw moduleError('NOT_FOUND', 'Artifact not found')
+  }
+
+  private async assertPackageEntitlements(accountId: string | null, packageIds: readonly string[]): Promise<void> {
+    const products = [...new Set(packageIds)]
+    if (!products.length) return
+    const offers = await this.db.selectFrom('greenfield_offers')
+      .select(['product_id', 'kind'])
+      .where('product_id', 'in', products)
+      .where('state', '=', 'ACTIVE')
+      .execute()
+    const offerKinds = new Map<string, Set<string>>()
+    for (const offer of offers) {
+      const kinds = offerKinds.get(offer.product_id) ?? new Set<string>()
+      kinds.add(offer.kind)
+      offerKinds.set(offer.product_id, kinds)
+    }
+    const gated = products.filter(productId => {
+      const kinds = offerKinds.get(productId)
+      return kinds && kinds.size > 0 && !kinds.has('FREE') && !kinds.has('FREEMIUM')
+    })
+    if (!gated.length) return
+    if (!accountId) throw moduleError('FORBIDDEN', 'An active product entitlement is required')
+    const now = new Date()
+    const entitled = await this.db.selectFrom('greenfield_entitlements')
+      .select('product_id')
+      .distinct()
+      .where('owner_account_id', '=', accountId)
+      .where('product_id', 'in', gated)
+      .where('state', 'in', ['TRIAL', 'ACTIVE', 'GRACE'])
+      .where('started_at', '<=', now)
+      .where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', now)]))
+      .execute()
+    const allowed = new Set(entitled.map(row => row.product_id))
+    if (gated.some(productId => !allowed.has(productId))) {
+      throw moduleError('FORBIDDEN', 'An active product entitlement is required')
+    }
+  }
+
+  private async verifyStoredArtifact<T extends {sha256: string; byte_size: number; bytes: Buffer; release_id: string}>(artifact: T): Promise<T> {
+    const observed = createHash('sha256').update(artifact.bytes).digest('hex')
+    if (artifact.byte_size === artifact.bytes.length && observed === artifact.sha256) return artifact
+    await new AuditRepository(this.db).append('module.artifact.integrity-failed', {
+      expectedDigest: artifact.sha256,
+      observedDigest: observed,
+      declaredBytes: artifact.byte_size,
+      observedBytes: artifact.bytes.length,
+    }, {type: 'moduleRelease', id: artifact.release_id})
+    throw moduleError('ARTIFACT_DIGEST_MISMATCH', 'Stored artifact failed integrity verification')
   }
 
   async orphanArtifactReport() {

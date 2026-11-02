@@ -1,16 +1,16 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 79 ordered up migrations, latest `079_story_attachment_pipeline.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 83 ordered up migrations, latest `083_moliboo_game_systems.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 321
-- Tables with API/worker source references: 307
+- Production tables: 344
+- Tables with API/worker source references: 330
 - Orphan candidates requiring manual confirmation: 14
 - Write-only candidates: 38
-- Read-only candidates: 26
+- Read-only candidates: 31
 
 ## Table inventory
 
@@ -637,9 +637,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `004_greenfield_sovereign_core.sql`
-- Routes reading: `POST /v1/account/data-exports`, `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/account/deletion-requests`, `POST /v1/accounts/forgot-password`, `GET /v1/accounts/me`, `PATCH /v1/accounts/me`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/me/modula-mail/provision`, `POST /v1/accounts/me/password`, `POST /v1/accounts/recovery/complete`, `POST /v1/accounts/recovery/request`, `POST /v1/accounts/resend-verification`, `POST /v1/accounts/reset-password`, `POST /v1/accounts/verify-email`, `POST /v1/admin/commerce/entitlements`, `PUT /v1/admin/developer/build-services/:serviceId`, `POST /v1/admin/developer/namespaces/:namespace/verify`, `PATCH /v1/admin/developer/programme/:accountId`, `POST /v1/admin/gubic/games/:gameId/review`, `POST /v1/admin/product-standard/ingest`, `PUT /v1/admin/qa/premium/:handle`, `GET /v1/admin/qa/verification/applications`, `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/sync`, `GET /v1/admin/registry/sync-runs`, `POST /v1/auth/passkeys/registration/options`, `POST /v1/auth/totp/enroll`, `GET /v1/backend/products/:productId/accounts/:accountId`, `POST /v1/developer/organisations/:organisationId/members`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `PATCH /v1/profiles/me`, `POST /v1/sessions`, `POST /v1/sessions/apple`, `POST /v1/sessions/email-code`, `POST /v1/sessions/email-code/request`, `POST /v1/sessions/passkey/options`, `POST /v1/sessions/recovery-code`, `POST /v1/support/cases`
+- Routes reading: `POST /v1/account/data-exports`, `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/account/deletion-requests`, `POST /v1/accounts/forgot-password`, `GET /v1/accounts/me`, `PATCH /v1/accounts/me`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/me/modula-mail/provision`, `POST /v1/accounts/me/password`, `POST /v1/accounts/recovery/complete`, `POST /v1/accounts/recovery/request`, `POST /v1/accounts/resend-verification`, `POST /v1/accounts/reset-password`, `POST /v1/accounts/verify-email`, `POST /v1/admin/commerce/entitlements`, `PUT /v1/admin/developer/build-services/:serviceId`, `POST /v1/admin/developer/namespaces/:namespace/verify`, `PATCH /v1/admin/developer/programme/:accountId`, `POST /v1/admin/gubic/games/:gameId/review`, `GET /v1/admin/gubic/submissions`, `POST /v1/admin/gubic/submissions/:submissionId/decision`, `POST /v1/admin/product-standard/ingest`, `PUT /v1/admin/qa/premium/:handle`, `GET /v1/admin/qa/verification/applications`, `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/sync`, `GET /v1/admin/registry/sync-runs`, `POST /v1/auth/passkeys/registration/options`, `POST /v1/auth/totp/enroll`, `GET /v1/backend/products/:productId/accounts/:accountId`, `POST /v1/developer/organisations/:organisationId/members`, `GET /v1/gubic/games/:gameId/lobbies`, `POST /v1/gubic/games/:gameId/lobbies`, `GET /v1/gubic/lobbies/:lobbyId`, `POST /v1/gubic/lobbies/:lobbyId/join`, `POST /v1/gubic/lobbies/:lobbyId/ready`, `POST /v1/gubic/lobbies/:lobbyId/start`, `POST /v1/gubic/lobbies/join`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `PATCH /v1/profiles/me`, `POST /v1/sessions`, `POST /v1/sessions/apple`, `POST /v1/sessions/email-code`, `POST /v1/sessions/email-code/request`, `POST /v1/sessions/passkey/options`, `POST /v1/sessions/recovery-code`, `POST /v1/support/cases`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/register`, `POST /v1/accounts/verify-email`, `PATCH /v1/profiles/me`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/auth/apple/service.ts`, `services/greenfield-api/src/auth/mfa/totp.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/backend-fabric/routes.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/entitlements/routes.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/permission-service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/modules/record-sharing-service.ts`, `services/greenfield-api/src/premium/service.ts`, `services/greenfield-api/src/premium/verification-service.ts`, `services/greenfield-api/src/support/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/auth/apple/service.ts`, `services/greenfield-api/src/auth/mfa/totp.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/backend-fabric/routes.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/entitlements/routes.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/permission-service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/modules/record-sharing-service.ts`, `services/greenfield-api/src/premium/service.ts`, `services/greenfield-api/src/premium/verification-service.ts`, `services/greenfield-api/src/support/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -1283,9 +1283,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `075_greenfield_messaging.sql`
-- Routes reading: `GET /v1/conversations`, `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `POST /v1/conversations/:id/read`, `GET /v1/conversations/unread`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`, `POST /v1/message-requests/:id/decline`
-- Routes writing: `POST /v1/conversations`, `POST /v1/conversations/:id/messages`, `POST /v1/conversations/:id/read`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `POST /v1/message-requests/:id/accept`, `POST /v1/message-requests/:id/decline`
-- API/worker source reads: `services/greenfield-api/src/domains/messaging/service.ts`
+- Routes reading: `GET /v1/conversations`, `POST /v1/conversations`, `POST /v1/conversations/:id/archive`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `DELETE /v1/conversations/:id/messages/:messageId`, `PATCH /v1/conversations/:id/messages/:messageId`, `DELETE /v1/conversations/:id/messages/:messageId/reactions`, `PUT /v1/conversations/:id/messages/:messageId/reactions`, `POST /v1/conversations/:id/mute`, `POST /v1/conversations/:id/read`, `GET /v1/conversations/:id/typing`, `POST /v1/conversations/:id/typing`, `GET /v1/conversations/unread`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`, `POST /v1/message-requests/:id/decline`
+- Routes writing: `POST /v1/conversations`, `POST /v1/conversations/:id/archive`, `POST /v1/conversations/:id/messages`, `POST /v1/conversations/:id/mute`, `POST /v1/conversations/:id/read`, `POST /v1/conversations/:id/typing`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `POST /v1/message-requests/:id/accept`, `POST /v1/message-requests/:id/decline`
+- API/worker source reads: `services/greenfield-api/src/app/register-messaging-routes.ts`, `services/greenfield-api/src/domains/messaging/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/messaging/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -1300,8 +1300,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `075_greenfield_messaging.sql`
-- Routes reading: `GET /v1/conversations`, `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `GET /v1/conversations/unread`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`
-- Routes writing: `POST /v1/conversations`, `POST /v1/conversations/:id/messages`, `POST /v1/in-mail`, `POST /v1/in-mail/:id/replies`
+- Routes reading: `GET /v1/conversations`, `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `DELETE /v1/conversations/:id/messages/:messageId`, `PATCH /v1/conversations/:id/messages/:messageId`, `DELETE /v1/conversations/:id/messages/:messageId/reactions`, `PUT /v1/conversations/:id/messages/:messageId/reactions`, `GET /v1/conversations/unread`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`
+- Routes writing: `POST /v1/conversations`, `POST /v1/conversations/:id/messages`, `DELETE /v1/conversations/:id/messages/:messageId`, `PATCH /v1/conversations/:id/messages/:messageId`, `POST /v1/in-mail`, `POST /v1/in-mail/:id/replies`
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/messaging/service.ts`
 - Disposition: active read/write or ledger/schema table
@@ -1317,7 +1317,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `075_greenfield_messaging.sql`
-- Routes reading: `GET /v1/conversations`, `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `POST /v1/conversations/:id/read`, `GET /v1/conversations/unread`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`, `POST /v1/message-requests/:id/decline`
+- Routes reading: `GET /v1/conversations`, `POST /v1/conversations`, `POST /v1/conversations/:id/archive`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `DELETE /v1/conversations/:id/messages/:messageId`, `PATCH /v1/conversations/:id/messages/:messageId`, `DELETE /v1/conversations/:id/messages/:messageId/reactions`, `PUT /v1/conversations/:id/messages/:messageId/reactions`, `POST /v1/conversations/:id/mute`, `POST /v1/conversations/:id/read`, `GET /v1/conversations/:id/typing`, `POST /v1/conversations/:id/typing`, `GET /v1/conversations/unread`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`, `POST /v1/message-requests/:id/decline`
 - Routes writing: `POST /v1/conversations`, `POST /v1/conversations/:id/messages`, `POST /v1/in-mail`, `POST /v1/in-mail/:id/replies`
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/messaging/service.ts`
@@ -1521,9 +1521,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `047_greenfield_backend_v1_developer_domain.sql`
-- Routes reading: `GET /v1/developer/board`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/developer/organisations/:organisationId/members`, `GET /v1/developer/products`, `POST /v1/developer/products`, `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/developer/products/:productId/releases`, `PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/products/:productId/sources`, `POST /v1/developer/products/:productId/test-groups`, `POST /v1/developer/publishers`, `POST /v1/developer/publishers/:publisherId/namespaces`, `POST /v1/intelligence/missions`
+- Routes reading: `GET /v1/developer/board`, `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`, `POST /v1/developer/organisations/:organisationId/members`, `GET /v1/developer/products`, `POST /v1/developer/products`, `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/developer/products/:productId/releases`, `PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/products/:productId/sources`, `POST /v1/developer/products/:productId/test-groups`, `POST /v1/developer/publishers`, `POST /v1/developer/publishers/:publisherId/namespaces`, `POST /v1/intelligence/missions`
 - Routes writing: `POST /v1/developer/organisations`, `POST /v1/developer/organisations/:organisationId/invitations/accept`, `POST /v1/developer/organisations/:organisationId/members`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/intelligence/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/intelligence/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -1895,9 +1895,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `started_at`, `expires_at`, `created_at`, `updated_at`
 - Migration introduced: `049_greenfield_backend_v1_entitlements_usage.sql`
-- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/commerce/entitlements`, `POST /v1/admin/commerce/entitlements/:entitlementId/transitions`, `GET /v1/backend/products/:productId/accounts/:accountId/entitlements`, `POST /v1/backend/products/:productId/entitlements/check`, `POST /v1/backend/products/:productId/usage`, `GET /v1/commerce/entitlements`, `POST /v1/commerce/entitlements/check`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`
+- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/commerce/entitlements`, `POST /v1/admin/commerce/entitlements/:entitlementId/transitions`, `GET /v1/backend/products/:productId/accounts/:accountId/entitlements`, `POST /v1/backend/products/:productId/entitlements/check`, `POST /v1/backend/products/:productId/usage`, `GET /v1/commerce/entitlements`, `POST /v1/commerce/entitlements/check`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/update`
 - Routes writing: `POST /v1/admin/commerce/entitlements`, `POST /v1/admin/commerce/entitlements/:entitlementId/transitions`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - API/worker source writes: `services/greenfield-api/src/entitlements/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -2406,9 +2406,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Timestamps: none observed
 - Migration introduced: `078_gubic_game_catalogue.sql`
 - Routes reading: `POST /v1/admin/gubic/games/:gameId/review`, `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/gubic/categories`, `GET /v1/gubic/featured`, `GET /v1/gubic/games`, `GET /v1/gubic/games/:gameId`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/games/:gameId/versions`, `GET /v1/gubic/my-games`, `GET /v1/gubic/new-releases`, `GET /v1/gubic/publishers/:publisherId`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`
-- Routes writing: `POST /v1/admin/gubic/games/:gameId/review`, `PUT /v1/developer/gubic/games/:gameId`
+- Routes writing: `POST /v1/admin/gubic/games/:gameId/review`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/developer/gubic/submissions`
 - API/worker source reads: `services/greenfield-api/src/modules/gubic-service.ts`
-- API/worker source writes: `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_game_catalogue_events`
@@ -2423,10 +2423,129 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Timestamps: none observed
 - Migration introduced: `078_gubic_game_catalogue.sql`
 - Routes reading: none observed
-- Routes writing: `POST /v1/admin/gubic/games/:gameId/review`, `PUT /v1/developer/gubic/games/:gameId`
+- Routes writing: `POST /v1/admin/gubic/games/:gameId/review`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/developer/gubic/submissions`
 - API/worker source reads: none observed
-- API/worker source writes: `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - Disposition: WRITE-ONLY CANDIDATE
+
+### `greenfield_gubic_achievement_unlocks`
+
+- Purpose: application state for greenfield gubic achievement unlocks
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `GET /v1/gubic/games/:gameId/achievements`, `GET /v1/gubic/library`, `PUT /v1/gubic/library/:gameId`, `GET /v1/gubic/me/achievements`, `POST /v1/gubic/sessions/:sessionId/achievements/:key`
+- Routes writing: `POST /v1/gubic/sessions/:sessionId/achievements/:key`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_gubic_achievements`
+
+- Purpose: application state for greenfield gubic achievements
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `GET /v1/gubic/games/:gameId/achievements`, `GET /v1/gubic/me/achievements`, `POST /v1/gubic/sessions/:sessionId/achievements/:key`
+- Routes writing: `POST /v1/admin/gubic/submissions/:submissionId/decision`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_gubic_library_items`
+
+- Purpose: application state for greenfield gubic library items
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `GET /v1/gubic/library`, `PUT /v1/gubic/library/:gameId`
+- Routes writing: `POST /v1/gubic/games/:gameId/sessions`, `DELETE /v1/gubic/library/:gameId`, `PUT /v1/gubic/library/:gameId`, `POST /v1/gubic/sessions/:sessionId/end`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_gubic_lobbies`
+
+- Purpose: application state for greenfield gubic lobbies
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `GET /v1/gubic/games/:gameId/lobbies`, `POST /v1/gubic/games/:gameId/lobbies`, `GET /v1/gubic/lobbies/:lobbyId`, `POST /v1/gubic/lobbies/:lobbyId/join`, `POST /v1/gubic/lobbies/:lobbyId/leave`, `POST /v1/gubic/lobbies/:lobbyId/ready`, `POST /v1/gubic/lobbies/:lobbyId/start`, `POST /v1/gubic/lobbies/join`
+- Routes writing: `POST /v1/gubic/games/:gameId/lobbies`, `POST /v1/gubic/lobbies/:lobbyId/join`, `POST /v1/gubic/lobbies/:lobbyId/leave`, `POST /v1/gubic/lobbies/:lobbyId/ready`, `POST /v1/gubic/lobbies/:lobbyId/start`, `POST /v1/gubic/lobbies/join`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_gubic_lobby_members`
+
+- Purpose: application state for greenfield gubic lobby members
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `GET /v1/gubic/games/:gameId/lobbies`, `POST /v1/gubic/games/:gameId/lobbies`, `POST /v1/gubic/games/:gameId/sessions`, `GET /v1/gubic/lobbies/:lobbyId`, `POST /v1/gubic/lobbies/:lobbyId/join`, `POST /v1/gubic/lobbies/:lobbyId/leave`, `POST /v1/gubic/lobbies/:lobbyId/ready`, `GET /v1/gubic/lobbies/:lobbyId/socket`, `POST /v1/gubic/lobbies/:lobbyId/start`, `POST /v1/gubic/lobbies/join`
+- Routes writing: `POST /v1/gubic/games/:gameId/lobbies`, `POST /v1/gubic/lobbies/:lobbyId/join`, `POST /v1/gubic/lobbies/:lobbyId/leave`, `POST /v1/gubic/lobbies/:lobbyId/ready`, `POST /v1/gubic/lobbies/join`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_gubic_play_sessions`
+
+- Purpose: application state for greenfield gubic play sessions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `POST /v1/gubic/games/:gameId/sessions`, `DELETE /v1/gubic/library/:gameId`, `POST /v1/gubic/sessions/:sessionId/achievements/:key`, `POST /v1/gubic/sessions/:sessionId/end`, `POST /v1/gubic/sessions/:sessionId/heartbeat`
+- Routes writing: `POST /v1/gubic/games/:gameId/sessions`, `POST /v1/gubic/sessions/:sessionId/end`, `POST /v1/gubic/sessions/:sessionId/heartbeat`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_gubic_submissions`
+
+- Purpose: application state for greenfield gubic submissions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `082_gubic_play_platform.sql`
+- Routes reading: `GET /v1/admin/gubic/submissions`, `POST /v1/admin/gubic/submissions/:submissionId/decision`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`
+- Routes writing: `POST /v1/admin/gubic/submissions/:submissionId/decision`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`
+- API/worker source writes: `services/greenfield-api/src/gubic/play-service.ts`
+- Disposition: active read/write or ledger/schema table
 
 ### `greenfield_handle_history`
 
@@ -2647,6 +2766,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Routes writing: `POST /v1/comments/:commentId/replies`, `POST /v1/posts/:postId/comments`, `POST /v1/posts/:postId/quote`
 - API/worker source reads: `services/greenfield-api/src/domains/mentions/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/mentions/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_message_reactions`
+
+- Purpose: application state for greenfield message reactions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `081_messaging_v2.sql`
+- Routes reading: `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `PATCH /v1/conversations/:id/messages/:messageId`, `DELETE /v1/conversations/:id/messages/:messageId/reactions`, `PUT /v1/conversations/:id/messages/:messageId/reactions`
+- Routes writing: `DELETE /v1/conversations/:id/messages/:messageId`, `DELETE /v1/conversations/:id/messages/:messageId/reactions`, `PUT /v1/conversations/:id/messages/:messageId/reactions`
+- API/worker source reads: `services/greenfield-api/src/domains/messaging/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/messaging/service.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_action_events`
@@ -3465,6 +3601,210 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-worker/src/modules/contribution-registration-handler.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_moliboo_active_buffs`
+
+- Purpose: application state for greenfield moliboo active buffs
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/activities/complete`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_buff_definitions`
+
+- Purpose: application state for greenfield moliboo buff definitions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/activities/complete`, `GET /v1/moliboo/catalogue/items`, `GET /v1/moliboo/catalogue/outfits`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`, `GET /v1/moliboo/inventory`, `POST /v1/moliboo/outfits`, `PATCH /v1/moliboo/outfits/:outfitId`, `GET /v1/moliboo/quests`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
+
+### `greenfield_moliboo_equipped`
+
+- Purpose: application state for greenfield moliboo equipped
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`
+- Routes writing: `POST /v1/moliboo/characters/:characterId/equip`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_events`
+
+- Purpose: application state for greenfield moliboo events
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/activities/complete`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`
+- Routes writing: `POST /v1/moliboo/activities/complete`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `POST /v1/moliboo/outfits`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_friendship`
+
+- Purpose: application state for greenfield moliboo friendship
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`
+- Routes writing: `POST /v1/moliboo/activities/complete`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `POST /v1/moliboo/quests/:questId/claim`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_inventory`
+
+- Purpose: application state for greenfield moliboo inventory
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `GET /v1/moliboo/catalogue/outfits`, `POST /v1/moliboo/characters/:characterId/equip`, `GET /v1/moliboo/inventory`, `POST /v1/moliboo/outfits`, `PATCH /v1/moliboo/outfits/:outfitId`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: `POST /v1/moliboo/quests/:questId/claim`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_items`
+
+- Purpose: application state for greenfield moliboo items
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/activities/complete`, `GET /v1/moliboo/catalogue/items`, `GET /v1/moliboo/catalogue/outfits`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`, `GET /v1/moliboo/inventory`, `POST /v1/moliboo/outfits`, `PATCH /v1/moliboo/outfits/:outfitId`, `GET /v1/moliboo/quests`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
+
+### `greenfield_moliboo_outfit_sets`
+
+- Purpose: application state for greenfield moliboo outfit sets
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/activities/complete`, `GET /v1/moliboo/catalogue/items`, `GET /v1/moliboo/catalogue/outfits`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`, `GET /v1/moliboo/inventory`, `POST /v1/moliboo/outfits`, `PATCH /v1/moliboo/outfits/:outfitId`, `GET /v1/moliboo/quests`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
+
+### `greenfield_moliboo_quest_progress`
+
+- Purpose: application state for greenfield moliboo quest progress
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `GET /v1/moliboo/quests`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: `POST /v1/moliboo/activities/complete`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `POST /v1/moliboo/outfits`, `POST /v1/moliboo/quests/:questId/claim`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_quests`
+
+- Purpose: application state for greenfield moliboo quests
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/activities/complete`, `GET /v1/moliboo/catalogue/items`, `GET /v1/moliboo/catalogue/outfits`, `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`, `GET /v1/moliboo/inventory`, `POST /v1/moliboo/outfits`, `PATCH /v1/moliboo/outfits/:outfitId`, `GET /v1/moliboo/quests`, `POST /v1/moliboo/quests/:questId/claim`
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
+
+### `greenfield_moliboo_skills`
+
+- Purpose: application state for greenfield moliboo skills
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/characters/:characterId/care`, `POST /v1/moliboo/characters/:characterId/equip`, `POST /v1/moliboo/characters/:characterId/skills/:skillId/use`, `GET /v1/moliboo/characters/:characterId/state`
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
+
+### `greenfield_moliboo_user_outfits`
+
+- Purpose: application state for greenfield moliboo user outfits
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `083_moliboo_game_systems.sql`
+- Routes reading: `POST /v1/moliboo/characters/:characterId/equip`, `GET /v1/moliboo/outfits`, `POST /v1/moliboo/outfits`, `DELETE /v1/moliboo/outfits/:outfitId`, `PATCH /v1/moliboo/outfits/:outfitId`
+- Routes writing: `POST /v1/moliboo/outfits`, `DELETE /v1/moliboo/outfits/:outfitId`, `PATCH /v1/moliboo/outfits/:outfitId`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
+- Disposition: active read/write or ledger/schema table
+
 ### `greenfield_mps_ingestions`
 
 - Purpose: application state for greenfield mps ingestions
@@ -3527,9 +3867,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `049_greenfield_backend_v1_entitlements_usage.sql`
-- Routes reading: `POST /v1/admin/commerce/entitlements`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`
+- Routes reading: `POST /v1/admin/commerce/entitlements`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/update`
 - Routes writing: `PUT /v1/admin/commerce/offers/:offerId`
-- API/worker source reads: `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - API/worker source writes: `services/greenfield-api/src/entitlements/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3629,9 +3969,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `076_greenfield_premium_entitlements.sql`
-- Routes reading: `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/premium/tiers`
+- Routes reading: `POST /v1/developer/gubic/submissions`, `GET /v1/gubic/capabilities`, `POST /v1/gubic/games/:gameId/lobbies`, `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/premium/tiers`
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/premium/service.ts`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/premium/service.ts`
 - API/worker source writes: none observed
 - Disposition: READ-ONLY APPLICATION CANDIDATE
 
@@ -3646,9 +3986,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `076_greenfield_premium_entitlements.sql`
-- Routes reading: `PUT /v1/admin/qa/premium/:handle`, `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/premium/tiers`
+- Routes reading: `PUT /v1/admin/qa/premium/:handle`, `POST /v1/developer/gubic/submissions`, `GET /v1/gubic/capabilities`, `POST /v1/gubic/games/:gameId/lobbies`, `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/premium/tiers`
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/premium/service.ts`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/premium/service.ts`
 - API/worker source writes: none observed
 - Disposition: READ-ONLY APPLICATION CANDIDATE
 
@@ -3680,9 +4020,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `076_greenfield_premium_entitlements.sql`
-- Routes reading: `PUT /v1/admin/qa/premium/:handle`, `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/me/membership`, `PATCH /v1/me/membership/badge-visibility`
+- Routes reading: `PUT /v1/admin/qa/premium/:handle`, `POST /v1/developer/gubic/submissions`, `GET /v1/gubic/capabilities`, `POST /v1/gubic/games/:gameId/lobbies`, `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/me/membership`, `PATCH /v1/me/membership/badge-visibility`
 - Routes writing: `PUT /v1/admin/qa/premium/:handle`
-- API/worker source reads: `services/greenfield-api/src/premium/badges.ts`, `services/greenfield-api/src/premium/service.ts`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/premium/badges.ts`, `services/greenfield-api/src/premium/service.ts`
 - API/worker source writes: `services/greenfield-api/src/premium/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3714,9 +4054,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: none observed
 - Migration introduced: `076_greenfield_premium_entitlements.sql`
-- Routes reading: `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/premium/tiers`
+- Routes reading: `POST /v1/developer/gubic/submissions`, `GET /v1/gubic/capabilities`, `POST /v1/gubic/games/:gameId/lobbies`, `GET /v1/me/entitlements`, `GET /v1/me/entitlements/:capabilityId`, `GET /v1/premium/tiers`
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/premium/service.ts`
+- API/worker source reads: `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/premium/service.ts`
 - API/worker source writes: none observed
 - Disposition: READ-ONLY APPLICATION CANDIDATE
 
@@ -3833,9 +4173,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`
 - Migration introduced: `047_greenfield_backend_v1_developer_domain.sql`
-- Routes reading: `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/developer/products`, `POST /v1/developer/publishers/:publisherId/namespaces`
+- Routes reading: `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`, `POST /v1/developer/products`, `POST /v1/developer/publishers/:publisherId/namespaces`
 - Routes writing: `POST /v1/developer/publishers`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -5042,7 +5382,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `002_phase6_social_atproto.sql`
 - Routes reading: `GET /v1/notifications`
 - Routes writing: `POST /v1/notifications/:notificationId/read`, `POST /v1/notifications/read-all`
-- API/worker source reads: `services/greenfield-api/src/domains/notifications/repository.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/notifications/create.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/notifications/repository.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/notifications/create.ts`, `services/greenfield-worker/src/push/dispatch.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/notifications/repository.ts`, `services/greenfield-worker/src/notifications/create.ts`, `services/greenfield-worker/src/notifications/social.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -5227,10 +5567,61 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: deleted_at
 - Timestamps: `focus_status_updated_at`, `joined_at`, `created_at`, `updated_at`, `deleted_at`
 - Migration introduced: `001_init_schema.sql`
-- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/accounts/me/blocks`, `GET /v1/accounts/me/mutes`, `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `DELETE /v1/comments/:commentId/pin`, `PUT /v1/comments/:commentId/pin`, `PUT /v1/comments/:commentId/poll/vote`, `GET /v1/comments/:commentId/replies`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/conversations`, `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `GET /v1/feed/profile/:profileId`, `POST /v1/follow-requests/:requestId/accept`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`, `GET /v1/posts/:postId/comments`, `POST /v1/posts/:postId/comments`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/:profileId/block`, `POST /v1/profiles/:profileId/block`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `DELETE /v1/profiles/:profileId/mute`, `POST /v1/profiles/:profileId/mute`, `PATCH /v1/profiles/me`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `GET /v1/profiles/me/follow-requests`, `POST /v1/reports`, `POST /v1/stories`, `GET /v1/stories/:groupId`, `GET /v1/stories/rail`
+- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/accounts/me/blocks`, `GET /v1/accounts/me/mutes`, `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `DELETE /v1/comments/:commentId/pin`, `PUT /v1/comments/:commentId/pin`, `PUT /v1/comments/:commentId/poll/vote`, `GET /v1/comments/:commentId/replies`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/conversations`, `POST /v1/conversations`, `GET /v1/conversations/:id/messages`, `POST /v1/conversations/:id/messages`, `PATCH /v1/conversations/:id/messages/:messageId`, `DELETE /v1/conversations/:id/messages/:messageId/reactions`, `PUT /v1/conversations/:id/messages/:messageId/reactions`, `GET /v1/conversations/:id/typing`, `GET /v1/feed/profile/:profileId`, `POST /v1/follow-requests/:requestId/accept`, `GET /v1/in-mail`, `POST /v1/in-mail`, `GET /v1/in-mail/:id`, `POST /v1/in-mail/:id/replies`, `GET /v1/message-requests`, `POST /v1/message-requests/:id/accept`, `GET /v1/posts/:postId/comments`, `POST /v1/posts/:postId/comments`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/:profileId/block`, `POST /v1/profiles/:profileId/block`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `DELETE /v1/profiles/:profileId/mute`, `POST /v1/profiles/:profileId/mute`, `PATCH /v1/profiles/me`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `GET /v1/profiles/me/follow-requests`, `POST /v1/reports`, `POST /v1/stories`, `GET /v1/stories/:groupId`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/verify-email`, `PATCH /v1/profiles/me`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/messaging/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/app/register-messaging-routes.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/messaging/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/push/dispatch.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `push_deliveries`
+
+- Purpose: application state for push deliveries
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `080_push_notifications.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-worker/src/push/dispatch.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/push/service.ts`, `services/greenfield-worker/src/push/dispatch.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `push_device_tokens`
+
+- Purpose: application state for push device tokens
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `080_push_notifications.sql`
+- Routes reading: `GET /v1/push/devices`
+- Routes writing: `POST /v1/push/devices`, `DELETE /v1/push/devices/:token`
+- API/worker source reads: `services/greenfield-api/src/domains/push/service.ts`, `services/greenfield-worker/src/push/dispatch.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/push/service.ts`, `services/greenfield-worker/src/push/dispatch.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `push_notification_preferences`
+
+- Purpose: application state for push notification preferences
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `080_push_notifications.sql`
+- Routes reading: `GET /v1/push/preferences`, `PATCH /v1/push/preferences`
+- Routes writing: `POST /v1/push/devices`, `GET /v1/push/preferences`, `PATCH /v1/push/preferences`
+- API/worker source reads: `services/greenfield-api/src/domains/push/service.ts`, `services/greenfield-worker/src/push/dispatch.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/push/service.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `recent_searches`

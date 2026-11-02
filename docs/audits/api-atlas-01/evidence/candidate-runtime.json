@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-29T20:54:12.233Z",
+  "capturedAt": "2026-11-02T10:09:01.508Z",
   "source": {
-    "branch": "phase/greenfield-functional-parity-media-cleanup",
-    "headAtCapture": "22ca9947f4dd64f498d2c56ff2773b3cf15c1ae2",
+    "branch": "test/qa-vault-package-install-plan",
+    "headAtCapture": "2616cabff439e9585acb567c6da856c1ade02f6f",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "9e3b72b355c73ebed12a6b4cdb8ad38f4ca9c75548cff6486d4fac1472b91902"
+    "apiSourceSha256": "1cde75b21b34325844575197be0f86cced31418bcbb49ac1314a764dd88fb2ba"
   },
   "runtimeRoutes": [
     {
@@ -5555,6 +5555,246 @@
       "handler": ""
     },
     {
+      "method": "PATCH",
+      "url": "/v1/conversations/:id/messages/:messageId",
+      "path": "/v1/conversations/:id/messages/:messageId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/conversations/:id/messages/:messageId",
+      "path": "/v1/conversations/:id/messages/:messageId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/conversations/:id/messages/:messageId/reactions",
+      "path": "/v1/conversations/:id/messages/:messageId/reactions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/conversations/:id/messages/:messageId/reactions",
+      "path": "/v1/conversations/:id/messages/:messageId/reactions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/typing",
+      "path": "/v1/conversations/:id/typing",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/conversations/:id/typing",
+      "path": "/v1/conversations/:id/typing",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/conversations/:id/typing",
+      "path": "/v1/conversations/:id/typing",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/mute",
+      "path": "/v1/conversations/:id/mute",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/archive",
+      "path": "/v1/conversations/:id/archive",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
       "method": "GET",
       "url": "/v1/message-requests",
       "path": "/v1/message-requests",
@@ -5716,6 +5956,132 @@
           }
         }
       },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/push/devices",
+      "path": "/v1/push/devices",
+      "prefix": "",
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token"
+          ],
+          "properties": {
+            "token": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 220
+            },
+            "platform": {
+              "type": "string",
+              "enum": [
+                "ios"
+              ]
+            },
+            "environment": {
+              "type": "string",
+              "enum": [
+                "development",
+                "production"
+              ]
+            },
+            "bundleId": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "appVersion": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "deviceName": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "locale": {
+              "type": "string",
+              "maxLength": 35
+            },
+            "timezone": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/push/devices",
+      "path": "/v1/push/devices",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/push/devices",
+      "path": "/v1/push/devices",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/push/devices/:token",
+      "path": "/v1/push/devices/:token",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token"
+          ],
+          "properties": {
+            "token": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 220
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/push/preferences",
+      "path": "/v1/push/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/push/preferences",
+      "path": "/v1/push/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/push/preferences",
+      "path": "/v1/push/preferences",
+      "prefix": "",
+      "schema": null,
       "config": null,
       "handler": ""
     },
@@ -5971,6 +6337,321 @@
     },
     {
       "method": "GET",
+      "url": "/v1/moliboo/catalogue/items",
+      "path": "/v1/moliboo/catalogue/items",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboo/catalogue/items",
+      "path": "/v1/moliboo/catalogue/items",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboo/catalogue/outfits",
+      "path": "/v1/moliboo/catalogue/outfits",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboo/catalogue/outfits",
+      "path": "/v1/moliboo/catalogue/outfits",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboo/inventory",
+      "path": "/v1/moliboo/inventory",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboo/inventory",
+      "path": "/v1/moliboo/inventory",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboo/outfits",
+      "path": "/v1/moliboo/outfits",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboo/outfits",
+      "path": "/v1/moliboo/outfits",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/moliboo/outfits",
+      "path": "/v1/moliboo/outfits",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/moliboo/outfits/:outfitId",
+      "path": "/v1/moliboo/outfits/:outfitId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outfitId"
+          ],
+          "properties": {
+            "outfitId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/moliboo/outfits/:outfitId",
+      "path": "/v1/moliboo/outfits/:outfitId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outfitId"
+          ],
+          "properties": {
+            "outfitId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboo/characters/:characterId/state",
+      "path": "/v1/moliboo/characters/:characterId/state",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "characterId"
+          ],
+          "properties": {
+            "characterId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboo/characters/:characterId/state",
+      "path": "/v1/moliboo/characters/:characterId/state",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "characterId"
+          ],
+          "properties": {
+            "characterId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/moliboo/characters/:characterId/equip",
+      "path": "/v1/moliboo/characters/:characterId/equip",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "characterId"
+          ],
+          "properties": {
+            "characterId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/moliboo/characters/:characterId/care",
+      "path": "/v1/moliboo/characters/:characterId/care",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "characterId"
+          ],
+          "properties": {
+            "characterId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/moliboo/characters/:characterId/skills/:skillId/use",
+      "path": "/v1/moliboo/characters/:characterId/skills/:skillId/use",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "characterId",
+            "skillId"
+          ],
+          "properties": {
+            "characterId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            },
+            "skillId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/moliboo/activities/complete",
+      "path": "/v1/moliboo/activities/complete",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboo/quests",
+      "path": "/v1/moliboo/quests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboo/quests",
+      "path": "/v1/moliboo/quests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/moliboo/quests/:questId/claim",
+      "path": "/v1/moliboo/quests/:questId/claim",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "questId"
+          ],
+          "properties": {
+            "questId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96,
+              "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/developer/board",
       "path": "/v1/developer/board",
       "prefix": "",
@@ -6216,6 +6897,303 @@
       "method": "POST",
       "url": "/v1/internal/build-service/builds/:buildId/result",
       "path": "/v1/internal/build-service/builds/:buildId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/capabilities",
+      "path": "/v1/gubic/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/capabilities",
+      "path": "/v1/gubic/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/library",
+      "path": "/v1/gubic/library",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/library",
+      "path": "/v1/gubic/library",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/gubic/library/:gameId",
+      "path": "/v1/gubic/library/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/gubic/library/:gameId",
+      "path": "/v1/gubic/library/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/games/:gameId/sessions",
+      "path": "/v1/gubic/games/:gameId/sessions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/sessions/:sessionId/heartbeat",
+      "path": "/v1/gubic/sessions/:sessionId/heartbeat",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/sessions/:sessionId/end",
+      "path": "/v1/gubic/sessions/:sessionId/end",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/sessions/:sessionId/achievements/:key",
+      "path": "/v1/gubic/sessions/:sessionId/achievements/:key",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId/achievements",
+      "path": "/v1/gubic/games/:gameId/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId/achievements",
+      "path": "/v1/gubic/games/:gameId/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/me/achievements",
+      "path": "/v1/gubic/me/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/me/achievements",
+      "path": "/v1/gubic/me/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId/lobbies",
+      "path": "/v1/gubic/games/:gameId/lobbies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId/lobbies",
+      "path": "/v1/gubic/games/:gameId/lobbies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/games/:gameId/lobbies",
+      "path": "/v1/gubic/games/:gameId/lobbies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/join",
+      "path": "/v1/gubic/lobbies/join",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/lobbies/:lobbyId",
+      "path": "/v1/gubic/lobbies/:lobbyId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/lobbies/:lobbyId",
+      "path": "/v1/gubic/lobbies/:lobbyId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/join",
+      "path": "/v1/gubic/lobbies/:lobbyId/join",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/leave",
+      "path": "/v1/gubic/lobbies/:lobbyId/leave",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/ready",
+      "path": "/v1/gubic/lobbies/:lobbyId/ready",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/start",
+      "path": "/v1/gubic/lobbies/:lobbyId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/lobbies/:lobbyId/socket",
+      "path": "/v1/gubic/lobbies/:lobbyId/socket",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/lobbies/:lobbyId/socket",
+      "path": "/v1/gubic/lobbies/:lobbyId/socket",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/gubic/submissions",
+      "path": "/v1/developer/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/developer/gubic/submissions",
+      "path": "/v1/developer/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/developer/gubic/submissions",
+      "path": "/v1/developer/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/gubic/submissions/:submissionId/withdraw",
+      "path": "/v1/developer/gubic/submissions/:submissionId/withdraw",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/gubic/submissions",
+      "path": "/v1/admin/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/gubic/submissions",
+      "path": "/v1/admin/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/gubic/submissions/:submissionId/decision",
+      "path": "/v1/admin/gubic/submissions/:submissionId/decision",
       "prefix": "",
       "schema": null,
       "config": null,
