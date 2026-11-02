@@ -105,48 +105,50 @@ CREATE TRIGGER greenfield_moliboo_pack_release_events_append_only
   BEFORE UPDATE OR DELETE ON greenfield_moliboo_pack_release_events
   FOR EACH ROW EXECUTE FUNCTION greenfield_reject_moliboo_pack_event_mutation();
 
-CREATE TABLE greenfield_moliboo_items (
-  item_id TEXT PRIMARY KEY CHECK (char_length(item_id) BETWEEN 3 AND 160),
-  item_type TEXT NOT NULL CHECK (item_type IN ('character','cosmetic')),
-  character_id TEXT REFERENCES greenfield_moliboo_characters(character_id) ON DELETE RESTRICT,
-  slot TEXT NOT NULL CHECK (slot ~ '^[a-z][a-z0-9-]{1,31}$'),
-  wearable BOOLEAN NOT NULL,
-  revoked_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CHECK ((item_type = 'character') = (character_id IS NOT NULL)),
-  CHECK (item_type <> 'character' OR slot = 'character')
-);
+-- Migration 083 introduced the canonical Moliboo catalogue, inventory and
+-- equipped-state tables. Extend that domain for installable character packs;
+-- do not create a parallel ownership or wardrobe implementation.
+ALTER TABLE greenfield_moliboo_items
+  DROP CONSTRAINT greenfield_moliboo_items_item_id_check,
+  DROP CONSTRAINT greenfield_moliboo_items_slot_check,
+  ADD COLUMN item_type TEXT NOT NULL DEFAULT 'cosmetic',
+  ADD COLUMN character_id TEXT REFERENCES greenfield_moliboo_characters(character_id) ON DELETE RESTRICT,
+  ADD COLUMN wearable BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN revoked_at TIMESTAMPTZ,
+  ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ADD CONSTRAINT greenfield_moliboo_items_item_id_check
+    CHECK (item_id ~ '^moliboo\.item\.[a-z0-9_]+$' OR item_id ~ '^moliboo\.[0-9]{1,4}$'),
+  ADD CONSTRAINT greenfield_moliboo_items_slot_check
+    CHECK (slot IN ('character','headwear','hair','face','top','outerwear','bottom','footwear','back','handheld','aura')),
+  ADD CONSTRAINT greenfield_moliboo_items_item_type_check
+    CHECK (item_type IN ('character','cosmetic')),
+  ADD CONSTRAINT greenfield_moliboo_items_character_relation_check
+    CHECK ((item_type = 'character') = (character_id IS NOT NULL)),
+  ADD CONSTRAINT greenfield_moliboo_items_character_slot_check
+    CHECK (item_type <> 'character' OR slot = 'character');
 CREATE UNIQUE INDEX greenfield_moliboo_items_character_idx
   ON greenfield_moliboo_items(character_id) WHERE character_id IS NOT NULL;
 
-CREATE TABLE greenfield_moliboo_ownership (
-  account_id TEXT NOT NULL REFERENCES greenfield_accounts(account_id) ON DELETE CASCADE,
-  item_id TEXT NOT NULL REFERENCES greenfield_moliboo_items(item_id) ON DELETE RESTRICT,
-  grant_id TEXT NOT NULL UNIQUE,
-  grant_source TEXT NOT NULL CHECK (grant_source IN ('qa_fixture','purchase','promotion','migration','system')),
-  granted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, item_id)
-);
-CREATE INDEX greenfield_moliboo_ownership_account_idx
-  ON greenfield_moliboo_ownership(account_id, granted_at, item_id);
+ALTER TABLE greenfield_moliboo_inventory
+  DROP CONSTRAINT greenfield_moliboo_inventory_source_check,
+  ADD COLUMN grant_id TEXT,
+  ADD CONSTRAINT greenfield_moliboo_inventory_source_check CHECK (source IN (
+    'quest','achievement','collection','premium_entitlement','admin_grant','gift',
+    'qa_fixture','purchase','promotion','migration','system'
+  )),
+  ADD CONSTRAINT greenfield_moliboo_inventory_grant_id_key UNIQUE (grant_id);
+CREATE INDEX greenfield_moliboo_inventory_account_acquired_idx
+  ON greenfield_moliboo_inventory(account_id, acquired_at DESC, item_id);
 
-CREATE TABLE greenfield_moliboo_outfits (
-  account_id TEXT PRIMARY KEY REFERENCES greenfield_accounts(account_id) ON DELETE CASCADE,
-  revision INTEGER NOT NULL DEFAULT 1 CHECK (revision > 0),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE greenfield_moliboo_outfit_items (
-  account_id TEXT NOT NULL REFERENCES greenfield_moliboo_outfits(account_id) ON DELETE CASCADE,
-  slot TEXT NOT NULL CHECK (slot ~ '^[a-z][a-z0-9-]{1,31}$'),
-  item_id TEXT NOT NULL REFERENCES greenfield_moliboo_items(item_id) ON DELETE RESTRICT,
-  equipped_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, slot),
-  UNIQUE (account_id, item_id),
-  FOREIGN KEY (account_id, item_id)
-    REFERENCES greenfield_moliboo_ownership(account_id, item_id) ON DELETE RESTRICT
-);
+ALTER TABLE greenfield_moliboo_equipped
+  DROP CONSTRAINT greenfield_moliboo_equipped_character_id_check,
+  ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD CONSTRAINT greenfield_moliboo_equipped_character_id_check CHECK (
+    character_id ~ '^moliboo\.[a-z0-9_]+\.[a-z0-9_]+$'
+    OR character_id ~ '^moliboo\.[0-9]{1,4}$'
+  );
+CREATE UNIQUE INDEX greenfield_moliboo_equipped_active_account_idx
+  ON greenfield_moliboo_equipped(account_id) WHERE is_active;
 
 -- Sticker artwork is projected from the same immutable release/blob inventory.
 -- The signed manifest artifact enumerates every image digest, so image bytes
@@ -187,14 +189,14 @@ CREATE INDEX greenfield_stickers_identity_idx ON greenfield_stickers(sticker_id,
 GRANT SELECT ON greenfield_release_artifact_signatures,
   greenfield_moliboo_characters, greenfield_moliboo_pack_releases,
   greenfield_moliboo_pack_release_events, greenfield_moliboo_items,
-  greenfield_moliboo_ownership, greenfield_moliboo_outfits,
-  greenfield_moliboo_outfit_items, greenfield_sticker_pack_releases,
+  greenfield_moliboo_inventory, greenfield_moliboo_equipped,
+  greenfield_sticker_pack_releases,
   greenfield_stickers TO modula_worker, modula_backup;
 GRANT SELECT, INSERT ON greenfield_release_artifact_signatures TO modula_api;
 GRANT SELECT, INSERT, UPDATE ON greenfield_moliboo_characters,
   greenfield_moliboo_pack_releases, greenfield_moliboo_items,
-  greenfield_moliboo_ownership, greenfield_moliboo_outfits,
-  greenfield_moliboo_outfit_items, greenfield_sticker_pack_releases,
+  greenfield_moliboo_inventory, greenfield_moliboo_equipped,
+  greenfield_sticker_pack_releases,
   greenfield_stickers TO modula_api;
 GRANT SELECT, INSERT ON greenfield_moliboo_pack_release_events TO modula_api;
 

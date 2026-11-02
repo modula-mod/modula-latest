@@ -166,11 +166,12 @@ export class MolibooService {
   async ownership(accountId: string, input: {cursor?: unknown; limit?: unknown} = {}) {
     const limit = pageLimit(input.limit)
     const cursor = decodeOwnershipCursor(input.cursor)
-    let query = this.db.selectFrom('greenfield_moliboo_ownership as ownership')
+    let query = this.db.selectFrom('greenfield_moliboo_inventory as ownership')
       .innerJoin('greenfield_moliboo_items as item', 'item.item_id', 'ownership.item_id')
       .leftJoin('greenfield_moliboo_characters as character', 'character.character_id', 'item.character_id')
       .select([
-        'ownership.item_id', 'ownership.grant_source', 'ownership.granted_at',
+        'ownership.item_id', 'ownership.source', 'ownership.acquired_at',
+        'ownership.revoked_at as ownership_revoked_at',
         'item.item_type', 'item.slot', 'item.wearable', 'item.revoked_at',
         'character.character_id', 'character.character_number', 'character.character_key',
         'character.display_name', 'character.family_id', 'character.series',
@@ -178,14 +179,14 @@ export class MolibooService {
       .where('ownership.account_id', '=', accountId)
     if (cursor) {
       query = query.where(eb => eb.or([
-        eb('ownership.granted_at', '<', cursor.grantedAt),
+        eb('ownership.acquired_at', '<', cursor.grantedAt),
         eb.and([
-          eb('ownership.granted_at', '=', cursor.grantedAt),
+          eb('ownership.acquired_at', '=', cursor.grantedAt),
           eb('ownership.item_id', '>', cursor.itemId),
         ]),
       ]))
     }
-    const rows = await query.orderBy('ownership.granted_at', 'desc').orderBy('ownership.item_id').limit(limit + 1).execute()
+    const rows = await query.orderBy('ownership.acquired_at', 'desc').orderBy('ownership.item_id').limit(limit + 1).execute()
     const hasMore = rows.length > limit
     const page = hasMore ? rows.slice(0, limit) : rows
     return {
@@ -194,9 +195,9 @@ export class MolibooService {
         type: row.item_type,
         slot: row.slot,
         wearable: row.wearable,
-        revoked: row.revoked_at !== null,
-        grantedAt: row.granted_at.toISOString(),
-        grantSource: row.grant_source,
+        revoked: row.revoked_at !== null || row.ownership_revoked_at !== null,
+        grantedAt: row.acquired_at.toISOString(),
+        grantSource: row.source,
         character: row.character_id ? {
           characterId: row.character_id,
           number: row.character_number,
@@ -206,63 +207,78 @@ export class MolibooService {
           series: row.series,
         } : null,
       })),
-      nextCursor: hasMore ? encodeOwnershipCursor(page.at(-1)!.granted_at, page.at(-1)!.item_id) : null,
+      nextCursor: hasMore ? encodeOwnershipCursor(page.at(-1)!.acquired_at, page.at(-1)!.item_id) : null,
       hasMore,
     }
   }
 
   async outfit(accountId: string) {
-    const outfit = await this.db.selectFrom('greenfield_moliboo_outfits').selectAll().where('account_id', '=', accountId).executeTakeFirst()
-    if (!outfit) return {revision: 0, updatedAt: null, items: []}
-    const items = await this.outfitItems(this.db, accountId)
-    return {revision: outfit.revision, updatedAt: outfit.updated_at.toISOString(), items}
+    const active = await this.db.selectFrom('greenfield_moliboo_equipped').selectAll()
+      .where('account_id', '=', accountId).where('is_active', '=', true).executeTakeFirst()
+    if (active) {
+      return {revision: active.revision, updatedAt: active.updated_at.toISOString(), items: await this.outfitItems(this.db, active)}
+    }
+    const latest = await this.db.selectFrom('greenfield_moliboo_equipped').select(['revision', 'updated_at'])
+      .where('account_id', '=', accountId).orderBy('revision', 'desc').orderBy('updated_at', 'desc').executeTakeFirst()
+    return {revision: latest?.revision ?? 0, updatedAt: latest?.updated_at.toISOString() ?? null, items: []}
   }
 
   async setOutfit(accountId: string, actorId: string, input: unknown) {
     const parsed = parseOutfit(input)
+    const characterSelection = parsed.items.filter(item => item.slot === 'character')
+    if (characterSelection.length !== 1) fail('VALIDATION_FAILED', 'An outfit must include exactly one character item')
     return this.db.transaction().execute(async trx => {
-      const inserted = await trx.insertInto('greenfield_moliboo_outfits')
-        .values({account_id: accountId, revision: 1, updated_at: new Date()})
-        .onConflict(oc => oc.column('account_id').doNothing())
-        .returning('account_id')
-        .executeTakeFirst()
-      const outfit = await trx.selectFrom('greenfield_moliboo_outfits').selectAll()
+      // Serialize first-equip as well as updates. Locking only an optional
+      // equipped row would allow two concurrent first writes to observe zero.
+      await trx.selectFrom('greenfield_accounts').select('account_id')
         .where('account_id', '=', accountId).forUpdate().executeTakeFirstOrThrow()
-      const currentRevision = inserted ? 0 : outfit.revision
+      const current = await trx.selectFrom('greenfield_moliboo_equipped').select(['revision'])
+        .where('account_id', '=', accountId).orderBy('revision', 'desc').orderBy('updated_at', 'desc').executeTakeFirst()
+      const currentRevision = current?.revision ?? 0
       if (parsed.expectedRevision !== null && parsed.expectedRevision !== currentRevision) {
         fail('REVISION_CONFLICT', `Outfit revision is ${currentRevision}, not ${parsed.expectedRevision}`)
       }
       const itemIds = parsed.items.map(item => item.itemId)
-      const owned = itemIds.length ? await trx.selectFrom('greenfield_moliboo_items as item')
-        .innerJoin('greenfield_moliboo_ownership as ownership', join => join
+      const candidates = await trx.selectFrom('greenfield_moliboo_items as item')
+        .leftJoin('greenfield_moliboo_inventory as ownership', join => join
           .onRef('ownership.item_id', '=', 'item.item_id')
           .on('ownership.account_id', '=', accountId))
         .leftJoin('greenfield_moliboo_characters as character', 'character.character_id', 'item.character_id')
         .select([
-          'item.item_id', 'item.item_type', 'item.slot', 'item.wearable', 'item.revoked_at',
+          'item.item_id', 'item.item_type', 'item.slot', 'item.access', 'item.active', 'item.wearable', 'item.revoked_at',
+          'ownership.item_id as owned_item_id', 'ownership.revoked_at as ownership_revoked_at',
           'character.character_id', 'character.character_number', 'character.character_key',
-          'character.display_name', 'character.family_id', 'character.series',
+          'character.display_name', 'character.family_id', 'character.series', 'character.wearable as character_wearable',
         ])
-        .where('item.item_id', 'in', itemIds).execute() : []
-      if (owned.length !== itemIds.length) fail('FORBIDDEN', 'Every equipped item must be owned by the authenticated account')
-      const byId = new Map(owned.map(item => [item.item_id, item]))
+        .where('item.item_id', 'in', itemIds).execute()
+      if (candidates.length !== itemIds.length) fail('FORBIDDEN', 'Every equipped item must be server-authorized for the authenticated account')
+      const byId = new Map(candidates.map(item => [item.item_id, item]))
       for (const requested of parsed.items) {
         const item = byId.get(requested.itemId)!
-        if (!item.wearable || item.revoked_at) fail('FORBIDDEN', 'Unknown, revoked, or non-wearable items cannot be equipped')
+        if (requested.slot === 'character' && (item.item_type !== 'character' || item.character_id === null)) {
+          fail('VALIDATION_FAILED', 'The character slot requires a registered Moliboo character item')
+        }
+        const authorized = item.item_type === 'cosmetic' && item.access === 'free'
+          || item.owned_item_id !== null && item.ownership_revoked_at === null
+        if (!authorized) fail('FORBIDDEN', 'Every equipped item must be server-authorized for the authenticated account')
+        if (!item.active || !item.wearable || item.revoked_at || (item.item_type === 'character' && !item.character_wearable)) {
+          fail('FORBIDDEN', 'Unknown, revoked, or non-wearable items cannot be equipped')
+        }
         if (item.slot !== requested.slot) fail('VALIDATION_FAILED', `Item ${requested.itemId} does not belong in slot ${requested.slot}`)
       }
-      await trx.deleteFrom('greenfield_moliboo_outfit_items').where('account_id', '=', accountId).execute()
       const now = new Date()
-      if (parsed.items.length) {
-        await trx.insertInto('greenfield_moliboo_outfit_items').values(parsed.items.map(item => ({
-          account_id: accountId,
-          slot: item.slot,
-          item_id: item.itemId,
-          equipped_at: now,
-        }))).execute()
-      }
       const revision = currentRevision + 1
-      await trx.updateTable('greenfield_moliboo_outfits').set({revision, updated_at: now}).where('account_id', '=', accountId).execute()
+      const characterId = byId.get(characterSelection[0]!.itemId)!.character_id!
+      const cosmeticIds = parsed.items.filter(item => item.slot !== 'character').map(item => item.itemId)
+      await trx.updateTable('greenfield_moliboo_equipped').set({is_active: false})
+        .where('account_id', '=', accountId).where('is_active', '=', true).execute()
+      await trx.insertInto('greenfield_moliboo_equipped').values({
+        account_id: accountId, character_id: characterId, item_ids: JSON.stringify(cosmeticIds),
+        source_set_id: null, source_outfit_id: null, revision, updated_at: now, is_active: true,
+      }).onConflict(oc => oc.columns(['account_id', 'character_id']).doUpdateSet({
+        item_ids: JSON.stringify(cosmeticIds), source_set_id: null, source_outfit_id: null,
+        revision, updated_at: now, is_active: true,
+      })).execute()
       await new AuditRepository(trx).append('moliboo.outfit.updated', {
         revision,
         slots: parsed.items.map(item => item.slot).sort(),
@@ -434,16 +450,17 @@ export class MolibooService {
     }
   }
 
-  private async outfitItems(db: ModulaDb, accountId: string) {
-    const rows = await db.selectFrom('greenfield_moliboo_outfit_items as outfit')
-      .innerJoin('greenfield_moliboo_items as item', 'item.item_id', 'outfit.item_id')
+  private async outfitItems(db: ModulaDb, equipped: {character_id: string; item_ids: unknown}) {
+    const cosmeticIds = stringArray(equipped.item_ids)
+    const itemIds = [equipped.character_id, ...cosmeticIds]
+    const rows = await db.selectFrom('greenfield_moliboo_items as item')
       .leftJoin('greenfield_moliboo_characters as character', 'character.character_id', 'item.character_id')
       .select([
-        'outfit.slot', 'item.item_id', 'item.item_type', 'item.wearable', 'item.revoked_at',
+        'item.slot', 'item.item_id', 'item.item_type', 'item.wearable', 'item.revoked_at',
         'character.character_id', 'character.character_number', 'character.character_key',
         'character.display_name', 'character.family_id', 'character.series',
       ])
-      .where('outfit.account_id', '=', accountId).orderBy('outfit.slot').execute()
+      .where('item.item_id', 'in', itemIds).orderBy('item.slot').execute()
     return rows.map(row => itemView(row.slot, row))
   }
 }

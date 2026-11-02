@@ -1,29 +1,60 @@
--- Recovery for 080 is backup/restore plus the prior application image. This
+-- Recovery for 084 is backup/restore plus the prior application image. This
 -- down migration is deliberately usable only before Moliboo account/release
 -- state exists, so a rollback cannot silently discard ownership or releases.
 
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM greenfield_moliboo_ownership)
-     OR EXISTS (SELECT 1 FROM greenfield_moliboo_outfit_items)
+  IF EXISTS (SELECT 1 FROM greenfield_moliboo_items WHERE item_type = 'character')
+     OR EXISTS (SELECT 1 FROM greenfield_moliboo_characters)
+     OR EXISTS (SELECT 1 FROM greenfield_moliboo_inventory WHERE grant_id IS NOT NULL)
+     OR EXISTS (SELECT 1 FROM greenfield_moliboo_equipped WHERE is_active)
      OR EXISTS (SELECT 1 FROM greenfield_moliboo_pack_releases)
      OR EXISTS (SELECT 1 FROM greenfield_sticker_pack_releases)
      OR EXISTS (SELECT 1 FROM greenfield_release_artifact_signatures) THEN
-    RAISE EXCEPTION 'cannot roll back 084 while Moliboo release, signature, ownership, or outfit state exists; restore a pre-084 backup instead';
+    RAISE EXCEPTION 'cannot roll back 084 while signed-pack release, signature, ownership, or active outfit state exists; restore a pre-084 backup instead';
   END IF;
 END;
 $$;
 
-DROP TABLE IF EXISTS greenfield_moliboo_outfit_items;
 DROP TABLE IF EXISTS greenfield_stickers;
 DROP TABLE IF EXISTS greenfield_sticker_pack_releases;
-DROP TABLE IF EXISTS greenfield_moliboo_outfits;
-DROP TABLE IF EXISTS greenfield_moliboo_ownership;
-DROP TABLE IF EXISTS greenfield_moliboo_items;
 DROP TRIGGER IF EXISTS greenfield_moliboo_pack_release_events_append_only ON greenfield_moliboo_pack_release_events;
 DROP FUNCTION IF EXISTS greenfield_reject_moliboo_pack_event_mutation();
 DROP TABLE IF EXISTS greenfield_moliboo_pack_release_events;
 DROP TABLE IF EXISTS greenfield_moliboo_pack_releases;
+
+DROP INDEX IF EXISTS greenfield_moliboo_equipped_active_account_idx;
+ALTER TABLE greenfield_moliboo_equipped
+  DROP CONSTRAINT greenfield_moliboo_equipped_character_id_check,
+  DROP COLUMN is_active,
+  ADD CONSTRAINT greenfield_moliboo_equipped_character_id_check
+    CHECK (character_id ~ '^moliboo\.[a-z0-9_]+\.[a-z0-9_]+$');
+
+DROP INDEX IF EXISTS greenfield_moliboo_inventory_account_acquired_idx;
+ALTER TABLE greenfield_moliboo_inventory
+  DROP CONSTRAINT greenfield_moliboo_inventory_grant_id_key,
+  DROP CONSTRAINT greenfield_moliboo_inventory_source_check,
+  DROP COLUMN grant_id,
+  ADD CONSTRAINT greenfield_moliboo_inventory_source_check
+    CHECK (source IN ('quest','achievement','collection','premium_entitlement','admin_grant','gift'));
+
+DROP INDEX IF EXISTS greenfield_moliboo_items_character_idx;
+ALTER TABLE greenfield_moliboo_items
+  DROP CONSTRAINT greenfield_moliboo_items_character_slot_check,
+  DROP CONSTRAINT greenfield_moliboo_items_character_relation_check,
+  DROP CONSTRAINT greenfield_moliboo_items_item_type_check,
+  DROP CONSTRAINT greenfield_moliboo_items_slot_check,
+  DROP CONSTRAINT greenfield_moliboo_items_item_id_check,
+  DROP COLUMN updated_at,
+  DROP COLUMN revoked_at,
+  DROP COLUMN wearable,
+  DROP COLUMN character_id,
+  DROP COLUMN item_type,
+  ADD CONSTRAINT greenfield_moliboo_items_item_id_check
+    CHECK (item_id ~ '^moliboo\.item\.[a-z0-9_]+$'),
+  ADD CONSTRAINT greenfield_moliboo_items_slot_check
+    CHECK (slot IN ('headwear','hair','face','top','outerwear','bottom','footwear','back','handheld','aura'));
+
 DROP TABLE IF EXISTS greenfield_moliboo_characters;
 DROP TRIGGER IF EXISTS greenfield_release_artifact_signatures_immutable ON greenfield_release_artifact_signatures;
 DROP FUNCTION IF EXISTS greenfield_reject_artifact_signature_mutation();

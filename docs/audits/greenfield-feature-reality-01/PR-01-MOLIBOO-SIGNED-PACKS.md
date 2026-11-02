@@ -5,12 +5,12 @@ STATUS: PARTIAL
 BRANCH: `feat/qa-moliboo-series2-packs`
 PR URL: `https://github.com/modula-mod/modula-latest/pull/147`
 BASE SHA: Initial implementation base `bae20cebb48685c56ed5ccfe5537f121e3f36110`; reconciled review base is current main `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
-HEAD SHA: Implementation commit `7b1a61a094e45446feb3cdd27235692329062d4a`; the exact live metadata tip is maintained in the draft PR description because a Git commit cannot embed its own SHA.
+HEAD SHA: The exact live branch tip is maintained in draft PR #147 because a Git commit cannot embed its own SHA.
 ROUTES ADDED: 9
 ROUTES MODIFIED: 1
 ATLAS UPDATED: YES
 MIGRATIONS: `084_moliboo_signed_packs`
-TESTS PASSED: 96 distinct tests (111 command-level executions) plus 103 Atlas checks
+TESTS PASSED: 26 current focused tests plus the full workspace typecheck and 103 Atlas checks
 TESTS FAILED: 0 final acceptance tests
 TESTS SKIPPED: 0 in the reported suites
 SECURITY RESULTS: PASS for implemented server boundaries
@@ -33,8 +33,6 @@ The server implementation and isolated QA evidence pass. The mission item remain
 - Container labels: `digital.modula.mission=GREENFIELD-FEATURE-REALITY-01` and `digital.modula.scope=qa-disposable`.
 - PostgreSQL is published only on loopback `127.0.0.1:55483`.
 - Fixture database: `modula_feature_reality_01_pr01`.
-- Final test database: `modula_feature_reality_01_pr01_final3_20261101`.
-- Migration recovery database: `modula_feature_reality_01_migration_gate`.
 - The one-use QA private signing key was stored outside the repository with mode `0600` and deleted after fixture creation. Only public-key/signature evidence remains in QA.
 - No production database, storage, signing key, package release, deployment or billing system was changed.
 - No package was published publicly.
@@ -64,12 +62,13 @@ Migration `084_moliboo_signed_packs` adds:
 - immutable direct artifact-signature evidence bound to the existing publisher key registry;
 - Moliboo character and signed release projections;
 - append-only package availability events;
-- item, ownership, outfit and equipped-item state;
+- character fields and idempotent grant evidence added to the existing canonical migration-083 item/inventory tables;
+- a single-active-character projection added to the existing canonical equipped-state table;
 - signed sticker pack and sticker projections;
 - bounded catalogue/access indexes and database uniqueness constraints;
 - the Moliboo content media type in the existing immutable artifact blob inventory.
 
-The down migration is deliberately empty-state-only. It refuses to run when release, signature, ownership or outfit data exists. Persistent recovery is a pre-084 database backup plus prior retained application images, not destructive down migration.
+No parallel Moliboo ownership or outfit tables remain. The API reads and writes `greenfield_moliboo_inventory` and `greenfield_moliboo_equipped`, alongside the game system already present on main. The down migration is deliberately signed-pack-empty-state-only: it retains the canonical migration-083 tables, restores their original constraints/columns, and refuses to run when release, signature, character grant or active outfit data exists. Persistent recovery is a pre-084 database backup plus prior retained application images, not destructive down migration.
 
 Recovery evidence:
 
@@ -153,7 +152,7 @@ The test suite additionally proved:
 The baseline was 484 application routes and 689 total runtime method routes. The candidate is:
 
 ```text
-704 runtime method routes = 493 application routes + 211 framework-derived routes
+773 runtime method routes = 544 application routes + 229 framework-derived routes
 source-only routes: 0
 runtime-only routes: 0
 mission-specific complete contracts: 10
@@ -169,41 +168,46 @@ Authoritative outputs now include JSON, CSV, Markdown, OpenAPI and a determinist
 All commands were run from `/root/modula-worktrees/greenfield-feature-reality-01`.
 
 ```text
-CI=true pnpm --filter @modula/greenfield-api typecheck
-PASS
+CI=true pnpm typecheck
+PASS: full workspace
 
-CI=true pnpm -r --if-present build
-PASS (23 workspace projects in scope)
+CI=true pnpm --dir services/greenfield-api exec vitest run tests/api-fix-01.migration.test.ts tests/greenfield-backend-v1.migration-ledger-security.test.ts tests/moliboo-game.integration.test.ts tests/moliboo-signed-packs.integration.test.ts tests/sticker-packs.integration.test.ts --maxWorkers=1 --no-file-parallelism
+PASS: 5 files, 21 tests, 0 skipped
 
-CI=true pnpm --filter @modula/greenfield-api exec vitest run --fileParallelism=false tests/moliboo-signed-packs.integration.test.ts tests/sticker-packs.integration.test.ts
-PASS: 2 files, 11 tests
+CI=true pnpm --dir services/greenfield-api exec vitest run tests/moliboo-game.rules.test.ts --maxWorkers=1 --no-file-parallelism
+PASS: 1 file, 5 tests, 0 skipped
 
-CI=true pnpm --filter @modula/greenfield-api exec vitest run --fileParallelism=false tests/phase6s.social.test.ts tests/registry-trust.assets.test.ts tests/registry-trust.signing.test.ts
-PASS: 3 files, 29 tests
-
-CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/settings-v2.integration.test.ts tests/greenfield-backend-v1.migration-ledger-security.test.ts tests/api-fix-01.migration.test.ts tests/api-fix-01.reaction-dead-letter-retry.test.ts tests/api-baseline-02.security-acceptance.test.ts tests/api-fix-01.follow-privacy.test.ts tests/registry-trust.signing.test.ts tests/registry-release-retrofit-signing.test.ts tests/registry-trust.trust-block.test.ts tests/module-version-switch.test.ts --maxWorkers=1 --no-file-parallelism
-PASS: 10 files, 71 tests
-
-CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true pnpm api:atlas:capture-candidate
-PASS: 704 runtime method routes
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true MODULA_GUBIC_PLAY_ENABLED=true pnpm api:atlas:capture-candidate
+PASS: 773 runtime method routes; 544 application + 229 framework; 0 source-only/runtime-only
 
 CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
 PASS: 103/103 checks
 
-TZ=Pacific/Auckland API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate.mjs
-PASS: DOCX SHA-256 unchanged from the UTC generation
+(umask 0022; API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate.mjs)
+(umask 0002; API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate.mjs)
+PASS: DOCX SHA-256 `e1284ad9306ffd887ab45311ccefe7359bbd94b83bd98b3eee447b4684cfac5b` in both runs; ZIP integrity valid
 
-CI=true pnpm --filter @modula/greenfield-api qa:seed-moliboo-series2
+CI=true pnpm --dir services/greenfield-api qa:seed-moliboo-series2
 PASS: immutable-source dry run, 100 packages
 
-CI=true pnpm --filter @modula/greenfield-api qa:seed-sprout-stickers
+CI=true pnpm --dir services/greenfield-api qa:seed-sprout-stickers
 PASS: immutable-source dry run, 2 packs / 65 stickers
+
+pnpm --dir services/greenfield-api qa:seed-moliboo-series2 --apply
+pnpm --dir services/greenfield-api qa:seed-sprout-stickers --apply
+PASS on labelled loopback QA: 100 Series 2 releases, 15 non-wearable Legends, 2 signed packs / 65 stickers; one-use QA private key deleted
+
+compiled API fixture smoke
+PASS: pages 50 + 50, IDs 116-215, raw catalogue 100, manifest/download 200, downloaded digest matches descriptor
+
+pnpm --dir services/greenfield-api db:rollback
+EXPECTED REFUSAL on seeded QA; migration 084 remained applied with 0 pending/unknown migrations
 
 git diff --check
 PASS
 ```
 
-Two preliminary command invocations were not acceptance runs and were corrected without state loss: the first migration CLI invocation refused missing loopback URL/origin configuration before connecting, and a `tsx -e` runtime smoke hit CommonJS package-export resolution before server creation. The configured migration sequence and compiled-ESM smoke subsequently passed and are the evidence reported above.
+Preliminary invocations were not acceptance runs and are excluded from the PASS totals: the reused disposable database first exposed stale pre-renumbering migration state and was recreated only after its QA labels/loopback binding were checked; configuration and command-line guardrails then refused three seed attempts before fixture writes (invalid `qa` API environment, missing preview encryption configuration, and an extra `--` argument). Every generated private key was removed by a failure trap or immediate cleanup. The configured migration, seed and compiled-ESM API smoke above subsequently passed.
 
 The first GitHub CI run also truthfully failed four migration-ledger assertions that still ended at 079 and found that the then-numbered migration 080 had replaced, rather than extended, the migration-077 release-media constraint. A first local remediation run passed 69/71 and exposed the two media-type regressions. The reconciled migration 084 preserves `application/vnd.modula.web-runtime+tgz` in both its up and down constraints. Its ledger assertions and exact CI totals are revalidated against current main before this report is finalized. The Atlas DOCX generator now pins both timestamps and archive member modes for cross-host byte stability.
 

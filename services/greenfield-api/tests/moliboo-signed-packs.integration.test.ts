@@ -140,7 +140,11 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
         series: number >= 116 ? 2 : 1, wearable: options.wearable ?? number > 115, created_at: now, updated_at: now,
       }).onConflict(oc => oc.column('character_id').doNothing()).execute()
       await trx.insertInto('greenfield_moliboo_items').values({
-        item_id: characterId, item_type: 'character', character_id: characterId, slot: 'character',
+        item_id: characterId, name: `Character ${number}`, slot: 'character',
+        rarity: number <= 115 ? 'legendary' : 'common', access: 'earnable',
+        family: number < 150 ? 'tideborn' : 'lantern-parade', set_id: null,
+        icon_key: `character_${number}`, palette: JSON.stringify([]), sort_order: number, active: true,
+        item_type: 'character', character_id: characterId,
         wearable: options.wearable ?? number > 115, revoked_at: null, created_at: now, updated_at: now,
       }).onConflict(oc => oc.column('item_id').doNothing()).execute()
       await trx.insertInto('greenfield_moliboo_pack_releases').values({
@@ -180,9 +184,9 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
     await publishPack(118, '1.0.0')
     await publishPack(119, '1.0.0', {signature: randomBytes(64)})
     for (const itemId of ['moliboo.101', 'moliboo.116', 'moliboo.117']) {
-      await db.insertInto('greenfield_moliboo_ownership').values({
+      await db.insertInto('greenfield_moliboo_inventory').values({
         account_id: owner.accountId, item_id: itemId, grant_id: `qa:${suffix}:${itemId}`,
-        grant_source: 'qa_fixture', granted_at: new Date(),
+        source: 'qa_fixture', source_ref: `qa:${suffix}:${itemId}`, acquired_at: new Date(), revoked_at: null,
       }).execute()
     }
   })
@@ -256,6 +260,13 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
   })
 
   it('enforces ownership, legend non-wearability, optimistic concurrency, and cross-session persistence', async () => {
+    const ownership = await app.inject({
+      method: 'GET', url: '/v1/me/moliboos/ownership', headers: {authorization: `Bearer ${owner.token}`},
+    })
+    expect(ownership.statusCode, ownership.body).toBe(200)
+    expect(ownership.json().data.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({itemId: 'moliboo.116', grantSource: 'qa_fixture', revoked: false}),
+    ]))
     const unowned = await app.inject({
       method: 'PUT', url: '/v1/me/moliboos/outfit', headers: {authorization: `Bearer ${owner.token}`},
       payload: {expectedRevision: 0, items: [{slot: 'character', itemId: 'moliboo.118'}]},
@@ -268,15 +279,23 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
     expect(legend.statusCode).toBe(403)
     const equipped = await app.inject({
       method: 'PUT', url: '/v1/me/moliboos/outfit', headers: {authorization: `Bearer ${owner.token}`},
-      payload: {expectedRevision: 0, items: [{slot: 'character', itemId: 'moliboo.116'}]},
+      payload: {expectedRevision: 0, items: [
+        {slot: 'character', itemId: 'moliboo.116'},
+        {slot: 'headwear', itemId: 'moliboo.item.halo_ring'},
+      ]},
     })
     expect(equipped.statusCode, equipped.body).toBe(200)
-    expect(equipped.json().data).toMatchObject({revision: 1, items: [{slot: 'character', itemId: 'moliboo.116'}]})
+    expect(equipped.json().data).toMatchObject({revision: 1, items: [
+      {slot: 'character', itemId: 'moliboo.116'},
+      {slot: 'headwear', itemId: 'moliboo.item.halo_ring'},
+    ]})
 
     const relogin = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email: `moliboo-owner-${suffix}@example.com`, password: 'secure-pass-word-1'}})
     expect(relogin.statusCode, relogin.body).toBe(200)
     const restored = await app.inject({method: 'GET', url: '/v1/me/moliboos/outfit', headers: {authorization: `Bearer ${relogin.json().data.accessToken}`}})
-    expect(restored.json().data).toMatchObject({revision: 1, items: [{itemId: 'moliboo.116'}]})
+    expect(restored.json().data).toMatchObject({revision: 1, items: [
+      {itemId: 'moliboo.116'}, {itemId: 'moliboo.item.halo_ring'},
+    ]})
 
     const concurrent = await Promise.all(['moliboo.116', 'moliboo.117'].map(itemId => app.inject({
       method: 'PUT', url: '/v1/me/moliboos/outfit', headers: {authorization: `Bearer ${owner.token}`},
@@ -289,11 +308,11 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
   })
 
   it('keeps duplicate ownership grants impossible at the database boundary', async () => {
-    await expect(db.insertInto('greenfield_moliboo_ownership').values({
+    await expect(db.insertInto('greenfield_moliboo_inventory').values({
       account_id: owner.accountId, item_id: 'moliboo.116', grant_id: `qa:${suffix}:duplicate`,
-      grant_source: 'qa_fixture', granted_at: new Date(),
+      source: 'qa_fixture', source_ref: `qa:${suffix}:duplicate`, acquired_at: new Date(), revoked_at: null,
     }).execute()).rejects.toThrow()
-    const rows = await db.selectFrom('greenfield_moliboo_ownership').select('item_id')
+    const rows = await db.selectFrom('greenfield_moliboo_inventory').select('item_id')
       .where('account_id', '=', owner.accountId).where('item_id', '=', 'moliboo.116').execute()
     expect(rows).toHaveLength(1)
   })

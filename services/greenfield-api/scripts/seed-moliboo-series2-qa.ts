@@ -218,8 +218,10 @@ async function publishPackage(db: ModulaDb, releases: GreenfieldModuleReleaseSer
       display_name: title(entry.key), family_id: entry.familyId, series: 2, wearable: true, created_at: now, updated_at: now,
     }).execute()
     await trx.insertInto('greenfield_moliboo_items').values({
-      item_id: entry.characterId, item_type: 'character', character_id: entry.characterId, slot: 'character', wearable: true,
-      revoked_at: null, created_at: now, updated_at: now,
+      item_id: entry.characterId, name: title(entry.key), slot: 'character', rarity: 'common', access: 'earnable',
+      family: entry.familyId, set_id: null, icon_key: `character_${entry.number}`, palette: JSON.stringify([]),
+      sort_order: entry.number, active: true, item_type: 'character', character_id: entry.characterId,
+      wearable: true, revoked_at: null, created_at: now, updated_at: now,
     }).execute()
     await trx.insertInto('greenfield_moliboo_pack_releases').values({
       release_id: imported.releaseId, artifact_id: artifactId, package_id: entry.packageId, version: entry.version,
@@ -260,9 +262,11 @@ async function ensureLegends(db: ModulaDb) {
       character_id: `moliboo.${number}`, character_number: number, character_key: key, display_name: name,
       family_id: 'legends', series: 1, wearable: false, created_at: now, updated_at: now,
     }))).onConflict(oc => oc.column('character_id').doNothing()).execute()
-    await trx.insertInto('greenfield_moliboo_items').values(legends.map(([number]) => ({
-      item_id: `moliboo.${number}`, item_type: 'character' as const, character_id: `moliboo.${number}`,
-      slot: 'character', wearable: false, revoked_at: null, created_at: now, updated_at: now,
+    await trx.insertInto('greenfield_moliboo_items').values(legends.map(([number, key, name]) => ({
+      item_id: `moliboo.${number}`, name, slot: 'character', rarity: 'legendary' as const, access: 'earnable' as const,
+      family: 'legends', set_id: null, icon_key: `character_${key}`, palette: JSON.stringify([]),
+      sort_order: number, active: true, item_type: 'character' as const, character_id: `moliboo.${number}`,
+      wearable: false, revoked_at: null, created_at: now, updated_at: now,
     }))).onConflict(oc => oc.column('item_id').doNothing()).execute()
   })
 }
