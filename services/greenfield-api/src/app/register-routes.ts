@@ -71,6 +71,7 @@ import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
 import {registerPushRoutes} from './register-push-routes.js'
 import {registerMessagingRoutes} from './register-messaging-routes.js'
+import {registerMolibooGameRoutes} from './register-moliboo-game-routes.js'
 import {registerPremiumRoutes} from '../premium/routes.js'
 import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
@@ -2711,6 +2712,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig})
+  await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerGubicPlayRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
