@@ -285,11 +285,13 @@ export class GreenfieldPolicyEngine {
     const actorId = input.actorId ?? null
     const accountId = input.accountId ?? input.actorAccountId ?? null
 
-    if (ownerActorId && actorId && ownerActorId === actorId) return allow(this.auditRequiredFor(input))
-    if (ownerAccountId && accountId && ownerAccountId === accountId) return allow(this.auditRequiredFor(input))
     if (ownerActorId && actorId && await this.isBlockedEitherWay(actorId, ownerActorId)) {
       return deny('RESOURCE_NOT_VISIBLE', ['exclude-private-content'], this.auditRequiredFor(input))
     }
+    const community = await this.evaluateCommunityResource(input, actorId)
+    if (community) return community
+    if (ownerActorId && actorId && ownerActorId === actorId) return allow(this.auditRequiredFor(input))
+    if (ownerAccountId && accountId && ownerAccountId === accountId) return allow(this.auditRequiredFor(input))
     if (visibility === 'public') return allow(this.auditRequiredFor(input))
     if (!actorId) return deny(aiAction(input) ? 'AI_CONTEXT_NOT_ALLOWED' : 'RESOURCE_NOT_VISIBLE', ['exclude-private-content'], this.auditRequiredFor(input))
 
@@ -309,6 +311,55 @@ export class GreenfieldPolicyEngine {
     }
 
     return deny('RESOURCE_NOT_VISIBLE', ['exclude-private-content'], this.auditRequiredFor(input))
+  }
+
+  private async evaluateCommunityResource(
+    input: ResolvedPolicyInput,
+    actorId: string | null,
+  ): Promise<PolicyDecision | null> {
+    const resource = input.resource
+    if (!resource?.id || (resource.type !== 'post' && resource.type !== 'comment')) return null
+    const query = resource.type === 'post'
+      ? this.db
+          .selectFrom('posts as post')
+          .innerJoin('greenfield_communities as community', 'community.community_id', 'post.community_id')
+          .innerJoin('greenfield_community_settings as settings', 'settings.community_id', 'community.community_id')
+          .select(['community.community_id', 'community.visibility', 'settings.reactions_enabled'])
+          .where('post.id', '=', resource.id)
+          .where('post.deleted_at', 'is', null)
+          .where('community.deleted_at', 'is', null)
+      : this.db
+          .selectFrom('greenfield_comments as comment')
+          .innerJoin('posts as post', 'post.id', 'comment.post_id')
+          .innerJoin('greenfield_communities as community', 'community.community_id', 'post.community_id')
+          .innerJoin('greenfield_community_settings as settings', 'settings.community_id', 'community.community_id')
+          .select(['community.community_id', 'community.visibility', 'settings.reactions_enabled'])
+          .where('comment.comment_id', '=', resource.id)
+          .where('comment.deleted_at', 'is', null)
+          .where('post.deleted_at', 'is', null)
+          .where('community.deleted_at', 'is', null)
+    const community = await query.executeTakeFirst()
+    if (!community) return null
+
+    if (!community.reactions_enabled && (input.action === 'post.engage' || input.action === 'comment.react')) {
+      return deny('FORBIDDEN', ['limit-results'], true)
+    }
+    if (community.visibility === 'public') return allow(this.auditRequiredFor(input))
+    if (!actorId) {
+      return deny(aiAction(input) ? 'AI_CONTEXT_NOT_ALLOWED' : 'RESOURCE_NOT_VISIBLE', ['exclude-private-content'], this.auditRequiredFor(input))
+    }
+    if (aiAction(input)) {
+      return deny('AI_CONTEXT_NOT_ALLOWED', ['exclude-private-content', 'require-AI-consent'], true)
+    }
+    const membership = await this.db
+      .selectFrom('greenfield_community_memberships')
+      .select('status')
+      .where('community_id', '=', community.community_id)
+      .where('actor_id', '=', actorId)
+      .executeTakeFirst()
+    return membership?.status === 'active'
+      ? allow(this.auditRequiredFor(input))
+      : deny('RESOURCE_NOT_VISIBLE', ['exclude-private-content'], this.auditRequiredFor(input))
   }
 
   private evaluateAiContext(input: ResolvedPolicyInput): PolicyDecision | null {
