@@ -37,9 +37,9 @@ export async function registerMessagingRoutes(
   app.get('/v1/conversations', read(), async (request, reply) => {
     const auth = requireCapability(request, reply, 'social:read')
     if (!auth) return
-    const q = request.query as {cursor?: string; limit?: string}
+    const q = request.query as {cursor?: string; limit?: string; archived?: string}
     try {
-      return reply.send(successEnvelope(await messaging.listConversations(auth.actorId, q.cursor, q.limit), request.id))
+      return reply.send(successEnvelope(await messaging.listConversations(auth.actorId, q.cursor, q.limit, q.archived), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Unable to load conversations')
     }
@@ -83,7 +83,7 @@ export async function registerMessagingRoutes(
     const auth = requireCapability(request, reply, 'post:engage')
     if (!auth) return
     const {id} = request.params as {id: string}
-    const body = (request.body ?? {}) as {text?: unknown}
+    const body = (request.body ?? {}) as {text?: unknown; replyToMessageId?: unknown}
     try {
       const message = await messaging.send(auth.actorId, id, body)
       await notifyConversationMembers(db, auth.actorId, id, typeof body.text === 'string' ? body.text : '')
@@ -103,6 +103,111 @@ export async function registerMessagingRoutes(
       return reply.send(successEnvelope({ok: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Unable to mark conversation read')
+    }
+  })
+
+  // ---- messaging v2 ---------------------------------------------------
+
+  const messageParams = {
+    schema: {
+      params: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['id', 'messageId'],
+        properties: {id: {type: 'string', minLength: 1, maxLength: 64}, messageId: {type: 'string', minLength: 1, maxLength: 64}},
+      },
+    },
+  }
+
+  app.patch('/v1/conversations/:id/messages/:messageId', write(messageParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    const {id, messageId} = request.params as {id: string; messageId: string}
+    try {
+      const message = await messaging.editMessage(auth.actorId, id, messageId, (request.body ?? {}) as {text?: unknown})
+      return reply.send(successEnvelope({message}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to edit message')
+    }
+  })
+
+  app.delete('/v1/conversations/:id/messages/:messageId', write(messageParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    const {id, messageId} = request.params as {id: string; messageId: string}
+    try {
+      await messaging.unsendMessage(auth.actorId, id, messageId)
+      return reply.send(successEnvelope({ok: true}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to unsend message')
+    }
+  })
+
+  app.put('/v1/conversations/:id/messages/:messageId/reactions', write(messageParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    const {id, messageId} = request.params as {id: string; messageId: string}
+    try {
+      return reply.send(successEnvelope(await messaging.react(auth.actorId, id, messageId, (request.body ?? {}) as {emoji?: unknown}, true), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to react')
+    }
+  })
+
+  app.delete('/v1/conversations/:id/messages/:messageId/reactions', write(messageParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    const {id, messageId} = request.params as {id: string; messageId: string}
+    const q = request.query as {emoji?: string}
+    try {
+      return reply.send(successEnvelope(await messaging.react(auth.actorId, id, messageId, {emoji: q.emoji}, false), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to remove reaction')
+    }
+  })
+
+  app.post('/v1/conversations/:id/typing', write(idParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    const {id} = request.params as {id: string}
+    try {
+      await messaging.setTyping(auth.actorId, id)
+      return reply.send(successEnvelope({ok: true}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to update typing')
+    }
+  })
+
+  app.get('/v1/conversations/:id/typing', read(idParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    const {id} = request.params as {id: string}
+    try {
+      return reply.send(successEnvelope(await messaging.typing(auth.actorId, id), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to load typing')
+    }
+  })
+
+  app.post('/v1/conversations/:id/mute', write(idParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    const {id} = request.params as {id: string}
+    try {
+      return reply.send(successEnvelope(await messaging.setMuted(auth.actorId, id, (request.body ?? {}) as {muted?: unknown; until?: unknown}), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to update mute')
+    }
+  })
+
+  app.post('/v1/conversations/:id/archive', write(idParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    const {id} = request.params as {id: string}
+    try {
+      return reply.send(successEnvelope(await messaging.setArchived(auth.actorId, id, (request.body ?? {}) as {archived?: unknown}), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to update archive')
     }
   })
 
@@ -196,6 +301,8 @@ async function notifyConversationMembers(db: ModulaDb, senderActorId: string, co
       .where('conversation_id', '=', conversationId)
       .where('actor_id', '<>', senderActorId)
       .where('state', 'in', ['active', 'pending'])
+      // Muted chats stay quiet until the mute ends.
+      .where(eb => eb.or([eb('muted_until', 'is', null), eb('muted_until', '<=', new Date())]))
       .execute(),
     db.selectFrom('profiles').select(['handle', 'display_name']).where('actor_id', '=', senderActorId).executeTakeFirst(),
   ])
