@@ -14,6 +14,7 @@ export type CommunityMembershipPolicy = 'open' | 'approval'
 export type CommunityPostingPolicy = 'members' | 'moderators'
 export type CommunityRole = 'owner' | 'admin' | 'moderator' | 'member' | 'restricted'
 export type CommunityMembershipStatus = 'active' | 'pending' | 'banned' | 'left'
+export type PostDraftState = 'editing' | 'published'
 
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended'
 export type AuthenticationMethodType = 'passkey' | 'password' | 'email_otp' | 'totp' | 'recovery_code' | 'apple' | 'oidc'
@@ -1464,6 +1465,49 @@ export interface Database {
     actor_id: string
     created_at: Date
     updated_at: Date
+  }
+  greenfield_saved_collections: {
+    collection_id: string
+    owner_actor_id: string
+    name: string
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_saved_collection_items: {
+    item_id: string
+    collection_id: string
+    save_id: string
+    position: number
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_post_drafts: {
+    draft_id: string
+    owner_actor_id: string
+    idempotency_key: string | null
+    text: string
+    feed: FeedMode
+    audience: Audience
+    reply_permission: ReplyPermission
+    publish_to_atproto: boolean
+    state: PostDraftState
+    published_post_id: string | null
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_post_draft_content: {
+    draft_id: string
+    attachment_id: string
+    content_type: Exclude<AttachmentKind, 'unknown'>
+    caption: string | null
+    position: number
+    created_at: Date
   }
   greenfield_premium_catalogue_versions: {catalogue_version: number; status: 'active' | 'retired'; effective_at: Date; metadata: unknown; created_at: Date}
   greenfield_premium_tiers: {catalogue_version: number; tier_id: 'core' | 'plus' | 'horizon' | 'horizon_plus' | 'studio'; display_name: string; rank: number; paid: boolean; metadata: unknown}

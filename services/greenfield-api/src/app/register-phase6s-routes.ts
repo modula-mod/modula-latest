@@ -13,6 +13,7 @@ import {FunctionJobService} from '../functions/job-service.js'
 import {GreenfieldSessionService} from '../sessions/service.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
+import {decodeCursor, parseLimit} from '../transport/pagination.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -248,12 +249,18 @@ export async function registerPhase6sRoutes(
       return mapDomainError(reply, error, request.id, 'Quote failed')
     }
   })
-  app.get('/v1/saves', opts.feedConfig, async (request, reply) => {
+  app.get('/v1/saves', {
+    ...opts.feedConfig,
+    schema: {querystring: {type: 'object', additionalProperties: false, properties: {
+      limit: {type: 'integer', minimum: 1, maximum: 50}, cursor: {type: 'string', minLength: 1, maxLength: 512},
+    }}},
+  }, async (request, reply) => {
     const auth = requireCapability(request, reply, 'saved:manage')
     if (!auth) return
     try {
-      const items = await saves.listSaves(auth.actorId)
-      return reply.send(successEnvelope({items}, request.id))
+      const query = (request.query ?? {}) as Record<string, unknown>
+      const page = await saves.listSaves(auth.actorId, parseLimit(query.limit), decodeCursor(query.cursor))
+      return reply.send(successEnvelope(page, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Failed to load saves')
     }
