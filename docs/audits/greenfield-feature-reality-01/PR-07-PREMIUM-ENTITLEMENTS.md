@@ -1,32 +1,32 @@
 # GREENFIELD FEATURE REALITY 01 — PR-07 Premium entitlements and billing QA
 
-Date: 2 November 2026  
-Mission item: PR-07  
-Repository: `modula-mod/modula-latest`  
-Branch: `feat/qa-premium-entitlements`  
-Base SHA: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`  
-Environment: isolated disposable PostgreSQL and source-level candidate only  
+Date: 2 November 2026
+Mission item: PR-07
+Repository: `modula-mod/modula-latest`
+Branch: `feat/qa-premium-entitlements`
+Base SHA: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
+Environment: isolated disposable PostgreSQL and source-level candidate only
 Production deployment: prohibited and not performed
 
 ## Completion record
 
-MISSION ITEM: PR-07 — PREMIUM ENTITLEMENTS AND BILLING QA  
-STATUS: PARTIAL  
-BRANCH: `feat/qa-premium-entitlements`  
-PR URL: https://github.com/modula-mod/modula-latest/pull/158  
-BASE SHA: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`  
-HEAD SHA: The draft PR head is authoritative after publication  
-ROUTES ADDED: 4  
-ROUTES MODIFIED: 6  
-ATLAS UPDATED: YES — JSON, CSV, DOCX and generated OpenAPI  
-MIGRATIONS: `084_greenfield_premium_apple_sandbox.sql` with QA-only down migration  
-TESTS PASSED: 535 full-suite tests; 19 focused database tests; 103 Atlas verification assertions  
-TESTS FAILED: 0 in the correctly provisioned acceptance run  
-TESTS SKIPPED: 1 pre-existing live-API N4 test requiring `GREENFIELD_API_BASE`  
-SECURITY RESULTS: PASS for Apple JWS verification, tamper rejection, replay protection, account binding, authorization and secret redaction; workspace dependency audit remains non-zero for unrelated existing transitive dependencies  
-QA INTEGRATION RESULTS: PARTIAL — persistent sandbox lifecycle proven with official Apple cryptographic fixtures and injected signed-data tests, but no live App Store Connect sandbox product or Native StoreKit transaction was available  
-NATIVE COMPATIBILITY: PARTIAL — current Native main has Premium UI contracts but no completed StoreKit purchase submission flow and uses placeholder local product identifiers  
-BLOCKERS: confirmed App Store Connect product IDs and billing periods; sandbox credentials/root material in QA; live signed sandbox purchase/restore/refund evidence; Native StoreKit handoff  
+MISSION ITEM: PR-07 — PREMIUM ENTITLEMENTS AND BILLING QA
+STATUS: PARTIAL
+BRANCH: `feat/qa-premium-entitlements`
+PR URL: https://github.com/modula-mod/modula-latest/pull/158
+BASE SHA: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
+HEAD SHA: The draft PR head is authoritative after publication
+ROUTES ADDED: 4
+ROUTES MODIFIED: 6
+ATLAS UPDATED: YES — JSON, CSV, DOCX and generated OpenAPI
+MIGRATIONS: `084_greenfield_premium_apple_sandbox.sql` with QA-only down migration
+TESTS PASSED: 535 full-suite tests; 19 focused database tests; 103 Atlas verification assertions
+TESTS FAILED: 0 in the correctly provisioned acceptance run
+TESTS SKIPPED: 1 pre-existing live-API N4 test requiring `GREENFIELD_API_BASE`
+SECURITY RESULTS: PASS for Apple JWS verification, tamper rejection, replay protection, account binding, authorization and secret redaction; workspace dependency audit remains non-zero for unrelated existing transitive dependencies
+QA INTEGRATION RESULTS: PARTIAL — persistent sandbox lifecycle proven with official Apple cryptographic fixtures and injected signed-data tests, but no live App Store Connect sandbox product or Native StoreKit transaction was available
+NATIVE COMPATIBILITY: PARTIAL — current Native main has Premium UI contracts but no completed StoreKit purchase submission flow and uses placeholder local product identifiers
+BLOCKERS: confirmed App Store Connect product IDs and billing periods; sandbox credentials/root material in QA; live signed sandbox purchase/restore/refund evidence; Native StoreKit handoff
 APPROVAL REQUIRED: Andy for merge, QA release configuration, deployment and any publication
 
 The implementation candidate is source- and database-ready, but the mission item is deliberately not marked PASS because a real Apple sandbox lifecycle and the Native purchase handoff have not been demonstrated.
