@@ -22,7 +22,7 @@ BEGIN
     SELECT 1 FROM greenfield_premium_membership_events
     WHERE event_type IN ('purchased', 'restored', 'upgraded', 'grace_started', 'grace_ended')
   ) THEN
-    RAISE EXCEPTION '084 rollback refused: verified Premium audit events require backup restore';
+    RAISE EXCEPTION '087 rollback refused: verified Premium audit events require backup restore';
   END IF;
 END
 $$;
@@ -42,5 +42,5 @@ SET metadata = metadata - 'displayPrice' - 'priceAuthority'
 WHERE catalogue_version = 1;
 
 INSERT INTO schema_metadata (key, value)
-VALUES ('schema_version', '083')
+VALUES ('schema_version', '086')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

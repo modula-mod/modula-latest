@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "feat/qa-premium-entitlements",
       "sourceSha256": "86965fb12e652eabc5da0c74a62b3a65d62f8a074ebed20704a516a9e5fe7129",
-      "capturedAt": "2026-11-02T08:24:47.048Z",
+      "capturedAt": "2026-11-02T10:12:03.814Z",
       "routeCount": 762
     },
     "status": "PASS"
@@ -94973,7 +94973,7 @@
       "ownershipColumns": [],
       "softDelete": false,
       "timestamps": [],
-      "migrationIntroduced": "084_greenfield_premium_apple_sandbox.sql",
+      "migrationIntroduced": "087_greenfield_premium_apple_sandbox.sql",
       "sourceReads": [
         "services/greenfield-api/src/premium/apple-service.ts"
       ],
@@ -95006,7 +95006,7 @@
       "ownershipColumns": [],
       "softDelete": false,
       "timestamps": [],
-      "migrationIntroduced": "084_greenfield_premium_apple_sandbox.sql",
+      "migrationIntroduced": "087_greenfield_premium_apple_sandbox.sql",
       "sourceReads": [
         "services/greenfield-api/src/premium/apple-service.ts"
       ],
@@ -95039,7 +95039,7 @@
       "ownershipColumns": [],
       "softDelete": false,
       "timestamps": [],
-      "migrationIntroduced": "084_greenfield_premium_apple_sandbox.sql",
+      "migrationIntroduced": "087_greenfield_premium_apple_sandbox.sql",
       "sourceReads": [
         "services/greenfield-api/src/premium/apple-service.ts"
       ],
@@ -95073,7 +95073,7 @@
       "ownershipColumns": [],
       "softDelete": false,
       "timestamps": [],
-      "migrationIntroduced": "084_greenfield_premium_apple_sandbox.sql",
+      "migrationIntroduced": "087_greenfield_premium_apple_sandbox.sql",
       "sourceReads": [
         "services/greenfield-api/src/premium/apple-service.ts"
       ],
@@ -95106,7 +95106,7 @@
       "ownershipColumns": [],
       "softDelete": false,
       "timestamps": [],
-      "migrationIntroduced": "084_greenfield_premium_apple_sandbox.sql",
+      "migrationIntroduced": "087_greenfield_premium_apple_sandbox.sql",
       "sourceReads": [
         "services/greenfield-api/src/premium/apple-service.ts"
       ],

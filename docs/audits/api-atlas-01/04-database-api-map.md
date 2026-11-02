@@ -1,6 +1,6 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 84 ordered up migrations, latest `084_greenfield_premium_apple_sandbox.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 84 ordered up migrations, latest `087_greenfield_premium_apple_sandbox.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
@@ -3968,7 +3968,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `084_greenfield_premium_apple_sandbox.sql`
+- Migration introduced: `087_greenfield_premium_apple_sandbox.sql`
 - Routes reading: `POST /v1/me/membership/apple-purchase-context`, `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - Routes writing: `POST /v1/me/membership/apple-purchase-context`
 - API/worker source reads: `services/greenfield-api/src/premium/apple-service.ts`
@@ -3985,7 +3985,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `084_greenfield_premium_apple_sandbox.sql`
+- Migration introduced: `087_greenfield_premium_apple_sandbox.sql`
 - Routes reading: `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - Routes writing: `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - API/worker source reads: `services/greenfield-api/src/premium/apple-service.ts`
@@ -4002,7 +4002,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `084_greenfield_premium_apple_sandbox.sql`
+- Migration introduced: `087_greenfield_premium_apple_sandbox.sql`
 - Routes reading: `PUT /v1/admin/qa/premium/apple-products/:productId`, `POST /v1/me/membership/apple-purchase-context`, `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - Routes writing: `PUT /v1/admin/qa/premium/apple-products/:productId`
 - API/worker source reads: `services/greenfield-api/src/premium/apple-service.ts`
@@ -4019,7 +4019,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `084_greenfield_premium_apple_sandbox.sql`
+- Migration introduced: `087_greenfield_premium_apple_sandbox.sql`
 - Routes reading: `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - Routes writing: `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - API/worker source reads: `services/greenfield-api/src/premium/apple-service.ts`
@@ -4036,7 +4036,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `084_greenfield_premium_apple_sandbox.sql`
+- Migration introduced: `087_greenfield_premium_apple_sandbox.sql`
 - Routes reading: `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - Routes writing: `POST /v1/premium/apple/notifications`, `POST /v1/premium/apple/transactions`
 - API/worker source reads: `services/greenfield-api/src/premium/apple-service.ts`

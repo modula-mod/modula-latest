@@ -130,5 +130,5 @@ GRANT SELECT ON
 TO modula_worker, modula_backup;
 
 INSERT INTO schema_metadata (key, value)
-VALUES ('schema_version', '084')
+VALUES ('schema_version', '087')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

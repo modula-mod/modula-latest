@@ -19,8 +19,8 @@ HEAD SHA: The draft PR head is authoritative after publication
 ROUTES ADDED: 4
 ROUTES MODIFIED: 6
 ATLAS UPDATED: YES — JSON, CSV, DOCX and generated OpenAPI
-MIGRATIONS: `084_greenfield_premium_apple_sandbox.sql` with QA-only down migration
-TESTS PASSED: 535 full-suite tests; 19 focused database tests; 103 Atlas verification assertions
+MIGRATIONS: `087_greenfield_premium_apple_sandbox.sql` with QA-only down migration; 084-086 remain reserved for PR-01, PR-04 and PR-05
+TESTS PASSED: 535 full-suite tests; 23 focused billing/migration/ledger tests after renumbering; 103 Atlas verification assertions
 TESTS FAILED: 0 in the correctly provisioned acceptance run
 TESTS SKIPPED: 1 pre-existing live-API N4 test requiring `GREENFIELD_API_BASE`
 SECURITY RESULTS: PASS for Apple JWS verification, tamper rejection, replay protection, account binding, authorization and secret redaction; workspace dependency audit remains non-zero for unrelated existing transitive dependencies
@@ -57,7 +57,7 @@ QA configuration fails closed unless all required sandbox values are present. Of
 
 ### Persistent ownership and audit model
 
-Migration 084 adds:
+Migration 087 adds:
 
 - a QA-configured Apple product map tied to the existing Premium catalogue;
 - one stable `appAccountToken` per Modula account;
@@ -122,16 +122,19 @@ An earlier diagnostic run used the migrator role where legacy suites require the
 
 ### Focused Premium and migration tests
 
+The post-renumber reconciliation used the fresh loopback-only database `modula_feature_reality_01_pr07_reconcile_20261102` in the labeled disposable mission container.
+
 ```text
 CI=true pnpm --dir services/greenfield-api exec vitest run \
   tests/premium.config.test.ts \
   tests/premium.apple-verifier.test.ts \
   tests/premium.apple-sandbox.integration.test.ts \
   tests/premium.integration.test.ts \
-  tests/api-fix-01.migration.test.ts
+  tests/api-fix-01.migration.test.ts \
+  tests/greenfield-backend-v1.migration-ledger-security.test.ts
 
-Test Files  5 passed (5)
-Tests       19 passed (19)
+Test Files  6 passed (6)
+Tests       23 passed (23)
 ```
 
 Coverage includes free membership, exact tier display labels, configuration fail-closed behavior, official Apple JWS fixture verification, one-byte tamper rejection, wrong bundle rejection, missing certificate rejection, account-token binding, client replay, notification replay, upgrade, grace, downgrade, expiration, refund/revocation, forged entitlement rejection, badge visibility, data preservation and fresh/legacy/up/down migration paths.
@@ -145,10 +148,17 @@ CI=true pnpm typecheck
 PASS across the workspace.
 
 ```text
-GITHUB_HEAD_REF=main API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true MODULA_GUBIC_PLAY_ENABLED=true pnpm api:atlas:capture-candidate
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
 ```
 
-PASS: 103/103 assertions, 539 application routes, 223 framework routes, zero source/runtime gaps, valid DOCX and passing secret scan.
+PASS: 103/103 assertions, 762 runtime method routes = 539 application routes + 223 framework routes, zero source/runtime gaps, valid DOCX and passing secret scan.
+
+```text
+TZ=Pacific/Auckland API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate-docx.mjs
+```
+
+PASS: byte-stable DOCX SHA-256 `75a42548c6f3382eda50822629854a59994ec935b50d0221e8438b95d0ab01dc` under a different timezone and umask.
 
 ```text
 git diff --check
@@ -176,7 +186,7 @@ The workspace gate remains non-zero with 69 advisories in existing transitive de
 
 ## Rollback and recovery
 
-Before verified billing evidence exists, migration 084 can be rolled down in disposable QA and was tested up/down/up. Once purchase/audit evidence exists, the down migration refuses lossy rollback. Recovery must preserve the database, restore a pre-migration backup if rollback is explicitly approved, and run the previous application image. Production rollback is not authorized by this PR.
+Before verified billing evidence exists, migration 087 can be rolled down in disposable QA and was tested up/down/up. It restores reserved schema version 086; on this direct-to-main review branch the next applied ledger entry is currently 083 until PR-01, PR-04 and PR-05 supply migrations 084-086 in the approved integration composition. Once purchase/audit evidence exists, the down migration refuses lossy rollback. Recovery must preserve the database, restore a pre-migration backup if rollback is explicitly approved, and run the previous application image. Production rollback is not authorized by this PR.
 
 ## Native handoff
 

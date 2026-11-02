@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-02T08:24:47.048Z for branch `feat/qa-premium-entitlements`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-02T10:12:03.814Z for branch `feat/qa-premium-entitlements`; this does not claim deployment.
 
 - Runtime method routes: 762
 - Application routes: 539
