@@ -11,7 +11,7 @@ const required = [
   '05-media-storage-map.md', '06-module-platform-map.md', '07-intelligence-api-map.md',
   '08-events-workers-jobs.md', '09-client-capability-coverage.md', '10-live-probe-results.md',
   '11-gap-register.md', '12-remediation-roadmap.md', 'api-atlas.json', 'api-atlas.csv',
-  '13-verification-results.md',
+  '13-verification-results.md', 'api-atlas.docx', 'contract-overrides.json',
   'route-data-map.json', 'contract-baseline.json', 'worker-job-map.json', 'gap-register.json', 'openapi.generated.yaml', 'request-flow.mmd',
   'module-flow.mmd', 'intelligence-flow.mmd', 'media-flow.mmd', 'event-flow.mmd',
   'client-contract-analysis.json', 'evidence/production-snapshot.json', 'evidence/candidate-runtime.json', 'evidence/live-probes.json',
@@ -83,6 +83,7 @@ let authenticatedAcceptance
 let closeout
 let contractBaseline
 let workerJobMap
+let contractOverrides
 try { atlas = JSON.parse(readFileSync(join(outputDir, 'api-atlas.json'), 'utf8')); check('api-atlas.json parses', true) } catch (error) { check('api-atlas.json parses', false, error.message) }
 try { gaps = JSON.parse(readFileSync(join(outputDir, 'gap-register.json'), 'utf8')); check('gap-register.json parses', true) } catch (error) { check('gap-register.json parses', false, error.message) }
 try { routeData = JSON.parse(readFileSync(join(outputDir, 'route-data-map.json'), 'utf8')); check('route-data-map.json parses', true) } catch (error) { check('route-data-map.json parses', false, error.message) }
@@ -95,6 +96,7 @@ try { authenticatedAcceptance = JSON.parse(readFileSync(join(outputDir, 'evidenc
 try { closeout = JSON.parse(readFileSync(join(outputDir, 'evidence/api-baseline-02-closeout.json'), 'utf8')); check('baseline closeout parses', true) } catch (error) { check('baseline closeout parses', false, error.message) }
 try { contractBaseline = JSON.parse(readFileSync(join(outputDir, 'contract-baseline.json'), 'utf8')); check('contract baseline parses', true) } catch (error) { check('contract baseline parses', false, error.message) }
 try { workerJobMap = JSON.parse(readFileSync(join(outputDir, 'worker-job-map.json'), 'utf8')); check('worker job map parses', true) } catch (error) { check('worker job map parses', false, error.message) }
+try { contractOverrides = JSON.parse(readFileSync(join(outputDir, 'contract-overrides.json'), 'utf8')); check('contract overrides parse', true) } catch (error) { check('contract overrides parse', false, error.message) }
 
 if (atlas && snapshot) {
   const reconciliation = atlas.reconciliation
@@ -144,6 +146,14 @@ if (clientContracts) check('literal client calls reconciled', clientContracts.un
 if (contractBaseline && atlas) {
   check('contract baseline covers every route', contractBaseline.routes.length === atlas.routes.length && contractBaseline.routes.every(route => typeof route.sourceContractSha256 === 'string' && route.sourceContractSha256.length === 64))
 }
+if (contractOverrides && atlas) {
+  const requiredContractFields = ['purpose', 'owningDomain', 'authentication', 'authorization', 'request', 'success', 'errors', 'pagination', 'idempotencyConcurrency', 'versioningCompatibility']
+  const atlasById = new Map(atlas.routes.map(route => [route.id, route]))
+  check('contract override schema', contractOverrides.schemaVersion === 1 && contractOverrides.routes && typeof contractOverrides.routes === 'object')
+  check('contract overrides map to routes', Object.keys(contractOverrides.routes).every(id => atlasById.has(id)))
+  check('contract overrides are complete', Object.values(contractOverrides.routes).every(contract => requiredContractFields.every(field => field in contract)))
+  check('contract overrides embedded in Atlas', Object.entries(contractOverrides.routes).every(([id, contract]) => JSON.stringify(atlasById.get(id)?.contract) === JSON.stringify(contract)))
+}
 if (workerJobMap) check('worker jobs mapped', workerJobMap.jobs.length > 0 && workerJobMap.jobs.every(job => job.jobType && job.source && job.handler !== 'unresolved'))
 if (authenticatedAcceptance) {
   check('authenticated acceptance excludes secrets', authenticatedAcceptance.metadata?.secretsIncluded === false)
@@ -178,7 +188,13 @@ const secretPatterns = [
   ['cookie value', /\b(?:set-cookie|cookie)\s*:\s*[^\s;]{16,}/i],
   ['secret assignment', /\b(?:password|passwd|api[_-]?key|client[_-]?secret|session[_-]?token|smtp[_-]?(?:password|user))\b\s*[:=]\s*["']?(?!PRESENT\b|MISSING\b|CONFIGURED\b|UNKNOWN\b|none\b|disabled\b)[A-Za-z0-9+/_.~-]{16,}/i],
 ]
-const scanFiles = filesUnder(outputDir).filter(file => !['.png','.jpg','.jpeg','.gif','.zip','.gz'].includes(extname(file)))
+try {
+  execFileSync('unzip', ['-tqq', join(outputDir, 'api-atlas.docx')], {stdio: 'pipe'})
+  check('DOCX package validates', statSync(join(outputDir, 'api-atlas.docx')).size > 1_000)
+} catch (error) {
+  check('DOCX package validates', false, error.message)
+}
+const scanFiles = filesUnder(outputDir).filter(file => !['.png','.jpg','.jpeg','.gif','.zip','.gz','.docx'].includes(extname(file)))
 for (const [label, pattern] of secretPatterns) {
   const hits = scanFiles.filter(file => pattern.test(readFileSync(file, 'utf8'))).map(file => relative(outputDir, file))
   check(`secret scan ${label}`, hits.length === 0, hits.join(', '))
