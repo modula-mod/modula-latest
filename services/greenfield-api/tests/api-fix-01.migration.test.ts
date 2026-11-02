@@ -10,7 +10,7 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 086', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 087', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -113,6 +113,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
       '084_moliboo_signed_packs', '085_greenfield_communities', '086_greenfield_collections_and_drafts',
+      '087_greenfield_premium_apple_sandbox',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -120,7 +121,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('086')
+    expect(version.rows[0]?.value).toBe('087')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -129,7 +130,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('086_greenfield_collections_and_drafts')
+    expect(applied.at(-1)).toBe('087_greenfield_premium_apple_sandbox')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -152,6 +153,16 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(canonicalMolibooItems.rows[0]?.count).toBeGreaterThan(0)
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
+
+    expect(await migrateDown(freshUrl)).toBe('087_greenfield_premium_apple_sandbox')
+
+    const rolledBackApplePremium = new pg.Client({connectionString: freshUrl})
+    await rolledBackApplePremium.connect()
+    const appleTransactions = await rolledBackApplePremium.query(`SELECT to_regclass('public.greenfield_premium_apple_transactions') AS name`)
+    const versionAfter087 = await rolledBackApplePremium.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(appleTransactions.rows[0]?.name).toBeNull()
+    expect(versionAfter087.rows[0]?.value).toBe('086')
+    await rolledBackApplePremium.end()
 
     expect(await migrateDown(freshUrl)).toBe('086_greenfield_collections_and_drafts')
     const rolledBackCollections = new pg.Client({connectionString: freshUrl})
@@ -315,6 +326,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
       '084_moliboo_signed_packs', '085_greenfield_communities', '086_greenfield_collections_and_drafts',
+      '087_greenfield_premium_apple_sandbox',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -345,6 +357,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
       '084_moliboo_signed_packs', '085_greenfield_communities', '086_greenfield_collections_and_drafts',
+      '087_greenfield_premium_apple_sandbox',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
@@ -359,7 +372,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(version.rows[0]?.value).toBe('086')
+    expect(version.rows[0]?.value).toBe('087')
     expect(account.rows[0]?.count).toBe(1)
     expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
     await after.end()

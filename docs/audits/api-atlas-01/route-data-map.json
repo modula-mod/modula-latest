@@ -1407,6 +1407,23 @@
       "services/greenfield-api/src/premium/service.ts#membershipForAccount"
     ]
   },
+  "PUT /v1/admin/qa/premium/apple-products/:productId": {
+    "reads": [
+      "greenfield_premium_apple_products",
+      "greenfield_premium_catalogue_versions"
+    ],
+    "writes": [
+      "greenfield_premium_apple_products"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#activeCatalogueVersion",
+      "services/greenfield-api/src/premium/apple-service.ts#configureProduct",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured"
+    ]
+  },
   "POST /v1/admin/qa/verification/appeals/:appealId/transitions": {
     "reads": [
       "actors",
@@ -5938,6 +5955,23 @@
       "services/greenfield-api/src/premium/service.ts#membership"
     ]
   },
+  "POST /v1/me/membership/apple-purchase-context": {
+    "reads": [
+      "greenfield_premium_apple_accounts",
+      "greenfield_premium_apple_products"
+    ],
+    "writes": [
+      "greenfield_premium_apple_accounts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#activeProducts",
+      "services/greenfield-api/src/premium/apple-service.ts#purchaseContext",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured"
+    ]
+  },
   "PATCH /v1/me/membership/badge-visibility": {
     "reads": [
       "actors",
@@ -8689,6 +8723,64 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/shares/service.ts#record"
+    ]
+  },
+  "POST /v1/premium/apple/notifications": {
+    "reads": [
+      "actors",
+      "greenfield_premium_apple_accounts",
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_products",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_memberships"
+    ],
+    "writes": [
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_membership_events",
+      "greenfield_premium_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#invalidateAccount",
+      "services/greenfield-api/src/premium/apple-service.ts#notificationReplay",
+      "services/greenfield-api/src/premium/apple-service.ts#persistNotification",
+      "services/greenfield-api/src/premium/apple-service.ts#persistTransaction",
+      "services/greenfield-api/src/premium/apple-service.ts#processNotification",
+      "services/greenfield-api/src/premium/apple-service.ts#projectLatestMembership",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured"
+    ]
+  },
+  "POST /v1/premium/apple/transactions": {
+    "reads": [
+      "actors",
+      "greenfield_premium_apple_accounts",
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_products",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_memberships"
+    ],
+    "writes": [
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_membership_events",
+      "greenfield_premium_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#invalidateAccount",
+      "services/greenfield-api/src/premium/apple-service.ts#persistTransaction",
+      "services/greenfield-api/src/premium/apple-service.ts#projectLatestMembership",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured",
+      "services/greenfield-api/src/premium/apple-service.ts#submitTransaction"
     ]
   },
   "GET /v1/premium/tiers": {

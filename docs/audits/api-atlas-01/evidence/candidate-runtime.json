@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-02T15:47:52.948Z",
+  "capturedAt": "2026-11-02T15:49:09.969Z",
   "source": {
     "branch": "qa/greenfield-feature-reality-01-integration",
-    "headAtCapture": "2fd8dceed711136fa3cf7df2622c8107abcafb62",
+    "headAtCapture": "24d0368f87e2a88e99ea0eb9a445a1a3c54002f6",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "5c5ad8ddf09fac28f6558e520e1e0673da67cd90974fa448158e6c15d197b2d0"
+    "apiSourceSha256": "263dad3ecd64b450c8faf9d4852710ec4c60c43ec8487caa45f553e1951ac9ba"
   },
   "runtimeRoutes": [
     {
@@ -8836,7 +8836,83 @@
       "url": "/v1/me/membership/badge-visibility",
       "path": "/v1/me/membership/badge-visibility",
       "prefix": "",
-      "schema": null,
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "visible"
+          ],
+          "properties": {
+            "visible": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/membership/apple-purchase-context",
+      "path": "/v1/me/membership/apple-purchase-context",
+      "prefix": "",
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "maxProperties": 0
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/premium/apple/transactions",
+      "path": "/v1/premium/apple/transactions",
+      "prefix": "",
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "signedTransaction"
+          ],
+          "properties": {
+            "signedTransaction": {
+              "type": "string",
+              "minLength": 16,
+              "maxLength": 200000
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/premium/apple/notifications",
+      "path": "/v1/premium/apple/notifications",
+      "prefix": "",
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "signedPayload"
+          ],
+          "properties": {
+            "signedPayload": {
+              "type": "string",
+              "minLength": 16,
+              "maxLength": 200000
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },
@@ -8857,6 +8933,102 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 80
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tier"
+          ],
+          "properties": {
+            "tier": {
+              "type": "string",
+              "enum": [
+                "core",
+                "plus",
+                "horizon",
+                "horizon_plus",
+                "studio"
+              ]
+            },
+            "subscriptionStatus": {
+              "type": "string",
+              "enum": [
+                "active",
+                "expired",
+                "revoked",
+                "downgraded"
+              ]
+            },
+            "effectiveAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "membershipSince": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/qa/premium/apple-products/:productId",
+      "path": "/v1/admin/qa/premium/apple-products/:productId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "productId"
+          ],
+          "properties": {
+            "productId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,159}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tier",
+            "billingPeriod"
+          ],
+          "properties": {
+            "tier": {
+              "type": "string",
+              "enum": [
+                "plus",
+                "horizon",
+                "horizon_plus",
+                "studio"
+              ]
+            },
+            "billingPeriod": {
+              "type": "string",
+              "enum": [
+                "monthly",
+                "annual"
+              ]
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "active",
+                "disabled"
+              ]
             }
           }
         }
