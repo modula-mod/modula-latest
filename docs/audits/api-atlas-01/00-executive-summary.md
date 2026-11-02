@@ -6,19 +6,19 @@ API service: `modula-production-greenfield-api-1` (healthy)
 Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no Docker healthcheck)
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
-HTTP routes discovered: 544 application / 773 runtime method routes
-Route evidence: local-candidate-runtime for feature branch feat/qa-moliboo-series2-packs; not deployed
-Public routes: 124
-Authenticated routes: 317
+HTTP routes discovered: 580 application / 823 runtime method routes
+Route evidence: local-candidate-runtime for feature branch qa/greenfield-feature-reality-01-integration; not deployed
+Public routes: 132
+Authenticated routes: 345
 Admin/internal routes: 103
-Mutating routes: 316
-Read-only routes: 228
-Routes with request schemas: 45
+Mutating routes: 338
+Read-only routes: 242
+Routes with request schemas: 83
 Routes with response schemas: 0
-Routes with automated tests: 454
+Routes with automated tests: 490
 Routes live-probed: 26 unique routes
-Routes with known callers: 241
-Database tables: 350
+Routes with known callers: 242
+Database tables: 362
 Workers: 1 GreenField worker
 Queues: PostgreSQL outbox plus background job tables
 Scheduled jobs: 0 module schedules; worker poll/reap loops are process timers
@@ -45,7 +45,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 | Posts | 7 | 11 | 0 | 2 | 0 |
 | Comments | 12 | 0 | 0 | 0 | 0 |
 | Reactions | 7 | 0 | 0 | 0 | 0 |
-| Media | 12 | 0 | 0 | 0 | 0 |
+| Media | 13 | 0 | 0 | 0 | 0 |
 | Search | 9 | 4 | 0 | 0 | 0 |
 | Discover | 1 | 1 | 4 | 0 | 0 |
 | Activity | 4 | 1 | 1 | 1 | 0 |
@@ -58,7 +58,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 ## Candidate and production conclusions
 
 - The running API and worker are the same OCI revision, `f05d03c237c62d1b0946a760610d1155f02a8520`; that revision exactly matches captured `origin/main`.
-- Candidate source/runtime reconciliation is exact: 773 = 544 application routes + 229 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
+- Candidate source/runtime reconciliation is exact: 823 = 580 application routes + 243 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
 - API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
@@ -117,7 +117,7 @@ Every item above is expanded with evidence, impact, dependency and verification 
 ## Existing GreenField Capabilities Not Currently Used
 
 - Complete passkey/TOTP/recovery/session security APIs, developer/build coordination, module installation descriptors, generic verified MPS ModuleHost execution, and governed intelligence mission routes exist beyond current observed client usage.
-- 329 registered routes have no statically observed product-client caller; 251 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
+- 364 registered routes have no statically observed product-client caller; 286 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
 - Real AI provider adapters exist, but all real providers are unconfigured; only a development mock is available and excluded by the production resolver.
 
 ## Duplicate or Competing Implementations

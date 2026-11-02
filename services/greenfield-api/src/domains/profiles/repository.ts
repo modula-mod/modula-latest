@@ -3,7 +3,7 @@ import type {ModulaProfileDto} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 import type {Database} from '../../database/types.js'
 import {mapProfile} from './mapper.js'
-import {badgesForActor} from '../../premium/badges.js'
+import {badgesForActor, publicIdentitiesForActors} from '../../premium/badges.js'
 
 type ProfileRow = Database['profiles']
 
@@ -52,6 +52,87 @@ export class ProfileRepository {
     if (!row) return null
     if (!(await this.canView(row, viewerActorId))) return null
     return this.hydrate(row, viewerActorId)
+  }
+
+  /**
+   * Bounded profile projection for directories and other cursor pages. This
+   * preserves the single-profile visibility contract without issuing one set
+   * of profile/count/link/follow queries per row.
+   */
+  async getByActorIds(actorIds: string[], viewerActorId: string | null = null): Promise<Map<string, ModulaProfileDto>> {
+    const ids = [...new Set(actorIds.filter(Boolean))]
+    const result = new Map<string, ModulaProfileDto>()
+    if (ids.length === 0) return result
+
+    const rows = await this.db.selectFrom('profiles').selectAll()
+      .where('actor_id', 'in', ids).where('deleted_at', 'is', null).execute()
+    const blocked = new Set(viewerActorId ? await this.blockedActorIds(viewerActorId) : [])
+    const following = new Set<string>()
+    if (viewerActorId) {
+      const followed = await this.db.selectFrom('follows').select('followed_actor_id')
+        .where('follower_actor_id', '=', viewerActorId).where('followed_actor_id', 'in', ids)
+        .where('deleted_at', 'is', null).execute()
+      for (const row of followed) following.add(row.followed_actor_id)
+    }
+    const visible = rows.filter(row => {
+      if (blocked.has(row.actor_id)) return false
+      if (row.visibility === 'public' || row.actor_id === viewerActorId) return true
+      return (row.visibility === 'followers' || row.visibility === 'teams') && following.has(row.actor_id)
+    })
+    if (visible.length === 0) return result
+
+    const visibleActorIds = visible.map(row => row.actor_id)
+    const visibleProfileIds = visible.map(row => row.id)
+    let linksQuery = this.db.selectFrom('profile_links').selectAll()
+      .where('profile_id', 'in', visibleProfileIds).where('deleted_at', 'is', null)
+    const selfProfileId = visible.find(row => row.actor_id === viewerActorId)?.id
+    linksQuery = selfProfileId
+      ? linksQuery.where(eb => eb.or([eb('visibility', '=', 'public'), eb('profile_id', '=', selfProfileId)]))
+      : linksQuery.where('visibility', '=', 'public')
+
+    const [links, followerRows, followingRows, postRows, followsViewerRows, identities] = await Promise.all([
+      linksQuery.orderBy('profile_id', 'asc').orderBy('sort_order', 'asc').execute(),
+      this.db.selectFrom('follows').select([
+        'followed_actor_id as actor_id', sql<number>`count(*)::int`.as('count'),
+      ]).where('followed_actor_id', 'in', visibleActorIds).where('deleted_at', 'is', null)
+        .groupBy('followed_actor_id').execute(),
+      this.db.selectFrom('follows').select([
+        'follower_actor_id as actor_id', sql<number>`count(*)::int`.as('count'),
+      ]).where('follower_actor_id', 'in', visibleActorIds).where('deleted_at', 'is', null)
+        .groupBy('follower_actor_id').execute(),
+      this.db.selectFrom('posts').select([
+        'author_actor_id as actor_id', sql<number>`count(*)::int`.as('count'),
+      ]).where('author_actor_id', 'in', visibleActorIds).where('deleted_at', 'is', null)
+        .where('audience', '=', 'public').groupBy('author_actor_id').execute(),
+      viewerActorId
+        ? this.db.selectFrom('follows').select('follower_actor_id')
+            .where('follower_actor_id', 'in', visibleActorIds).where('followed_actor_id', '=', viewerActorId)
+            .where('deleted_at', 'is', null).execute()
+        : Promise.resolve([]),
+      publicIdentitiesForActors(this.db, visibleActorIds),
+    ])
+
+    const linksByProfile = new Map<string, typeof links>()
+    for (const link of links) linksByProfile.set(link.profile_id, [...(linksByProfile.get(link.profile_id) ?? []), link])
+    const followerCounts = new Map(followerRows.map(row => [row.actor_id, row.count]))
+    const followingCounts = new Map(followingRows.map(row => [row.actor_id, row.count]))
+    const postCounts = new Map(postRows.map(row => [row.actor_id, row.count]))
+    const followsViewer = new Set(followsViewerRows.map(row => row.follower_actor_id))
+
+    for (const row of visible) {
+      const dto = mapProfile(row, linksByProfile.get(row.id) ?? [], {
+        followers: followerCounts.get(row.actor_id) ?? 0,
+        following: followingCounts.get(row.actor_id) ?? 0,
+        posts: postCounts.get(row.actor_id) ?? 0,
+      })
+      result.set(row.actor_id, {
+        ...dto,
+        isFollowing: following.has(row.actor_id),
+        followsViewer: followsViewer.has(row.actor_id),
+        ...identities.get(row.actor_id),
+      })
+    }
+    return result
   }
 
   async listPublic(viewerActorId: string | null = null, excludedActorIds: string[] = []): Promise<ModulaProfileDto[]> {

@@ -9,6 +9,12 @@ export type Audience = 'public' | 'followers' | 'private'
 export type ReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'none'
 export type AttachmentKind = 'image' | 'video' | 'audio' | 'pdf' | 'document' | 'unknown'
 export type AttachmentStatus = 'created' | 'uploading' | 'uploaded' | 'processing' | 'ready' | 'failed' | 'expired' | 'rejected'
+export type CommunityVisibility = 'public' | 'private'
+export type CommunityMembershipPolicy = 'open' | 'approval'
+export type CommunityPostingPolicy = 'members' | 'moderators'
+export type CommunityRole = 'owner' | 'admin' | 'moderator' | 'member' | 'restricted'
+export type CommunityMembershipStatus = 'active' | 'pending' | 'banned' | 'left'
+export type PostDraftState = 'editing' | 'published'
 
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended'
 export type AuthenticationMethodType = 'passkey' | 'password' | 'email_otp' | 'totp' | 'recovery_code' | 'apple' | 'oidc'
@@ -326,6 +332,9 @@ export interface Database {
     quote_count: number
     reply_count: number
     repost_count: number
+    community_id: string | null
+    community_moderation_state: 'visible' | 'hidden' | 'removed' | null
+    community_featured_at: Date | null
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
@@ -1358,6 +1367,146 @@ export interface Database {
     message_id: string
     actor_id: string
     emoji: string
+    created_at: Date
+  }
+  greenfield_communities: {
+    community_id: string
+    slug: string
+    owner_actor_id: string
+    name: string
+    description: string
+    category: string
+    visibility: CommunityVisibility
+    discoverable: boolean
+    featured: boolean
+    membership_policy: CommunityMembershipPolicy
+    posting_policy: CommunityPostingPolicy
+    icon_attachment_id: string | null
+    cover_attachment_id: string | null
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_community_settings: {
+    community_id: string
+    allow_attachments: boolean
+    reactions_enabled: boolean
+    featured_posts_enabled: boolean
+    invite_links_enabled: boolean
+    blocked_words: string[]
+    version: number
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_community_memberships: {
+    community_id: string
+    actor_id: string
+    role: CommunityRole
+    status: CommunityMembershipStatus
+    notify_mentions: boolean
+    weekly_digest: boolean
+    event_reminders: boolean
+    joined_at: Date | null
+    created_at: Date
+    updated_at: Date
+    version: number
+  }
+  greenfield_community_events: {
+    event_id: string
+    community_id: string
+    creator_actor_id: string
+    title: string
+    description: string
+    starts_at: Date
+    ends_at: Date
+    timezone: string
+    location_type: 'online' | 'inPerson' | 'tba'
+    location_name: string | null
+    online_url: string | null
+    cover_attachment_id: string | null
+    capacity: number | null
+    status: 'scheduled' | 'cancelled'
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_community_event_responses: {
+    event_id: string
+    actor_id: string
+    response: 'going' | 'interested'
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_community_polls: {
+    poll_id: string
+    community_id: string
+    creator_actor_id: string
+    question: string
+    closes_at: Date
+    allow_vote_changes: boolean
+    results_visibility: 'always' | 'afterVote' | 'afterClose'
+    status: 'open' | 'cancelled'
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_community_poll_options: {
+    poll_id: string
+    option_id: string
+    position: number
+    text: string
+  }
+  greenfield_community_poll_votes: {
+    poll_id: string
+    option_id: string
+    actor_id: string
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_saved_collections: {
+    collection_id: string
+    owner_actor_id: string
+    name: string
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_saved_collection_items: {
+    item_id: string
+    collection_id: string
+    save_id: string
+    position: number
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_post_drafts: {
+    draft_id: string
+    owner_actor_id: string
+    idempotency_key: string | null
+    text: string
+    feed: FeedMode
+    audience: Audience
+    reply_permission: ReplyPermission
+    publish_to_atproto: boolean
+    state: PostDraftState
+    published_post_id: string | null
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
+  greenfield_post_draft_content: {
+    draft_id: string
+    attachment_id: string
+    content_type: Exclude<AttachmentKind, 'unknown'>
+    caption: string | null
+    position: number
     created_at: Date
   }
   greenfield_premium_catalogue_versions: {catalogue_version: number; status: 'active' | 'retired'; effective_at: Date; metadata: unknown; created_at: Date}

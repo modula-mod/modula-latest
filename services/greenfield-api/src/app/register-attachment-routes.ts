@@ -123,6 +123,31 @@ export async function registerAttachmentRoutes(
       }
     }
     if (!allowed) {
+      // Community artwork and event covers inherit the community boundary.
+      // Private assets require a current active membership; knowing the
+      // attachment identifier never grants access.
+      const communityBinding = await db
+        .selectFrom('greenfield_communities as community')
+        .leftJoin('greenfield_community_events as event', join => join
+          .onRef('event.community_id', '=', 'community.community_id')
+          .on('event.deleted_at', 'is', null))
+        .select(['community.community_id', 'community.visibility'])
+        .where('community.deleted_at', 'is', null)
+        .where(eb => eb.or([
+          eb('community.icon_attachment_id', '=', attachmentId),
+          eb('community.cover_attachment_id', '=', attachmentId),
+          eb('event.cover_attachment_id', '=', attachmentId),
+        ]))
+        .executeTakeFirst()
+      if (communityBinding?.visibility === 'public') {
+        allowed = true
+      } else if (communityBinding && request.auth?.actorId) {
+        allowed = Boolean(await db.selectFrom('greenfield_community_memberships').select('actor_id')
+          .where('community_id', '=', communityBinding.community_id)
+          .where('actor_id', '=', request.auth.actorId).where('status', '=', 'active').executeTakeFirst())
+      }
+    }
+    if (!allowed) {
       // Story media follows the story group's visibility and block policy. An
       // attachment URL alone never grants access to private story content.
       const storyBinding = await db.selectFrom('greenfield_story_items as item')

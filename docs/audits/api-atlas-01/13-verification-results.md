@@ -4,7 +4,7 @@
 
 - `pnpm api:atlas:verify`: 85/85 passed.
 - Deterministic output: two consecutive generations byte-identical.
-- Runtime completeness: 773 = 544 application + 229 framework-derived; all framework-derived routes are explicitly excluded.
+- Runtime completeness: 823 = 580 application + 243 framework-derived; all framework-derived routes are explicitly excluded.
 - Parsers: JSON, RFC-style CSV and JSON-compatible OpenAPI YAML PASS.
 - Mermaid sanity: request, module, intelligence, media and event flows PASS.
 - Client literals: 142/142 matched; 0 unresolved.
