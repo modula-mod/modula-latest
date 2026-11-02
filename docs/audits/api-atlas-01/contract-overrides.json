@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mission": "GREENFIELD-FEATURE-REALITY-01",
-  "workstream": "PR-01 through PR-05 disposable integration composition",
+  "workstream": "PR-01 through PR-06 disposable integration composition",
   "routes": {
     "DELETE /v1/me/collections/:collectionId": {
       "purpose": "Soft-delete an authenticated actor-owned collection without deleting source posts or Saved rows.",
@@ -2723,6 +2723,71 @@
       },
       "idempotencyConcurrency": "The server derives idempotency key draft-publish:<draftId>. The existing unique post author/key invariant converges concurrent retries, and post creation, attachment activation, outbox/events/audit and draft state/publishedPostId update commit in one database transaction. A stale finalizer rolls back the post; failed publication leaves state=editing.",
       "versioningCompatibility": "HTTP v1 new route. The created post is a normal SocialPostDto record consumable without a fake draft post type."
+    },
+    "POST /v1/modules/:moduleId/package-install-plan": {
+      "purpose": "Resolve an authenticated, signed and compatible package dependency closure for a module without installing it, subtract already-cached public immutable artifacts, and return a canonical lock digest for install-time concurrency checking.",
+      "owningDomain": "Modules / signed package distribution",
+      "authentication": "Required GreenField bearer access session; the authenticated account is resolved server-side.",
+      "authorization": "The requested module must be catalogue-installable for the authenticated account. Every paid package in the resolved closure requires that account to hold a current TRIAL, ACTIVE or GRACE entitlement. Client-supplied account or ownership fields are rejected.",
+      "request": {
+        "path": {
+          "moduleId": "Required canonical module or package identifier; aliases are normalized by the server. It never selects a storage path."
+        },
+        "body": {
+          "version": "Optional exact semantic version; null or omission selects the highest compatible signed release.",
+          "hostVersion": "Required semantic host version.",
+          "platform": "Required: ios, android, web, desktop or server.",
+          "moduleSdkVersion": "Optional semantic SDK version reported by the host.",
+          "productUiContractVersion": "Optional semantic product UI contract version reported by the host.",
+          "hostCapabilities": "Optional array of at most 256 validated host capability descriptors: id, version, status, provenance and optional renderer/provider/fallback/constraints.",
+          "cachedPublicDigests": "Optional array of at most 4096 lowercase SHA-256 digests for public immutable artifacts already verified by PackageManager."
+        },
+        "validation": "A JSON object is required. Unknown fields, malformed semantic versions, unsupported platforms, invalid capability descriptors, uppercase/non-SHA digests and limit violations are rejected. Package metadata and dependency graphs are validated server-side; clients cannot supply releases, signatures, storage paths, publisher trust or entitlement facts."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "private, no-store"
+        },
+        "envelope": "{ok:true,data:{lock,lockSha256},meta:{requestId,serverTime}}",
+        "lock": {
+          "schemaVersion": "modula.package-lock.1",
+          "requested": "Canonical requested package IDs.",
+          "packages": "Topologically valid exact releases. Each entry contains schemaVersion, packageId, publisherId, category, version, releaseId, SHA-256 artifact metadata and bounded sizes, server-selected download reference and authorization mode, Ed25519 signature evidence, verified/revoked trust state, host/platform/capability requirements, dependency ranges, cache policy, sharing class and optional execution provider.",
+          "aggregateCompressedBytes": "Total compressed bytes in the closure.",
+          "aggregateInstalledEstimateBytes": "Total declared installed-size estimate.",
+          "newDownloadBytes": "Bytes not represented by cachedPublicDigests.",
+          "reusedArtifactDigests": "Verified public immutable digests reused from the client cache."
+        },
+        "lockSha256": "Lowercase SHA-256 of canonical JSON for the complete lock; the install request must return this digest when an optional package closure exists."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed or unknown request fields, invalid versions/capabilities/digests, invalid dependency constraints or graph-bound violations."
+        ],
+        "401": [
+          "UNAUTHENTICATED for a missing, invalid or expired bearer session."
+        ],
+        "403": [
+          "FORBIDDEN when the account lacks catalogue access or an active entitlement for any paid closure member.",
+          "UNTRUSTED_RELEASE, RELEASE_REVOKED or SIGNER_REVOKED when declared package bytes cannot satisfy the signed trust chain."
+        ],
+        "404": [
+          "NOT_FOUND when the module has no declared optional modula.package.1 distribution release. This permits the separate historical standard-install path; it does not advertise an installable package closure."
+        ],
+        "409": [
+          "CONFLICT for dependency cycles, missing dependencies, incompatible constraints, unsupported capabilities/platforms or unavailable execution providers.",
+          "HOST_VERSION_TOO_OLD for an incompatible host.",
+          "ARTIFACT_DIGEST_MISMATCH if retained artifact bytes fail read-time integrity verification."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; secrets and private account facts are not returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated. Resolution is bounded to 128 selected packages, 16,384 resolver visits, 256 supplied capabilities and 4,096 cached digests.",
+      "idempotencyConcurrency": "Read-only and deterministic for the same registry, entitlement and request snapshot. No Idempotency-Key is used. lockSha256 is the optimistic concurrency token: install rejects a changed closure instead of silently installing different bytes. Duplicate cached digests do not alter ownership or registry state.",
+      "versioningCompatibility": "HTTP v1. Lock schema is modula.package-lock.1 and package schema is modula.package.1. Only Ed25519-signed releases compatible with the supplied host version, platform, Module SDK, Product UI contract and available capabilities are selected. Unknown/revoked signers and unsupported package metadata fail closed."
     },
     "POST /v1/stories/:storyId/replies": {
       "purpose": "Deliver an authenticated viewer's reply to a concrete live Story item as a persistent message in the Story author's canonical one-to-one conversation.",

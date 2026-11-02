@@ -30,6 +30,7 @@ import {ModuleBackendLifecycleService} from '../backend/lifecycle-service.js'
 import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId, type GreenfieldInterModuleActionLineage} from '@modula/greenfield-contracts'
+import {isSemver} from '@modula/greenfield-module-manifest'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldPublisherSigningKeyService} from '../release-signing.js'
 import {loadRegisteredIdentityAliases} from '../identity-aliases.js'
@@ -52,6 +53,48 @@ type RouteConfig = Record<string, unknown>
 
 function canonicalModuleParam(request: FastifyRequest): string {
   return resolveCanonicalModuleId(String((request.params as {moduleId?: string}).moduleId ?? ''))
+}
+
+const PACKAGE_PLAN_FIELDS = new Set([
+  'version', 'hostVersion', 'platform', 'moduleSdkVersion', 'productUiContractVersion',
+  'hostCapabilities', 'cachedPublicDigests',
+])
+
+function packagePlanInput(value: unknown): {
+  version: string | null
+  context: DistributionHostContext
+  cachedPublicDigests: string[]
+} {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw moduleError('VALIDATION_FAILED', 'Package plan body must be an object')
+  }
+  const input = value as Record<string, unknown>
+  const unknown = Object.keys(input).find(key => !PACKAGE_PLAN_FIELDS.has(key))
+  if (unknown) throw moduleError('VALIDATION_FAILED', `Unknown request field: ${unknown}`)
+  const version = input.version == null ? null
+    : typeof input.version === 'string' && isSemver(input.version.trim()) ? input.version.trim()
+      : null
+  if (input.version != null && !version) throw moduleError('VALIDATION_FAILED', 'version must be a semantic version')
+  if (typeof input.hostVersion !== 'string' || !input.hostVersion.trim()) {
+    throw moduleError('VALIDATION_FAILED', 'hostVersion is required')
+  }
+  if (typeof input.platform !== 'string' || !['ios', 'android', 'web', 'desktop', 'server'].includes(input.platform)) {
+    throw moduleError('VALIDATION_FAILED', 'platform must be ios, android, web, desktop, or server')
+  }
+  for (const key of ['moduleSdkVersion', 'productUiContractVersion'] as const) {
+    if (input[key] != null && (typeof input[key] !== 'string' || !isSemver(input[key].trim()))) {
+      throw moduleError('VALIDATION_FAILED', `${key} must be a semantic version`)
+    }
+  }
+  if (input.hostCapabilities != null && (!Array.isArray(input.hostCapabilities) || input.hostCapabilities.length > 256)) {
+    throw moduleError('VALIDATION_FAILED', 'hostCapabilities must be an array of at most 256 entries')
+  }
+  const cachedPublicDigests = input.cachedPublicDigests == null ? [] : input.cachedPublicDigests
+  if (!Array.isArray(cachedPublicDigests) || cachedPublicDigests.length > 4096
+      || cachedPublicDigests.some(digest => typeof digest !== 'string' || !/^[a-f0-9]{64}$/.test(digest))) {
+    throw moduleError('VALIDATION_FAILED', 'cachedPublicDigests must contain at most 4096 lowercase SHA-256 digests')
+  }
+  return {version, context: distributionContext(input), cachedPublicDigests: cachedPublicDigests as string[]}
 }
 
 /**
@@ -750,12 +793,12 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      const body = (request.body as Record<string, unknown> | null) ?? {}
-      await gubic.assertCatalogueInstallAllowed(auth.accountId, canonicalModuleParam(request))
-      const cached = Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : []
-      if (cached.some(value => typeof value !== 'string')) throw moduleError('VALIDATION_FAILED', 'Cached digest list must contain strings')
-      const plan = await distribution.packageInstallPlan(canonicalModuleParam(request),
-        typeof body.version === 'string' ? body.version : null, distributionContext(body), cached as string[])
+      const moduleId = canonicalModuleParam(request)
+      const input = packagePlanInput(request.body)
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, moduleId)
+      const plan = await distribution.packageInstallPlan(
+        auth.accountId, moduleId, input.version, input.context, input.cachedPublicDigests,
+      )
       reply.header('Cache-Control', 'private, no-store')
       return reply.send(successEnvelope(plan, request.id))
     } catch (error) {
@@ -773,7 +816,7 @@ export async function registerModuleRoutes(
       const hostContext = distributionContext(body)
       let exactPackageVersion: string | undefined
       try {
-        const plan = await distribution.packageInstallPlan(moduleId,
+        const plan = await distribution.packageInstallPlan(auth.accountId, moduleId,
           typeof body.version === 'string' ? body.version : null, hostContext,
           Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : [])
         if (body.packageLockSha256 !== plan.lockSha256) {
@@ -941,7 +984,7 @@ export async function registerModuleRoutes(
       const hostContext = distributionContext(body)
       let exactPackageVersion: string | undefined
       try {
-        const plan = await distribution.packageInstallPlan(moduleId,
+        const plan = await distribution.packageInstallPlan(auth.accountId, moduleId,
           typeof body.version === 'string' ? body.version : null, hostContext,
           Array.isArray(body.cachedPublicDigests) ? body.cachedPublicDigests : [])
         if (body.packageLockSha256 !== plan.lockSha256) {

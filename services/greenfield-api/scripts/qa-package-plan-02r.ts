@@ -19,7 +19,7 @@ try {
   const service = new GreenfieldModuleDistributionService(db, config)
   for (const moduleId of ['digital.modula.orbit-phaser', 'digital.modula.orbit-dash']) {
     for (const cachedPublicDigests of [[], ['70b3ae149b9eec18c2fdabf69a9cf3e05a15dc2a2c2255929e10c4aa5f7fa28b']]) {
-      const {lock, lockSha256} = await service.packageInstallPlan(moduleId, null,
+      const {lock, lockSha256} = await service.packageInstallPlan(null, moduleId, null,
         {hostVersion: '1.1.0', platform: 'ios'}, cachedPublicDigests)
       console.log(JSON.stringify({moduleId, cached: cachedPublicDigests.length > 0, lockSha256,
         packages: lock.packages.map(item => ({packageId: item.packageId, version: item.version,

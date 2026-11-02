@@ -88,6 +88,38 @@ it('accepts an inventoried web runtime and rejects substitution or native member
   expect(() => verifyOptionalArchive(native, 'web-runtime')).toThrow(/native payload|unsafe member/)
 })
 
+it('requires module package inventories and rejects tampered or executable content', () => {
+  const frontend = Buffer.from('{"schemaVersion":"1.0.0","views":[]}')
+  const inventory = Buffer.from(JSON.stringify({
+    schema: 'modula.package-files.1',
+    files: {'frontend/frontend.manifest.json': sha256(frontend)},
+  }))
+  const modulePackage = gzipSync(Buffer.concat([
+    tarEntry('frontend/frontend.manifest.json', frontend),
+    tarEntry('package.files.json', inventory),
+    Buffer.alloc(1024),
+  ]))
+  expect(() => verifyOptionalArchive(modulePackage, 'module')).not.toThrow()
+
+  const changed = gzipSync(Buffer.concat([
+    tarEntry('frontend/frontend.manifest.json', Buffer.from('{"changed":true}')),
+    tarEntry('package.files.json', inventory),
+    Buffer.alloc(1024),
+  ]))
+  expect(() => verifyOptionalArchive(changed, 'module')).toThrow(/digest mismatch/)
+
+  const nativeInventory = Buffer.from(JSON.stringify({
+    schema: 'modula.package-files.1',
+    files: {'native/module.dylib': sha256(Buffer.from('native'))},
+  }))
+  const native = gzipSync(Buffer.concat([
+    tarEntry('native/module.dylib', Buffer.from('native')),
+    tarEntry('package.files.json', nativeInventory),
+    Buffer.alloc(1024),
+  ]))
+  expect(() => verifyOptionalArchive(native, 'module')).toThrow(/native payload|unsafe member/)
+})
+
 type Built = {source: FakeSource; productId: string; version: string; tag: string; packageBytes: Buffer; files: Record<string, Buffer>; provenance: Record<string, unknown>}
 
 class FakeSource implements GithubReleaseSource {
@@ -458,6 +490,147 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     })
     expect(afterRevocationDownload.statusCode).toBe(404)
   })
+
+  it('plans and installs a signed content-only module package with entitlement and tamper gates', async () => {
+    const keys = generateKeyPairSync('ed25519')
+    const keyId = `module-package-${suffix}`
+    await new GreenfieldPublisherSigningKeyService(db).register(
+      'modula',
+      {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()},
+      null,
+    )
+    const moduleId = nextId()
+    const content = Buffer.from('{"schemaVersion":"1.0.0","views":[]}')
+    const inventory = Buffer.from(JSON.stringify({
+      schema: 'modula.package-files.1',
+      files: {'frontend/frontend.manifest.json': sha256(content)},
+    }))
+    const packageBytes = gzipSync(Buffer.concat([
+      tarEntry('frontend/frontend.manifest.json', content),
+      tarEntry('package.files.json', inventory),
+      Buffer.alloc(1024),
+    ]))
+    const packagePath = 'distribution/module-content.tgz'
+    const built = buildRelease(moduleId, '1.0.0', {
+      sign: {keyId, privateKey: keys.privateKey},
+      mutateProduct: mps => {
+        mps.distribution = {
+          schema: 'modula.package.1', category: 'module',
+          artifact: {
+            path: packagePath, sha256: sha256(packageBytes), mediaType: 'application/gzip',
+            compressedSizeBytes: packageBytes.length, installedSizeEstimateBytes: content.length,
+          },
+          minimumHostVersion: '>=1.0.0', platforms: ['ios'], dependencies: [], requiredCapabilities: [],
+          cachePolicy: 'retain-while-owned', sharing: 'public-immutable',
+        }
+      },
+      mutateFiles: files => { files[packagePath] = packageBytes },
+    })
+    const synced = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({
+      repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false,
+    })
+    expect(synced).toMatchObject({signed: true, releaseState: 'published'})
+
+    const owner = await registerAccount(app, `module-package-${suffix}@example.invalid`, `pkg${suffix}`, db)
+    const other = await registerAccount(app, `module-package-other-${suffix}@example.invalid`, `pkgx${suffix}`, db)
+    const headers = {authorization: `Bearer ${owner.token}`}
+    const path = `/v1/modules/${moduleId}/package-install-plan`
+    const payload = {version: '1.0.0', hostVersion: '1.1.0', platform: 'ios', cachedPublicDigests: []}
+
+    expect((await app.inject({method: 'POST', url: path, payload})).statusCode).toBe(401)
+    const unknown = await app.inject({method: 'POST', url: path, headers, payload: {...payload, accountId: owner.accountId}})
+    expect(unknown.statusCode, unknown.body).toBe(400)
+    expect(unknown.json().error.code).toBe('VALIDATION_FAILED')
+    const invalidDigest = await app.inject({method: 'POST', url: path, headers, payload: {...payload, cachedPublicDigests: ['not-a-digest']}})
+    expect(invalidDigest.statusCode, invalidDigest.body).toBe(400)
+
+    const initialPlan = await app.inject({method: 'POST', url: path, headers, payload})
+    expect(initialPlan.statusCode, initialPlan.body).toBe(200)
+    expect(initialPlan.headers['cache-control']).toBe('private, no-store')
+    expect(initialPlan.json().data).toMatchObject({
+      lock: {
+        schemaVersion: 'modula.package-lock.1', requested: [moduleId],
+        packages: [expect.objectContaining({
+          packageId: moduleId, version: '1.0.0', category: 'module',
+          artifact: expect.objectContaining({sha256: sha256(packageBytes), compressedSizeBytes: packageBytes.length}),
+          trust: {verified: true, publisherVerified: true, revoked: false},
+          signature: expect.objectContaining({algorithm: 'Ed25519', keyId}),
+        })],
+        newDownloadBytes: packageBytes.length,
+      },
+      lockSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+    })
+    const cached = await app.inject({
+      method: 'POST', url: path, headers,
+      payload: {...payload, cachedPublicDigests: [sha256(packageBytes)]},
+    })
+    expect(cached.statusCode, cached.body).toBe(200)
+    expect(cached.json().data.lock).toMatchObject({newDownloadBytes: 0, reusedArtifactDigests: [sha256(packageBytes)]})
+
+    const now = new Date()
+    const offerId = `offer:${moduleId}`
+    await db.insertInto('greenfield_offers').values({
+      offer_id: offerId, product_id: moduleId, kind: 'ONE_TIME', display_name: 'QA module package',
+      capabilities: sql`${JSON.stringify([])}::jsonb`, commercial_terms: sql`${JSON.stringify({})}::jsonb`,
+      trial_duration_seconds: null, state: 'ACTIVE', created_by_account_id: owner.accountId,
+      created_at: now, updated_at: now,
+    }).execute()
+    const unownedPlan = await app.inject({
+      method: 'POST', url: path, headers: {authorization: `Bearer ${other.token}`}, payload,
+    })
+    expect(unownedPlan.statusCode, unownedPlan.body).toBe(403)
+    const unownedInstall = await app.inject({
+      method: 'POST', url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${other.token}`, 'idempotency-key': `unowned-module-package-${suffix}`},
+      payload: {...payload, approvedPermissions: [], packageLockSha256: initialPlan.json().data.lockSha256},
+    })
+    expect(unownedInstall.statusCode, unownedInstall.body).toBe(403)
+
+    await db.insertInto('greenfield_entitlements').values({
+      entitlement_id: `entitlement:${moduleId}:${owner.accountId}`, owner_type: 'ACCOUNT',
+      owner_account_id: owner.accountId, owner_organisation_id: null, product_id: moduleId, offer_id: offerId,
+      source: 'ADMIN', state: 'ACTIVE', external_receipt_id: null, provenance_reference: 'isolated-package-plan-qa',
+      started_at: now, expires_at: null, created_at: now, updated_at: now,
+    }).execute()
+    const entitledPlan = await app.inject({method: 'POST', url: path, headers, payload})
+    expect(entitledPlan.statusCode, entitledPlan.body).toBe(200)
+    expect(entitledPlan.json().data.lockSha256).toBe(initialPlan.json().data.lockSha256)
+
+    const changedLock = await app.inject({
+      method: 'POST', url: `/v1/modules/${moduleId}/install`,
+      headers: {...headers, 'idempotency-key': `changed-module-package-${suffix}`},
+      payload: {...payload, approvedPermissions: [], packageLockSha256: '0'.repeat(64)},
+    })
+    expect(changedLock.statusCode, changedLock.body).toBe(409)
+    const installed = await app.inject({
+      method: 'POST', url: `/v1/modules/${moduleId}/install`,
+      headers: {...headers, 'idempotency-key': `module-package-install-${suffix}`},
+      payload: {...payload, approvedPermissions: [], packageLockSha256: entitledPlan.json().data.lockSha256},
+    })
+    expect(installed.statusCode, installed.body).toBe(202)
+    expect(installed.json().data).toMatchObject({
+      status: 'installing', distributionReady: true,
+      installationDescriptor: {moduleId, currentRelease: {version: '1.0.0'}},
+    })
+    const replay = await app.inject({
+      method: 'POST', url: `/v1/modules/${moduleId}/install`,
+      headers: {...headers, 'idempotency-key': `module-package-install-${suffix}`},
+      payload: {...payload, approvedPermissions: [], packageLockSha256: entitledPlan.json().data.lockSha256},
+    })
+    expect(replay.statusCode, replay.body).toBe(202)
+    expect(replay.json().data.installationId).toBe(installed.json().data.installationId)
+
+    const downloadRef = entitledPlan.json().data.lock.packages[0].artifact.download.pathOrUrl
+    const download = await app.inject({method: 'GET', url: new URL(downloadRef, 'https://qa.invalid').pathname})
+    expect(download.statusCode, download.body).toBe(200)
+    expect(sha256(download.rawPayload)).toBe(sha256(packageBytes))
+    const corrupted = Buffer.from(packageBytes)
+    corrupted[0] = corrupted[0]! ^ 0xff
+    await expect(db.insertInto('greenfield_release_asset_blobs').values({
+      sha256: 'f'.repeat(64), media_type: 'application/gzip', byte_size: corrupted.length,
+      bytes: corrupted, created_at: now,
+    } as never).execute()).rejects.toThrow()
+  }, 120_000)
 
   it('projects a signed external game through governed GUBIC discovery, entitlement and publisher isolation', async () => {
     const owner = await registerAccount(app, `gubic-owner-${suffix}@example.invalid`, `gubicowner${suffix}`, db)
