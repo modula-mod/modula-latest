@@ -1,5 +1,6 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import pg from 'pg'
+import net, {type AddressInfo} from 'node:net'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
@@ -149,6 +150,40 @@ describeIfDb('GUBIC play platform (library, sessions, lobbies, achievements, sub
     await expect(play.decide(users.admin.accountId, submission.submissionId, {decision: 'approve'})).rejects.toMatchObject({code: 'FORBIDDEN'})
     const rejected = await play.decide(users.admin.accountId, submission.submissionId, {decision: 'reject', reason: 'Add a pause screen'})
     expect(rejected).toMatchObject({status: 'rejected', decisionReason: 'Add a pause screen'})
+  })
+
+  it('rejects lobby socket upgrades before the handshake unless authenticated and a member', async () => {
+    const lobby = await play.createLobby(users.host.accountId, GAME, {title: 'Socket', visibility: 'invite', maxPlayers: 2})
+    await app.listen({host: '127.0.0.1', port: 0})
+    const {port} = app.server.address() as AddressInfo
+    // Raw handshake so we observe exactly what the server answers on the wire.
+    const upgrade = (lobbyId: string, token?: string) => new Promise<number>((resolve, reject) => {
+      const socket = net.connect(port, '127.0.0.1', () => socket.write([
+        `GET /v1/gubic/lobbies/${lobbyId}/socket HTTP/1.1`, `Host: 127.0.0.1:${port}`, 'Connection: Upgrade', 'Upgrade: websocket',
+        'Sec-WebSocket-Version: 13', 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==', ...(token ? [`Authorization: Bearer ${token}`] : []), '', '',
+      ].join('\r\n')))
+      let data = ''
+      socket.on('data', chunk => {
+        data += chunk.toString('latin1')
+        const match = /^HTTP\/1\.1 (\d{3})/.exec(data)
+        if (match) { socket.destroy(); resolve(Number(match[1])) }
+      })
+      socket.on('error', reject)
+      socket.on('close', () => reject(new Error(`closed without status: ${JSON.stringify(data)}`)))
+    })
+    expect(await upgrade('lobby-does-not-exist')).toBe(401)
+    expect(await upgrade(lobby.lobbyId)).toBe(401)
+    expect(await upgrade(lobby.lobbyId, 'not-a-real-token')).toBe(401)
+    expect(await upgrade('lobby-does-not-exist', users.host.accessToken)).toBe(404)
+    expect(await upgrade(lobby.lobbyId, users.third.accessToken)).toBe(404)
+    expect(await upgrade(lobby.lobbyId, users.host.accessToken)).toBe(101)
+    let hello!: Promise<any>
+    const ws = await (app as any).injectWS(`/v1/gubic/lobbies/${lobby.lobbyId}/socket`, {headers: {authorization: `Bearer ${users.host.accessToken}`}}, {
+      onInit: (socket: any) => { hello = new Promise(resolve => socket.once('message', (data: Buffer) => resolve(JSON.parse(data.toString())))) },
+    })
+    expect(await hello).toEqual({type: 'hello', lobbyId: lobby.lobbyId})
+    ws.terminate()
+    await play.leaveLobby(users.host.accountId, lobby.lobbyId)
   })
 
   async function createUser(handle: string) {
