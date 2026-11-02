@@ -1,22 +1,22 @@
 # GREENFIELD FEATURE REALITY 01 — PR-03 Story replies into direct messages
 
-MISSION ITEM: PR-03 — STORY REPLIES INTO DIRECT MESSAGES  
-STATUS: PARTIAL  
-BRANCH: `feat/qa-story-dm-replies`  
-PR URL: `https://github.com/modula-mod/modula-latest/pull/149`  
-BASE SHA: Stacked review base `828173171147e2bc033142b413d3f7d4d8b1f410`; underlying GreenField main baseline `bae20cebb48685c56ed5ccfe5537f121e3f36110`  
-HEAD SHA: Implementation commit `cd1e1dbd7e73f990166774dc0ed15fb196f5125b`; the exact review tip is maintained in the draft PR description  
-ROUTES ADDED: 1 — `POST /v1/stories/:storyId/replies`  
-ROUTES MODIFIED: 1 — `GET /v1/conversations/:id/messages` adds optional `storyContext`; `POST /v1/conversations` retains its PR-02 contract while sharing the same transaction-safe primitive  
-ATLAS UPDATED: YES — JSON, CSV, DOCX, Markdown and OpenAPI; 690 runtime methods reconcile to 485 application routes plus 205 framework routes  
-MIGRATIONS: None; existing message, idempotency, event, delivery, outbox, job and notification tables are reused  
-TESTS PASSED: 22 persisted integration/regression tests, canonical workspace typecheck and 103 Atlas checks  
-TESTS FAILED: 0 final acceptance tests  
-TESTS SKIPPED: 0 in the reported final suites  
-SECURITY RESULTS: PASS for authentication, Story visibility/expiry, either-direction blocks, self-reply, recipient derivation, declined requests, unknown fields, guessed IDs, idempotency-key conflicts and cross-user conversation reads  
-QA INTEGRATION RESULTS: PASS for persisted API, event-delivery and worker-handler behavior in disposable PostgreSQL; no deployed QA API/worker or Native runtime was claimed  
-NATIVE COMPATIBILITY: Ordinary message rows remain displayable by existing clients and `storyContext` is additive, but latest Native main still opens Messages instead of calling the reply endpoint  
-BLOCKERS: Native request wiring and a deployed isolated-QA service/device journey are required for full end-to-end acceptance  
+MISSION ITEM: PR-03 — STORY REPLIES INTO DIRECT MESSAGES
+STATUS: PARTIAL
+BRANCH: `feat/qa-story-dm-replies`
+PR URL: `https://github.com/modula-mod/modula-latest/pull/149`
+BASE SHA: Stacked review base `d99c1470df6e5b9aff8f6bb02174120fcd7bc9b5`; underlying GreenField main baseline `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
+HEAD SHA: Implementation commit `cd1e1dbd7e73f990166774dc0ed15fb196f5125b`; the exact review tip is maintained in the draft PR description
+ROUTES ADDED: 1 — `POST /v1/stories/:storyId/replies`
+ROUTES MODIFIED: 1 — `GET /v1/conversations/:id/messages` adds optional `storyContext`; `POST /v1/conversations` retains its PR-02 contract while sharing the same transaction-safe primitive
+ATLAS UPDATED: YES — JSON, CSV, DOCX, Markdown and OpenAPI; 759 runtime methods reconcile to 536 application routes plus 223 framework routes
+MIGRATIONS: None; existing message, idempotency, event, delivery, outbox, job and notification tables are reused
+TESTS PASSED: 23/23 persisted integration/regression tests, canonical workspace typecheck and 103/103 Atlas checks
+TESTS FAILED: 0 final acceptance tests
+TESTS SKIPPED: 0 in the reported final suites
+SECURITY RESULTS: PASS for authentication, Story visibility/expiry, either-direction blocks, self-reply, recipient derivation, declined requests, unknown fields, guessed IDs, idempotency-key conflicts and cross-user conversation reads
+QA INTEGRATION RESULTS: PASS for persisted API, event-delivery and worker-handler behavior in disposable PostgreSQL; no deployed QA API/worker or Native runtime was claimed
+NATIVE COMPATIBILITY: Ordinary message rows remain displayable by existing clients and `storyContext` is additive, but latest Native main still opens Messages instead of calling the reply endpoint
+BLOCKERS: Native request wiring and a deployed isolated-QA service/device journey are required for full end-to-end acceptance
 APPROVAL REQUIRED: Andy must approve merge and any QA deployment
 
 ## Outcome
@@ -32,8 +32,8 @@ The backend candidate passes its persisted, concurrency, security, regression an
 - Disposable PostgreSQL container: `modula-feature-reality-01-pg`.
 - Isolation labels: `digital.modula.mission=GREENFIELD-FEATURE-REALITY-01`, `digital.modula.scope=qa-disposable`.
 - PostgreSQL exposure: loopback only at `127.0.0.1:55483`.
-- Final acceptance database: `modula_feature_reality_01_pr03_final1_20261101`.
-- `/root/modula-latest` remained untouched at production revision `db0e1e31c19f07538198c8191fa97976c39a7684`.
+- Reconciliation database: `modula_feature_reality_01_pr03_reconcile_20261102`.
+- `/root/modula-latest` was observed clean and remained untouched at `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`.
 - No production database, object storage, signing key, billing system, deployment, merge or public publication was used.
 
 ## API contract
@@ -130,7 +130,7 @@ The notification worker's idempotent mode uses `ON CONFLICT DO NOTHING`. Running
 ## API Atlas result
 
 ```text
-690 runtime method routes = 485 application routes + 205 framework-derived routes
+759 runtime method routes = 536 application routes + 223 framework-derived routes
 source-only routes: 0
 runtime-only routes: 0
 routes added from PR-02 candidate: 1
@@ -151,17 +151,20 @@ CI=true pnpm typecheck
 PASS: canonical 24-project workspace dependency builds and typechecks
 
 MODULA_TEST_DATABASE_URL=<isolated-loopback-database> CI=true pnpm --dir services/greenfield-api exec vitest run tests/story-dm-replies.integration.test.ts tests/phase7i.f5-stories.test.ts tests/messaging.integration.test.ts tests/phase6s.social.test.ts --no-file-parallelism --maxWorkers=1
-PASS: 4 files, 22 tests, 0 failed, 0 skipped
+PASS: 4 files, 23 tests, 0 failed, 0 skipped
   story-dm-replies.integration.test.ts: 3
   phase7i.f5-stories.test.ts: 4
-  messaging.integration.test.ts: 7
+  messaging.integration.test.ts: 8
   phase6s.social.test.ts: 8
 
-CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true pnpm api:atlas:capture-candidate
-PASS: 690 runtime methods / 485 application routes / zero reconciliation gaps
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true MODULA_GUBIC_PLAY_ENABLED=true pnpm api:atlas:capture-candidate
+PASS: 759 runtime methods / 536 application routes / zero reconciliation gaps
 
 CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
 PASS: 103/103 checks
+
+(umask 0002; TZ=Pacific/Auckland API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate-docx.mjs)
+PASS: DOCX SHA-256 unchanged at `100319ea2b9677daa4c061999ca648775a4902736c552f5b906b1e7fddfd0ecc`
 
 git diff --check
 PASS
@@ -193,7 +196,7 @@ Mission evidence:
 
 ## Native integration gap
 
-The latest remote Native main inspected read-only was `dbbd1f26a4a0761cfd6bc46c2e7ef671085b1775` (31 October 2026). In `ios/Modula/Features/Stories/StoryViews.swift`, `sendReply` still states `No story-reply endpoint yet`, clears the draft, and opens a new Messages surface without issuing the API request.
+The latest remote Native main inspected read-only was `e50fc3916fb4738b7c63b7bed92bef49a8076eb8` (2 November 2026). In `ios/Modula/Features/Stories/StoryViews.swift`, `sendReply` still states `No story-reply endpoint yet`, clears the draft, and opens a new Messages surface without issuing the API request. The decoded `StoryItem.id` is already sourced from the server's `itemId`, so it is the correct path identifier once the request is wired.
 
 Required Native follow-up, outside this server mission:
 

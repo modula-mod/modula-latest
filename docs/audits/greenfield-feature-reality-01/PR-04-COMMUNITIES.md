@@ -8,7 +8,7 @@ BRANCH: `feat/qa-communities`
 
 PR URL: `https://github.com/modula-mod/modula-latest/pull/150`
 
-BASE SHA: Stacked review base `e2da717950ded407edbba3ab8cca44b6c56bf08a`; underlying GreenField main baseline `bae20cebb48685c56ed5ccfe5537f121e3f36110`
+BASE SHA: Stacked review base `2826b31c3412203514f2113c81cf1c645e718513`; underlying GreenField main baseline `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`
 
 HEAD SHA: Implementation commit `102a310195373fb3ff810d0f55b90e67883f8982`; the exact review tip is maintained in the draft PR description
 
@@ -16,11 +16,11 @@ ROUTES ADDED: 21 — Communities discovery/identity, membership, posts, settings
 
 ROUTES MODIFIED: Shared attachment-content, canonical post-write/read/edit/delete, comment and reaction policy behavior now enforces Community visibility and settings
 
-ATLAS UPDATED: YES — JSON, CSV, DOCX, Markdown and OpenAPI; 720 runtime methods reconcile to 506 application routes plus 214 framework routes
+ATLAS UPDATED: YES — JSON, CSV, DOCX, Markdown and OpenAPI; 789 runtime methods reconcile to 557 application routes plus 232 framework routes
 
-MIGRATIONS: `081_greenfield_communities` with tested down migration; `080` remains reserved for PR-01
+MIGRATIONS: `085_greenfield_communities` with tested down migration; `084` remains reserved for PR-01
 
-TESTS PASSED: 24 persisted integration/regression tests, canonical workspace typecheck and 103 Atlas checks
+TESTS PASSED: 31 tests (24 persisted integration/regression plus 7 migration/ledger tests), canonical workspace typecheck and 103 Atlas checks
 
 TESTS FAILED: 0 final acceptance tests
 
@@ -51,10 +51,11 @@ The backend candidate passes its isolated database, concurrency, security, regre
 - Disposable PostgreSQL container: `modula-feature-reality-01-pg`.
 - Isolation labels: `digital.modula.mission=GREENFIELD-FEATURE-REALITY-01`, `digital.modula.scope=qa-disposable`.
 - PostgreSQL exposure: loopback only at `127.0.0.1:55483`.
-- Final regression database: `modula_feature_reality_01_pr04_final3_20261101`.
-- Migration-cycle database: `modula_feature_reality_01_pr04_rollback2_20261101`.
-- GreenField remote main remained `bae20cebb48685c56ed5ccfe5537f121e3f36110` at final verification.
-- `/root/modula-latest` remained clean and untouched at production revision `db0e1e31c19f07538198c8191fa97976c39a7684`.
+- Final regression/fixture database: `modula_feature_reality_01_pr04_reconcile_20261102`.
+- Migration test database: `modula_feature_reality_01_pr04_migration_tests_20261102`.
+- Final migration-cycle database: `modula_feature_reality_01_pr04_cycle2_20261102`.
+- GreenField remote main remained `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c` at final verification.
+- `/root/modula-latest` remained clean and untouched at protected production checkout revision `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`.
 - No production database, storage, service, billing system, signing key, deployment, merge or publication was used.
 
 ## API surface
@@ -118,7 +119,7 @@ Polls support 2–10 ordered options, explicit close time, results visibility, v
 
 ## Persistence and constraints
 
-Migration `081_greenfield_communities` adds:
+Migration `085_greenfield_communities` adds:
 
 - `greenfield_communities`
 - `greenfield_community_settings`
@@ -134,7 +135,7 @@ Foreign keys, partial unique indexes, membership-owner uniqueness, event/poll ch
 
 Member profile projections and event/poll aggregates are hydrated with bounded batch queries for each cursor page rather than issuing a new query set per result row.
 
-Migration number `080` is reserved by PR-01. The intended approval order remains PR-01, PR-02, PR-03, then PR-04. The disposable database accepted 081 without a fabricated 080 ledger row; the combined approved history will supply 080 before 081.
+Migration number `084` is reserved by PR-01. The intended approval order remains PR-01, PR-02, PR-03, then PR-04. The disposable database accepted 085 without a fabricated 084 ledger row; the combined approved history will supply 084 before 085.
 
 ## Security and reliability results
 
@@ -167,10 +168,10 @@ Running the seed twice against the final disposable database returned the same C
 ## API Atlas result
 
 ```text
-720 runtime method routes = 506 application routes + 214 framework-derived routes
+789 runtime method routes = 557 application routes + 232 framework-derived routes
 source-only routes: 0
 runtime-only routes: 0
-application routes before PR-04: 485
+application routes before PR-04: 536
 application routes added by PR-04: 21
 mission-specific complete contracts: 24 stacked overrides
 Atlas verification: 103/103
@@ -186,23 +187,31 @@ All commands were run from `/root/modula-worktrees/greenfield-feature-reality-01
 CI=true pnpm typecheck
 PASS: canonical 24-project dependency builds and workspace typechecks
 
-MODULA_TEST_DATABASE_URL=<isolated-loopback-database> CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/communities.integration.test.ts tests/communities.qa-seed.test.ts tests/phase6s.social.test.ts tests/greenfield-backend-v1.social-completion.test.ts tests/post04.attachments.test.ts --reporter=verbose
+MODULA_TEST_DATABASE_URL=<isolated-loopback-database> CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/communities.integration.test.ts tests/communities.qa-seed.test.ts tests/phase6s.social.test.ts tests/greenfield-backend-v1.social-completion.test.ts tests/post04.attachments.test.ts --reporter=verbose --no-file-parallelism --maxWorkers=1
 PASS: 5 files, 24 tests, 0 failed, 0 skipped
+
+MODULA_TEST_DATABASE_URL=<isolated-loopback-database> CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/api-fix-01.migration.test.ts tests/greenfield-backend-v1.migration-ledger-security.test.ts --reporter=verbose --no-file-parallelism --maxWorkers=1
+PASS: 2 files, 7 tests, 0 failed, 0 skipped; canonical migration/ledger version 085
 
 MODULA_QA_FIXTURES_ENABLED=true MODULA_DATABASE_URL=<isolated-loopback-database> pnpm --filter @modula/greenfield-api db:seed:communities-qa
 PASS: repeated seed retained one Community, three members, one post, one poll and one event
 
-CI=true GITHUB_HEAD_REF=feat/qa-communities API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true pnpm api:atlas:capture-candidate
-PASS: 720 runtime methods / 506 application routes / zero reconciliation gaps
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true MODULA_GUBIC_PLAY_ENABLED=true pnpm api:atlas:capture-candidate
+PASS: 789 runtime methods / 557 application routes / zero reconciliation gaps
 
-CI=true GITHUB_HEAD_REF=main API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
 PASS: 103/103 checks
+
+TZ=Pacific/Auckland API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate-docx.mjs
+PASS: stable DOCX SHA-256 `967f432aa014442300df5c04fad929a7f55682dfe994ee0d2f26dcf9a8c70d42` under a different timezone and umask
 
 git diff --check
 PASS
 ```
 
-The initial rollback CLI attempt was rejected before database access because required loopback API/origin configuration was absent. The empty disposable database was verified and the rehearsal was rerun with complete QA configuration. The successful cycle applied 081, observed the three notification columns, rolled 081 back with Community tables and `posts.community_id` absent, then reapplied 081.
+The initial QA seed CLI attempt was rejected before database access because required loopback public-API and allowed-origin configuration was absent. It was rerun with complete QA configuration; two successful invocations retained the same Community ID and exact counts `1|3|1|1|1`.
+
+The first post-renumber migration rehearsal exposed that the migration still wrote schema version 081. That defect was corrected before commit and the cycle was repeated from an empty disposable database. The final cycle applied 085 (`085|085_greenfield_communities|t`), rolled it back with Community tables and `posts.community_id` absent (`084|083_moliboo_game_systems|t|t`), then reapplied 085. The schema version intentionally returns to reserved version 084 while the latest applied ledger entry is 083 until PR-01 supplies migration 084.
 
 ## Files changed
 
@@ -211,8 +220,8 @@ Implementation and contracts:
 - `packages/api-contracts/src/communities.ts`
 - `packages/api-contracts/src/index.ts`
 - `packages/greenfield-schema-registry/src/events.ts`
-- `services/greenfield-api/migrations/081_greenfield_communities.sql`
-- `services/greenfield-api/migrations/081_greenfield_communities.down.sql`
+- `services/greenfield-api/migrations/085_greenfield_communities.sql`
+- `services/greenfield-api/migrations/085_greenfield_communities.down.sql`
 - `services/greenfield-api/src/app/register-communities-routes.ts`
 - `services/greenfield-api/src/app/register-routes.ts`
 - `services/greenfield-api/src/app/register-attachment-routes.ts`
@@ -243,7 +252,7 @@ Mission evidence:
 
 ## Native integration gap
 
-The latest Native remote main inspected read-only is `dbbd1f26a4a0761cfd6bc46c2e7ef671085b1775`.
+The latest Native remote main inspected read-only is `e50fc3916fb4738b7c63b7bed92bef49a8076eb8`.
 
 `ios/Modula/Features/Community/CommunityModels.swift` still declares that GreenField has no Community routes, defines `CommunityLocalSettings` in `UserDefaults`, treats interest as device-only and adapts comment polls instead of Community polls. `CommunityHubViews.swift` and `CommunityDetailViews.swift` still show preview/Coming Soon states for live membership, posts, events, moderation and persistence.
 
@@ -261,7 +270,7 @@ Until that client work is implemented and exercised against a deployed isolated-
 
 ## Rollback and recovery
 
-Before real user data exists, the tested QA down migration removes the Community domain tables and canonical-post linkage and restores the pre-081 schema. That down path is destructive and is not a production data-preservation plan.
+Before real user data exists, the tested QA down migration removes the Community domain tables and canonical-post linkage and restores the pre-085 schema. That down path is destructive and is not a production data-preservation plan.
 
 After any real QA data exists, recovery must use a database backup plus the prior application revision, or a forward migration that preserves records. A code-only rollback must also prevent clients from creating new Community records. Community artwork objects remain scoped attachments; deleting a collection of Community records must never delete unrelated underlying media or social posts without a separate, reviewed retention decision.
 

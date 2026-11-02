@@ -793,6 +793,64 @@ export interface Database {
     deleted_at: Date | null
     version: number
   }
+  push_device_tokens: {
+    id: string
+    account_id: string
+    actor_id: string
+    token: string
+    platform: 'ios'
+    environment: 'development' | 'production'
+    bundle_id: string
+    app_version: string | null
+    device_name: string | null
+    locale: string | null
+    timezone: string | null
+    created_at: Date
+    updated_at: Date
+    last_seen_at: Date
+    disabled_at: Date | null
+    disabled_reason: string | null
+  }
+  push_notification_preferences: {
+    actor_id: string
+    push_enabled: boolean
+    likes_enabled: boolean
+    comments_enabled: boolean
+    replies_enabled: boolean
+    mentions_enabled: boolean
+    follows_enabled: boolean
+    messages_enabled: boolean
+    stories_enabled: boolean
+    moliboo_care_enabled: boolean
+    gubic_invites_enabled: boolean
+    quiet_hours_enabled: boolean
+    quiet_hours_start: string
+    quiet_hours_end: string
+    timezone: string
+    version: number
+    created_at: Date
+    updated_at: Date
+  }
+  push_deliveries: {
+    id: string
+    recipient_actor_id: string
+    notification_id: string | null
+    category: string
+    actor_id: string | null
+    title: string | null
+    body: string
+    deep_link: string | null
+    thread_id: string | null
+    data: unknown
+    status: 'queued' | 'sending' | 'sent' | 'suppressed' | 'failed' | 'dead_letter'
+    attempts: number
+    next_attempt_at: Date
+    lease_expires_at: Date | null
+    last_error: string | null
+    sent_count: number
+    created_at: Date
+    updated_at: Date
+  }
   notification_preferences: {
     id: string
     actor_id: string
@@ -1289,6 +1347,9 @@ export interface Database {
     last_read_at: Date | null
     joined_at: Date
     updated_at: Date
+    muted_until: Date | null
+    archived_at: Date | null
+    typing_at: Date | null
   }
   greenfield_conversation_messages: {
     message_id: string
@@ -1296,6 +1357,15 @@ export interface Database {
     sender_actor_id: string
     subject: string | null
     body: string
+    created_at: Date
+    reply_to_message_id: string | null
+    edited_at: Date | null
+    deleted_at: Date | null
+  }
+  greenfield_message_reactions: {
+    message_id: string
+    actor_id: string
+    emoji: string
     created_at: Date
   }
   greenfield_communities: {
@@ -1447,6 +1517,13 @@ export interface Database {
   greenfield_release_artifacts: {artifact_id: string; release_id: string; kind: 'module-package' | 'frontend' | 'asset' | 'icon' | 'cover' | 'screenshot' | 'schema' | 'other'; sha256: string; filename: string; access_class: 'public' | 'installation'; required_for_offline_launch: boolean; created_at: Date}
   greenfield_game_catalogue_entries: {game_id: string; publisher_id: string; origin_type: 'modula-developed' | 'external-open-source' | 'independent-publisher' | 'commercial-publisher'; genre: string; categories: unknown; runtime_category: 'html5-javascript' | 'phaser' | 'playcanvas' | 'browser-runtime' | 'streamed'; age_classification: unknown; availability: 'available' | 'coming-soon' | 'unavailable' | 'region-restricted'; publication_status: 'draft' | 'in-review' | 'published' | 'rejected' | 'retired'; featured: boolean; featured_rank: number | null; created_by_account_id: string | null; updated_by_account_id: string | null; created_at: Date; updated_at: Date}
   greenfield_game_catalogue_events: {event_id: string; game_id: string; publisher_id: string; event_type: 'registered' | 'metadata-updated' | 'submitted' | 'published' | 'rejected' | 'retired' | 'featured' | 'unfeatured'; actor_account_id: string | null; previous_status: string | null; publication_status: string; evidence: unknown; occurred_at: Date}
+  greenfield_gubic_library_items: {account_id: string; game_id: string; added_at: Date; hidden: boolean; favourite: boolean; last_played_at: Date | null; play_count: number; total_play_seconds: string | number; updated_at: Date}
+  greenfield_gubic_play_sessions: {session_id: string; account_id: string; game_id: string; release_version: string | null; lobby_id: string | null; client_platform: 'ios' | 'ipados' | 'macos' | 'web' | 'android'; status: 'active' | 'ended' | 'abandoned'; started_at: Date; last_heartbeat_at: Date; ended_at: Date | null; duration_seconds: number | null}
+  greenfield_gubic_lobbies: {lobby_id: string; game_id: string; host_account_id: string; title: string; visibility: 'public' | 'invite'; join_code: string; max_players: number; status: 'open' | 'in-game' | 'closed'; revision: number; created_at: Date; updated_at: Date; expires_at: Date}
+  greenfield_gubic_lobby_members: {lobby_id: string; account_id: string; role: 'host' | 'player'; ready: boolean; joined_at: Date; left_at: Date | null}
+  greenfield_gubic_achievements: {game_id: string; achievement_key: string; title: string; description: string; points: number; hidden: boolean; retired: boolean; created_at: Date; updated_at: Date}
+  greenfield_gubic_achievement_unlocks: {account_id: string; game_id: string; achievement_key: string; session_id: string | null; unlocked_at: Date}
+  greenfield_gubic_submissions: {submission_id: string; game_id: string; publisher_id: string; submitted_by_account_id: string; version: string; manifest: unknown; manifest_sha256: string; monetisation: 'free' | 'paid' | 'in-game-purchases'; status: 'submitted' | 'in-review' | 'approved' | 'rejected' | 'withdrawn'; reviewer_account_id: string | null; decision_reason: string | null; created_at: Date; updated_at: Date; decided_at: Date | null}
   greenfield_release_frontends: {frontend_id: string; ingestion_id: string; release_id: string | null; product_id: string; version: string; frontend_mode: 'declarative' | 'host-contribution'; artifact_role: 'product.frontend'; artifact_path: string; media_type: 'application/vnd.modula.frontend+json'; artifact_sha256: string; schema_version: '1.0.0'; mps_version: '1.0-RC' | '1.0'; entry_view: string | null; route_count: number; routes: unknown; compatibility: unknown; required_capabilities: unknown; runtime_projection: unknown; verified_at: Date; created_at: Date}
   greenfield_product_privacy_declarations: {ingestion_id: string; product_id: string; version: string; data_accessed: unknown; data_created: unknown; data_transmitted: unknown; processors: unknown; retention: string | null; export_policy: string | null; deletion_policy: string | null; telemetry: string | null; declaration: unknown; created_at: Date}
   intelligence_missions: {mission_id: string; owner_account_id: string; workspace_id: string | null; objective: string; status: IntelligenceMissionStatus; correlation_id: string; created_at: Date; updated_at: Date; completed_at: Date | null}

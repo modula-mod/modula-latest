@@ -2738,6 +2738,116 @@
       "sourceContractSha256": "b690f7b18d07e00b67b360c3da9de2dc5bc9a6e723a1b22029669bf865937c5d"
     },
     {
+      "id": "GET /v1/admin/gubic/submissions",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/admin/gubic/submissions/:submissionId/decision",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "d38067e2ec88fa0b9382659b16a07bf63ce8fa738ca5cbf09e80613587fe2439"
+    },
+    {
       "id": "GET /v1/admin/moderation/reports",
       "authorization": {
         "visibility": "ADMIN",
@@ -13522,7 +13632,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "926eefbce4c2c2f068c51b0c782830c9626a66b156d4591de5615a9d4757206f"
+      "sourceContractSha256": "a41505b3d63e3ac5b85d60f6e30ed43bed6ff70a4b06256813846f574332191d"
     },
     {
       "id": "POST /v1/conversations",
@@ -13643,6 +13753,65 @@
         "versioningCompatibility": "HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged."
       },
       "sourceContractSha256": "0a080357455119564dfcb96c5e52ba263204a7001a81ffbbf54d340c7bd902e5"
+    },
+    {
+      "id": "POST /v1/conversations/:id/archive",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "a49a969ccdf6524425120c17c0e0bec2cb8bc391d878400f2cc13e49f63f134f"
     },
     {
       "id": "GET /v1/conversations/:id/messages",
@@ -13823,7 +13992,304 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "7367e39da05d725bb4baf5a58eb749f87220b7b28cb5bcf553c8ed252130a82f"
+      "sourceContractSha256": "dd358d370c659495c724c831f64d8979f03381041aad2c0e740d9e950487de23"
+    },
+    {
+      "id": "DELETE /v1/conversations/:id/messages/:messageId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "ef0848e60d6ef0f19d42ba0f02ce3046bb187b4eb307618ef303e82f9225a0e6"
+    },
+    {
+      "id": "PATCH /v1/conversations/:id/messages/:messageId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "fe690c8d767d7b9a3fb3776b61282c336ac3670144de4b3b0855d5d53483da01"
+    },
+    {
+      "id": "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [
+          "{emoji?: string}"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "483f0f90a5097ce32bdad9c1ab4e51ace20465d75f4e7f22680687d459dfabe5"
+    },
+    {
+      "id": "PUT /v1/conversations/:id/messages/:messageId/reactions",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "ba6dfd97041122061e91ffe14231bf59373d045c7fcef98de0a000cd610583bd"
+    },
+    {
+      "id": "POST /v1/conversations/:id/mute",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "35629e66d6123de18f91dcc5bc00e7430134773bbbc51886d006eb98aebb26a8"
     },
     {
       "id": "POST /v1/conversations/:id/read",
@@ -13838,6 +14304,124 @@
         "adminRequired": false,
         "capabilities": [
           "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "f8b1b3972c5e0010edf08d37daceb66fcb1f007dd3aa00d70de191a2d5cab9db"
+    },
+    {
+      "id": "GET /v1/conversations/:id/typing",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "986e906b7e8031ddeeabef82c501e90a6f4cb8c0a752586059c844d59a69e23a"
+    },
+    {
+      "id": "POST /v1/conversations/:id/typing",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
         ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
@@ -14215,6 +14799,171 @@
       },
       "contract": null,
       "sourceContractSha256": "2e6e3913b622d81c90cf7add51fd8ae2e658ce2a2fb2f3a14ab03ca7d28ea7dc"
+    },
+    {
+      "id": "GET /v1/developer/gubic/submissions",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "baae3d3556a57a76be3d14314a2c5780741de5f226b5e5e95eff8b0b17b7b8af"
+    },
+    {
+      "id": "POST /v1/developer/gubic/submissions",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/developer/gubic/submissions/:submissionId/withdraw",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4465c51b8f2fe1b195519b4609b233aa99e6709c8045ac2bf90fadd6949e2ac4"
     },
     {
       "id": "POST /v1/developer/organisations",
@@ -16822,6 +17571,61 @@
       "sourceContractSha256": "6facea9be2865f6e02195e7481a608f85695ba77285de5cfcec969d317e1d659"
     },
     {
+      "id": "GET /v1/gubic/capabilities",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
       "id": "GET /v1/gubic/categories",
       "authorization": {
         "visibility": "PUBLIC",
@@ -17048,6 +17852,61 @@
       "sourceContractSha256": "be0de84f2c25667e902132f86bba662431d72c172aed7e5e76902e348d2ae0e2"
     },
     {
+      "id": "GET /v1/gubic/games/:gameId/achievements",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "a3255039a7f4fc8a1d6bc77baf93272f37c16cadf14f757d9fcfe80f8567b75e"
+    },
+    {
       "id": "GET /v1/gubic/games/:gameId/eligibility",
       "authorization": {
         "visibility": "PUBLIC",
@@ -17164,6 +18023,171 @@
       "sourceContractSha256": "7500f86ff4f26223d451139d4574e890573e244638d964ba613bbf1cdad9f824"
     },
     {
+      "id": "GET /v1/gubic/games/:gameId/lobbies",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/gubic/games/:gameId/lobbies",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/gubic/games/:gameId/sessions",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
       "id": "GET /v1/gubic/games/:gameId/versions",
       "authorization": {
         "visibility": "PUBLIC",
@@ -17219,6 +18243,611 @@
       },
       "contract": null,
       "sourceContractSha256": "5f927a2b7db401763a5aeca6e6db9f1c78267a8b2402d26e2d690715028be162"
+    },
+    {
+      "id": "GET /v1/gubic/library",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "DELETE /v1/gubic/library/:gameId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "PUT /v1/gubic/library/:gameId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/gubic/lobbies/:lobbyId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "a87a9b1c229cf3d24663740cf3e676430a5e371f7502872a812ade33426d9cbb"
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/join",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "ccd179ba37345875ee8c0b01cf315cf5fc4d39985798f0a910d4a80ac8176ea7"
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/leave",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "eb1cf366a5ceba6d92e45f628a79fe3229d22aee690a9020a20363a3e915eb58"
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/ready",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "f0543fe941525ca813520aaf59e1c11e4dae7559e8801a54c0274df6d689ec29"
+    },
+    {
+      "id": "GET /v1/gubic/lobbies/:lobbyId/socket",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "43f275e24d4bd4315427f27a775f4e62c953db15bb02802f77944f7b651f1edb"
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/start",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "10a914a6ae6db2c62ec54822ed4a6edd4a6ed8e98e8751eec582187235558f37"
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/join",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/gubic/me/achievements",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
       "id": "GET /v1/gubic/my-games",
@@ -17388,6 +19017,171 @@
       },
       "contract": null,
       "sourceContractSha256": "e3d60d0a8cdabfffcf508f4ae0d15d2e25e38350b27144d9fb76c4050b4d9dc8"
+    },
+    {
+      "id": "POST /v1/gubic/sessions/:sessionId/achievements/:key",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "790520df8dd3d14a645cf10ca74ebfc5f373c687a00c28e58213089b8618dbad"
+    },
+    {
+      "id": "POST /v1/gubic/sessions/:sessionId/end",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "9adafa99d168b3fa18264fca0f2749014e70d097c20e2b33b5043a5bac8fe3cf"
+    },
+    {
+      "id": "POST /v1/gubic/sessions/:sessionId/heartbeat",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "8b8eb3f53b5de78b0c1dcb2a6db74a9c0483b7a78df48936d9d95d02e05e1670"
     },
     {
       "id": "GET /v1/hashtags/suggest",
@@ -24163,6 +25957,776 @@
       "sourceContractSha256": "82d831d84cd78b69a7220506c58819845b06c3c90990fc9864fd652c5a20d1d1"
     },
     {
+      "id": "POST /v1/moliboo/activities/complete",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/moliboo/catalogue/items",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/moliboo/catalogue/outfits",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/moliboo/characters/:characterId/care",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/moliboo/characters/:characterId/equip",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/moliboo/characters/:characterId/skills/:skillId/use",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/moliboo/characters/:characterId/state",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/moliboo/inventory",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/moliboo/outfits",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/moliboo/outfits",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "DELETE /v1/moliboo/outfits/:outfitId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "PATCH /v1/moliboo/outfits/:outfitId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "GET /v1/moliboo/quests",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/moliboo/quests/:questId/claim",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
       "id": "GET /v1/notifications",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -26669,6 +29233,293 @@
       },
       "contract": null,
       "sourceContractSha256": "822ed37874cbff772a21aa6cfe86187effd7b51de6fd06166bf07de41e139e44"
+    },
+    {
+      "id": "GET /v1/push/devices",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "766801558daded88dc6bb851bcf6858642b884056572ad721a702b5fd1820fbe"
+    },
+    {
+      "id": "POST /v1/push/devices",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "not evident in the route handler; inspect downstream service",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "not evident in the route handler; inspect downstream service",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "2eed5359cdad51d54cd22f30b2e9afa17605fe8bafad31f882feeec43ba258b3"
+    },
+    {
+      "id": "DELETE /v1/push/devices/:token",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{token: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "0a1e77fb880c722c67a45b7c9e83cc24c51ef1e2b3db99b4c850e6e31fb07eae"
+    },
+    {
+      "id": "GET /v1/push/preferences",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "39c13f3fcdb05374a05804d83ab59083601e684b9b41a9cacebdd62709148644"
+    },
+    {
+      "id": "PATCH /v1/push/preferences",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "75a14e9763321716db900384559b9c1d7b701bffbd2fd02441406f3c342d813b"
     },
     {
       "id": "GET /v1/reels",
