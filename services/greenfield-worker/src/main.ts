@@ -13,6 +13,8 @@ import {DIGEST_PASS_INTERVAL_MS, runDigestPass} from './digests/digests.js'
 import {infrastructureBackoffMs} from './jobs/retry.js'
 import {metrics} from './observability/metrics.js'
 import {runAttachmentCleanup} from './media/cleanup.js'
+import {ApnsSender, loadApnsConfig} from './push/apns.js'
+import {runPushPass} from './push/dispatch.js'
 
 const METRICS_LOG_INTERVAL_MS = 60_000
 
@@ -44,6 +46,11 @@ async function main() {
   let lastDigest = 0
   let lastMetricsLog = 0
   let lastMediaCleanup = 0
+  let lastPush = 0
+  const apnsConfig = loadApnsConfig()
+  const apns = apnsConfig ? new ApnsSender(apnsConfig) : null
+  const pushIntervalMs = Number(process.env.MODULA_WORKER_PUSH_INTERVAL_MS ?? 2_000)
+  log.info({apnsConfigured: Boolean(apns), apnsEnvironment: apnsConfig?.defaultEnvironment}, 'push dispatcher')
   const startedAt = new Date()
   const releaseSha = process.env.MODULA_RELEASE_SHA ?? null
   let consecutiveInfrastructureFailures = 0
@@ -81,6 +88,15 @@ async function main() {
         } catch (error) {
           metrics.increment('mediaCleanupErrors')
           log.error({operation: 'media.cleanup', error}, 'attachment cleanup pass failed')
+        }
+      }
+      if (apns && now - lastPush >= pushIntervalMs) {
+        lastPush = now
+        try {
+          const result = await runPushPass(db, apns, {defaultEnvironment: apnsConfig?.defaultEnvironment, onAuthError: () => apns.invalidateProviderToken()})
+          if (result.claimed > 0) log.info({operation: 'push.dispatch', ...result}, 'push pass')
+        } catch (error) {
+          log.error({operation: 'push.dispatch', error}, 'push pass failed')
         }
       }
       if (now - lastDigest >= DIGEST_PASS_INTERVAL_MS) {
@@ -130,6 +146,7 @@ async function main() {
       await delay(backoffMs)
     }
   }
+  apns?.close()
   await db.destroy()
   if (shutdownTimer) clearTimeout(shutdownTimer)
   log.info('modula worker stopped')
