@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import {execFileSync} from 'node:child_process'
-import {mkdtempSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync} from 'node:fs'
+import {chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import {outputDir} from './lib.mjs'
@@ -83,6 +83,9 @@ try {
     const target = join(temporaryDirectory, relativePath)
     mkdirSync(join(target, '..'), {recursive: true})
     writeFileSync(target, contents)
+    // ZIP central-directory entries preserve source modes. Pin them so the
+    // generated DOCX is byte-identical under developer and CI process umasks.
+    chmodSync(target, 0o644)
     utimesSync(target, fixedDate, fixedDate)
   }
   rmSync(outputPath, {force: true})
