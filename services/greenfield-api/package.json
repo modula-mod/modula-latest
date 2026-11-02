@@ -37,6 +37,7 @@
     "@fastify/cors": "^11.0.1",
     "@fastify/helmet": "^13.0.1",
     "@fastify/rate-limit": "^10.3.0",
+    "@fastify/websocket": "^11.3.6",
     "@modula/api-contracts": "workspace:*",
     "@modula/atproto-lexicons": "workspace:*",
     "@modula/dimon-contracts": "workspace:*",
