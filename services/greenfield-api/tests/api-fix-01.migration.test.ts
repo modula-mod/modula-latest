@@ -146,6 +146,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
     expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
+    expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.game-web+tgz')
     const canonicalMolibooItems = await client.query(`
       SELECT count(*)::int AS count, count(*) FILTER (WHERE item_type = 'cosmetic')::int AS cosmetics
       FROM greenfield_moliboo_items
@@ -199,11 +200,16 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
         AND column_name IN ('item_type', 'character_id', 'wearable', 'revoked_at', 'updated_at')
     `)
     const versionAfter084 = await rolledBackMoliboo.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    const mediaConstraintAfter084 = await rolledBackMoliboo.query(`
+      SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+      WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
+    `)
     expect(molibooTable.rows[0]?.name).toBeNull()
     expect(canonicalTables.rows[0]).toEqual({
       items: 'greenfield_moliboo_items', inventory: 'greenfield_moliboo_inventory', equipped: 'greenfield_moliboo_equipped',
     })
     expect(extensionColumns.rows[0]?.count).toBe(0)
+    expect(mediaConstraintAfter084.rows[0]?.definition).toContain('application/vnd.modula.game-web+tgz')
     expect(versionAfter084.rows[0]?.value).toBe('083')
     await rolledBackMoliboo.end()
 

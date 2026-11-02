@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-02T15:49:09.969Z for branch `qa/greenfield-feature-reality-01-integration`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-02T15:53:53.358Z for branch `qa/greenfield-feature-reality-01-integration`; this does not claim deployment.
 
 - Runtime method routes: 827
 - Application routes: 584

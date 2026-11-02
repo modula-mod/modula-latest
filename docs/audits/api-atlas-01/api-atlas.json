@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "qa/greenfield-feature-reality-01-integration",
       "sourceSha256": "263dad3ecd64b450c8faf9d4852710ec4c60c43ec8487caa45f553e1951ac9ba",
-      "capturedAt": "2026-11-02T15:49:09.969Z",
+      "capturedAt": "2026-11-02T15:53:53.358Z",
       "routeCount": 827
     },
     "status": "PASS"

@@ -10,7 +10,7 @@ ROUTES ADDED: 9
 ROUTES MODIFIED: 1
 ATLAS UPDATED: YES
 MIGRATIONS: `084_moliboo_signed_packs`
-TESTS PASSED: 26 current focused tests plus the full workspace typecheck and 103 Atlas checks
+TESTS PASSED: 42 distinct focused feature/migration/registry compatibility tests plus the full workspace typecheck and 103 Atlas checks
 TESTS FAILED: 0 final acceptance tests
 TESTS SKIPPED: 0 in the reported suites
 SECURITY RESULTS: PASS for implemented server boundaries
@@ -33,6 +33,7 @@ The server implementation and isolated QA evidence pass. The mission item remain
 - Container labels: `digital.modula.mission=GREENFIELD-FEATURE-REALITY-01` and `digital.modula.scope=qa-disposable`.
 - PostgreSQL is published only on loopback `127.0.0.1:55483`.
 - Fixture database: `modula_feature_reality_01_pr01`.
+- Cross-workstream media-constraint regression database: `modula_feature_reality_01_pr01_media_reconcile_20261102`.
 - The one-use QA private signing key was stored outside the repository with mode `0600` and deleted after fixture creation. Only public-key/signature evidence remains in QA.
 - No production database, storage, signing key, package release, deployment or billing system was changed.
 - No package was published publicly.
@@ -66,7 +67,7 @@ Migration `084_moliboo_signed_packs` adds:
 - a single-active-character projection added to the existing canonical equipped-state table;
 - signed sticker pack and sticker projections;
 - bounded catalogue/access indexes and database uniqueness constraints;
-- the Moliboo content media type in the existing immutable artifact blob inventory.
+- the Moliboo content media type in the existing immutable artifact blob inventory while preserving the already-shipped web-runtime and GUBIC game-web media types.
 
 No parallel Moliboo ownership or outfit tables remain. The API reads and writes `greenfield_moliboo_inventory` and `greenfield_moliboo_equipped`, alongside the game system already present on main. The down migration is deliberately signed-pack-empty-state-only: it retains the canonical migration-083 tables, restores their original constraints/columns, and refuses to run when release, signature, character grant or active outfit data exists. Persistent recovery is a pre-084 database backup plus prior retained application images, not destructive down migration.
 
@@ -177,6 +178,9 @@ PASS: 5 files, 21 tests, 0 skipped
 CI=true pnpm --dir services/greenfield-api exec vitest run tests/moliboo-game.rules.test.ts --maxWorkers=1 --no-file-parallelism
 PASS: 1 file, 5 tests, 0 skipped
 
+MODULA_TEST_DATABASE_URL=<isolated-loopback-database> MODULA_TEST_ADMIN_DATABASE_URL=<isolated-admin-database> CI=true pnpm --dir services/greenfield-api exec vitest run tests/registry-trust.github-sync.test.ts tests/api-fix-01.migration.test.ts tests/greenfield-backend-v1.migration-ledger-security.test.ts --reporter=verbose --maxWorkers=1 --no-file-parallelism
+PASS: 3 files, 23 tests, 0 failed, 0 skipped; signed external-game import remains valid after migration 084 and both up/down constraints preserve `application/vnd.modula.game-web+tgz`
+
 CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true MODULA_GUBIC_PLAY_ENABLED=true pnpm api:atlas:capture-candidate
 PASS: 773 runtime method routes; 544 application + 229 framework; 0 source-only/runtime-only
 
@@ -209,7 +213,7 @@ PASS
 
 Preliminary invocations were not acceptance runs and are excluded from the PASS totals: the reused disposable database first exposed stale pre-renumbering migration state and was recreated only after its QA labels/loopback binding were checked; configuration and command-line guardrails then refused three seed attempts before fixture writes (invalid `qa` API environment, missing preview encryption configuration, and an extra `--` argument). Every generated private key was removed by a failure trap or immediate cleanup. The configured migration, seed and compiled-ESM API smoke above subsequently passed.
 
-The first GitHub CI run also truthfully failed four migration-ledger assertions that still ended at 079 and found that the then-numbered migration 080 had replaced, rather than extended, the migration-077 release-media constraint. A first local remediation run passed 69/71 and exposed the two media-type regressions. The reconciled migration 084 preserves `application/vnd.modula.web-runtime+tgz` in both its up and down constraints. Its ledger assertions and exact CI totals are revalidated against current main before this report is finalized. The Atlas DOCX generator now pins both timestamps and archive member modes for cross-host byte stability.
+The first GitHub CI run also truthfully failed four migration-ledger assertions that still ended at 079 and found that the then-numbered migration 080 had replaced, rather than extended, the migration-077 release-media constraint. A first local remediation run passed 69/71 and exposed two media-type regressions. The later disposable PR-01→PR-07 composition exposed one further compatibility omission: migration 084 had retained web-runtime but not the already-shipped GUBIC `application/vnd.modula.game-web+tgz` type. The up and down constraints now preserve both media types, and the real signed external-game import plus canonical up/down tests pass. The Atlas DOCX generator pins both timestamps and archive member modes for cross-host byte stability.
 
 ## Files changed
 

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-02T15:49:09.969Z",
+  "capturedAt": "2026-11-02T15:53:53.358Z",
   "source": {
     "branch": "qa/greenfield-feature-reality-01-integration",
-    "headAtCapture": "24d0368f87e2a88e99ea0eb9a445a1a3c54002f6",
-    "worktreeDirtyAtCapture": true,
+    "headAtCapture": "cbe95659f7727b8c1d70bea6508ceaa2117fb3b4",
+    "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "263dad3ecd64b450c8faf9d4852710ec4c60c43ec8487caa45f553e1951ac9ba"
   },
   "runtimeRoutes": [
