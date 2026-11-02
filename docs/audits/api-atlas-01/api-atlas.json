@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "test/qa-vault-package-install-plan",
       "sourceSha256": "1cde75b21b34325844575197be0f86cced31418bcbb49ac1314a764dd88fb2ba",
-      "capturedAt": "2026-11-02T01:51:43.368Z",
+      "capturedAt": "2026-11-02T10:09:01.508Z",
       "routeCount": 758
     },
     "status": "PASS"

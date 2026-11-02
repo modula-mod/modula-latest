@@ -68,7 +68,7 @@ Atlas route count changed from the stale 499-route current-main artifact to 535 
 Read-only reference identities:
 
 - GreenField base: `f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c`.
-- Native main: `dbbd1f26a4a0761cfd6bc46c2e7ef671085b1775`.
+- Native main: `e50fc3916fb4738b7c63b7bed92bef49a8076eb8`.
 - Vault Notes main: `c9e902e85e63f8846d147a70333f9e93eb3087da`.
 - Actual module ID: `digital.modula.vault-notes`.
 - Release tag: `vault-notes-v2.0.2` at commit `bd5440278831cf97dfa2a6882125d207af013def`.
@@ -89,7 +89,7 @@ The standard installation returning `distributionReady: true` means the canonica
 
 ## Native integration gap
 
-Native main was inspected read-only. `ios/Modula/Features/ProductHub/ProductHubView.swift` calls `validateSupportedPackagePlan`, then accepts only a root package with category `game-content` and exactly one dependency with category `web-runtime`. Although the shared model recognizes `module`, the activation path fails closed for it.
+Native remote main `e50fc3916fb4738b7c63b7bed92bef49a8076eb8` was inspected read-only. `ios/Modula/Features/ProductHub/ProductHubView.swift` calls `validateSupportedPackagePlan`, then accepts only a root package with category `game-content` and exactly one dependency with category `web-runtime`. Although the shared model recognizes `module`, the activation path fails closed for it.
 
 Native work must extend the existing PackageManager path to activate a validated content-only `module` closure without a Vault-specific adapter. It must retain the current signature, digest, archive safety, atomic activation and last-known-good rollback semantics. No Native files were changed in this server workstream.
 
@@ -132,10 +132,17 @@ MODULA_TEST_DATABASE_URL=<isolated-pr06-url> MODULA_LOG_LEVEL=silent CI=true pnp
 Result: real signed 2.0.2 standard install and descriptor PASS; optional package plan `404 NOT_FOUND` recorded as the release blocker.
 
 ```bash
-GITHUB_HEAD_REF=test/qa-vault-package-install-plan API_ATLAS_RUNTIME_EVIDENCE=candidate CI=true pnpm api:atlas:verify
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate MODULA_ENVIRONMENT=development MODULA_PREMIUM_ENTITLEMENTS_ENABLED=true MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED=true MODULA_VERIFICATION_ENABLED=true MODULA_VERIFICATION_QA_REVIEW_ENABLED=true MODULA_GUBIC_PLAY_ENABLED=true pnpm api:atlas:capture-candidate
+CI=true API_ATLAS_RUNTIME_EVIDENCE=candidate pnpm api:atlas:verify
 ```
 
 Result: 103/103 checks passed, including complete contract override embedding, deterministic output, CSV count, route reconciliation, DOCX package validation and secret scanning.
+
+```bash
+TZ=Pacific/Auckland API_ATLAS_RUNTIME_EVIDENCE=candidate node tools/api-atlas/generate-docx.mjs
+```
+
+Result: byte-stable DOCX SHA-256 `9b6e3b9507218f20abe94620a2f85428006b9390513a4256c4b0b4aac7ca02ad` under a different timezone and umask. The first draft CI run exposed mode-only DOCX drift under the GitHub runner umask; package entries are now normalized to mode `0644` and the local cross-umask comparison passes.
 
 ```bash
 git diff --check

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-02T01:51:43.368Z",
+  "capturedAt": "2026-11-02T10:09:01.508Z",
   "source": {
     "branch": "test/qa-vault-package-install-plan",
-    "headAtCapture": "f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c",
-    "worktreeDirtyAtCapture": true,
+    "headAtCapture": "2616cabff439e9585acb567c6da856c1ade02f6f",
+    "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "1cde75b21b34325844575197be0f86cced31418bcbb49ac1314a764dd88fb2ba"
   },
   "runtimeRoutes": [
