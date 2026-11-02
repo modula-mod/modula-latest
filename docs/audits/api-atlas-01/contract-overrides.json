@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "mission": "GREENFIELD-FEATURE-REALITY-01",
+  "workstream": "PR-02",
+  "routes": {
+    "POST /v1/conversations": {
+      "purpose": "Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.",
+      "owningDomain": "Direct messaging",
+      "authentication": "Bearer session required with post:engage capability; the sender actor is resolved only from the authenticated session.",
+      "authorization": "The target handle must resolve to a live profile on an active account. Self-conversations and either-direction account blocks are rejected. A new recipient becomes active only when they follow the sender; otherwise the conversation is a message request.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": {
+          "handle": "required target profile handle, string 1-80 characters; an optional leading @ is normalized away",
+          "text": "optional initial message, string maximum 5000 characters; blank non-empty values are rejected"
+        },
+        "validation": "Unknown fields, including client-supplied sender or actor identifiers, are rejected. The target is resolved server-side and must remain active. Subsequent messages to a reused conversation use POST /v1/conversations/:id/messages."
+      },
+      "success": {
+        "status": "201 when created; 200 when an existing conversation is reused",
+        "body": "Envelope data {created:boolean, conversation:{id,kind,participants,lastMessage,unreadCount,updatedAt}}. The conversation ID and participant fields are sufficient for native thread navigation."
+      },
+      "errors": [
+        {"status": 400, "codes": ["VALIDATION_FAILED"]},
+        {"status": 401, "codes": ["UNAUTHENTICATED", "SESSION_EXPIRED"]},
+        {"status": 403, "codes": ["FORBIDDEN"]},
+        {"status": 404, "codes": ["NOT_FOUND"]},
+        {"status": 429, "codes": ["RATE_LIMITED"]},
+        {"status": 500, "codes": ["SERVER_ERROR"]}
+      ],
+      "pagination": {"style": "none", "filtering": "none"},
+      "idempotencyConcurrency": "The sorted authenticated-sender/target actor pair forms the unique direct_key database invariant. Concurrent inserts use INSERT ON CONFLICT and return the same committed conversation. Optional text is creation-only and commits atomically with the conversation and two members, so retry after a lost response cannot duplicate it. A reused conversation returns 200 and does not append text.",
+      "versioningCompatibility": "HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged."
+    }
+  }
+}
