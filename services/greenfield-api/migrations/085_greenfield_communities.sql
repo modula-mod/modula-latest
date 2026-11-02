@@ -1,5 +1,5 @@
 -- GREENFIELD-FEATURE-REALITY-01 PR-04: persistent Communities domain.
--- Migration 080 is reserved by the preceding Moliboo signed-pack workstream.
+-- Migration 084 is reserved by the preceding Moliboo signed-pack workstream.
 
 CREATE TABLE greenfield_communities (
   community_id TEXT PRIMARY KEY,
@@ -240,5 +240,5 @@ GRANT SELECT ON
   greenfield_community_poll_votes
 TO modula_worker, modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '081')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '085')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();

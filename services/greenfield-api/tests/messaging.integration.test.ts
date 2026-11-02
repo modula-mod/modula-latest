@@ -189,6 +189,58 @@ describeIfDb('Messaging: conversations, requests and In-Mail', () => {
     expect(forged.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'Invalid conversation request'})
   })
 
+  it('reacts, replies, edits, unsends, types, mutes and archives (v2)', async () => {
+    const {alpha, beta, gamma: outsider} = await users()
+    const conversationId = (await authed(alpha.accessToken, 'POST', '/v1/conversations', {handle: beta.handle})).json().data.conversation.id
+    const first = (await authed(alpha.accessToken, 'POST', `/v1/conversations/${conversationId}/messages`, {text: 'v2 parent'})).json().data.message
+
+    const reply = await authed(beta.accessToken, 'POST', `/v1/conversations/${conversationId}/messages`, {text: 'v2 child', replyToMessageId: first.id})
+    expect(reply.statusCode).toBe(201)
+    expect(reply.json().data.message.replyTo).toMatchObject({id: first.id, body: 'v2 parent', deleted: false})
+    expect((await authed(beta.accessToken, 'POST', `/v1/conversations/${conversationId}/messages`, {text: 'x', replyToMessageId: 'missing'})).statusCode).toBe(400)
+
+    const base = `/v1/conversations/${conversationId}/messages/${first.id}`
+    const reacted = await authed(beta.accessToken, 'PUT', `${base}/reactions`, {emoji: '❤️'})
+    expect(reacted.statusCode).toBe(200)
+    expect(reacted.json().data.reactions).toEqual([{emoji: '❤️', count: 1, mine: true}])
+    await authed(beta.accessToken, 'PUT', `${base}/reactions`, {emoji: '❤️'})
+    const seen = (await authed(alpha.accessToken, 'GET', `/v1/conversations/${conversationId}/messages`)).json().data.items
+    expect(seen.find((m: any) => m.id === first.id).reactions).toEqual([{emoji: '❤️', count: 1, mine: false}])
+    expect((await authed(outsider.accessToken, 'PUT', `${base}/reactions`, {emoji: '👍'})).statusCode).toBe(404)
+    const removed = await authed(beta.accessToken, 'DELETE', `${base}/reactions?emoji=${encodeURIComponent('❤️')}`)
+    expect(removed.json().data.reactions).toEqual([])
+
+    expect((await authed(beta.accessToken, 'PATCH', base, {text: 'hijack'})).statusCode).toBe(403)
+    const edited = await authed(alpha.accessToken, 'PATCH', base, {text: 'v2 parent (edited)'})
+    expect(edited.statusCode).toBe(200)
+    expect(edited.json().data.message.body).toBe('v2 parent (edited)')
+    expect(edited.json().data.message.editedAt).toBeTruthy()
+
+    expect((await authed(beta.accessToken, 'DELETE', base)).statusCode).toBe(403)
+    expect((await authed(alpha.accessToken, 'DELETE', base)).statusCode).toBe(200)
+    const after = (await authed(beta.accessToken, 'GET', `/v1/conversations/${conversationId}/messages`)).json().data.items
+    const gone = after.find((m: any) => m.id === first.id)
+    expect(gone).toMatchObject({body: '', deleted: true})
+    expect(after.find((m: any) => m.body === 'v2 child').replyTo).toMatchObject({deleted: true, body: ''})
+    expect((await authed(alpha.accessToken, 'PATCH', base, {text: 'back'})).statusCode).toBe(404)
+
+    expect((await authed(alpha.accessToken, 'POST', `/v1/conversations/${conversationId}/typing`, {})).statusCode).toBe(200)
+    const typing = (await authed(beta.accessToken, 'GET', `/v1/conversations/${conversationId}/typing`)).json().data.typing
+    expect(typing.map((p: any) => p.handle)).toEqual([alpha.handle])
+    expect((await authed(alpha.accessToken, 'GET', `/v1/conversations/${conversationId}/typing`)).json().data.typing).toEqual([])
+
+    const muted = await authed(beta.accessToken, 'POST', `/v1/conversations/${conversationId}/mute`, {muted: true})
+    expect(muted.json().data.muted).toBe(true)
+    const archived = await authed(beta.accessToken, 'POST', `/v1/conversations/${conversationId}/archive`, {archived: true})
+    expect(archived.json().data.archived).toBe(true)
+    const active = (await authed(beta.accessToken, 'GET', '/v1/conversations')).json().data.items
+    expect(active.find((c: any) => c.id === conversationId)).toBeUndefined()
+    const archivedList = (await authed(beta.accessToken, 'GET', '/v1/conversations?archived=true')).json().data.items
+    expect(archivedList.find((c: any) => c.id === conversationId)).toMatchObject({muted: true, archived: true})
+    await authed(beta.accessToken, 'POST', `/v1/conversations/${conversationId}/archive`, {archived: false})
+    expect((await authed(beta.accessToken, 'GET', '/v1/conversations')).json().data.items.find((c: any) => c.id === conversationId)).toBeTruthy()
+  })
+
   it('declines requests and hides them', async () => {
     const {gamma: alpha, beta} = await users()
     const started = await authed(alpha.accessToken, 'POST', '/v1/conversations', {handle: beta.handle, text: 'Hello'})

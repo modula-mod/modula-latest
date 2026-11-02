@@ -87,5 +87,5 @@ GRANT SELECT ON
   greenfield_post_draft_content
 TO modula_worker, modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '082')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '086')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();

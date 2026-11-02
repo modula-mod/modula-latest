@@ -1,3 +1,4 @@
+-- GREENFIELD-FEATURE-REALITY-01 PR-04: remove the Communities domain.
 DELETE FROM greenfield_event_schema_registry
 WHERE event_version = '1.0.0'
   AND event_type IN (
@@ -29,5 +30,5 @@ DROP TABLE IF EXISTS greenfield_community_memberships;
 DROP TABLE IF EXISTS greenfield_community_settings;
 DROP TABLE IF EXISTS greenfield_communities;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '080')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '084')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();

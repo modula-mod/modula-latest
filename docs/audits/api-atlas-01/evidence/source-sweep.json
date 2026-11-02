@@ -213,21 +213,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 249,
+      "line": 259,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 277,
+      "line": 287,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 279,
+      "line": 289,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2266,21 +2266,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 249,
+      "line": 259,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 277,
+      "line": 287,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 279,
+      "line": 289,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
