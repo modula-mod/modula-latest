@@ -213,21 +213,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 249,
+      "line": 259,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 277,
+      "line": 287,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 279,
+      "line": 289,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -240,11 +240,32 @@
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
     },
     {
+      "file": "services/greenfield-api/src/domains/comments/sticker-service.ts",
+      "line": 223,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed || typeof parsed.packId !== 'string' || !PACK_ID.test(parsed.packId)) throw new Error()"
+    },
+    {
       "file": "services/greenfield-api/src/domains/gifs/service.ts",
       "line": 4,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "* itself unconfigured instead of returning placeholder content."
+    },
+    {
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 632,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed || typeof parsed.packageId !== 'string' || !PACKAGE_ID.test(parsed.packageId)) throw new Error()"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 647,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Number.isFinite(grantedAt.getTime()) || typeof parsed.itemId !== 'string' || !ITEM_ID.test(parsed.itemId)) throw new Error()"
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
@@ -2245,21 +2266,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 249,
+      "line": 259,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 277,
+      "line": 287,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 279,
+      "line": 289,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2272,11 +2293,32 @@
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
     },
     {
+      "file": "services/greenfield-api/src/domains/comments/sticker-service.ts",
+      "line": 223,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed || typeof parsed.packId !== 'string' || !PACK_ID.test(parsed.packId)) throw new Error()"
+    },
+    {
       "file": "services/greenfield-api/src/domains/gifs/service.ts",
       "line": 4,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "* itself unconfigured instead of returning placeholder content."
+    },
+    {
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 632,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed || typeof parsed.packageId !== 'string' || !PACKAGE_ID.test(parsed.packageId)) throw new Error()"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 647,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Number.isFinite(grantedAt.getTime()) || typeof parsed.itemId !== 'string' || !ITEM_ID.test(parsed.itemId)) throw new Error()"
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",

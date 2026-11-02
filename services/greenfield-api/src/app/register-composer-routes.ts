@@ -3,18 +3,18 @@ import type {ModulaDb} from '../database/client.js'
 import {GifService} from '../domains/gifs/service.js'
 import {LinkPreviewService} from '../domains/link-previews/service.js'
 import {linkSafety} from '../domains/link-previews/safety.js'
-import {STICKER_PACKS} from '../domains/comments/stickers.js'
+import {StickerService} from '../domains/comments/sticker-service.js'
 import {sql} from 'kysely'
 import {requireAuth} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 
 function fail(reply: any, error: any, requestId: string, fallback: string) {
-  const code = ['VALIDATION_FAILED', 'CAPABILITY_DISABLED', 'NOT_FOUND'].includes(error?.code) ? error.code : 'SERVER_ERROR'
+  const code = ['VALIDATION_FAILED', 'INVALID_CURSOR', 'CAPABILITY_DISABLED', 'NOT_FOUND'].includes(error?.code) ? error.code : 'SERVER_ERROR'
   return reply.code(statusForError(code)).send(failureEnvelope(code, code === 'SERVER_ERROR' ? fallback : error.message, requestId))
 }
 
 /** Composer support: GIF proxy (server-held provider key) and link previews (SSRF-guarded unfurl). */
-export async function registerComposerRoutes(app: FastifyInstance, db: ModulaDb, options: {feedConfig: Record<string, unknown>}) {
+export async function registerComposerRoutes(app: FastifyInstance, db: ModulaDb, options: {feedConfig: Record<string, unknown>; publicApiUrl: string}) {
   const gifs = new GifService()
   const previews = new LinkPreviewService(db)
 
@@ -64,8 +64,20 @@ export async function registerComposerRoutes(app: FastifyInstance, db: ModulaDb,
     }
   })
 
-  app.get('/v1/stickers/packs', options.feedConfig, async (request, reply) => {
-    return reply.send(successEnvelope({packs: STICKER_PACKS}, request.id))
+  app.get('/v1/stickers/packs', {
+    ...options.feedConfig,
+    schema: {
+      querystring: {
+        type: 'object', additionalProperties: false,
+        properties: {cursor: {type: 'string', maxLength: 256}, limit: {type: 'integer', minimum: 1, maximum: 50}, series: {type: 'integer', minimum: 1, maximum: 99}},
+      },
+    },
+  }, async (request, reply) => {
+    try {
+      return reply.send(successEnvelope(await new StickerService(db, options.publicApiUrl).list(request.query as any), request.id))
+    } catch (error) {
+      return fail(reply, error, request.id, 'Sticker packs unavailable')
+    }
   })
 
   /** Hashtag autocomplete from recent public posts and comments. */

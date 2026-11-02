@@ -86,6 +86,7 @@ import {registerProviderRoutes} from '../providers/routes.js'
 import {registerIntelligenceRoutes} from '../intelligence/index.js'
 import {registerAttachmentRoutes} from './register-attachment-routes.js'
 import {registerComposerRoutes} from './register-composer-routes.js'
+import {registerMolibooRoutes} from './register-moliboo-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -251,7 +252,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   const mutationsAllowed = config.mutationsEnabled
   await registerAttachmentRoutes(app, db, config, {writeConfig, feedConfig, mutationsAllowed})
-  await registerComposerRoutes(app, db, {feedConfig})
+  await registerComposerRoutes(app, db, {feedConfig, publicApiUrl: config.publicApiUrl})
 
   app.get('/version.json', healthConfig, async (_request, reply) => {
     return reply.header('Cache-Control', 'no-store').send(releaseIdentity(config))
@@ -2710,6 +2711,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   await registerMessagingRoutes(app, db, {feedConfig, writeConfig})
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
+  await registerMolibooRoutes(app, db, config, {feedConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})

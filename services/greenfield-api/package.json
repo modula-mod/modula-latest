@@ -27,6 +27,8 @@
     "registry:trust-bootstrap": "tsx scripts/trust-bootstrap.ts",
     "registry:migrate-legacy-installs": "tsx scripts/migrate-legacy-installations.ts",
     "registry:trust-cutover-gate": "tsx scripts/trust-cutover-gate.ts",
+    "qa:seed-moliboo-series2": "tsx scripts/seed-moliboo-series2-qa.ts",
+    "qa:seed-sprout-stickers": "tsx scripts/seed-sprout-stickers-qa.ts",
     "permissions:reconcile": "tsx scripts/reconcile-module-permissions.ts",
     "ops:api-fix-01d-crypto-acceptance": "tsx scripts/api-fix-01d-crypto-acceptance.ts",
     "ops:replay-reaction-dead-letters": "tsx scripts/replay-reaction-dead-letters.ts",

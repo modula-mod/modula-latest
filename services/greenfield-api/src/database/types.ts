@@ -1410,6 +1410,28 @@ export interface Database {
   greenfield_release_presentation_assets: {asset_id: string; ingestion_id: string; release_id: string | null; product_id: string; version: string; role: string; artifact_path: string; media_type: string; width: number | null; height: number | null; sha256: string | null; development_asset: boolean; alt_text: string | null; presentation_slot: string | null; sort_order: number; created_at: Date}
   greenfield_release_asset_blobs: {sha256: string; media_type: string; byte_size: number; bytes: Buffer; created_at: Date}
   greenfield_release_artifacts: {artifact_id: string; release_id: string; kind: 'module-package' | 'frontend' | 'asset' | 'icon' | 'cover' | 'screenshot' | 'schema' | 'other'; sha256: string; filename: string; access_class: 'public' | 'installation'; required_for_offline_launch: boolean; created_at: Date}
+  greenfield_release_artifact_signatures: {artifact_signature_id: string; artifact_id: string; signature_key_id: string; algorithm: 'Ed25519'; signed_digest: string; signature: string; verification_state: 'verified' | 'invalid' | 'unknownKey' | 'revokedKey'; verified_at: Date; created_at: Date}
+  greenfield_moliboo_characters: {character_id: string; character_number: number; character_key: string; display_name: string; family_id: string; series: number; wearable: boolean; created_at: Date; updated_at: Date}
+  greenfield_moliboo_pack_releases: {release_id: string; artifact_id: string; package_id: string; version: string; character_id: string; family_id: string; minimum_host_version: string; runtime_version: number; asset_capabilities: unknown; rollback_compatible: boolean; availability: 'approved' | 'withdrawn'; state_revision: number; approved_at: Date; withdrawn_at: Date | null; withdrawal_reason: string | null; created_at: Date; updated_at: Date}
+  greenfield_moliboo_pack_release_events: {event_id: string; release_id: string; event_type: 'approved' | 'withdrawn' | 'restored'; state_revision: number; actor_account_id: string | null; reason: string | null; occurred_at: Date}
+  greenfield_moliboo_items: {
+    item_id: string; name: string; slot: string; rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+    access: 'free' | 'earnable' | 'premium'; family: string | null; set_id: string | null; icon_key: string
+    palette: unknown; sort_order: Generated<number>; active: Generated<boolean>; created_at: Generated<Date>
+    item_type: Generated<'character' | 'cosmetic'>; character_id: string | null; wearable: Generated<boolean>
+    revoked_at: Date | null; updated_at: Generated<Date>
+  }
+  greenfield_moliboo_inventory: {
+    account_id: string; item_id: string
+    source: 'quest' | 'achievement' | 'collection' | 'premium_entitlement' | 'admin_grant' | 'gift' | 'qa_fixture' | 'purchase' | 'promotion' | 'migration' | 'system'
+    source_ref: string; acquired_at: Generated<Date>; revoked_at: Date | null; grant_id: Generated<string | null>
+  }
+  greenfield_moliboo_equipped: {
+    account_id: string; character_id: string; item_ids: Generated<unknown>; source_set_id: string | null
+    source_outfit_id: string | null; revision: Generated<number>; updated_at: Generated<Date>; is_active: Generated<boolean>
+  }
+  greenfield_sticker_pack_releases: {release_id: string; manifest_artifact_id: string; pack_id: string; version: string; title: string; icon: string; series: number | null; availability: 'approved' | 'withdrawn'; sort_order: number; approved_at: Date; withdrawn_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_stickers: {release_id: string; sticker_id: string; label: string; emoji: string; artifact_id: string; sort_order: number; created_at: Date}
   greenfield_game_catalogue_entries: {game_id: string; publisher_id: string; origin_type: 'modula-developed' | 'external-open-source' | 'independent-publisher' | 'commercial-publisher'; genre: string; categories: unknown; runtime_category: 'html5-javascript' | 'phaser' | 'playcanvas' | 'browser-runtime' | 'streamed'; age_classification: unknown; availability: 'available' | 'coming-soon' | 'unavailable' | 'region-restricted'; publication_status: 'draft' | 'in-review' | 'published' | 'rejected' | 'retired'; featured: boolean; featured_rank: number | null; created_by_account_id: string | null; updated_by_account_id: string | null; created_at: Date; updated_at: Date}
   greenfield_game_catalogue_events: {event_id: string; game_id: string; publisher_id: string; event_type: 'registered' | 'metadata-updated' | 'submitted' | 'published' | 'rejected' | 'retired' | 'featured' | 'unfeatured'; actor_account_id: string | null; previous_status: string | null; publication_status: string; evidence: unknown; occurred_at: Date}
   greenfield_gubic_library_items: {account_id: string; game_id: string; added_at: Date; hidden: boolean; favourite: boolean; last_played_at: Date | null; play_count: number; total_play_seconds: string | number; updated_at: Date}
