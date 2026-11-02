@@ -1,0 +1,407 @@
+{
+  "schemaVersion": 1,
+  "routes": {
+    "GET /v1/premium/tiers": {
+      "purpose": "Return the active server-maintained Premium tier and capability catalogue, mission-supplied display-price labels, and the currently configured Apple sandbox purchase products.",
+      "owningDomain": "Premium catalogue and entitlements",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Any authenticated account may read the catalogue. Product mappings are server-selected; clients cannot submit tier, price or entitlement facts.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No route parameters, query parameters or request body."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{schemaVersion:1,catalogueVersion,pricingStatus:'supplied_display_only',purchase:{enabled,environment:'sandbox',reason,products[]},tiers:[{id,displayName,rank,paid,price:null,displayPrice,products[],metadata}],capabilities:[{id,displayName,minimumRank,availabilityMode,metadata}]}"
+      },
+      "errors": {
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only. Repeated and concurrent reads do not mutate entitlement state; Cache-Control no-store prevents stale commercial state.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Display prices are labels only and do not declare a billing period or purchasable App Store product."
+    },
+    "GET /v1/me/membership": {
+      "purpose": "Return the authenticated account's effective server-authoritative membership, billing status, badge preference and purchase availability.",
+      "owningDomain": "Premium memberships",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped. The account and actor identifiers are resolved from the authenticated session; no client-supplied owner identifier is accepted.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No route parameters, query parameters or request body."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{schemaVersion:1,accountId,tier,recordedTier,subscriptionStatus,entitlementSource,effectiveAt,expiresAt,membershipSince,badgeVisible,revision,renewal,purchase,publicIdentity,serverTime}"
+      },
+      "errors": {
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only account projection. Expired active/grace records are projected as Core without deleting historical membership or user data.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "GET /v1/me/entitlements": {
+      "purpose": "Evaluate every Premium capability for the authenticated account from the active catalogue and effective membership state.",
+      "owningDomain": "Premium entitlement evaluation",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped; the server derives account and actor identity from the bearer session.",
+      "request": {
+        "params": {},
+        "query": {},
+        "body": null,
+        "validation": "No route parameters, query parameters or request body."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{schemaVersion:1,catalogueVersion,tier,subscriptionStatus,capabilities:[{id,available,value,mode,reason}]}"
+      },
+      "errors": {
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only deterministic evaluation for a catalogue and membership revision. A client flag such as premium=true is never consulted.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "GET /v1/me/entitlements/:capabilityId": {
+      "purpose": "Evaluate one named Premium capability for the authenticated account.",
+      "owningDomain": "Premium entitlement evaluation",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped; the server derives account and actor identity from the bearer session.",
+      "request": {
+        "path": {
+          "capabilityId": "Required lowercase identifier matching ^[a-z][a-z0-9_]{2,79}$."
+        },
+        "query": {},
+        "body": null,
+        "validation": "Fastify rejects malformed capability identifiers; the service resolves the identifier only from the active server catalogue."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{id,available,value,mode,reason,catalogueVersion,tier}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for a malformed capabilityId."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "404": [
+          "NOT_FOUND when capabilityId is absent from the active catalogue."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Read-only deterministic evaluation for a catalogue and membership revision.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "PATCH /v1/me/membership/badge-visibility": {
+      "purpose": "Set whether the authenticated account's eligible Premium membership badge is publicly visible, independently of membership entitlement and identity verification.",
+      "owningDomain": "Premium membership preferences",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped; the account and actor are resolved from the bearer session. The request cannot alter tier, payment state or identity verification.",
+      "request": {
+        "body": {
+          "visible": "Required boolean; the only accepted field."
+        },
+        "validation": "A JSON object is required. Unknown fields, missing visible and non-boolean values are rejected."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "Updated membership projection with badgeVisible and incremented preference audit state."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for missing, non-boolean or unknown body fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "A transaction upserts the account preference and appends an audit event. Last committed write is authoritative; repeating the same value is safe but creates another auditable preference event.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    },
+    "POST /v1/me/membership/apple-purchase-context": {
+      "purpose": "Create or return the authenticated account's stable Apple appAccountToken and the operator-confirmed sandbox products to pass into StoreKit purchase operations.",
+      "owningDomain": "Premium Apple sandbox billing",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Strictly self-scoped. The server generates and binds the UUID to the authenticated account; client-supplied account IDs, tokens, products and tiers are rejected.",
+      "request": {
+        "body": "Required empty JSON object {}.",
+        "validation": "Unknown fields and non-object bodies are rejected."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{environment:'sandbox',appAccountToken:<UUID>,products:[{productId,tier,billingPeriod,environment:'sandbox',state:'active'}]}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for unknown body fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when the Apple verifier is disabled, the catalogue is unavailable or no sandbox products are configured."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Idempotent per account. Database uniqueness on account_id and app_account_token makes concurrent initialization return one stable binding.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Products must be explicitly confirmed and configured by a QA operator; no product identifiers are seeded."
+    },
+    "POST /v1/premium/apple/transactions": {
+      "purpose": "Verify an Apple StoreKit 2 sandbox signed transaction and transactionally project the authenticated account's Premium membership.",
+      "owningDomain": "Premium Apple sandbox billing",
+      "authentication": "Required GreenField bearer access session plus a cryptographically valid Apple signed transaction.",
+      "authorization": "The verified appAccountToken and original transaction chain must belong to the authenticated account. Only PURCHASED auto-renewable sandbox subscriptions mapped to active server products are accepted; family-shared, production, forged and cross-account transactions fail closed.",
+      "request": {
+        "body": {
+          "signedTransaction": "Required compact JWS string, 16 to 200000 characters; the only accepted field."
+        },
+        "validation": "Apple certificate chain, signature, bundle ID, Sandbox environment, transaction type, ownership, product mapping, dates and account binding are validated server-side. Raw signed data is redacted from logs and not persisted."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{accepted:true,replay,environment:'sandbox',transactionId,originalTransactionId,productId,tier,status:'active|grace|expired|revoked',expiresAt,membershipRevision}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed/unknown input, signature or certificate failure, invalid verified fields, inconsistent dates or a future signedDate."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN for production/family-shared/unsupported transactions, absent or mismatched account binding, or an original transaction owned by another account."
+        ],
+        "409": [
+          "CONFLICT for a transaction concurrency invariant violation."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when verification is disabled, the product is not enabled or the Premium catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "The signed evidence SHA-256 and unique (transaction_id,evidence_sha256) event constraint make exact retries idempotent. A per-account PostgreSQL advisory transaction lock serializes projection updates; revision changes only when effective membership changes.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Uses Apple App Store Server Library signed-data verification in Sandbox only. Production transactions are rejected."
+    },
+    "POST /v1/premium/apple/notifications": {
+      "purpose": "Receive, verify and replay-protect Apple App Store Server Notifications V2 for sandbox Premium subscriptions.",
+      "owningDomain": "Premium Apple sandbox billing",
+      "authentication": "No user bearer session. Authorization is the verified Apple JWS certificate chain, signature, bundle identity and Sandbox environment.",
+      "authorization": "Only cryptographically verified Apple notifications are processed. Embedded transaction and renewal JWS values are independently verified. Account binding is resolved only from verified appAccountToken or an existing original-transaction ownership record.",
+      "request": {
+        "body": {
+          "signedPayload": "Required App Store Server Notifications V2 compact JWS, 16 to 200000 characters; the only accepted field."
+        },
+        "validation": "Outer notification and nested transaction/renewal signatures, bundle ID, environment, identifiers, dates and stored product mappings are validated. Raw JWS data is redacted and never stored."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "Either {accepted:true,replay,notificationUuid,notificationType,state:'processed|ignored|unbound',reasonCode,transactionId} or the verified transaction projection response."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed/unknown input, signature/certificate failure or invalid verified fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN for non-Sandbox or unsupported verified transaction ownership/type."
+        ],
+        "409": [
+          "CONFLICT when a notification UUID is replayed with different signed evidence."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when sandbox verification or required catalogue/product state is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "notificationUUID is the replay key. Same UUID plus same evidence returns replay=true; same UUID with different evidence is rejected. Transaction evidence uniqueness and per-account advisory locks prevent duplicate entitlement side effects.",
+      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. App Store Server Notifications V2 Sandbox only; no production notification URL is activated by this PR."
+    },
+    "PUT /v1/admin/qa/premium/:handle": {
+      "purpose": "Assign an auditable synthetic Premium membership fixture to a test account in isolated QA.",
+      "owningDomain": "Premium QA administration",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Requires admin:ops. The route is registered only when the non-production QA assignment flag is enabled and is refused by configuration in production.",
+      "request": {
+        "path": {
+          "handle": "Required account handle, 1 to 80 characters."
+        },
+        "headers": {
+          "Idempotency-Key": "Required non-empty key, maximum 200 characters."
+        },
+        "body": {
+          "tier": "Required: core, plus, horizon, horizon_plus or studio.",
+          "subscriptionStatus": "Optional: active, expired, revoked or downgraded; defaults active.",
+          "effectiveAt": "Optional ISO date-time.",
+          "expiresAt": "Optional ISO date-time later than effectiveAt.",
+          "membershipSince": "Optional ISO date-time."
+        },
+        "validation": "Unknown and privileged fields are rejected; the target account is resolved server-side."
+      },
+      "success": {
+        "status": 200,
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "Updated target membership projection; entitlementSource is qa_fixture."
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed fields, invalid timestamps, invalid tier/status, expiry ordering or missing Idempotency-Key."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN without admin:ops."
+        ],
+        "404": [
+          "NOT_FOUND when the handle or account actor does not exist."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Idempotency-Key is unique in the membership event ledger. Exact retries return the current membership without a duplicate fixture event; membership revision advances on a new assignment.",
+      "versioningCompatibility": "HTTP v1, QA-only synthetic operation. It cannot process payment, grant identity verification or be enabled in production."
+    },
+    "PUT /v1/admin/qa/premium/apple-products/:productId": {
+      "purpose": "Configure or disable one operator-confirmed Apple sandbox product-to-tier mapping for QA purchase verification.",
+      "owningDomain": "Premium Apple sandbox administration",
+      "authentication": "Required GreenField bearer access session.",
+      "authorization": "Requires admin:ops. The route is available only with QA assignments and Apple sandbox verification enabled; both are refused in production.",
+      "request": {
+        "path": {
+          "productId": "Required App Store product identifier matching ^[A-Za-z0-9][A-Za-z0-9._-]{2,159}$."
+        },
+        "body": {
+          "tier": "Required paid tier: plus, horizon, horizon_plus or studio.",
+          "billingPeriod": "Required: monthly or annual.",
+          "state": "Optional: active or disabled; defaults active."
+        },
+        "validation": "Unknown fields, Core mappings, invented billing periods and malformed identifiers are rejected. The server selects the active Premium catalogue."
+      },
+      "success": {
+        "status": 200,
+        "headers": {
+          "Cache-Control": "no-store"
+        },
+        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
+        "data": "{productId,tier,billingPeriod,environment:'sandbox',state:'active|disabled'}"
+      },
+      "errors": {
+        "400": [
+          "VALIDATION_FAILED for malformed path/body values or unknown fields."
+        ],
+        "401": [
+          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
+        ],
+        "403": [
+          "FORBIDDEN without admin:ops."
+        ],
+        "409": [
+          "CONFLICT when another active product already maps to the same catalogue tier and billing period."
+        ],
+        "500": [
+          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
+        ],
+        "503": [
+          "CAPABILITY_UNAVAILABLE when sandbox verification or the active catalogue is unavailable."
+        ],
+        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
+      },
+      "pagination": "Not paginated and accepts no filtering parameters.",
+      "idempotencyConcurrency": "Upsert by productId. A PostgreSQL advisory lock and partial unique index allow only one active product per catalogue tier, billing period and Sandbox environment.",
+      "versioningCompatibility": "HTTP v1, QA Sandbox only. Product identifiers are never seeded or inferred; App Store Connect confirmation is an external prerequisite."
+    }
+  }
+}
+

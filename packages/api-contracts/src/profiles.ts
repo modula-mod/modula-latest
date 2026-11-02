@@ -13,7 +13,7 @@ export type PublicPremiumTier = 'core' | 'plus' | 'horizon' | 'horizon_plus' | '
 export type PublicIdentitySummary = {
   schemaVersion: 1
   verification: {status: 'unverified' | 'verified'; type: PublicVerificationType | null; mark: PublicVerificationMark | null}
-  membership: {tier: PublicPremiumTier; status: 'core' | 'active' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
+  membership: {tier: PublicPremiumTier; status: 'core' | 'active' | 'grace' | 'expired' | 'revoked' | 'downgraded'; badgeVisible: boolean; mark: 'modula_unit' | null}
 }
 
 export type ProfileFocusStatus = {

@@ -69,16 +69,17 @@ describeIfDb('Premium, Verification and public identity integration', () => {
     for (const url of ['/v1/premium/tiers', '/v1/me/membership', '/v1/me/entitlements', '/v1/me/verification']) {
       expect((await app.inject({method: 'GET', url})).statusCode).toBe(401)
     }
-    expect((await app.inject({method: 'POST', url: '/v1/premium/apple/transactions', payload: {tier: 'studio'}})).statusCode).toBe(404)
+    expect((await app.inject({method: 'POST', url: '/v1/premium/apple/transactions', payload: {signedTransaction: 'header.payload.signature'}})).statusCode).toBe(401)
   })
 
   it('defaults every account to Core and keeps existing-free capabilities available', async () => {
     const {core} = await users()
     const catalogue = await authed(core, 'GET', '/v1/premium/tiers')
     expect(catalogue.statusCode, catalogue.body).toBe(200)
-    expect(catalogue.json().data).toMatchObject({catalogueVersion: 1, pricingStatus: 'provisional', purchase: {enabled: false}})
+    expect(catalogue.json().data).toMatchObject({catalogueVersion: 1, pricingStatus: 'supplied_display_only', purchase: {enabled: false, reason: 'apple_sandbox_verifier_disabled'}})
     expect(catalogue.json().data.tiers.map((tier: any) => tier.id)).toEqual(['core', 'plus', 'horizon', 'horizon_plus', 'studio'])
     expect(catalogue.json().data.tiers.every((tier: any) => tier.price === null)).toBe(true)
+    expect(catalogue.json().data.tiers.map((tier: any) => tier.displayPrice)).toEqual(['Free', '£3.99', '£8.99', '£14.99', 'From £29.99'])
     const membership = (await authed(core, 'GET', '/v1/me/membership')).json().data
     expect(membership).toMatchObject({tier: 'core', subscriptionStatus: 'core', revision: 0, purchase: {enabled: false}})
     const entitlements = (await authed(core, 'GET', '/v1/me/entitlements')).json().data

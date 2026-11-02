@@ -831,6 +831,39 @@
       "services/greenfield-api/src/modules/gubic-service.ts#reviewCatalogueEntry"
     ]
   },
+  "GET /v1/admin/gubic/submissions": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_gubic_submissions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#requireAdmin",
+      "services/greenfield-api/src/gubic/play-service.ts#reviewQueue"
+    ]
+  },
+  "POST /v1/admin/gubic/submissions/:submissionId/decision": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_gubic_submissions"
+    ],
+    "writes": [
+      "greenfield_gubic_achievements",
+      "greenfield_gubic_submissions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#decide",
+      "services/greenfield-api/src/gubic/play-service.ts#requireAdmin",
+      "services/greenfield-api/src/gubic/play-service.ts#submission",
+      "services/greenfield-api/src/gubic/play-service.ts#submissionRow"
+    ]
+  },
   "GET /v1/admin/moderation/reports": {
     "reads": [
       "reports"
@@ -1310,6 +1343,23 @@
       "services/greenfield-api/src/premium/service.ts#invalidateAccount",
       "services/greenfield-api/src/premium/service.ts#membership",
       "services/greenfield-api/src/premium/service.ts#membershipForAccount"
+    ]
+  },
+  "PUT /v1/admin/qa/premium/apple-products/:productId": {
+    "reads": [
+      "greenfield_premium_apple_products",
+      "greenfield_premium_catalogue_versions"
+    ],
+    "writes": [
+      "greenfield_premium_apple_products"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#activeCatalogueVersion",
+      "services/greenfield-api/src/premium/apple-service.ts#configureProduct",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured"
     ]
   },
   "POST /v1/admin/qa/verification/appeals/:appealId/transitions": {
@@ -3141,6 +3191,7 @@
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_reactions",
       "profiles"
     ],
     "writes": [
@@ -3159,6 +3210,7 @@
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
       "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
@@ -3167,11 +3219,29 @@
       "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts"
     ]
   },
+  "POST /v1/conversations/:id/archive": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversations"
+    ],
+    "writes": [
+      "archive",
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#setArchived"
+    ]
+  },
   "GET /v1/conversations/:id/messages": {
     "reads": [
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_reactions",
       "profiles"
     ],
     "writes": [],
@@ -3182,6 +3252,7 @@
       "services/greenfield-api/src/domains/messaging/service.ts#listMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
       "services/greenfield-api/src/domains/messaging/service.ts#participants"
     ]
@@ -3190,7 +3261,9 @@
     "reads": [
       "blocks",
       "greenfield_conversation_members",
+      "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_reactions",
       "profiles"
     ],
     "writes": [
@@ -3200,15 +3273,119 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
       "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
       "services/greenfield-api/src/domains/messaging/service.ts#send"
+    ]
+  },
+  "DELETE /v1/conversations/:id/messages/:messageId": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations"
+    ],
+    "writes": [
+      "greenfield_conversation_messages",
+      "greenfield_message_reactions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#unsendMessage"
+    ]
+  },
+  "PATCH /v1/conversations/:id/messages/:messageId": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "greenfield_message_reactions",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_conversation_messages"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#editMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants"
+    ]
+  },
+  "DELETE /v1/conversations/:id/messages/:messageId/reactions": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "greenfield_message_reactions",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_message_reactions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#react"
+    ]
+  },
+  "PUT /v1/conversations/:id/messages/:messageId/reactions": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "greenfield_message_reactions",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_message_reactions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#react"
+    ]
+  },
+  "POST /v1/conversations/:id/mute": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversations"
+    ],
+    "writes": [
+      "greenfield_conversation_members",
+      "mute"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#setMuted"
     ]
   },
   "POST /v1/conversations/:id/read": {
@@ -3225,6 +3402,39 @@
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#markRead",
       "services/greenfield-api/src/domains/messaging/service.ts#membership"
+    ]
+  },
+  "GET /v1/conversations/:id/typing": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#typing"
+    ]
+  },
+  "POST /v1/conversations/:id/typing": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversations"
+    ],
+    "writes": [
+      "greenfield_conversation_members",
+      "typing"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#setTyping"
     ]
   },
   "GET /v1/conversations/unread": {
@@ -3333,6 +3543,67 @@
       "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
       "services/greenfield-api/src/modules/gubic-service.ts#requirePublisherAccess",
       "services/greenfield-api/src/modules/gubic-service.ts#upsertCatalogueEntry"
+    ]
+  },
+  "GET /v1/developer/gubic/submissions": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_gubic_submissions",
+      "greenfield_publisher_owners"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#listSubmissions",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublisherAccess"
+    ]
+  },
+  "POST /v1/developer/gubic/submissions": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_gubic_submissions",
+      "greenfield_premium_capabilities",
+      "greenfield_premium_catalogue_versions",
+      "greenfield_premium_memberships",
+      "greenfield_premium_tiers",
+      "greenfield_publisher_owners"
+    ],
+    "writes": [
+      "greenfield_game_catalogue_entries",
+      "greenfield_game_catalogue_events",
+      "greenfield_gubic_submissions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#capabilities",
+      "services/greenfield-api/src/gubic/play-service.ts#capability",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublisherAccess",
+      "services/greenfield-api/src/gubic/play-service.ts#submission",
+      "services/greenfield-api/src/gubic/play-service.ts#submissionRow",
+      "services/greenfield-api/src/gubic/play-service.ts#submit"
+    ]
+  },
+  "POST /v1/developer/gubic/submissions/:submissionId/withdraw": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_gubic_submissions",
+      "greenfield_publisher_owners"
+    ],
+    "writes": [
+      "greenfield_gubic_submissions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublisherAccess",
+      "services/greenfield-api/src/gubic/play-service.ts#submission",
+      "services/greenfield-api/src/gubic/play-service.ts#submissionRow",
+      "services/greenfield-api/src/gubic/play-service.ts#withdraw"
     ]
   },
   "POST /v1/developer/organisations": {
@@ -4081,6 +4352,21 @@
       "services/greenfield-api/src/domains/gifs/service.ts#trending"
     ]
   },
+  "GET /v1/gubic/capabilities": {
+    "reads": [
+      "greenfield_premium_capabilities",
+      "greenfield_premium_catalogue_versions",
+      "greenfield_premium_memberships",
+      "greenfield_premium_tiers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#capabilities"
+    ]
+  },
   "GET /v1/gubic/categories": {
     "reads": [
       "greenfield_game_catalogue_entries",
@@ -4148,6 +4434,20 @@
       "services/greenfield-api/src/modules/gubic-service.ts#listGames"
     ]
   },
+  "GET /v1/gubic/games/:gameId/achievements": {
+    "reads": [
+      "greenfield_gubic_achievement_unlocks",
+      "greenfield_gubic_achievements"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#gameAchievements",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame"
+    ]
+  },
   "GET /v1/gubic/games/:gameId/eligibility": {
     "reads": [
       "greenfield_entitlements",
@@ -4191,6 +4491,71 @@
       "services/greenfield-api/src/modules/gubic-service.ts#packageInstallPlan"
     ]
   },
+  "GET /v1/gubic/games/:gameId/lobbies": {
+    "reads": [
+      "code",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#listLobbies",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame"
+    ]
+  },
+  "POST /v1/gubic/games/:gameId/lobbies": {
+    "reads": [
+      "code",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members",
+      "greenfield_premium_capabilities",
+      "greenfield_premium_catalogue_versions",
+      "greenfield_premium_memberships",
+      "greenfield_premium_tiers"
+    ],
+    "writes": [
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#capabilities",
+      "services/greenfield-api/src/gubic/play-service.ts#capability",
+      "services/greenfield-api/src/gubic/play-service.ts#createLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame"
+    ]
+  },
+  "POST /v1/gubic/games/:gameId/sessions": {
+    "reads": [
+      "greenfield_gubic_lobby_members",
+      "greenfield_gubic_play_sessions",
+      "the"
+    ],
+    "writes": [
+      "greenfield_gubic_library_items",
+      "greenfield_gubic_play_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#closeSession",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame",
+      "services/greenfield-api/src/gubic/play-service.ts#startSession"
+    ]
+  },
   "GET /v1/gubic/games/:gameId/versions": {
     "reads": [
       "greenfield_game_catalogue_entries",
@@ -4207,6 +4572,201 @@
       "services/greenfield-api/src/modules/gubic-service.ts#getGame",
       "services/greenfield-api/src/modules/gubic-service.ts#listGames",
       "services/greenfield-api/src/modules/gubic-service.ts#versions"
+    ]
+  },
+  "GET /v1/gubic/library": {
+    "reads": [
+      "greenfield_gubic_achievement_unlocks",
+      "greenfield_gubic_library_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#library"
+    ]
+  },
+  "DELETE /v1/gubic/library/:gameId": {
+    "reads": [
+      "greenfield_gubic_play_sessions"
+    ],
+    "writes": [
+      "greenfield_gubic_library_items"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#removeLibraryItem"
+    ]
+  },
+  "PUT /v1/gubic/library/:gameId": {
+    "reads": [
+      "greenfield_gubic_achievement_unlocks",
+      "greenfield_gubic_library_items"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_gubic_library_items"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#library",
+      "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame",
+      "services/greenfield-api/src/gubic/play-service.ts#upsertLibraryItem"
+    ]
+  },
+  "GET /v1/gubic/lobbies/:lobbyId": {
+    "reads": [
+      "code",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby"
+    ]
+  },
+  "POST /v1/gubic/lobbies/:lobbyId/join": {
+    "reads": [
+      "code",
+      "failed",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#bump",
+      "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#joinLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby"
+    ]
+  },
+  "POST /v1/gubic/lobbies/:lobbyId/leave": {
+    "reads": [
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#bump",
+      "services/greenfield-api/src/gubic/play-service.ts#leaveLobby"
+    ]
+  },
+  "POST /v1/gubic/lobbies/:lobbyId/ready": {
+    "reads": [
+      "code",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#bump",
+      "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#setReady"
+    ]
+  },
+  "GET /v1/gubic/lobbies/:lobbyId/socket": {
+    "reads": [
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/lobby-hub.ts#relay",
+      "services/greenfield-api/src/gubic/lobby-hub.ts#subscribe",
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#isActiveMember"
+    ]
+  },
+  "POST /v1/gubic/lobbies/:lobbyId/start": {
+    "reads": [
+      "code",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [
+      "greenfield_gubic_lobbies"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#startLobby"
+    ]
+  },
+  "POST /v1/gubic/lobbies/join": {
+    "reads": [
+      "code",
+      "failed",
+      "greenfield_accounts",
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "writes": [
+      "greenfield_gubic_lobbies",
+      "greenfield_gubic_lobby_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+      "services/greenfield-api/src/gubic/play-service.ts#bump",
+      "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#joinLobby",
+      "services/greenfield-api/src/gubic/play-service.ts#presentLobby"
+    ]
+  },
+  "GET /v1/gubic/me/achievements": {
+    "reads": [
+      "greenfield_gubic_achievement_unlocks",
+      "greenfield_gubic_achievements"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#myAchievements"
     ]
   },
   "GET /v1/gubic/my-games": {
@@ -4264,6 +4824,54 @@
     "evidence": [
       "services/greenfield-api/src/modules/gubic-service.ts#listGames",
       "services/greenfield-api/src/modules/gubic-service.ts#publisherDetail"
+    ]
+  },
+  "POST /v1/gubic/sessions/:sessionId/achievements/:key": {
+    "reads": [
+      "greenfield_gubic_achievement_unlocks",
+      "greenfield_gubic_achievements",
+      "greenfield_gubic_play_sessions"
+    ],
+    "writes": [
+      "greenfield_gubic_achievement_unlocks"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#ownedSession",
+      "services/greenfield-api/src/gubic/play-service.ts#unlockAchievement"
+    ]
+  },
+  "POST /v1/gubic/sessions/:sessionId/end": {
+    "reads": [
+      "greenfield_gubic_play_sessions"
+    ],
+    "writes": [
+      "greenfield_gubic_library_items",
+      "greenfield_gubic_play_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#closeSession",
+      "services/greenfield-api/src/gubic/play-service.ts#endSession"
+    ]
+  },
+  "POST /v1/gubic/sessions/:sessionId/heartbeat": {
+    "reads": [
+      "greenfield_gubic_play_sessions"
+    ],
+    "writes": [
+      "greenfield_gubic_play_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/gubic/play-service.ts#heartbeat",
+      "services/greenfield-api/src/gubic/play-service.ts#ownedSession"
     ]
   },
   "GET /v1/hashtags/suggest": {
@@ -4617,6 +5225,23 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/premium/service.ts#membership"
+    ]
+  },
+  "POST /v1/me/membership/apple-purchase-context": {
+    "reads": [
+      "greenfield_premium_apple_accounts",
+      "greenfield_premium_apple_products"
+    ],
+    "writes": [
+      "greenfield_premium_apple_accounts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#activeProducts",
+      "services/greenfield-api/src/premium/apple-service.ts#purchaseContext",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured"
     ]
   },
   "PATCH /v1/me/membership/badge-visibility": {
@@ -6469,6 +7094,325 @@
       "services/greenfield-api/src/modules/distribution-service.ts#updateFeed"
     ]
   },
+  "POST /v1/moliboo/activities/complete": {
+    "reads": [
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests"
+    ],
+    "writes": [
+      "SET",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_quest_progress"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#addFriendship",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#completeActivity",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#recordEvent"
+    ]
+  },
+  "GET /v1/moliboo/catalogue/items": {
+    "reads": [
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#listItems",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#unlockQuestFor",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#visible"
+    ]
+  },
+  "GET /v1/moliboo/catalogue/outfits": {
+    "reads": [
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#listOutfitSets",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet"
+    ]
+  },
+  "POST /v1/moliboo/characters/:characterId/care": {
+    "reads": [
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests",
+      "greenfield_moliboo_skills"
+    ],
+    "writes": [
+      "SET",
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_quest_progress"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#addFriendship",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#care",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#characterState",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#grantBuff",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#recordEvent"
+    ]
+  },
+  "POST /v1/moliboo/characters/:characterId/equip": {
+    "reads": [
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests",
+      "greenfield_moliboo_skills",
+      "greenfield_moliboo_user_outfits"
+    ],
+    "writes": [
+      "SET",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_quest_progress"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#characterState",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#equip",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#recordEvent",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#validated"
+    ]
+  },
+  "POST /v1/moliboo/characters/:characterId/skills/:skillId/use": {
+    "reads": [
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests",
+      "greenfield_moliboo_skills"
+    ],
+    "writes": [
+      "SET",
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_quest_progress"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#addFriendship",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#characterState",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#grantBuff",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#recordEvent",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#useSkill"
+    ]
+  },
+  "GET /v1/moliboo/characters/:characterId/state": {
+    "reads": [
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests",
+      "greenfield_moliboo_skills"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#characterState"
+    ]
+  },
+  "GET /v1/moliboo/inventory": {
+    "reads": [
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#inventory",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#unlockQuestFor",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#visible"
+    ]
+  },
+  "GET /v1/moliboo/outfits": {
+    "reads": [
+      "greenfield_moliboo_user_outfits"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#listSavedOutfits",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#outfitDto"
+    ]
+  },
+  "POST /v1/moliboo/outfits": {
+    "reads": [
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests",
+      "greenfield_moliboo_user_outfits"
+    ],
+    "writes": [
+      "SET",
+      "greenfield_moliboo_events",
+      "greenfield_moliboo_quest_progress",
+      "greenfield_moliboo_user_outfits"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#cleanName",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#outfitDto",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#recordEvent",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#saveOutfit",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#validated"
+    ]
+  },
+  "DELETE /v1/moliboo/outfits/:outfitId": {
+    "reads": [
+      "greenfield_moliboo_user_outfits"
+    ],
+    "writes": [
+      "greenfield_moliboo_user_outfits"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#deleteOutfit"
+    ]
+  },
+  "PATCH /v1/moliboo/outfits/:outfitId": {
+    "reads": [
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quests",
+      "greenfield_moliboo_user_outfits"
+    ],
+    "writes": [
+      "greenfield_moliboo_user_outfits",
+      "outfit"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#cleanName",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#outfitDto",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#updateOutfit",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#validated"
+    ]
+  },
+  "GET /v1/moliboo/quests": {
+    "reads": [
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quest_progress",
+      "greenfield_moliboo_quests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#quests"
+    ]
+  },
+  "POST /v1/moliboo/quests/:questId/claim": {
+    "reads": [
+      "greenfield_moliboo_active_buffs",
+      "greenfield_moliboo_buff_definitions",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items",
+      "greenfield_moliboo_outfit_sets",
+      "greenfield_moliboo_quest_progress",
+      "greenfield_moliboo_quests"
+    ],
+    "writes": [
+      "SET",
+      "greenfield_moliboo_friendship",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_quest_progress"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#addFriendship",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#claimQuest",
+      "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet"
+    ]
+  },
   "GET /v1/notifications": {
     "reads": [
       "blocks",
@@ -6886,6 +7830,64 @@
       "services/greenfield-api/src/domains/shares/service.ts#record"
     ]
   },
+  "POST /v1/premium/apple/notifications": {
+    "reads": [
+      "actors",
+      "greenfield_premium_apple_accounts",
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_products",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_memberships"
+    ],
+    "writes": [
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_membership_events",
+      "greenfield_premium_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#invalidateAccount",
+      "services/greenfield-api/src/premium/apple-service.ts#notificationReplay",
+      "services/greenfield-api/src/premium/apple-service.ts#persistNotification",
+      "services/greenfield-api/src/premium/apple-service.ts#persistTransaction",
+      "services/greenfield-api/src/premium/apple-service.ts#processNotification",
+      "services/greenfield-api/src/premium/apple-service.ts#projectLatestMembership",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured"
+    ]
+  },
+  "POST /v1/premium/apple/transactions": {
+    "reads": [
+      "actors",
+      "greenfield_premium_apple_accounts",
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_products",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_memberships"
+    ],
+    "writes": [
+      "greenfield_premium_apple_notifications",
+      "greenfield_premium_apple_transaction_events",
+      "greenfield_premium_apple_transactions",
+      "greenfield_premium_membership_events",
+      "greenfield_premium_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/premium/apple-service.ts#invalidateAccount",
+      "services/greenfield-api/src/premium/apple-service.ts#persistTransaction",
+      "services/greenfield-api/src/premium/apple-service.ts#projectLatestMembership",
+      "services/greenfield-api/src/premium/apple-service.ts#requireConfigured",
+      "services/greenfield-api/src/premium/apple-service.ts#submitTransaction"
+    ]
+  },
   "GET /v1/premium/tiers": {
     "reads": [
       "greenfield_premium_capabilities",
@@ -7297,6 +8299,76 @@
     "evidence": [
       "services/greenfield-api/src/providers/service.ts#list",
       "services/greenfield-api/src/providers/service.ts#resolve"
+    ]
+  },
+  "GET /v1/push/devices": {
+    "reads": [
+      "push_device_tokens"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/push/service.ts#list"
+    ]
+  },
+  "POST /v1/push/devices": {
+    "reads": [
+      "the"
+    ],
+    "writes": [
+      "push_device_tokens",
+      "push_notification_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/push/service.ts#register"
+    ]
+  },
+  "DELETE /v1/push/devices/:token": {
+    "reads": [],
+    "writes": [
+      "push_device_tokens"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/push/service.ts#unregister"
+    ]
+  },
+  "GET /v1/push/preferences": {
+    "reads": [
+      "push_notification_preferences"
+    ],
+    "writes": [
+      "push_notification_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/push/service.ts#ensure",
+      "services/greenfield-api/src/domains/push/service.ts#get"
+    ]
+  },
+  "PATCH /v1/push/preferences": {
+    "reads": [
+      "push_notification_preferences"
+    ],
+    "writes": [
+      "push",
+      "push_notification_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/push/service.ts#ensure",
+      "services/greenfield-api/src/domains/push/service.ts#patch"
     ]
   },
   "GET /v1/reels": {
