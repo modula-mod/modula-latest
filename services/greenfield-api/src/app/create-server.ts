@@ -3,6 +3,7 @@ import Fastify, {type FastifyInstance} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import {createDb, type ModulaDb} from '../database/client.js'
 import {createRequestId} from '../transport/envelope.js'
+import type {PremiumAppleVerifier} from '../premium/apple-verifier.js'
 import {registerGracefulShutdown} from './graceful-shutdown.js'
 import {registerPlugins} from './register-plugins.js'
 import {registerRoutes} from './register-routes.js'
@@ -13,7 +14,11 @@ export type CreatedServer = {
   config: AppConfig
 }
 
-export async function createServer(config: AppConfig): Promise<CreatedServer> {
+export type ServerDependencies = {
+  premiumAppleVerifier?: PremiumAppleVerifier | null
+}
+
+export async function createServer(config: AppConfig, dependencies: ServerDependencies = {}): Promise<CreatedServer> {
   const app = Fastify({
     logger: {
       level: config.logLevel,
@@ -34,6 +39,8 @@ export async function createServer(config: AppConfig): Promise<CreatedServer> {
           'databaseUrl',
           'MODULA_DATABASE_URL',
           'connectionString',
+          'req.body.signedTransaction',
+          'req.body.signedPayload',
         ],
         remove: true,
       },
@@ -44,7 +51,7 @@ export async function createServer(config: AppConfig): Promise<CreatedServer> {
   })
   const db = createDb(config.databaseUrl, error => app.log.error({error: safeDatabaseError(error)}, 'database pool idle client error'))
   await registerPlugins(app, config)
-  await registerRoutes(app, db, config)
+  await registerRoutes(app, db, config, dependencies)
   registerGracefulShutdown(app, db, config.shutdownTimeoutMs)
   return {app, db, config}
 }

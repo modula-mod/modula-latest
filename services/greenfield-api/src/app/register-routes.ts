@@ -73,6 +73,7 @@ import {registerPushRoutes} from './register-push-routes.js'
 import {registerMessagingRoutes} from './register-messaging-routes.js'
 import {registerMolibooGameRoutes} from './register-moliboo-game-routes.js'
 import {registerPremiumRoutes} from '../premium/routes.js'
+import type {PremiumAppleVerifier} from '../premium/apple-verifier.js'
 import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
 import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
@@ -157,7 +158,12 @@ function releaseIdentity(config: AppConfig) {
   }
 }
 
-export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
+export async function registerRoutes(
+  app: FastifyInstance,
+  db: ModulaDb,
+  config: AppConfig,
+  dependencies: {premiumAppleVerifier?: PremiumAppleVerifier | null} = {},
+): Promise<void> {
   app.addContentTypeParser('application/octet-stream', (request, payload, done) => done(null, payload))
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db, config.publicApiUrl)
@@ -2711,7 +2717,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   await registerMessagingRoutes(app, db, {feedConfig, writeConfig})
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
-  await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig})
+  await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig}, {appleVerifier: dependencies.premiumAppleVerifier})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
