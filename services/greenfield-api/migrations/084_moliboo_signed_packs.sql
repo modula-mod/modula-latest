@@ -11,6 +11,7 @@ ALTER TABLE greenfield_release_asset_blobs
     'application/gzip','application/x-gzip','application/octet-stream',
     'application/json','application/schema+json','application/vnd.modula.frontend+json',
     'application/vnd.modula.web-runtime+tgz','application/vnd.modula.game-web+tgz',
+    'application/vnd.modula.asset-pack+tgz',
     'application/vnd.modula.moliboo-asset-pack+json'
   ));
 

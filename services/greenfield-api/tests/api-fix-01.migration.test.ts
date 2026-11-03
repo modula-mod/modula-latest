@@ -9,6 +9,17 @@ import {listMigrationFiles, migrateDown, migrateStatus, migrateUp} from '../src/
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
+const pre084PackageMediaTypes = [
+  'application/vnd.modula.game-web+tgz',
+  'application/vnd.modula.web-runtime+tgz',
+  'application/vnd.modula.asset-pack+tgz',
+] as const
+const mediaTypesAfter084 = [...pre084PackageMediaTypes, 'application/vnd.modula.moliboo-asset-pack+json'] as const
+
+function expectMediaTypes(definition: string | undefined, expected: readonly string[]) {
+  expect(definition).toBeTruthy()
+  for (const mediaType of expected) expect(definition).toContain(mediaType)
+}
 
 describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 084', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
@@ -144,8 +155,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
-    expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.game-web+tgz')
+    expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     const canonicalMolibooItems = await client.query(`
       SELECT count(*)::int AS count, count(*) FILTER (WHERE item_type = 'cosmetic')::int AS cosmetics
       FROM greenfield_moliboo_items
@@ -178,7 +188,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       items: 'greenfield_moliboo_items', inventory: 'greenfield_moliboo_inventory', equipped: 'greenfield_moliboo_equipped',
     })
     expect(extensionColumns.rows[0]?.count).toBe(0)
-    expect(mediaConstraintAfter084.rows[0]?.definition).toContain('application/vnd.modula.game-web+tgz')
+    expectMediaTypes(mediaConstraintAfter084.rows[0]?.definition, pre084PackageMediaTypes)
     expect(versionAfter084.rows[0]?.value).toBe('083')
     await rolledBackMoliboo.end()
 
@@ -347,7 +357,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     `)
     expect(version.rows[0]?.value).toBe('084')
     expect(account.rows[0]?.count).toBe(1)
-    expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
+    expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     await after.end()
   }, 120_000)
 })
