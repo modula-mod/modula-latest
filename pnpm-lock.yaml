@@ -482,6 +482,9 @@ importers:
       '@modula/intelligence-governance':
         specifier: workspace:*
         version: link:../../packages/intelligence-governance
+      '@modula/mar-runtime':
+        specifier: workspace:*
+        version: link:../../packages/mar-runtime
       '@modula/module-backend-protocol':
         specifier: file:../../../modula-mod/modula-module-standard/packages/module-backend-protocol
         version: file:../modula-mod/modula-module-standard/packages/module-backend-protocol

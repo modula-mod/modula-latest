@@ -52,6 +52,7 @@ RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/dimon-contracts build \
  && pnpm --filter @modula/intelligence-contracts build \
  && pnpm --filter @modula/intelligence-governance build \
+ && pnpm --filter @modula/mar-runtime build \
  && pnpm --filter @modula/greenfield-api build
 RUN pnpm --config.inject-workspace-packages=true --filter @modula/greenfield-api deploy --prod /prod/api
 

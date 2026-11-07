@@ -121,7 +121,7 @@ Circuit cards/revisions are versioned and scoped. A successful mission never aut
 
 ## API representation
 
-Authenticated routes under `/v1/intelligence` expose mission list/detail, start, Ledger, evidence, decisions, approvals, approval/rejection, and governed execution. Every lookup starts with owner authorization; UUID entropy is not authorization. Database rows are mapped into explicit lifecycle DTOs rather than being treated as the public contract.
+Authenticated routes under `/v1/intelligence` expose mission list/detail, start, cancel (`POST /v1/intelligence/missions/:missionId/cancel`), Ledger, evidence, decisions, approvals, approval/rejection, and governed execution. Cancel delegates to `MissionRuntime.cancel()` for the owning account: already-cancelled is idempotent success, and other terminal states return `INVALID_MISSION_STATE`. Every lookup starts with owner authorization; UUID entropy is not authorization. Database rows are mapped into explicit lifecycle DTOs rather than being treated as the public contract.
 
 ## Kaizen and Atlas foundations
 
