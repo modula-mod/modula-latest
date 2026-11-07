@@ -123,7 +123,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs',
+      '084_moliboo_signed_packs', '084_publisher_release_console',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -140,7 +140,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('084_moliboo_signed_packs')
+    expect(applied.at(-1)).toBe('084_publisher_release_console')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -163,6 +163,17 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(canonicalMolibooItems.rows[0]?.count).toBeGreaterThan(0)
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
+
+    expect(await migrateDown(freshUrl)).toBe('084_publisher_release_console')
+    const rolledBackConsole = new pg.Client({connectionString: freshUrl})
+    await rolledBackConsole.connect()
+    const consoleTables = await rolledBackConsole.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs, to_regclass('public.greenfield_publisher_release_job_logs') AS logs`)
+    const dispatchCheck = await rolledBackConsole.query(`SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conname = 'background_jobs_dispatch_mode_check'`)
+    const versionAfterPublisher = await rolledBackConsole.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(consoleTables.rows[0]).toEqual({jobs: null, logs: null})
+    expect(dispatchCheck.rows[0]?.definition).not.toContain('PUBLISHER_RELEASE_RUNNER')
+    expect(versionAfterPublisher.rows[0]?.value).toBe('083')
+    await rolledBackConsole.end()
 
     expect(await migrateDown(freshUrl)).toBe('084_moliboo_signed_packs')
     const rolledBackMoliboo = new pg.Client({connectionString: freshUrl})
@@ -310,7 +321,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs',
+      '084_moliboo_signed_packs', '084_publisher_release_console',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -340,7 +351,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs',
+      '084_moliboo_signed_packs', '084_publisher_release_console',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])

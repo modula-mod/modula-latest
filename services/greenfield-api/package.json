@@ -22,6 +22,7 @@
     "registry:ingest-mps-products": "tsx scripts/ingest-mps-products.ts",
     "registry:publish-mps-products": "tsx scripts/publish-mps-products.ts",
     "registry:sync-github-release": "tsx scripts/sync-github-release.ts",
+    "publisher:release-runner": "node dist/publisher/release-job-runner-main.js",
     "registry:backfill-distribution-artifacts": "tsx scripts/backfill-distribution-artifacts.ts",
     "benchmark:module-distribution": "tsx scripts/benchmark-module-distribution.ts",
     "registry:trust-bootstrap": "tsx scripts/trust-bootstrap.ts",
