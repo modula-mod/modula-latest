@@ -74,6 +74,43 @@ describe('generic GAIA discovery from authorized module actions', () => {
     expect(String(plan.steps[0]?.actionProposal.capability)).not.toContain('vault-notes')
   })
 
+  it('honors a limit declared on the available action instead of parsing a number from the objective', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: 'Query the authorized module collection for the five most recently updated records.'},
+      availableActions: [{...syntheticQueryAction, limits: {min: 1, max: 100, default: 10}}],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal.input).toEqual({
+      collection: syntheticCollection,
+      limit: 10,
+      sort: 'updatedAt',
+      direction: 'desc',
+    })
+  })
+
+  it('keeps limit 25 when the declaration omits a limit, even if the objective mentions a number', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: 'Return the five most recently updated records from the authorized module collection.'},
+      availableActions: [syntheticQueryAction],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal.input).toMatchObject({
+      collection: syntheticCollection,
+      limit: 25,
+      sort: 'updatedAt',
+      direction: 'desc',
+    })
+  })
+
+  it('clamps a declared default to the declared maximum', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: genericQueryObjective},
+      availableActions: [{...syntheticQueryAction, limits: {min: 1, max: 8, default: 25}}],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal.input).toMatchObject({limit: 8})
+  })
+
   it('treats module absence as a supported blocked state', async () => {
     const plan = await planner().plan({
       mission: {...mission, objective: genericQueryObjective},
