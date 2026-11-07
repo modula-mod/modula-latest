@@ -42,6 +42,7 @@ export class DeterministicTestPlanner implements GaiaPlanner {
 
   private proposal(input: GaiaPlanningInput): ModulaActionProposal {
     const common = {id: this.id(), missionId: input.mission.id, requestedBy: 'gaia' as const}
+    // Isolated GAI-01 notes special cases — defects to retire, not a pattern to extend.
     if (input.mission.objective === RECENT_VAULT_NOTES_OBJECTIVE) {
       const action = find(input.availableActions, 'record.query', 'note')
       return {
@@ -83,7 +84,31 @@ export class DeterministicTestPlanner implements GaiaPlanner {
     if (input.mission.objective === FINANCIAL_FIXTURE_OBJECTIVE) {
       return {...common, family: 'financial.fixture', capability: 'financial.fixture', input: {}}
     }
-    throw new IntelligenceError('CAPABILITY_UNKNOWN', 'DeterministicTestPlanner only supports declared GAI-01 acceptance objectives')
+    return genericAuthorizedQuery(common, input.availableActions)
+  }
+}
+
+function genericAuthorizedQuery(
+  common: Pick<ModulaActionProposal, 'id' | 'missionId' | 'requestedBy'>,
+  availableActions: GaiaAvailableAction[],
+): ModulaActionProposal {
+  const action = availableActions.find(candidate => candidate.family === 'record.query' && candidate.collection)
+  if (!action?.collection) {
+    const absent = availableActions.length === 0
+    return {
+      ...common,
+      family: absent ? 'module.absent' : 'capability.unavailable',
+      capability: absent ? 'module.absent' : 'capability.unavailable',
+      input: {},
+    }
+  }
+  return {
+    ...common,
+    moduleId: action.moduleId,
+    family: action.family,
+    capability: action.capability,
+    actionId: action.actionId,
+    input: {collection: action.collection, limit: 25, sort: 'updatedAt', direction: 'desc'},
   }
 }
 

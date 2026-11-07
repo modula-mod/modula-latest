@@ -463,6 +463,9 @@ importers:
       '@modula/intelligence-contracts':
         specifier: workspace:*
         version: link:../../packages/intelligence-contracts
+      '@modula/intelligence-core':
+        specifier: workspace:*
+        version: link:../../packages/intelligence-core
       '@modula/intelligence-governance':
         specifier: workspace:*
         version: link:../../packages/intelligence-governance

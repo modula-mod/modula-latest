@@ -52,6 +52,7 @@
     "@modula/greenfield-runtime": "workspace:*",
     "@modula/greenfield-schema-registry": "workspace:*",
     "@modula/intelligence-contracts": "workspace:*",
+    "@modula/intelligence-core": "workspace:*",
     "@modula/intelligence-governance": "workspace:*",
     "@modula/module-backend-protocol": "file:../../../modula-mod/modula-module-standard/packages/module-backend-protocol",
     "@modula/protocol-contracts": "workspace:*",
