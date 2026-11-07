@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {symbols} from 'pino'
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
@@ -36,6 +37,8 @@ describeIfDb('BUILDER-01 publisher release console', () => {
   let publisher: ReturnType<typeof recordingPublisher>
   let signer: FixtureSigner
   const network = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => { throw new Error('Live network forbidden in BUILDER-01 fixture suite') })
+  const requestLogs: string[] = []
+  let logWrite: ReturnType<typeof vi.spyOn>
   let patch = 0
   let previousNamespace: {publisher_id: string; revoked_at: Date | null} | null = null
   const adminHandle = `bfounder${suffix}`.slice(0, 20)
@@ -85,6 +88,13 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     }})
     app = created.app
     db = created.db
+    // Capture the real Pino destination, including request child loggers, not just job logs.
+    const logStream = (app.log as any)[symbols.streamSym]
+    const write = logStream.write.bind(logStream)
+    logWrite = vi.spyOn(logStream, 'write').mockImplementation((...args: any[]) => {
+      requestLogs.push(String(args[0]))
+      return write(...args)
+    })
     await app.ready()
     owner = await registerAccount(app, `bowner-${suffix}@example.com`, `bowner${suffix}`.slice(0, 20), db)
     otherPublisher = await registerAccount(app, `bother-${suffix}@example.com`, `bother${suffix}`.slice(0, 20), db)
@@ -127,6 +137,7 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     }
     await app?.close()
     await db?.destroy()
+    logWrite?.mockRestore()
     network.mockRestore()
   })
 
@@ -201,6 +212,95 @@ describeIfDb('BUILDER-01 publisher release console', () => {
       const response = await api(owner.token, 'POST', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/release-jobs`, {sourceRepository: 'someone-else/repo', releaseTag: 'v1.0.0'})
       expect(response.statusCode).toBe(400)
       expect(consoleCode(response)).toBe('INVALID_SOURCE_RELEASE')
+    })
+  })
+
+  describe('write body allowlists', () => {
+    const syntheticValue = 'TEST_SYNTHETIC_PRIVATE_KEY_DO_NOT_USE'
+    const createPath = `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/release-jobs`
+
+    function rejected(response: Awaited<ReturnType<typeof api>>, fields: string[]) {
+      expect(response.statusCode, response.body).toBe(400)
+      expect(response.json()).toMatchObject({ok: false, error: {code: 'VALIDATION_FAILED', details: {publisherConsoleCode: 'INVALID_REQUEST', fields}}})
+      expect(response.body).not.toContain(syntheticValue)
+      expect(requestLogs.length).toBeGreaterThan(0)
+      expect(requestLogs.join('')).not.toContain(syntheticValue)
+    }
+
+    it('rejects synthetic privateKey before create, idempotency or natural-key replay; valid two-field create is 202', async () => {
+      const release = addFixtureRelease(source, nextPatch(), {signer})
+      const body = {sourceRepository: BUILDER_TEST_REPOSITORY, releaseTag: release.tag}
+      const headers = {'idempotency-key': `unknown-keys-${suffix}`}
+      const bad = {...body, privateKey: syntheticValue}
+      rejected(await api(owner.token, 'POST', createPath, bad, headers), ['privateKey'])
+      expect(await db.selectFrom('greenfield_publisher_release_jobs').select('job_id').where('module_id', '=', BUILDER_TEST_MODULE_ID).where('release_tag', '=', release.tag).execute()).toHaveLength(0)
+      const valid = await api(owner.token, 'POST', createPath, body, headers)
+      expect(valid.statusCode, valid.body).toBe(202)
+      const jobId = valid.json().data.jobId
+      // Neither replay route may bypass body rejection.
+      rejected(await api(owner.token, 'POST', createPath, bad, headers), ['privateKey'])
+      rejected(await api(owner.token, 'POST', createPath, bad), ['privateKey'])
+      for (const fields of [['signingKey'], ['secret'], ['syntheticExtra'], ['privateKey', 'signingKey', 'secret']]) {
+        rejected(await api(owner.token, 'POST', createPath, {...body, ...Object.fromEntries(fields.map(field => [field, syntheticValue]))}), fields)
+      }
+      // Unknown fields also take precedence over malformed/missing source fields.
+      rejected(await api(owner.token, 'POST', createPath, {privateKey: syntheticValue}), ['privateKey'])
+      const logs = await api(owner.token, 'GET', `/v1/publisher/release-jobs/${jobId}/logs`)
+      expect(logs.statusCode).toBe(200)
+      expect(logs.body).not.toContain(syntheticValue)
+      expect(JSON.stringify(await db.selectFrom('greenfield_publisher_release_jobs').selectAll().where('job_id', '=', jobId).executeTakeFirst())).not.toContain(syntheticValue)
+      expect((await getJob(jobId)).state).toBe('created')
+    })
+
+    it.each(['validate', 'cancel', 'resume'])('%s rejects every extra field before state processing without logging values', async action => {
+      const release = addFixtureRelease(source, nextPatch(), {signer})
+      const jobId = (await createJob(release.tag)).json().data.jobId
+      const url = `/v1/publisher/release-jobs/${jobId}/${action}`
+      rejected(await api(owner.token, 'POST', url, {syntheticExtra: syntheticValue}), ['syntheticExtra'])
+      rejected(await api(owner.token, 'POST', `/v1/publisher/release-jobs/prj_${randomUUID()}/${action}`, {syntheticExtra: syntheticValue}), ['syntheticExtra'])
+      expect((await getJob(jobId)).state).toBe('created')
+      expect(await db.selectFrom('background_jobs').select('id').where('trace_id', '=', jobId).execute()).toHaveLength(0)
+      const logs = await api(owner.token, 'GET', `/v1/publisher/release-jobs/${jobId}/logs`)
+      expect(logs.body).not.toContain(syntheticValue)
+    })
+
+    it.each([undefined, {}])('validate/cancel/resume accept omitted body or empty object (%j)', async body => {
+      const release = addFixtureRelease(source, nextPatch(), {signer})
+      const jobId = (await createJob(release.tag)).json().data.jobId
+      const path = `/v1/publisher/release-jobs/${jobId}`
+      expect((await api(owner.token, 'POST', `${path}/validate`, body)).statusCode).toBe(202)
+      await drain()
+      expect((await api(owner.token, 'POST', `${path}/cancel`, body)).statusCode).toBe(200)
+      const resumed = await api(owner.token, 'POST', `${path}/resume`, body)
+      expect(resumed.statusCode, resumed.body).toBe(202)
+      expect(resumed.json().data.state).toBe('ready_for_review')
+    })
+
+    it('all write bodies must be non-array objects', async () => {
+      for (const url of [createPath, ...['validate', 'publish', 'cancel', 'resume'].map(action => `/v1/publisher/release-jobs/prj_${randomUUID()}/${action}`)]) {
+        for (const body of [[], 'synthetic', 42, true, null]) {
+          const response = await api(owner.token, 'POST', url, JSON.stringify(body), {'content-type': 'application/json'})
+          expect(response.statusCode, response.body).toBe(400)
+          expect(consoleCode(response)).toBe('INVALID_REQUEST')
+          expect(response.json().error.message).toBe('Body must be an object')
+        }
+      }
+    })
+
+    it('missing or malformed allowed create fields remain INVALID_SOURCE_RELEASE', async () => {
+      for (const body of [{}, {sourceRepository: BUILDER_TEST_REPOSITORY}, {releaseTag: 'v1.0.0'}, {sourceRepository: 42, releaseTag: 'v1.0.0'}, {sourceRepository: BUILDER_TEST_REPOSITORY, releaseTag: false}]) {
+        const response = await api(owner.token, 'POST', createPath, body)
+        expect(response.statusCode, response.body).toBe(400)
+        expect(consoleCode(response)).toBe('INVALID_SOURCE_RELEASE')
+      }
+    })
+
+    it('publish still rejects synthetic privateKey and preserves its accepted field', async () => {
+      const {jobId} = await validatedJob()
+      rejected(await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/publish`, {permissionChangeAcknowledged: true, privateKey: syntheticValue}), ['privateKey'])
+      expect((await getJob(jobId)).state).toBe('ready_for_review')
+      const logs = await api(owner.token, 'GET', `/v1/publisher/release-jobs/${jobId}/logs`)
+      expect(logs.body).not.toContain(syntheticValue)
     })
   })
 

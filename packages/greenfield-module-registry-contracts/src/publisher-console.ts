@@ -178,6 +178,7 @@ export type PublisherGithubSourceRelease = {
   existingJobId: string | null
 }
 
+/** sourceRepository and releaseTag are the ONLY accepted body keys; any other key is rejected with INVALID_REQUEST. */
 export type CreatePublisherReleaseJobRequest = {
   /** GitHub owner/name; must be one of the module's registered source repositories. */
   sourceRepository: string

@@ -23,6 +23,19 @@ const ENVELOPE_CODE_BY_STATUS: Record<number, ApiErrorCode> = {
   400: 'VALIDATION_FAILED', 401: 'UNAUTHENTICATED', 403: 'FORBIDDEN', 404: 'NOT_FOUND', 409: 'CONFLICT', 503: 'CAPABILITY_UNAVAILABLE', 500: 'SERVER_ERROR',
 }
 
+/** Reject before service calls; only field names, never request values, enter errors. */
+function releaseJobBody(request: FastifyRequest, allowedKeys: readonly string[]): Record<string, unknown> {
+  const body = request.body === undefined ? {} : request.body
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) throw new PublisherConsoleError('INVALID_REQUEST', 'Body must be an object')
+  const unknown = Object.keys(body).filter(key => !allowedKeys.includes(key))
+  if (unknown.length) {
+    const accepted = allowedKeys.length === 1 ? `the only accepted field is ${allowedKeys[0]}`
+      : allowedKeys.length ? `the only accepted fields are ${allowedKeys.join(', ')}` : 'no body fields are accepted'
+    throw new PublisherConsoleError('INVALID_REQUEST', `Unsupported field(s): ${unknown.join(', ')}; ${accepted}`, {fields: unknown})
+  }
+  return body as Record<string, unknown>
+}
+
 /**
  * BUILDER-01 publisher Module Release Console. Every route authenticates the
  * session and then checks publisher access for the specific module/job. No
@@ -80,25 +93,30 @@ export async function registerPublisherConsoleRoutes(
     return {data: await service.listJobs(accountId, String(params(request).moduleId), Number.isFinite(limit) ? limit : 50)}
   }))
   app.post('/v1/publisher/modules/:moduleId/release-jobs', routeConfig.writeConfig, handle(async (accountId, request) => {
-    const body = (request.body ?? {}) as Record<string, unknown>
+    const body = releaseJobBody(request, ['sourceRepository', 'releaseTag'])
     const result = await service.createJob(accountId, String(params(request).moduleId), {sourceRepository: body.sourceRepository as string, releaseTag: body.releaseTag as string}, idempotencyKey(request))
     return {status: result.replayed ? 200 : 202, data: result.job}
   }))
   app.get('/v1/publisher/release-jobs/:jobId', routeConfig.profileConfig, handle(async (accountId, request) => ({data: await service.getJob(accountId, String(params(request).jobId))})))
   app.get('/v1/publisher/release-jobs/:jobId/logs', routeConfig.profileConfig, handle(async (accountId, request) => ({data: await service.logs(accountId, String(params(request).jobId), (request.query ?? {}) as Record<string, unknown>)})))
-  app.post('/v1/publisher/release-jobs/:jobId/validate', routeConfig.writeConfig, handle(async (accountId, request) => ({status: 202, data: await service.validate(accountId, String(params(request).jobId))})))
+  app.post('/v1/publisher/release-jobs/:jobId/validate', routeConfig.writeConfig, handle(async (accountId, request) => {
+    releaseJobBody(request, [])
+    return {status: 202, data: await service.validate(accountId, String(params(request).jobId))}
+  }))
   app.post('/v1/publisher/release-jobs/:jobId/publish', routeConfig.writeConfig, handle(async (accountId, request) => {
-    const body = request.body ?? {}
-    if (typeof body !== 'object' || Array.isArray(body)) throw new PublisherConsoleError('INVALID_REQUEST', 'Body must be an object')
-    const keys = Object.keys(body as object)
-    const unknown = keys.filter(key => key !== 'permissionChangeAcknowledged')
-    if (unknown.length) throw new PublisherConsoleError('INVALID_REQUEST', `Unsupported field(s): ${unknown.join(', ')}; the only accepted field is permissionChangeAcknowledged`, {fields: unknown})
+    const body = releaseJobBody(request, ['permissionChangeAcknowledged'])
     const ack = (body as {permissionChangeAcknowledged?: unknown}).permissionChangeAcknowledged
     if (ack !== undefined && typeof ack !== 'boolean') throw new PublisherConsoleError('INVALID_REQUEST', 'permissionChangeAcknowledged must be a boolean')
     return {status: 202, data: await service.publish(accountId, String(params(request).jobId), {permissionChangeAcknowledged: ack as boolean | undefined})}
   }))
-  app.post('/v1/publisher/release-jobs/:jobId/cancel', routeConfig.writeConfig, handle(async (accountId, request) => ({data: await service.cancel(accountId, String(params(request).jobId))})))
-  app.post('/v1/publisher/release-jobs/:jobId/resume', routeConfig.writeConfig, handle(async (accountId, request) => ({status: 202, data: await service.resume(accountId, String(params(request).jobId))})))
+  app.post('/v1/publisher/release-jobs/:jobId/cancel', routeConfig.writeConfig, handle(async (accountId, request) => {
+    releaseJobBody(request, [])
+    return {data: await service.cancel(accountId, String(params(request).jobId))}
+  }))
+  app.post('/v1/publisher/release-jobs/:jobId/resume', routeConfig.writeConfig, handle(async (accountId, request) => {
+    releaseJobBody(request, [])
+    return {status: 202, data: await service.resume(accountId, String(params(request).jobId))}
+  }))
 
   // Same source as HTTP listing, same database queue as HTTP validate/publish.
   // Production keeps its separate runner process and default publishRelease.
