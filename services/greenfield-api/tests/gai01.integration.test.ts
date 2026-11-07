@@ -70,6 +70,7 @@ describeIfDb('GAI-01 governed intelligence database acceptance', () => {
     await expect(db.updateTable('intelligence_ledger_events').set({event_type: 'tampered'}).where('event_id', '=', event.event_id).execute()).rejects.toThrow(/append-only/)
     await expect(db.deleteFrom('intelligence_ledger_events').where('event_id', '=', event.event_id).execute()).rejects.toThrow(/append-only/)
     await expect(db.updateTable('intelligence_missions').set({status: 'running'}).where('mission_id', '=', mission.id).execute()).rejects.toThrow(/invalid intelligence mission transition/)
+    await expect(db.insertInto('intelligence_plans').values({plan_id: `orphan-${randomUUID()}`, mission_id: `missing-${randomUUID()}`, version: 1, summary: 'must fail', created_at: new Date()}).execute()).rejects.toThrow(/foreign key/)
   })
 
   it('Acceptance B: unknown capability is blocked with zero runtime execution', async () => {
