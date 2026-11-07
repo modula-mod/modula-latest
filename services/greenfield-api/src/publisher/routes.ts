@@ -7,7 +7,15 @@ import {HttpGithubReleaseSource, type GithubReleaseSource} from '../modules/gith
 import type {GreenfieldSessionService} from '../sessions/service.js'
 import {failureEnvelope, successEnvelope} from '../transport/envelope.js'
 import {PublisherConsoleError} from './release-job-core.js'
+import {PublisherReleaseJobProcessor, type ReleasePublisher} from './release-job-processor.js'
+import {PublisherReleaseJobRunner} from './release-job-runner.js'
 import {PublisherReleaseConsoleService} from './release-job-service.js'
+
+/** Test-only app injection. No runner starts automatically; disposable suites tick it explicitly. */
+export type PublisherConsoleTestOptions = {
+  githubReleaseSource?: GithubReleaseSource
+  publisher?: ReleasePublisher
+}
 
 type RouteConfig = Record<string, unknown>
 
@@ -26,12 +34,13 @@ export async function registerPublisherConsoleRoutes(
   config: AppConfig,
   sessions: GreenfieldSessionService,
   routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig},
-  options: {githubReleaseSource?: GithubReleaseSource} = {},
+  options?: PublisherConsoleTestOptions,
 ) {
+  const source = options?.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null})
   const service = new PublisherReleaseConsoleService(
     db,
     config,
-    options.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}),
+    source,
     {githubEnabled: config.moduleGithubSyncEnabled},
   )
 
@@ -90,4 +99,10 @@ export async function registerPublisherConsoleRoutes(
   }))
   app.post('/v1/publisher/release-jobs/:jobId/cancel', routeConfig.writeConfig, handle(async (accountId, request) => ({data: await service.cancel(accountId, String(params(request).jobId))})))
   app.post('/v1/publisher/release-jobs/:jobId/resume', routeConfig.writeConfig, handle(async (accountId, request) => ({status: 202, data: await service.resume(accountId, String(params(request).jobId))})))
+
+  // Same source as HTTP listing, same database queue as HTTP validate/publish.
+  // Production keeps its separate runner process and default publishRelease.
+  return options ? new PublisherReleaseJobRunner(db, new PublisherReleaseJobProcessor(db, {
+    source, config, githubEnabled: config.moduleGithubSyncEnabled, publish: options.publisher,
+  }), {workerId: 'publisher-console-test-runner'}) : undefined
 }

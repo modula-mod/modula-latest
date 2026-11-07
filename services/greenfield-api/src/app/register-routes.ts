@@ -77,7 +77,7 @@ import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
 import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
 import {registerDeveloperRoutes} from '../developers/routes.js'
-import {registerPublisherConsoleRoutes} from '../publisher/routes.js'
+import {registerPublisherConsoleRoutes, type PublisherConsoleTestOptions} from '../publisher/routes.js'
 import {registerGubicPlayRoutes} from '../gubic/routes.js'
 import {registerEntitlementRoutes} from '../entitlements/routes.js'
 import {registerAccountDataRoutes} from '../account-data/routes.js'
@@ -159,7 +159,7 @@ function releaseIdentity(config: AppConfig) {
   }
 }
 
-export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
+export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig, options: {publisherConsole?: PublisherConsoleTestOptions} = {}) {
   app.addContentTypeParser('application/octet-stream', (request, payload, done) => done(null, payload))
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db, config.publicApiUrl)
@@ -2718,13 +2718,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
-  await registerPublisherConsoleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  const publisherReleaseJobRunner = await registerPublisherConsoleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig}, options.publisherConsole)
   await registerGubicPlayRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerEntitlementRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerAccountDataRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerSupportRoutes(app, db, config, greenfieldSessions, {healthConfig, profileConfig, writeConfig})
   await registerSettingsV2Routes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerProviderRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  return {publisherReleaseJobRunner}
 }
 
 function idempotencyKey(request: any, body: unknown): string | undefined {

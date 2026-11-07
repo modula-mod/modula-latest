@@ -16,6 +16,7 @@ import {GreenfieldModuleReleaseService} from '../../src/modules/release-service.
 import {moduleError} from '../../src/modules/module-errors.js'
 import {buildPublisherReleaseStatement, statementBytes} from '../../src/modules/release-signing.js'
 import type {ReleasePublisher} from '../../src/publisher/release-job-processor.js'
+export type {ReleasePublisher} from '../../src/publisher/release-job-processor.js'
 import {adapterManifest, fixtureProduct, sha256} from './registry-fixtures.js'
 
 export const BUILDER_TEST_PUBLISHER_ID = 'test.modula.builder-publisher'

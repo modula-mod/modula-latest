@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto'
-import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
@@ -7,7 +7,6 @@ import {DeveloperService} from '../src/developers/service.js'
 import {GreenfieldPublisherSigningKeyService} from '../src/modules/release-signing.js'
 import {PublisherReleaseJobProcessor} from '../src/publisher/release-job-processor.js'
 import {PublisherReleaseJobRunner} from '../src/publisher/release-job-runner.js'
-import {PublisherReleaseConsoleService} from '../src/publisher/release-job-service.js'
 import {configureRegistryTestEnv, registerAccount} from './helpers/registry-fixtures.js'
 import {
   BUILDER_TEST_COMMIT,
@@ -36,6 +35,7 @@ describeIfDb('BUILDER-01 publisher release console', () => {
   let runner: PublisherReleaseJobRunner
   let publisher: ReturnType<typeof recordingPublisher>
   let signer: FixtureSigner
+  const network = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => { throw new Error('Live network forbidden in BUILDER-01 fixture suite') })
   let patch = 0
   let previousNamespace: {publisher_id: string; revoked_at: Date | null} | null = null
   const adminHandle = `bfounder${suffix}`.slice(0, 20)
@@ -77,7 +77,12 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     configureRegistryTestEnv(databaseUrl!, '4063')
     process.env.MODULA_ADMIN_HANDLES = adminHandle
     await migrateUp(databaseUrl!)
-    const created = await createServer(loadConfig())
+    source = new FixtureGithubSource()
+    const created = await createServer(loadConfig(), {publisherConsole: {
+      githubReleaseSource: source,
+      // The app creates its pool; bind the recorder immediately after construction.
+      publisher: (moduleId, version) => publisher(moduleId, version),
+    }})
     app = created.app
     db = created.db
     await app.ready()
@@ -105,10 +110,9 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     signer = {keyId: `builder-${suffix}-main`, privateKey: keys.privateKey}
     await new GreenfieldPublisherSigningKeyService(db).register(BUILDER_TEST_PUBLISHER_ID, {keyId: signer.keyId, publicKeyPem: keys.publicKeyPem}, null)
 
-    source = new FixtureGithubSource()
     publisher = recordingPublisher(db)
-    const processor = new PublisherReleaseJobProcessor(db, {source, config: loadConfig(), githubEnabled: true, publish: publisher})
-    runner = new PublisherReleaseJobRunner(db, processor, {workerId: `test-runner-${suffix}`})
+    runner = created.publisherReleaseJobRunner!
+    expect(runner).toBeDefined()
     // Drain any stale runner work from earlier runs of this suite.
     await db.updateTable('background_jobs').set({status: 'CANCELLED'} as never).where('dispatch_mode', '=', 'PUBLISHER_RELEASE_RUNNER' as never).where('status', 'in', ['QUEUED', 'RETRYING']).execute()
   })
@@ -123,6 +127,7 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     }
     await app?.close()
     await db?.destroy()
+    network.mockRestore()
   })
 
   describe('authentication and publisher-specific ownership', () => {
@@ -200,7 +205,7 @@ describeIfDb('BUILDER-01 publisher release console', () => {
   })
 
   describe('asynchronous lifecycle', () => {
-    it('create/validate never download in-request; the runner validates, then publishes only after review', async () => {
+    it('injected HTTP create/validate never download in-request; the app runner validates and uses the recording publisher', async () => {
       const release = addFixtureRelease(source, nextPatch(), {signer})
       const downloadsBefore = source.downloads.length
       const created = await createJob(release.tag)
@@ -215,6 +220,8 @@ describeIfDb('BUILDER-01 publisher release console', () => {
       expect(queued).toEqual([{job_type: 'publisher.release-job.validate', dispatch_mode: 'PUBLISHER_RELEASE_RUNNER', status: 'QUEUED'}])
 
       await drain()
+      expect(source.downloads.length).toBeGreaterThan(downloadsBefore)
+      expect(network).not.toHaveBeenCalled()
       const job = await getJob(jobId)
       expect(job.state).toBe('ready_for_review')
       expect(job.sourceCommit).toBe(BUILDER_TEST_COMMIT)
@@ -242,6 +249,8 @@ describeIfDb('BUILDER-01 publisher release console', () => {
       // The isolated fixture never writes the public catalogue.
       const catalogue = await db.selectFrom('greenfield_extension_catalogue').select(['extension_id']).where('extension_id', '=', BUILDER_TEST_MODULE_ID).executeTakeFirst()
       expect(catalogue).toBeUndefined()
+      expect((await db.selectFrom('greenfield_module_releases').select('release_state').where('release_id', '=', job.releaseId).executeTakeFirstOrThrow()).release_state).toBe('verified')
+      expect(network).not.toHaveBeenCalled()
 
       const logs = await api(owner.token, 'GET', `/v1/publisher/release-jobs/${jobId}/logs`)
       expect(logs.json().data.entries.map((e: any) => e.step)).toEqual(expect.arrayContaining(['create', 'validate', 'fetch', 'signature', 'review', 'publish']))
@@ -253,14 +262,29 @@ describeIfDb('BUILDER-01 publisher release console', () => {
       await expect(db.updateTable('greenfield_publisher_release_jobs').set({state: 'cancelled', cancelled_at: new Date()} as never).where('job_id', '=', jobId).execute()).rejects.toThrow(/terminal/)
     })
 
-    it('lists valid tagged GitHub source releases as metadata only', async () => {
-      const service = new PublisherReleaseConsoleService(db, loadConfig(), source, {githubEnabled: true})
+    it('lists injected GitHub releases over HTTP as metadata only, with no network', async () => {
+      const release = addFixtureRelease(source, nextPatch(), {signer})
       const before = source.downloads.length
-      const releases = await service.githubReleases(owner.accountId, BUILDER_TEST_MODULE_ID)
-      expect(releases.length).toBeGreaterThan(0)
-      expect(releases.every(r => r.repository === BUILDER_TEST_REPOSITORY && r.valid && r.hasProvenance)).toBe(true)
+      const response = await api(owner.token, 'GET', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/github-releases`)
+      expect(response.statusCode, response.body).toBe(200)
+      const releases = response.json().data
+      expect(releases.some((r: any) => r.releaseTag === release.tag)).toBe(true)
+      expect(releases.every((r: any) => r.repository === BUILDER_TEST_REPOSITORY && r.valid && r.hasProvenance)).toBe(true)
       expect(source.downloads.length).toBe(before)
-      await expect(service.githubReleases(otherPublisher.accountId, BUILDER_TEST_MODULE_ID)).rejects.toMatchObject({code: 'FORBIDDEN_NOT_PUBLISHER'})
+      const forbidden = await api(otherPublisher.token, 'GET', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/github-releases`)
+      expect(consoleCode(forbidden)).toBe('FORBIDDEN_NOT_PUBLISHER')
+      expect(network).not.toHaveBeenCalled()
+    })
+
+    it('does not construct an in-process runner when test hooks are omitted', async () => {
+      const productionShape = await createServer(loadConfig())
+      try {
+        expect(productionShape.publisherReleaseJobRunner).toBeUndefined()
+        expect(network).not.toHaveBeenCalled()
+      } finally {
+        await productionShape.app.close()
+        await productionShape.db.destroy()
+      }
     })
   })
 
