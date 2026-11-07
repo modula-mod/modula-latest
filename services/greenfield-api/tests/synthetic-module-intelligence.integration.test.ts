@@ -6,6 +6,7 @@ import {
 } from '@modula/intelligence-core'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
+import {IntelligenceActionBoundary} from '../src/intelligence/action-boundary.js'
 import {GovernedIntelligenceService} from '../src/intelligence/service.js'
 import {
   DETERMINISTIC_TEST_ADAPTER_LIMITATION,
@@ -17,6 +18,9 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const moduleId = 'test.modula.synthetic-records'
 const collection = 'item'
+const undeclaredCollection = 'plain'
+const queryActionId = `${moduleId}.action.item.query`
+const queryFunctionId = `${moduleId}.function.item.query`
 const genericQueryObjective = 'Query the authorized module collection for recently updated records.'
 const suffix = randomUUID().slice(0, 8)
 const accountA = `syn-a-${suffix}`
@@ -46,6 +50,7 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     expect(detail.proposals[0]).toMatchObject({
       family: 'record.query',
       moduleId,
+      actionId: queryActionId,
       capability: `records:module.${moduleId}.${collection}:read`,
       input: {collection, limit: 25, sort: 'updatedAt', direction: 'desc'},
     })
@@ -61,6 +66,19 @@ describeIfDb('synthetic authorized module intelligence path', () => {
       modelProviderStatus: DETERMINISTIC_TEST_ADAPTER_STATUS,
       limitation: DETERMINISTIC_TEST_ADAPTER_LIMITATION,
     })
+  })
+
+  it('does not discover a readable collection that has no AI-callable declaration', async () => {
+    const actions = await new IntelligenceActionBoundary(db, developmentTrust).availableActions(accountA)
+    expect(actions).toEqual([expect.objectContaining({
+      family: 'record.query',
+      moduleId,
+      actionId: queryActionId,
+      collection,
+      capability: `records:module.${moduleId}.${collection}:read`,
+    })])
+    expect(actions.some(action => action.collection === undeclaredCollection)).toBe(false)
+    expect(actions.some(action => action.family === 'record.create')).toBe(false)
   })
 
   it('treats an account with no installed module as a supported blocked state', async () => {
@@ -99,8 +117,9 @@ async function seedRuntime(db: ModulaDb) {
   const permissions = [
     `records:module.${moduleId}.${collection}:read`,
     `records:module.${moduleId}.${collection}:write`,
+    `records:module.${moduleId}.${undeclaredCollection}:read`,
   ]
-  const manifest = {permissions: permissions.map(permission => ({permission, reason: 'synthetic intelligence fixture', risk: permission.endsWith(':read') ? 'low' : 'medium'})), contributions: {schemas: [], events: []}}
+  const manifest = syntheticAiManifest(permissions.map(permission => ({permission, reason: 'synthetic intelligence fixture', risk: permission.endsWith(':read') ? 'low' : 'medium'})))
   await db.insertInto('greenfield_publishers').values({publisher_id: publisherId, display_name: 'Synthetic Intelligence Fixture', website: null, status: 'verified', trust_level: 'firstParty', created_at: now, updated_at: now, verified_at: now, suspended_at: null, revoked_at: null}).execute()
   await db.insertInto('greenfield_extensions').values({extension_id: extensionId, slug: `syn-records-${suffix}`, publisher_account_id: null, status: 'published', created_at: now, updated_at: now}).execute()
   await db.insertInto('greenfield_extension_versions').values({extension_version_id: extensionVersionId, extension_id: extensionId, version, manifest, status: 'published', created_at: now}).execute()
@@ -112,7 +131,10 @@ async function seedRuntime(db: ModulaDb) {
     {fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true},
     {fieldId: 'body', name: 'body', type: 'text', label: 'Body', required: true},
   ]
-  await db.insertInto('greenfield_module_record_collections').values({collection_id: `syn-collection-${suffix}`, release_id: releaseId, module_id: moduleId, collection, schema_ref: 'schemas/item.json', default_visibility: 'private', fields: jsonb(fields), searchable_fields: jsonb(['title', 'body']), filterable_fields: jsonb([]), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now}).execute()
+  await db.insertInto('greenfield_module_record_collections').values([
+    {collection_id: `syn-collection-${suffix}`, release_id: releaseId, module_id: moduleId, collection, schema_ref: 'schemas/item.json', default_visibility: 'private', fields: jsonb(fields), searchable_fields: jsonb(['title', 'body']), filterable_fields: jsonb([]), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now},
+    {collection_id: `syn-plain-${suffix}`, release_id: releaseId, module_id: moduleId, collection: undeclaredCollection, schema_ref: 'schemas/plain.json', default_visibility: 'private', fields: jsonb(fields), searchable_fields: jsonb(['title', 'body']), filterable_fields: jsonb([]), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now},
+  ]).execute()
   const records = new GreenfieldModuleRecordService(db, developmentTrust)
   for (let index = 0; index < 5; index += 1) {
     await records.create(accountA, moduleId, collection, {
@@ -131,7 +153,7 @@ async function seedDeniedReadInstallation(db: ModulaDb, accountId: string) {
   const version = `0.0.${Date.now()}`
   const read = `records:module.${moduleId}.${collection}:read`
   const write = `records:module.${moduleId}.${collection}:write`
-  const manifest = {permissions: [{permission: write, reason: 'write only', risk: 'medium'}, {permission: read, reason: 'read declared but denied', risk: 'low'}], contributions: {schemas: [], events: []}}
+  const manifest = syntheticAiManifest([{permission: write, reason: 'write only', risk: 'medium'}, {permission: read, reason: 'read declared but denied', risk: 'low'}])
   await db.insertInto('greenfield_publishers').values({publisher_id: publisherId, display_name: 'Synthetic Denied Read', website: null, status: 'verified', trust_level: 'firstParty', created_at: now, updated_at: now, verified_at: now, suspended_at: null, revoked_at: null}).execute()
   await db.insertInto('greenfield_extensions').values({extension_id: extensionId, slug: `syn-denied-${suffix}`, publisher_account_id: null, status: 'published', created_at: now, updated_at: now}).execute()
   await db.insertInto('greenfield_extension_versions').values({extension_version_id: extensionVersionId, extension_id: extensionId, version, manifest, status: 'published', created_at: now}).execute()
@@ -144,4 +166,43 @@ async function seedDeniedReadInstallation(db: ModulaDb, accountId: string) {
 
 function jsonb(value: unknown) {
   return sql`${JSON.stringify(value)}::jsonb`
+}
+
+function syntheticAiManifest(permissions: Array<{permission: string; reason: string; risk: string}>) {
+  return {
+    permissions,
+    contributions: {schemas: [], events: []},
+    actions: [{
+      id: queryActionId,
+      title: 'Query recent items',
+      functionId: queryFunctionId,
+      permissions: [`records:module.${moduleId}.${collection}:read`],
+      confirmationPolicy: {required: false, policyMode: 'warn'},
+      sideEffects: ['record.query'],
+      audit: {event: 'synthetic.item.query', includeInput: false},
+    }],
+    functions: [{
+      id: queryFunctionId,
+      title: 'Query recent items',
+      inputSchema: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          collection: {type: 'string', const: collection},
+          limit: {type: 'integer', minimum: 1, maximum: 100, default: 25},
+        },
+      },
+      outputSchema: {type: 'object'},
+      permissions: [`records:module.${moduleId}.${collection}:read`],
+      aiCallable: true,
+      automationCallable: false,
+      idempotent: true,
+      sideEffects: ['record.query'],
+      timeoutMs: 10_000,
+      rateLimit: {windowSeconds: 60, maxCalls: 30},
+      audit: {event: 'synthetic.item.query', includeInput: false, includeOutput: false},
+      confirmationPolicy: {required: false, risk: 'low'},
+    }],
+    ai: [],
+  }
 }

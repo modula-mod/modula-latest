@@ -108,8 +108,15 @@ function genericAuthorizedQuery(
     family: action.family,
     capability: action.capability,
     actionId: action.actionId,
-    input: {collection: action.collection, limit: 25, sort: 'updatedAt', direction: 'desc'},
+    input: {collection: action.collection, limit: queryLimit(action), sort: 'updatedAt', direction: 'desc'},
   }
+}
+
+function queryLimit(action: GaiaAvailableAction): number {
+  const max = action.limits?.max ?? 100
+  const min = action.limits?.min ?? 1
+  const requested = action.limits?.default ?? 25
+  return Math.min(max, Math.max(min, requested))
 }
 
 function find(actions: GaiaAvailableAction[], family: string, preferredCollection?: string): GaiaAvailableAction {
