@@ -7,13 +7,13 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 557 application / 793 runtime method routes
-Route evidence: local-candidate-runtime for feature branch mosaic/pr160-084-privileges; not deployed
+Route evidence: local-candidate-runtime for feature branch mosaic/pr148-update; not deployed
 Public routes: 136
 Authenticated routes: 318
 Admin/internal routes: 103
 Mutating routes: 322
 Read-only routes: 235
-Routes with request schemas: 45
+Routes with request schemas: 46
 Routes with response schemas: 0
 Routes with automated tests: 473
 Routes live-probed: 26 unique routes
