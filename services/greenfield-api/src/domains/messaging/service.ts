@@ -1,7 +1,9 @@
 import {randomUUID} from 'node:crypto'
+import {sql, type Transaction} from 'kysely'
 import {badgesForActors, NO_BADGES, type PublicBadgeFields} from '../../premium/badges.js'
 
 import type {ModulaDb} from '../../database/client.js'
+import type {Database} from '../../database/types.js'
 
 export type ParticipantDto = {id: string; handle: string; displayName: string; avatarUrl: string | null} & Partial<PublicBadgeFields>
 export type MessagePreviewDto = {id: string; body: string; sentAt: string; senderId: string}
@@ -15,6 +17,7 @@ export type ConversationDto = {
   muted?: boolean
   archived?: boolean
 }
+export type StartConversationResult = {conversation: ConversationDto; created: boolean}
 export type MessageDto = {
   id: string
   conversationId: string
@@ -29,6 +32,16 @@ export type MessageDto = {
   reactions?: ReactionDto[]
   editedAt?: string | null
   deleted?: boolean
+  storyContext?: StoryMessageContext
+}
+export type StoryMessageContext = {
+  type: 'story'
+  storyId: string
+  groupId: string
+  ownerActorId: string
+  mediaKind: 'image' | 'video'
+  createdAt: string
+  expiresAt: string
 }
 export type MessageRequestDto = {
   id: string
@@ -72,6 +85,12 @@ export const MESSAGE_MAX = 5_000
 export const INMAIL_BODY_MAX = 20_000
 export const SUBJECT_MAX = 180
 
+type DirectConversationRecord = {
+  conversationId: string
+  created: boolean
+  recipientState: 'active' | 'pending' | 'declined'
+}
+
 function fail(code: string, message: string): never {
   throw Object.assign(new Error(message), {code})
 }
@@ -106,6 +125,10 @@ function cleanText(raw: unknown, max: number, label: string): string {
   return text
 }
 
+export function normalizeMessageText(raw: unknown): string {
+  return cleanText(raw, MESSAGE_MAX, 'Message')
+}
+
 export class MessagingService {
   constructor(private readonly db: ModulaDb) {}
 
@@ -132,16 +155,25 @@ export class MessagingService {
   private async resolveHandle(raw: unknown): Promise<string> {
     const handle = cleanText(raw, 80, 'Recipient').replace(/^@/, '').toLowerCase()
     const row = await this.db
-      .selectFrom('profiles')
-      .select('actor_id')
-      .where('handle', '=', handle)
+      .selectFrom('profiles as p')
+      .innerJoin('actors as a', 'a.id', 'p.actor_id')
+      .innerJoin('greenfield_accounts as ga', 'ga.account_id', 'a.account_id')
+      .select('p.actor_id')
+      .where('p.handle', '=', handle)
+      .where('p.deleted_at', 'is', null)
+      .where('a.deleted_at', 'is', null)
+      .where('ga.status', '=', 'active')
       .executeTakeFirst()
     if (!row) fail('NOT_FOUND', 'Recipient not found')
-    return row!.actor_id
+    return row.actor_id
   }
 
   private async isBlockedEitherWay(a: string, b: string): Promise<boolean> {
-    const row = await this.db
+    return this.isBlockedEitherWayWith(this.db, a, b)
+  }
+
+  private async isBlockedEitherWayWith(db: ModulaDb | Transaction<Database>, a: string, b: string): Promise<boolean> {
+    const row = await db
       .selectFrom('blocks')
       .select('id')
       .where('deleted_at', 'is', null)
@@ -151,17 +183,6 @@ export class MessagingService {
           eb.and([eb('blocker_actor_id', '=', b), eb('blocked_actor_id', '=', a)]),
         ]),
       )
-      .executeTakeFirst()
-    return Boolean(row)
-  }
-
-  private async follows(follower: string, followed: string): Promise<boolean> {
-    const row = await this.db
-      .selectFrom('follows')
-      .select('id')
-      .where('follower_actor_id', '=', follower)
-      .where('followed_actor_id', '=', followed)
-      .where('deleted_at', 'is', null)
       .executeTakeFirst()
     return Boolean(row)
   }
@@ -211,6 +232,24 @@ export class MessagingService {
     return map
   }
 
+  private async storyContexts(messageIds: string[]): Promise<Map<string, StoryMessageContext>> {
+    const contexts = new Map<string, StoryMessageContext>()
+    if (messageIds.length === 0) return contexts
+    const rows = await this.db
+      .selectFrom('greenfield_domain_events')
+      .select(['aggregate_id', 'payload'])
+      .where('event_type', '=', 'message.story-replied')
+      .where('aggregate_type', '=', 'conversation-message')
+      .where('aggregate_id', 'in', messageIds)
+      .execute()
+    for (const row of rows) {
+      const payload = asRecord(row.payload)
+      const context = storyMessageContext(payload.storyContext)
+      if (context) contexts.set(row.aggregate_id, context)
+    }
+    return contexts
+  }
+
   private async unreadCounts(rows: {conversation_id: string; last_read_at: Date | null}[], viewer: string) {
     const map = new Map<string, number>()
     for (const row of rows) {
@@ -247,6 +286,38 @@ export class MessagingService {
         .execute()
     })
     return {messageId, now}
+  }
+
+  /**
+   * Transaction-scoped primitive used by other authenticated domains. The
+   * caller must first obtain the conversation through
+   * ensureDirectConversationInTransaction so the actor-pair moderation lock
+   * and recipient checks cover this write.
+   */
+  async insertDirectMessageInTransaction(
+    trx: Transaction<Database>,
+    conversationId: string,
+    sender: string,
+    body: string,
+    messageId: string = randomUUID(),
+    now: Date = new Date(),
+  ): Promise<{messageId: string; createdAt: Date}> {
+    await trx
+      .insertInto('greenfield_conversation_messages')
+      .values({message_id: messageId, conversation_id: conversationId, sender_actor_id: sender, subject: null, body, created_at: now})
+      .execute()
+    await trx
+      .updateTable('greenfield_conversations')
+      .set({last_message_at: now, updated_at: now})
+      .where('conversation_id', '=', conversationId)
+      .execute()
+    await trx
+      .updateTable('greenfield_conversation_members')
+      .set({last_read_at: now, updated_at: now})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', sender)
+      .execute()
+    return {messageId, createdAt: now}
   }
 
   private async listForViewer(viewer: string, kind: 'direct' | 'inmail', state: 'active' | 'pending', cursorRaw: unknown, limitRaw: unknown, archived: boolean | null = null) {
@@ -324,53 +395,103 @@ export class MessagingService {
     return {unreadCount: total}
   }
 
-  /** Start (or reuse) a direct conversation. New contacts who don't follow the sender get a request. */
-  async startConversation(viewer: string, input: {handle?: unknown; text?: unknown}): Promise<ConversationDto> {
+  /** Resolve a public handle, then atomically create or reuse its direct conversation. */
+  async startConversation(viewer: string, input: {handle?: unknown; text?: unknown}): Promise<StartConversationResult> {
     const recipient = await this.resolveHandle(input.handle)
+    return this.startDirectConversation(viewer, recipient, input.text)
+  }
+
+  /**
+   * Server-side direct-conversation primitive for trusted domain integrations.
+   * The optional text is an initial message: it is written only by the request
+   * that creates the conversation, making retries safe after a lost response.
+   */
+  async startDirectConversation(viewer: string, recipient: string, initialText?: unknown): Promise<StartConversationResult> {
     if (recipient === viewer) fail('VALIDATION_FAILED', 'You cannot message yourself')
-    if (await this.isBlockedEitherWay(viewer, recipient)) fail('FORBIDDEN', 'You cannot message this account')
-    const text = input.text === undefined || input.text === '' ? null : cleanText(input.text, MESSAGE_MAX, 'Message')
+    const text = initialText === undefined || initialText === '' ? null : cleanText(initialText, MESSAGE_MAX, 'Message')
+    const result = await this.db.transaction().execute(async trx => {
+      const ensured = await this.ensureDirectConversationInTransaction(trx, viewer, recipient)
+      if (ensured.created && text) {
+        await this.insertDirectMessageInTransaction(trx, ensured.conversationId, viewer, text)
+      }
+      return ensured
+    })
+    return {conversation: await this.conversationFor(viewer, result.conversationId), created: result.created}
+  }
+
+  /**
+   * Create or reuse the canonical direct conversation while holding the same
+   * actor-pair advisory lock used by moderation block creation. Trusted
+   * domain integrations can keep their message, event and outbox records in
+   * the same database transaction as this operation.
+   */
+  async ensureDirectConversationInTransaction(
+    trx: Transaction<Database>,
+    viewer: string,
+    recipient: string,
+  ): Promise<DirectConversationRecord> {
+    if (recipient === viewer) fail('VALIDATION_FAILED', 'You cannot message yourself')
     const directKey = [viewer, recipient].sort().join(':')
-    let conversation = await this.db
+    await sql`SELECT pg_advisory_xact_lock(hashtextextended(${directKey}, 0))`.execute(trx)
+    const activeRecipient = await trx
+      .selectFrom('actors as a')
+      .innerJoin('greenfield_accounts as ga', 'ga.account_id', 'a.account_id')
+      .select('a.id')
+      .where('a.id', '=', recipient)
+      .where('a.deleted_at', 'is', null)
+      .where('ga.status', '=', 'active')
+      .executeTakeFirst()
+    if (!activeRecipient) fail('NOT_FOUND', 'Recipient not found')
+    if (await this.isBlockedEitherWayWith(trx, viewer, recipient)) {
+      fail('FORBIDDEN', 'You cannot message this account')
+    }
+
+    const follows = await trx
+      .selectFrom('follows')
+      .select('id')
+      .where('follower_actor_id', '=', recipient)
+      .where('followed_actor_id', '=', viewer)
+      .where('deleted_at', 'is', null)
+      .executeTakeFirst()
+    const newRecipientState: 'active' | 'pending' = follows ? 'active' : 'pending'
+    const conversationId = randomUUID()
+    const now = new Date()
+    const inserted = await trx
+      .insertInto('greenfield_conversations')
+      .values({conversation_id: conversationId, kind: 'direct', subject: null, direct_key: directKey, created_by_actor_id: viewer, created_at: now, updated_at: now, last_message_at: now})
+      .onConflict(oc => oc.column('direct_key').doNothing())
+      .returning('conversation_id')
+      .executeTakeFirst()
+
+    if (inserted) {
+      await trx
+        .insertInto('greenfield_conversation_members')
+        .values([
+          {conversation_id: conversationId, actor_id: viewer, state: 'active', last_read_at: now, joined_at: now, updated_at: now},
+          {conversation_id: conversationId, actor_id: recipient, state: newRecipientState, last_read_at: null, joined_at: now, updated_at: now},
+        ])
+        .execute()
+      return {conversationId, created: true, recipientState: newRecipientState}
+    }
+
+    const existing = await trx
       .selectFrom('greenfield_conversations')
       .select('conversation_id')
       .where('direct_key', '=', directKey)
-      .executeTakeFirst()
-    if (!conversation) {
-      const conversationId = randomUUID()
-      const recipientState = (await this.follows(recipient, viewer)) ? 'active' : 'pending'
-      const now = new Date()
-      await this.db.transaction().execute(async trx => {
-        await trx
-          .insertInto('greenfield_conversations')
-          .values({conversation_id: conversationId, kind: 'direct', subject: null, direct_key: directKey, created_by_actor_id: viewer, created_at: now, updated_at: now, last_message_at: now})
-          .onConflict(oc => oc.column('direct_key').doNothing())
-          .execute()
-        await trx
-          .insertInto('greenfield_conversation_members')
-          .values([
-            {conversation_id: conversationId, actor_id: viewer, state: 'active', last_read_at: now, joined_at: now, updated_at: now},
-            {conversation_id: conversationId, actor_id: recipient, state: recipientState, last_read_at: null, joined_at: now, updated_at: now},
-          ])
-          .onConflict(oc => oc.columns(['conversation_id', 'actor_id']).doNothing())
-          .execute()
-      })
-      conversation = await this.db
-        .selectFrom('greenfield_conversations')
-        .select('conversation_id')
-        .where('direct_key', '=', directKey)
-        .executeTakeFirstOrThrow()
-    } else {
-      // Re-opening by the viewer reactivates their side if they had declined.
-      await this.db
-        .updateTable('greenfield_conversation_members')
-        .set({state: 'active', updated_at: new Date()})
-        .where('conversation_id', '=', conversation.conversation_id)
-        .where('actor_id', '=', viewer)
-        .execute()
-    }
-    if (text) await this.send(viewer, conversation.conversation_id, {text})
-    return this.conversationFor(viewer, conversation.conversation_id)
+      .executeTakeFirstOrThrow()
+    await trx
+      .updateTable('greenfield_conversation_members')
+      .set({state: 'active', updated_at: now})
+      .where('conversation_id', '=', existing.conversation_id)
+      .where('actor_id', '=', viewer)
+      .execute()
+    const recipientMember = await trx
+      .selectFrom('greenfield_conversation_members')
+      .select('state')
+      .where('conversation_id', '=', existing.conversation_id)
+      .where('actor_id', '=', recipient)
+      .executeTakeFirstOrThrow()
+    return {conversationId: existing.conversation_id, created: false, recipientState: recipientMember.state}
   }
 
   async conversationFor(viewer: string, conversationId: string): Promise<ConversationDto> {
@@ -420,10 +541,13 @@ export class MessagingService {
       .where('actor_id', '!=', viewer)
       .execute()
     const othersReadAt = otherReads.map(r => r.last_read_at?.getTime() ?? 0)
-    const people = await this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id)])
+    const [people, contexts, extras] = await Promise.all([
+      this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id)]),
+      this.storyContexts(page.map(row => row.message_id)),
+      this.messageExtras(page, viewer),
+    ])
     void member
-    const extras = await this.messageExtras(page, viewer)
-    const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt, extras))
+    const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt, extras, contexts.get(row.message_id)))
     return {items, nextCursor: hasMore && oldest ? encodeCursor(oldest.created_at, oldest.message_id) : null, hasMore}
   }
 
@@ -433,6 +557,7 @@ export class MessagingService {
     people: Map<string, ParticipantDto>,
     othersReadAt: number[] = [],
     extras?: MessageExtras,
+    storyContext?: StoryMessageContext,
   ): MessageDto {
     const isOwn = row.sender_actor_id === viewer
     const read = isOwn && othersReadAt.length > 0 && othersReadAt.every(t => t >= row.created_at.getTime())
@@ -450,6 +575,7 @@ export class MessagingService {
       reactions: extras?.reactions.get(row.message_id) ?? [],
       editedAt: row.edited_at ? row.edited_at.toISOString() : null,
       deleted: Boolean(row.deleted_at),
+      ...(storyContext ? {storyContext} : {}),
     }
   }
 
@@ -804,5 +930,31 @@ export class MessagingService {
       viewer,
       people,
     )
+  }
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+}
+
+function storyMessageContext(value: unknown): StoryMessageContext | null {
+  const context = asRecord(value)
+  if (
+    context.type !== 'story' ||
+    typeof context.storyId !== 'string' ||
+    typeof context.groupId !== 'string' ||
+    typeof context.ownerActorId !== 'string' ||
+    (context.mediaKind !== 'image' && context.mediaKind !== 'video') ||
+    typeof context.createdAt !== 'string' ||
+    typeof context.expiresAt !== 'string'
+  ) return null
+  return {
+    type: 'story',
+    storyId: context.storyId,
+    groupId: context.groupId,
+    ownerActorId: context.ownerActorId,
+    mediaKind: context.mediaKind,
+    createdAt: context.createdAt,
+    expiresAt: context.expiresAt,
   }
 }

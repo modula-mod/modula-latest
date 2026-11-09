@@ -183,12 +183,19 @@ export class AttachmentService {
   }
 
   async removeOrphan(accountId: string, attachmentId: string): Promise<void> {
-    const row = await this.db.selectFrom('attachments').selectAll().where('attachment_id', '=', attachmentId).executeTakeFirst()
-    if (!row) return
-    if (row.owner_account_id !== accountId) throw domainError('Attachment unavailable', 'FORBIDDEN')
-    if (row.attached_at) throw domainError('Published attachments cannot be removed here', 'CONFLICT')
-    if (row.storage_key) await rm(join(this.config.mediaRoot, 'attachments', row.storage_key), {force: true})
-    await this.db.deleteFrom('attachments').where('attachment_id', '=', attachmentId).execute()
+    const storageKey = await this.db.transaction().execute(async trx => {
+      const row = await trx.selectFrom('attachments').selectAll().where('attachment_id', '=', attachmentId)
+        .forUpdate().executeTakeFirst()
+      if (!row) return null
+      if (row.owner_account_id !== accountId) throw domainError('Attachment unavailable', 'FORBIDDEN')
+      if (row.attached_at) throw domainError('Published attachments cannot be removed here', 'CONFLICT')
+      const draftReservation = await trx.selectFrom('greenfield_post_draft_content').select('draft_id')
+        .where('attachment_id', '=', attachmentId).executeTakeFirst()
+      if (draftReservation) throw domainError('Draft attachments must be removed from the draft first', 'CONFLICT')
+      await trx.deleteFrom('attachments').where('attachment_id', '=', attachmentId).execute()
+      return row.storage_key
+    })
+    if (storageKey) await rm(join(this.config.mediaRoot, 'attachments', storageKey), {force: true})
   }
 
   private async requireDto(accountId: string, attachmentId: string): Promise<AttachmentDto> {

@@ -45,6 +45,29 @@ function rejectUnresolvedAuthorization(request: any, reply: any): boolean {
   return false
 }
 
+const storyReplyContract = {
+  attachValidation: true,
+  schema: {
+    params: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['storyId'],
+      properties: {storyId: {type: 'string', format: 'uuid'}},
+    },
+    body: {
+      type: 'object',
+      // Preserve unknown fields so the authenticated handler can reject them
+      // explicitly instead of Fastify silently removing privileged input.
+      additionalProperties: true,
+      required: ['text', 'idempotencyKey'],
+      properties: {
+        text: {type: 'string', minLength: 1, maxLength: 5_000},
+        idempotencyKey: {type: 'string', minLength: 8, maxLength: 200, pattern: '^[A-Za-z0-9._:-]+$'},
+      },
+    },
+  },
+}
+
 export async function registerPhase7fStoriesRoutes(
   app: FastifyInstance,
   db: ModulaDb,
@@ -119,6 +142,25 @@ export async function registerPhase7fStoriesRoutes(
       return reply.send(successEnvelope({ok: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Unable to mark story viewed')
+    }
+  })
+
+  app.post('/v1/stories/:storyId/replies', {...writeConfig, ...storyReplyContract}, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    if (request.validationError) {
+      return sendError(reply, 'VALIDATION_FAILED', 'Invalid story reply request', request.id)
+    }
+    const params = request.params as {storyId?: string}
+    const body = (request.body ?? {}) as {text?: unknown; idempotencyKey?: unknown}
+    if (Object.keys(body).some(key => key !== 'text' && key !== 'idempotencyKey')) {
+      return sendError(reply, 'VALIDATION_FAILED', 'Invalid story reply request', request.id)
+    }
+    try {
+      const delivered = await stories.reply(auth.actorId, params.storyId ?? '', body, request.id)
+      return reply.code(delivered.created ? 201 : 200).send(successEnvelope(delivered, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to reply to story')
     }
   })
 
