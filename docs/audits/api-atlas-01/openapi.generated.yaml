@@ -1257,7 +1257,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:107",
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:121",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -1284,7 +1284,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:108",
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:122",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8199,7 +8199,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:105",
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:119",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8217,7 +8217,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:104",
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:118",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -8244,7 +8244,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:106",
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:120",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10107,7 +10107,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:80",
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:84",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
