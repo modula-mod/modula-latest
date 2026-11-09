@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T21:10:05.020Z",
+  "capturedAt": "2026-11-09T22:02:27.020Z",
   "source": {
-    "branch": "integration/gate-01",
-    "headAtCapture": "0b1e8da89eb871a94459e7cd8a974da3b4f1ff54",
+    "branch": "mosaic/pr160-084-privileges",
+    "headAtCapture": "baed7f22ec47573c230f3a99ee959ba14e35122d",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "ae54a8e50b3c47d850ae78cdf7b20733a5e297897aabe03ff0a9945356392257"
   },
