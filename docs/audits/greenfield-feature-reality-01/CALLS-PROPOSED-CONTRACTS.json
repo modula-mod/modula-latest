@@ -1,0 +1,476 @@
+{
+  "schemaVersion": 1,
+  "status": "design-only",
+  "implemented": false,
+  "deployed": false,
+  "atlasContract": false,
+  "mission": "GREENFIELD-FEATURE-REALITY-01/PR-08",
+  "baseSha": "f4f70bfa761556ce9460cbd7ade2c2dfabf9c38c",
+  "warning": "Proposed vocabulary only. These routes and events are not available to clients and must not be added to the implemented API Atlas before runtime implementation and acceptance.",
+  "common": {
+    "successEnvelope": {
+      "required": ["ok", "data", "meta"],
+      "properties": {
+        "ok": {"const": true},
+        "data": {"type": "object"},
+        "meta": {
+          "type": "object",
+          "required": ["requestId"],
+          "properties": {"requestId": {"type": "string"}}
+        }
+      }
+    },
+    "failureEnvelope": {
+      "required": ["ok", "error", "meta"],
+      "properties": {
+        "ok": {"const": false},
+        "error": {
+          "type": "object",
+          "required": ["code", "message", "retryable"],
+          "properties": {
+            "code": {"type": "string"},
+            "message": {"type": "string"},
+            "retryable": {"type": "boolean"},
+            "details": {"type": "object"}
+          }
+        },
+        "meta": {
+          "type": "object",
+          "required": ["requestId"],
+          "properties": {"requestId": {"type": "string"}}
+        }
+      }
+    },
+    "callSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "conversationId",
+        "mediaKind",
+        "state",
+        "revision",
+        "initiatorActorId",
+        "recipientActorId",
+        "ringDeadlineAt",
+        "acceptedAt",
+        "connectedAt",
+        "endedAt",
+        "terminalReason"
+      ],
+      "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "conversationId": {"type": "string", "minLength": 1, "maxLength": 200},
+        "mediaKind": {"enum": ["audio", "video"]},
+        "state": {
+          "enum": [
+            "ringing",
+            "connecting",
+            "active",
+            "reconnecting",
+            "declined",
+            "cancelled",
+            "missed",
+            "ended",
+            "failed"
+          ]
+        },
+        "revision": {"type": "integer", "minimum": 1},
+        "initiatorActorId": {"type": "string"},
+        "recipientActorId": {"type": "string"},
+        "ringDeadlineAt": {"type": "string", "format": "date-time"},
+        "acceptedAt": {"type": ["string", "null"], "format": "date-time"},
+        "connectedAt": {"type": ["string", "null"], "format": "date-time"},
+        "endedAt": {"type": ["string", "null"], "format": "date-time"},
+        "terminalReason": {"type": ["string", "null"], "maxLength": 80}
+      }
+    },
+    "errorCodes": {
+      "400": ["VALIDATION_FAILED"],
+      "401": ["UNAUTHENTICATED"],
+      "403": ["CALL_NOT_ALLOWED"],
+      "404": ["NOT_FOUND"],
+      "409": [
+        "CALL_BUSY",
+        "CALL_REVISION_CONFLICT",
+        "CALL_ALREADY_ANSWERED",
+        "CALL_ALREADY_TERMINAL"
+      ],
+      "410": ["CALL_RING_EXPIRED"],
+      "429": ["RATE_LIMITED"],
+      "503": ["CALLS_UNAVAILABLE", "TURN_UNAVAILABLE"]
+    }
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/v1/conversations/:conversationId/calls",
+      "purpose": "Start one authorized 1:1 audio or video call in an accepted direct conversation.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "authenticated actor must be an active conversation member; recipient is derived server-side; blocks, privacy, busy state and rate limits apply",
+      "idempotency": "Idempotency-Key required and unique per initiator",
+      "concurrency": "ordered actor locks plus one non-terminal call per conversation and one active call per actor",
+      "request": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["conversationId"],
+          "properties": {"conversationId": {"type": "string", "minLength": 1, "maxLength": 200}}
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mediaKind", "deviceId"],
+          "properties": {
+            "mediaKind": {"enum": ["audio", "video"]},
+            "deviceId": {"type": "string", "minLength": 1, "maxLength": 200}
+          }
+        }
+      },
+      "success": {"status": 201, "data": {"required": ["call"], "callRef": "#/common/callSnapshot"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/calls/:callId",
+      "purpose": "Recover the latest authorized call snapshot after push, reconnect or revision conflict.",
+      "auth": "opaque GreenField access token",
+      "authorization": "participant only; unauthorized and absent calls are indistinguishable",
+      "idempotency": "safe read",
+      "request": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["callId"],
+          "properties": {"callId": {"type": "string", "format": "uuid"}}
+        }
+      },
+      "success": {"status": 200, "data": {"required": ["call", "serverTime"], "callRef": "#/common/callSnapshot"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/me/calls",
+      "purpose": "List the authenticated actor's bounded call history.",
+      "auth": "opaque GreenField access token",
+      "authorization": "records scoped to authenticated actor",
+      "pagination": "opaque cursor over created_at DESC, call_id DESC; default 30, maximum 50",
+      "filters": ["conversationId", "mediaKind", "result"],
+      "success": {
+        "status": 200,
+        "data": {"required": ["items", "nextCursor", "hasMore"]}
+      },
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/calls/:callId/accept",
+      "purpose": "Accept a ringing call from one recipient-owned device.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "recipient participant and owned active device only",
+      "idempotency": "Idempotency-Key required; first valid device wins",
+      "concurrency": "call row lock; expectedRevision required",
+      "requestRef": "#/schemas/lifecycleCommand",
+      "success": {"status": 200, "data": {"required": ["call", "replay"], "callRef": "#/common/callSnapshot"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/calls/:callId/decline",
+      "purpose": "Record an explicit recipient decline while ringing.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "recipient participant and owned active device only",
+      "idempotency": "Idempotency-Key required",
+      "concurrency": "call row lock; expectedRevision required",
+      "requestRef": "#/schemas/lifecycleCommand",
+      "success": {"status": 200, "data": {"required": ["call", "replay"], "callRef": "#/common/callSnapshot"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/calls/:callId/cancel",
+      "purpose": "Allow only the initiator to cancel a ringing call.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "initiator participant only",
+      "idempotency": "Idempotency-Key required",
+      "concurrency": "call row lock; expectedRevision required",
+      "requestRef": "#/schemas/lifecycleCommand",
+      "success": {"status": 200, "data": {"required": ["call", "replay"], "callRef": "#/common/callSnapshot"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/calls/:callId/end",
+      "purpose": "Allow either participant to end a connecting, active or reconnecting call.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "selected participant device or server policy transition",
+      "idempotency": "Idempotency-Key required",
+      "concurrency": "call row lock; expectedRevision required; first terminal transition wins",
+      "requestRef": "#/schemas/lifecycleCommand",
+      "success": {"status": 200, "data": {"required": ["call", "replay"], "callRef": "#/common/callSnapshot"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/calls/:callId/signalling-ticket",
+      "purpose": "Issue a one-time 60-second WebSocket upgrade ticket bound to call, actor, session and device.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "authorized call participant and owned active device",
+      "idempotency": "new issuance revokes prior unconsumed tickets for the same binding",
+      "request": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deviceId"],
+          "properties": {"deviceId": {"type": "string", "minLength": 1, "maxLength": 200}}
+        }
+      },
+      "success": {
+        "status": 200,
+        "data": {
+          "required": ["ticket", "socketUrl", "protocolVersion", "expiresAt"],
+          "sensitive": ["ticket"]
+        }
+      },
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/calls/:callId/media-credentials",
+      "purpose": "Issue renewable short-lived STUN/TURN configuration for an authorized selected device.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "authorized call participant and owned active device; call must be non-terminal",
+      "idempotency": "repeatable issuance with per-call and per-actor rate limits",
+      "request": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deviceId"],
+          "properties": {"deviceId": {"type": "string", "minLength": 1, "maxLength": 200}}
+        }
+      },
+      "success": {
+        "status": 200,
+        "data": {
+          "required": ["iceServers", "iceTransportPolicy", "credentialVersion", "expiresAt"],
+          "sensitive": ["iceServers.credential"]
+        }
+      },
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/push/voip-devices",
+      "purpose": "Register or refresh a PushKit VoIP token against an existing owned alert-device installation.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "deviceId must identify an active /v1/push/devices record owned by the authenticated actor; server pins the approved bundle and VoIP topic",
+      "idempotency": "upsert by deterministic token hash; reassignment disables any prior actor binding atomically",
+      "request": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deviceId", "token", "environment", "appVersion"],
+          "properties": {
+            "deviceId": {"type": "string", "format": "uuid"},
+            "token": {"type": "string", "pattern": "^[0-9a-fA-F]{64,200}$"},
+            "environment": {"enum": ["development", "production"]},
+            "appVersion": {"type": "string", "minLength": 1, "maxLength": 40}
+          }
+        }
+      },
+      "success": {"status": 201, "dataRef": "#/schemas/voipDeviceRegistration"},
+      "sensitive": ["request.body.token"],
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/push/voip-devices",
+      "purpose": "List safe VoIP registration metadata for the authenticated actor without returning device tokens.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "registrations scoped to the authenticated actor",
+      "idempotency": "safe read",
+      "success": {"status": 200, "data": {"required": ["devices"], "itemsRef": "#/schemas/voipDeviceRegistration"}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/push/voip-devices/:registrationId",
+      "purpose": "Disable an owned VoIP registration and revoke its outstanding call-delivery bindings.",
+      "auth": "opaque GreenField access token plus calls:use capability",
+      "authorization": "registration must belong to the authenticated actor; absent and foreign IDs are indistinguishable",
+      "idempotency": "repeated deletion returns removed false without disclosing prior ownership",
+      "request": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["registrationId"],
+          "properties": {"registrationId": {"type": "string", "format": "uuid"}}
+        }
+      },
+      "success": {"status": 200, "data": {"required": ["removed"]}},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/me/call-settings",
+      "purpose": "Read server-backed incoming-call privacy and media policy.",
+      "auth": "opaque GreenField access token",
+      "authorization": "authenticated actor only",
+      "idempotency": "safe read",
+      "success": {"status": 200, "dataRef": "#/schemas/callSettings"},
+      "errorsRef": "#/common/errorCodes"
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/me/call-settings",
+      "purpose": "Update incoming-call privacy and media policy with optimistic concurrency.",
+      "auth": "opaque GreenField access token",
+      "authorization": "authenticated actor only",
+      "idempotency": "expectedVersion prevents stale overwrite",
+      "requestRef": "#/schemas/callSettingsPatch",
+      "success": {"status": 200, "dataRef": "#/schemas/callSettings"},
+      "errorsRef": "#/common/errorCodes"
+    }
+  ],
+  "schemas": {
+    "lifecycleCommand": {
+      "params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["callId"],
+        "properties": {"callId": {"type": "string", "format": "uuid"}}
+      },
+      "body": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["deviceId", "expectedRevision", "reason"],
+        "properties": {
+          "deviceId": {"type": "string", "minLength": 1, "maxLength": 200},
+          "expectedRevision": {"type": "integer", "minimum": 1},
+          "reason": {"type": "string", "minLength": 1, "maxLength": 80}
+        }
+      }
+    },
+    "callSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["incomingCalls", "allowVideo", "ringOnDevices", "relayOnly", "version", "updatedAt"],
+      "properties": {
+        "incomingCalls": {"enum": ["accepted_directs", "nobody"]},
+        "allowVideo": {"type": "boolean"},
+        "ringOnDevices": {"enum": ["all", "recent"]},
+        "relayOnly": {"type": "boolean"},
+        "version": {"type": "integer", "minimum": 1},
+        "updatedAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "callSettingsPatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedVersion"],
+      "properties": {
+        "incomingCalls": {"enum": ["accepted_directs", "nobody"]},
+        "allowVideo": {"type": "boolean"},
+        "ringOnDevices": {"enum": ["all", "recent"]},
+        "relayOnly": {"type": "boolean"},
+        "expectedVersion": {"type": "integer", "minimum": 1}
+      }
+    },
+    "voipDeviceRegistration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "deviceId", "environment", "bundleId", "appVersion", "registeredAt", "lastSeenAt"],
+      "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "deviceId": {"type": "string", "format": "uuid"},
+        "environment": {"enum": ["development", "production"]},
+        "bundleId": {"type": "string", "minLength": 1, "maxLength": 200},
+        "appVersion": {"type": "string", "minLength": 1, "maxLength": 40},
+        "registeredAt": {"type": "string", "format": "date-time"},
+        "lastSeenAt": {"type": "string", "format": "date-time"}
+      }
+    }
+  },
+  "websocket": {
+    "method": "GET-UPGRADE",
+    "path": "/v1/calls/:callId/signalling",
+    "implemented": false,
+    "authentication": {
+      "location": "Authorization header",
+      "scheme": "Bearer",
+      "credential": "single-use signalling ticket",
+      "queryStringCredentialAllowed": false,
+      "ticketTtlSeconds": 60
+    },
+    "protocolVersion": 1,
+    "maxFrameBytes": 73728,
+    "heartbeatSeconds": 15,
+    "stalePresenceSeconds": 45,
+    "closeCodes": {
+      "4401": "unauthenticated",
+      "4403": "revoked-or-forbidden",
+      "4404": "not-found-or-hidden",
+      "4408": "expired",
+      "4429": "rate-limited",
+      "4503": "unavailable"
+    },
+    "clientEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocolVersion", "type", "messageId", "callId", "sentAt", "payload"],
+      "properties": {
+        "protocolVersion": {"const": 1},
+        "type": {"type": "string", "maxLength": 80},
+        "messageId": {"type": "string", "format": "uuid"},
+        "callId": {"type": "string", "format": "uuid"},
+        "negotiationId": {"type": ["string", "null"], "format": "uuid"},
+        "expectedRevision": {"type": ["integer", "null"], "minimum": 1},
+        "sentAt": {"type": "string", "format": "date-time"},
+        "payload": {"type": "object"}
+      }
+    },
+    "clientEvents": {
+      "client.ready": {"payload": ["lastSequence", "capabilities"]},
+      "signal.offer": {"payload": ["sdp"], "maxSdpBytes": 65536},
+      "signal.answer": {"payload": ["sdp"], "maxSdpBytes": 65536},
+      "signal.ice_candidate": {
+        "payload": ["candidate", "sdpMid", "sdpMLineIndex"],
+        "maxCandidateBytes": 2048,
+        "maxPerNegotiation": 256
+      },
+      "signal.ice_complete": {"payload": []},
+      "media.connected": {"payload": ["negotiationId", "candidateType", "audio", "video"]},
+      "media.disconnected": {"payload": ["negotiationId", "reason"]},
+      "media.reconnect_started": {"payload": ["negotiationId"]},
+      "call.end": {"payload": ["expectedRevision", "idempotencyKey", "reason"]},
+      "ping": {"payload": ["clientTime"]}
+    },
+    "serverEvents": [
+      "server.ready",
+      "server.ack",
+      "call.snapshot",
+      "call.ringing",
+      "call.accepted",
+      "call.declined",
+      "call.cancelled",
+      "call.missed",
+      "call.ended",
+      "call.failed",
+      "call.answered_elsewhere",
+      "signal.offer",
+      "signal.answer",
+      "signal.ice_candidate",
+      "signal.ice_complete",
+      "media.reconnect_required",
+      "error",
+      "pong"
+    ],
+    "delivery": {
+      "lifecycle": "authoritative PostgreSQL state plus durable domain event/outbox",
+      "sdpAndIce": "ephemeral Redis Pub/Sub relay; peer acknowledgement and retry; never PostgreSQL",
+      "ordering": "monotonic server sequence per call for server events",
+      "deduplication": "messageId scoped to call, actor, device and negotiation TTL",
+      "recovery": "GET call snapshot and create a fresh negotiation after reconnect"
+    }
+  }
+}

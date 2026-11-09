@@ -56,7 +56,6 @@
         "schema": null,
         "envelope": "raw/specialized response"
       },
-      "contract": null,
       "sourceContractSha256": "07cd351616969f0645f62d07b612f5308ef4c00a1460d519c206b7adf4e99c01"
     },
     {
@@ -111,7 +110,6 @@
         "schema": null,
         "envelope": "raw/specialized response"
       },
-      "contract": null,
       "sourceContractSha256": "4c137ff9e8865973951e0c3d18913a53e8c6805d0b88a8c65f46035be5df82a8"
     },
     {
@@ -166,7 +164,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -221,7 +218,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -276,7 +272,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -331,7 +326,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -386,7 +380,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -441,7 +434,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f3ad5ec622e43de1c371756f82129e01ab7e121707ac9bb0a3187e3fc7d3e272"
     },
     {
@@ -496,7 +488,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -553,7 +544,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "583ca5be5bb60f38012487d5ca5eb3014683fcc8300c6967175b4d8d3518b97a"
     },
     {
@@ -610,7 +600,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b76ee542b6ec3434475f66a8d4e447bbf87f304a362704e49048a5736aa0a299"
     },
     {
@@ -667,7 +656,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d9e204411c7b74a5766b824694711387d637e9ad0a91540ec56d5d83dce574e7"
     },
     {
@@ -724,7 +712,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6c70dd586003c07988c7b8476893bd7ef830474902cf04b52c63ae35a360535a"
     },
     {
@@ -779,7 +766,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d91ca078ac65fbdbd4ece273951697cf9b36a41114e6d2221d245fb64c4c7d85"
     },
     {
@@ -836,7 +822,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a2ba63675db33027bf385b69482d6b7b176cda0bbb2a4f5737985cbb3fe640df"
     },
     {
@@ -891,7 +876,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -946,7 +930,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7d12008923d0e50206060f0e2a74db490c029973a0071ad23ee31226c8b5bb76"
     },
     {
@@ -1001,7 +984,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "709cab544eaa5cd5df06784c8d3c371e8ff55df1ad3428b13c86db11c2b75770"
     },
     {
@@ -1058,7 +1040,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "041f69839fb74693e0de0ff02a655cee60d1ca2e00e3161393c3e1e92707be6b"
     },
     {
@@ -1113,7 +1094,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -1170,7 +1150,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "05ad0535f909d8e9bd0afbb17cfd44c65351b09ec531c379eb80c448054eb876"
     },
     {
@@ -1225,7 +1204,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4783eed8d6cffc753d4c83ffb27ca50f58335c33e640886ec20376731c9852de"
     },
     {
@@ -1282,7 +1260,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c70d9f4aa4a8de8647f3b595362bb526410980044b8a5b88845b897cfee2fabe"
     },
     {
@@ -1337,7 +1314,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e6837eb8932af395d7a967dd17ef7995d527c1005eb58143fc1ea5cbc2305b7d"
     },
     {
@@ -1392,7 +1368,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -1447,7 +1422,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "109406b98e5a77c11b5b3d5a22d28e168c7cd78263a23070ae31974ec1eab16a"
     },
     {
@@ -1504,7 +1478,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5cd4674ac27c20497f15201e3cd561cd0c9a0fa9a7b990110d60ea01478331e3"
     },
     {
@@ -1561,7 +1534,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "768e5100a6ded356f0cff85b35ac3c2d696c7dba52b8f54b8a265e25083d1cec"
     },
     {
@@ -1616,7 +1588,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c6ff8a285babde7235603f5a6de3b1478c7364c0a8c269484b0565c067035e65"
     },
     {
@@ -1671,7 +1642,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f2f321f7d0cf6c0b85313cf11ccbd4146968149379286059a0b0dfe7169c06ae"
     },
     {
@@ -1728,7 +1698,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "cac92c983e9e975607e04c5275c6396a64f537bb5fadcea6da24377475aaef8a"
     },
     {
@@ -1785,7 +1754,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "da713f0abf56131460be3b79f0180b269713e0b8e7670f28085dacc5f2426f77"
     },
     {
@@ -1842,7 +1810,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c66645debfbf4eef2370fcb1f6b9c5d48b2a7c778290e9152004545edfa341a3"
     },
     {
@@ -1899,7 +1866,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "edc4e206aae3d643857a932f84d54aadf10096ffb97ed4b6abb29a124f22a7af"
     },
     {
@@ -1956,7 +1922,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e655febf250412e8c8069776f8ab6ff53cfd1cd26e92c080e82591bb6386b44b"
     },
     {
@@ -2011,7 +1976,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ad94d56109b87e55bf8e5007e9dbf29eb8dd18d80905a5b67364058411b6348a"
     },
     {
@@ -2066,7 +2030,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a23e426eba980635cdb0f0b440c03082f45d659f77df07956cebafe76ad5e811"
     },
     {
@@ -2123,7 +2086,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a8893106e534fbaf9e5703bed04504d9279dce04ea28750d55367d0f11037e8c"
     },
     {
@@ -2180,7 +2142,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9eb9ed518637331de53e1c184effe0faee9b54e34d47eb5ffcfcab6cef124cc2"
     },
     {
@@ -2237,7 +2198,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "42a2c7599912647f687c2c130cc11b2306da187a5f5c2d5b9fba179269b1fd29"
     },
     {
@@ -2294,7 +2254,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e3ad0e341fcef4ad9e07e6da87ffc88ab7db06902abd109883c11312dd1392b1"
     },
     {
@@ -2349,7 +2308,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "840f9dc1447f26d8fb4b1fe3f1e9cb4db697f34940e8e594797ae421be070072"
     },
     {
@@ -2404,7 +2362,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "da14f4b88f4ea4e197a1ae3931bd11b5ecaeb3e3b34dc68049eb22f3ac0a5187"
     },
     {
@@ -2459,7 +2416,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "de80dfe92c2655c5577a6035ef64c56732a13a3c9ba3d8e8235f73d4592edf67"
     },
     {
@@ -2514,7 +2470,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f2d8de75c4fc6e085396b55509b15fe347d5993f0ea81d4231449dff60b9bfe"
     },
     {
@@ -2569,7 +2524,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d9daf22a867ebde09735f2054d6d1d9284ab6fa08b6d5a349ade7985bf8068c4"
     },
     {
@@ -2624,7 +2578,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ff623dc879e6715ba06df0e4b290f003629a932ac5137705d16005d63aa45413"
     },
     {
@@ -2679,7 +2632,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2d9adf751856332daa3f1b86cc18b18a16444267a404ef192daf8e94ab3af4ae"
     },
     {
@@ -2734,7 +2686,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b690f7b18d07e00b67b360c3da9de2dc5bc9a6e723a1b22029669bf865937c5d"
     },
     {
@@ -2789,7 +2740,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -2844,7 +2794,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d38067e2ec88fa0b9382659b16a07bf63ce8fa738ca5cbf09e80613587fe2439"
     },
     {
@@ -2903,7 +2852,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "336da3ff5fb08a851bbab11854b271ea189e66c82e94dd92f476b8d21e08b1cd"
     },
     {
@@ -2962,7 +2910,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "516f4c5eeaa9df79e466820685b06fd099c41f7be9577a4e7fba41bdafd6f09b"
     },
     {
@@ -3021,7 +2968,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6bd0ea61731bf040211c2538acf08679817b9f769bbf147826bb170f4bfbd459"
     },
     {
@@ -3080,7 +3026,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1c75bbeb5f9293e331d15207881ee2d335e106bd13885a55e1965dbf7f7a76de"
     },
     {
@@ -3135,7 +3080,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -3190,7 +3134,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -3249,7 +3192,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3deeea985eda3dc2e9bc998c22935a267e1e6600fa60d249b540537c5ff20c41"
     },
     {
@@ -3306,7 +3248,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f50fab033574f06d7563679fdd4d2ab3867e44c23c7bac91200789ffc3ded332"
     },
     {
@@ -3363,7 +3304,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ca39f833e641e451a7f5a9cd9623e484bdcaa269390d72009ddd529478d24590"
     },
     {
@@ -3420,7 +3360,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "64a0e1c98c6fc91d5e16bda7f6ce6f2062d7d26b618fc5f38284c512059d05b4"
     },
     {
@@ -3479,7 +3418,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3826eb607f84632997c6cea32f0bb12a82f9171f281c7c396ce4487dab2ad99e"
     },
     {
@@ -3534,7 +3472,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -3593,7 +3530,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e6d47b79209158c3907f615cb92d1c935107d4868772cce331dd6a38798a1a82"
     },
     {
@@ -3652,7 +3588,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4cba87409e16e219e2e706900248eded07672b19a7d496048b539722d88da957"
     },
     {
@@ -3713,7 +3648,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a001fd34c075b7e988c14bc4553805b68101a9df4c0eccd51e980919f7372361"
     },
     {
@@ -3772,7 +3706,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e487aef6bac35b6efbabad879f1b4fe066fee47365bb026b04940dde6edf5fbc"
     },
     {
@@ -3829,7 +3762,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "db4576df59db603aa5cd7984d17162fe29327fee417b474f8c67347f0f479ea1"
     },
     {
@@ -3888,7 +3820,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2ec18801c0a2b9342defe9b30c36e5da8e4330698ffae9598b0dd759b12b0c03"
     },
     {
@@ -3947,7 +3878,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "86ee9161f5f59744fe57fb46d6851e2bac7867de41087714cf754af27771d98b"
     },
     {
@@ -4006,7 +3936,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "86ee9161f5f59744fe57fb46d6851e2bac7867de41087714cf754af27771d98b"
     },
     {
@@ -4067,7 +3996,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "48017de2a17e91b7835f61442efab47109f9e68fc0be107a0b9b6482bc63404c"
     },
     {
@@ -4126,7 +4054,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e81ccc24ee7e09176a99d9696939676693e77bd93d9f9937bc82bea9e24c3496"
     },
     {
@@ -4185,7 +4112,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d81748ebd05327c68fa6bde81a50010cde397709d3324cfae5a2f41d6f816d24"
     },
     {
@@ -4244,7 +4170,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "545006eb461092672bd01fb0975d4f27a0a6a91e8a70aebb02f11e7e703294ea"
     },
     {
@@ -4301,7 +4226,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c5f403d1608a8927d6fc81c811e87c9f947153266c3c07c5a47ed6170e505764"
     },
     {
@@ -4360,7 +4284,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "22348b73485c5cd0a8d4097ae11a3d4adae3a694f643392c1aa18532b103333d"
     },
     {
@@ -4419,7 +4342,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4bc8d7f8a82f7f280cf437c071421e42565ae53e93f2f8157dfa5f8670b53fc4"
     },
     {
@@ -4478,7 +4400,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "47e6d49a63412b3ea74e510ad9992270e5f83f60d6e50f800c502c5912399c3c"
     },
     {
@@ -4535,7 +4456,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3365c8dbc588f2a106cad7dc396f8b487bb33e1c897ea997a54c40656de83045"
     },
     {
@@ -4594,7 +4514,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "325d9dcf924215d70d17748dfd7694276f780805c496b4e9f43a2e8922dbdd9b"
     },
     {
@@ -4651,7 +4570,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7dd8a4914e8095d1f6f58b82243fbfcae1305dce21b2eb4981c4f5415a38a4b6"
     },
     {
@@ -4708,7 +4626,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "78a468f8e03140af12f6ed4b147e6026be11cc5aa4ef123714377887318a428b"
     },
     {
@@ -4767,7 +4684,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0d342c6861ceda9a709442c0bd109aa50aa772b1638eff93b5eda00b1f14eb32"
     },
     {
@@ -4824,7 +4740,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6d6c16c9ad506f497be22a240954d124b637f562556ae917761bd87b571a6808"
     },
     {
@@ -4883,7 +4798,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e5ee5b67a186d5807366dfe178e1c3ac43537528faae2bfd4f158bb7877fab93"
     },
     {
@@ -4942,7 +4856,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d54c060fdce22ef8ca8ae2b931bfa355a570d150ef1c2f45e5f68d53f37a7cce"
     },
     {
@@ -5001,7 +4914,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e805184230954c754f2389f6986db7ea271f73cb93e94d344f151897c170214"
     },
     {
@@ -5060,7 +4972,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "341d7b6ca3b4cb638f3e49181cae47a63a1039759519928493561a22283a8014"
     },
     {
@@ -5115,7 +5026,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9c9d0651d3c9c32bd36681f0f7da612561efb9ba2738a2a37834610661367fd8"
     },
     {
@@ -5172,7 +5082,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "177678855c748f4512b0311f9ef82bcd1143fd56c3eb14bd7b8f09c2faf2fe90"
     },
     {
@@ -5229,7 +5138,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "952a0d33e272c3f62443c85b3c44dbdcec8c07acfca091a3dbfc7871a78bbf7a"
     },
     {
@@ -5288,7 +5196,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d8dce989125368aee8ad308a6ddcbff8d56f891a49991b6855f51f9a61bbecb4"
     },
     {
@@ -5347,7 +5254,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9658a57b28412523a942ace76cd28ff4223cb8e34c6a2ed1caa764948008e72d"
     },
     {
@@ -5404,7 +5310,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1fc12b02ef5941c48da1f1a511b34d363def49cddcfd269eb05abd0d913a25a5"
     },
     {
@@ -5461,7 +5366,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3490df7c39408808590c49674fa831a6c0505064b2f124af9e6274a0746ab022"
     },
     {
@@ -5518,7 +5422,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8310ae8c4c86cbdcd914c56a7fdff7d1a94a8d6c2db7ce3f582a0e36f000575d"
     },
     {
@@ -5577,7 +5480,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ccb869f8e461368f3fffbafa39bcbbbcc1563011dfd4c98ee11b2817a2c4b945"
     },
     {
@@ -5636,7 +5538,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "89db926982704455f3a63e072cf0e0f65a885bed28ce29658903a0c5c004617e"
     },
     {
@@ -5695,7 +5596,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c6515ccb1e4bcafc92279a06b643d2d9b5a6971e1278f3acdd2205a87c9133dc"
     },
     {
@@ -5752,7 +5652,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0b7688c179dfe5ee34b653f67a0d17aec2c0e79770d114e0e675b9463b304fcc"
     },
     {
@@ -5809,7 +5708,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b8a86a8f53d323fe27e7fa0f0b5c2201057b79e0dda4b590ff95b09b17cb39c4"
     },
     {
@@ -5864,7 +5762,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "27aa424dde8edbe7c41c9dd56f744fc1b40e0beec0a370aeb27d931af5cccef8"
     },
     {
@@ -5921,7 +5818,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c7ff24faf15af0c7529de4b85294208e5151fe0c945d937816e02ac8574f8d95"
     },
     {
@@ -5978,7 +5874,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7e807ce69f261b584505bf2dd42ed067a0f1803f8cf9d4349c50c083e85f802c"
     },
     {
@@ -6035,7 +5930,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e1fa803cab1f5e9a678e5229c9be1f15dd3754d4df4b6ce8593f7a972ea37b4f"
     },
     {
@@ -6090,7 +5984,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "bf77c560e4b6aec485c92426b6144cc8f9aa1b9f4370276ef3e079954e99cb70"
     },
     {
@@ -6145,7 +6038,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "178bf69622d3ccf32fcf0deb8fb2337bc8b990d42f29ec2a3331036e71b4539b"
     },
     {
@@ -6202,7 +6094,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b651685368339eb5e42d543f4b7bd3facf110e4b0eb1babe784cb54f583ce55f"
     },
     {
@@ -6259,7 +6150,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d35495f8b6317e6882ebfeebc7e665285dd60636c828544ada03a38c4f6e6405"
     },
     {
@@ -6316,7 +6206,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a2bdc9a764bd0fa9a596c0e24c56d9f16177cf72e399f99eb701fa318473e856"
     },
     {
@@ -6375,7 +6264,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "dc1da020f5bbcecf5205e8fe637a593c46de3bf31c9d720b1e0c44f7f1e03301"
     },
     {
@@ -6432,7 +6320,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8f1916aad7978d409397b1ad89a20bb6ab3ba71c3d0e0b2fd245a61e5858535a"
     },
     {
@@ -6491,7 +6378,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0b9ca4136612fc688f5ae28939ec289697fd9e2159d6904601359d675bfd562d"
     },
     {
@@ -6550,7 +6436,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "25365a962f098ec7d3d6f6f2d04489928b067fb53efd8c3471d4eb5b5be1b4ae"
     },
     {
@@ -6609,7 +6494,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3230b8b77b0b4bad3db0763dbaf15b836266f03a3584c8768949efd74777109c"
     },
     {
@@ -6666,7 +6550,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3294db46cd0016ca4f4d8103f184809b954936f79d88eb64355a664ef567be0d"
     },
     {
@@ -6725,7 +6608,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b5bf52c897f677a99d5a196979c64b391e2dffe7000f1c5de6cd658c22cdc66f"
     },
     {
@@ -6784,7 +6666,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "159c507a916a5cb7e55f3769e9aee1b1a788849cbb334e793143bdec29c8323c"
     },
     {
@@ -6841,7 +6722,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "64ccc6a8d2366f71da016df777d346e2c94662137fc98546769d562808805183"
     },
     {
@@ -6900,7 +6780,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "28f706c50a3b9029d8ebbbf84f87ecafa8a6798ca1acd1da0693ed32b646a3cf"
     },
     {
@@ -6959,7 +6838,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a70a514a3506abb050596acf364b886e44665d92f3ab296138a42e88b73fa43"
     },
     {
@@ -7018,7 +6896,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0473644d97facaecad1b0d1ac803d37482c9bea5e37bb4981d21cc3bc10ed26d"
     },
     {
@@ -7075,7 +6952,6 @@
         "schema": null,
         "envelope": "raw/specialized response"
       },
-      "contract": null,
       "sourceContractSha256": "feade2fa40ad6f4bacc9f8b3db499e5750f4e8e1c631435a4d6e1860f17643dd"
     },
     {
@@ -7132,7 +7008,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7347b17e3b7a4665bcc6b0011554c6b4ab2a9b2219153388136a2a444d71926b"
     },
     {
@@ -7193,7 +7068,6 @@
         "schema": null,
         "envelope": "raw/specialized response"
       },
-      "contract": null,
       "sourceContractSha256": "b8a5773b53eb40ee1c3824d95fe4186f06e3d0095b5bc7a10d0e182d7e92e657"
     },
     {
@@ -7248,7 +7122,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c2bfbd4b78f1dda1b941b5f0c2fba6caf3b5b7502488420b2110e562e566d4b6"
     },
     {
@@ -7303,7 +7176,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "aaf68672831bf032760bcf36eedb2d74c44167563c1840163bdd12ed901730d1"
     },
     {
@@ -7358,7 +7230,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "08827f02edf373b42eb7889c3816b90af83fb91cf05b5bffbafd5afb8546158e"
     },
     {
@@ -7413,7 +7284,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7c9256a5e8b1f2f65a9469e15d4ddfb3a170228a6b82f5273428e25592020df9"
     },
     {
@@ -7470,7 +7340,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "073eb7bc857a35b4430bc0422e35c23c0331068634ae25bde6d1e5cf23a43780"
     },
     {
@@ -7525,7 +7394,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6f542cabda770bf5fc5be7960964c8089ef28be762490c0889874d7dc4495484"
     },
     {
@@ -7582,7 +7450,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ea87aeecc69cc3a73cdbe9c0602ade7b7f48c831b6a4b1a923c0db2c0f417587"
     },
     {
@@ -7639,7 +7506,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "bcd299b5c4c85cc21ae9004f66d3393834843299a470833c7dc63a188b184500"
     },
     {
@@ -7694,7 +7560,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8481fdb5a5509a1e88d4ef5ea80b72e73ea45ed9bb95d00d28727217db9d5bea"
     },
     {
@@ -7749,7 +7614,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4bcdf3a0fbe5a3fcb5b652c0e84e5cefe6ea4f67e85c2205d3e82a0a7a46e896"
     },
     {
@@ -7804,7 +7668,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "aa508b845941115f09c7ecff4333c2b95b0c8b6cc18c5ce33603d61f28935c12"
     },
     {
@@ -7859,7 +7722,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4161a4522494a71e561ddfdc600315c0994936d0dd08b56c23c083a2e171fd1c"
     },
     {
@@ -7914,7 +7776,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2f218c77ef7d24230907ddb4f524e8ff8180baea232bd1d0e7eefe78741ca2f4"
     },
     {
@@ -7969,7 +7830,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ee7e5cc18a1fd200b68690ffec938d54e8f32583e7ec87bba38e83b6f8e42c86"
     },
     {
@@ -8024,7 +7884,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "26758930c7f313b0fc1a1beb9c3331843ef3104fe59c2ea921033ac59358a2ea"
     },
     {
@@ -8081,7 +7940,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c88b7acab8b1ded0347dc53bb683b677d075a5d485da4351c6a8c1ed2668aa81"
     },
     {
@@ -8140,7 +7998,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c88b7acab8b1ded0347dc53bb683b677d075a5d485da4351c6a8c1ed2668aa81"
     },
     {
@@ -8195,7 +8052,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -8252,7 +8108,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "65fbac012788fda0b7d26bb2862d4f55dc82f3399805f1225d910193cb17d0a8"
     },
     {
@@ -8307,7 +8162,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -8364,7 +8218,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -8421,7 +8274,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5bf1dfb14d6274b19ddf0a4e2db0dbe8824edee94c5ab0f2e31cd2a005062d6d"
     },
     {
@@ -8476,7 +8328,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -8531,7 +8382,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -8586,7 +8436,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -8643,7 +8492,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "05a9e317716f42e8877dd858e23c580c98625ddbbc6142f2689dbac70c8e34d3"
     },
     {
@@ -8700,7 +8548,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e9f6784dc54254d06b3055b5034f8eca0a931d2909f00dd1c7c9dd339e680662"
     },
     {
@@ -8757,7 +8604,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -8814,7 +8660,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -8871,7 +8716,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -8928,7 +8772,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -8985,7 +8828,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -9042,7 +8884,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "90b71394cc716b80927a07d08f07427b71ab19dfc3721e0b61409e3161458f7a"
     },
     {
@@ -9099,7 +8940,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "18dc9178551f005196e41874825c3a8c20cf0d892259683c9de490f98a15981a"
     },
     {
@@ -9154,7 +8994,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2d1fffca5193c5b3e210dcf1fbd73d9d3e31004667533984064a21ea2b95df4f"
     },
     {
@@ -9209,7 +9048,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -9264,7 +9102,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -9319,7 +9156,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7d0f726fad81cee2133b4872cb7a328879b401b98806b4007a97ec98b5fb164e"
     },
     {
@@ -9374,7 +9210,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "cc2f2f81c2d71e924baff91d76221b941a1377c772239e00ccec90bb708c9a39"
     },
     {
@@ -9429,7 +9264,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -9484,7 +9318,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d6a780ccb440269df1be2d8fd0f426058ec15892a0b0bb5a2b7db4e983984b58"
     },
     {
@@ -9539,7 +9372,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "84dc6fb94f91b46b09fe6baa4cba0fef8427ea260c15ab1936084e126ef62b40"
     },
     {
@@ -9596,7 +9428,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -9653,7 +9484,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a055146b0a304285252fe52b32b791dc210d7e90b1ab4ad0b1f2fe17804d359"
     },
     {
@@ -9708,7 +9538,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2345b175ae1b0e1efae255bdcd4aa7dce0df61355327b3a49ab3c17d4b55ecce"
     },
     {
@@ -9765,7 +9594,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c9757b606983b948856b7d103eb96f76b640b9428ae4c57a256db71cddbae990"
     },
     {
@@ -9824,7 +9652,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b13aee58d262ebe8923c75cabd58dbe87a65a222d9d883030cde932e7f089d97"
     },
     {
@@ -9885,7 +9712,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c99cc10f2defd2d170123766ff1dfc86c1668b8b406a5640dfd4106a68d6f745"
     },
     {
@@ -9944,7 +9770,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a00ac9d3b7385c0d4b3533e37e898feb9f03e6f3aba67ad1d794f69321ef087d"
     },
     {
@@ -10003,7 +9828,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a00ac9d3b7385c0d4b3533e37e898feb9f03e6f3aba67ad1d794f69321ef087d"
     },
     {
@@ -10064,7 +9888,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9918385b86f9ac6f78c2c00cccf20521dfe69de97e351408d251f60b40bfb2b9"
     },
     {
@@ -10123,7 +9946,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "849a9c143f4090719e6e2d3de6a1e82e178f37120c6b01900d048e1618e797e0"
     },
     {
@@ -10184,7 +10006,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5ad918ec7fdc18f4895a3e8b38cfedcab795549acf23a1f58df4bf9f890c13a8"
     },
     {
@@ -10241,7 +10062,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b5c8d83a3f549e816888da6c635242154120433ec0392e8529764dff03abb3fc"
     },
     {
@@ -10303,7 +10123,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "59fcbaf0633ff0bab9102aaec44665ef7917e96c2089e637e4d956c58da10151"
     },
     {
@@ -10358,7 +10177,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -10413,7 +10231,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3d3c431e53abb42850e6879580fd847cd84b7da94cb7c0110ce2d624500da351"
     },
     {
@@ -10468,7 +10285,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4c2198e56c9a325c831222a1ca9dbfada6ba3260271d6429cf0a7b0ea613c3d1"
     },
     {
@@ -10523,7 +10339,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -10578,7 +10393,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "fb7fd2f85a9d60a3b8c3eafbdafaf69eda74ae445f03a3fd57755a0e2bf80b3e"
     },
     {
@@ -10637,7 +10451,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "aa32ab90d1dd0da469d6d1ca3cc20c2d5e6a6ab5100fcf96e16887272271c022"
     },
     {
@@ -10694,7 +10507,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0584f038793ebfd6d500ec7789850a157f1bd9653fc07f39ed7d092ea3ca5df0"
     },
     {
@@ -10751,7 +10563,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4152204947ae7b93651500c93cb3e16800a0468f83e8e25e554721bfa448b4fd"
     },
     {
@@ -10808,7 +10619,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0b5b056432398eaca640476bde5738cbff0d1e63afdffe3fe75c95cfbda62158"
     },
     {
@@ -10865,7 +10675,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4d1610882f69d90b4364986144266b32f271a5581f69e070e8e544d2f7eb7824"
     },
     {
@@ -10920,7 +10729,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "63c666b3f9ca0d5f5d6951004b4c184046fa7b3bbdbe18eebd4e6d6beb3175e7"
     },
     {
@@ -10977,7 +10785,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "036756c8f557c406bf210c8b184a962abad764e108896fdbb0cf38fc2f91f1bd"
     },
     {
@@ -11036,7 +10843,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "744a2fd65d2b49ac99d0cd16c7dbe369c952a599c1ebe16d1d661382d435033e"
     },
     {
@@ -11095,7 +10901,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a41505b3d63e3ac5b85d60f6e30ed43bed6ff70a4b06256813846f574332191d"
     },
     {
@@ -11136,8 +10941,8 @@
         "params": [],
         "query": [],
         "body": [],
-        "explicitFastifySchema": true,
-        "manualValidationObserved": true,
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -11152,71 +10957,7 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": {
-        "purpose": "Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.",
-        "owningDomain": "Direct messaging",
-        "authentication": "Bearer session required with post:engage capability; the sender actor is resolved only from the authenticated session.",
-        "authorization": "The target handle must resolve to a live profile on an active account. Self-conversations and either-direction account blocks are rejected. A new recipient becomes active only when they follow the sender; otherwise the conversation is a message request.",
-        "request": {
-          "params": {},
-          "query": {},
-          "body": {
-            "handle": "required target profile handle, string 1-80 characters; an optional leading @ is normalized away",
-            "text": "optional initial message, string maximum 5000 characters; blank non-empty values are rejected"
-          },
-          "validation": "Unknown fields, including client-supplied sender or actor identifiers, are rejected. The target is resolved server-side and must remain active. Subsequent messages to a reused conversation use POST /v1/conversations/:id/messages."
-        },
-        "success": {
-          "status": "201 when created; 200 when an existing conversation is reused",
-          "body": "Envelope data {created:boolean, conversation:{id,kind,participants,lastMessage,unreadCount,updatedAt}}. The conversation ID and participant fields are sufficient for native thread navigation."
-        },
-        "errors": [
-          {
-            "status": 400,
-            "codes": [
-              "VALIDATION_FAILED"
-            ]
-          },
-          {
-            "status": 401,
-            "codes": [
-              "UNAUTHENTICATED",
-              "SESSION_EXPIRED"
-            ]
-          },
-          {
-            "status": 403,
-            "codes": [
-              "FORBIDDEN"
-            ]
-          },
-          {
-            "status": 404,
-            "codes": [
-              "NOT_FOUND"
-            ]
-          },
-          {
-            "status": 429,
-            "codes": [
-              "RATE_LIMITED"
-            ]
-          },
-          {
-            "status": 500,
-            "codes": [
-              "SERVER_ERROR"
-            ]
-          }
-        ],
-        "pagination": {
-          "style": "none",
-          "filtering": "none"
-        },
-        "idempotencyConcurrency": "The sorted authenticated-sender/target actor pair forms the unique direct_key database invariant. Concurrent inserts use INSERT ON CONFLICT and return the same committed conversation. Optional text is creation-only and commits atomically with the conversation and two members, so retry after a lost response cannot duplicate it. A reused conversation returns 200 and does not append text.",
-        "versioningCompatibility": "HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged."
-      },
-      "sourceContractSha256": "0a080357455119564dfcb96c5e52ba263204a7001a81ffbbf54d340c7bd902e5"
+      "sourceContractSha256": "abc8b2c3b28c98139da8b19446f6f8b186efa459fb35f5b438f44ec0ab256b0f"
     },
     {
       "id": "POST /v1/conversations/:id/archive",
@@ -11274,7 +11015,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a49a969ccdf6524425120c17c0e0bec2cb8bc391d878400f2cc13e49f63f134f"
     },
     {
@@ -11335,7 +11075,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ba0469879f470266397fc90aa623959ac9a437f1caebb9b7d0fe8833c22b6399"
     },
     {
@@ -11394,7 +11133,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "dd358d370c659495c724c831f64d8979f03381041aad2c0e740d9e950487de23"
     },
     {
@@ -11453,7 +11191,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ef0848e60d6ef0f19d42ba0f02ce3046bb187b4eb307618ef303e82f9225a0e6"
     },
     {
@@ -11512,7 +11249,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "fe690c8d767d7b9a3fb3776b61282c336ac3670144de4b3b0855d5d53483da01"
     },
     {
@@ -11573,7 +11309,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "483f0f90a5097ce32bdad9c1ab4e51ace20465d75f4e7f22680687d459dfabe5"
     },
     {
@@ -11632,7 +11367,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ba6dfd97041122061e91ffe14231bf59373d045c7fcef98de0a000cd610583bd"
     },
     {
@@ -11691,7 +11425,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "35629e66d6123de18f91dcc5bc00e7430134773bbbc51886d006eb98aebb26a8"
     },
     {
@@ -11750,7 +11483,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f8b1b3972c5e0010edf08d37daceb66fcb1f007dd3aa00d70de191a2d5cab9db"
     },
     {
@@ -11809,7 +11541,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "986e906b7e8031ddeeabef82c501e90a6f4cb8c0a752586059c844d59a69e23a"
     },
     {
@@ -11868,7 +11599,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f8b1b3972c5e0010edf08d37daceb66fcb1f007dd3aa00d70de191a2d5cab9db"
     },
     {
@@ -11925,7 +11655,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c3b47a4b9a0791f31ea1ca72194309ef3518a8888dac3045c14ec9b3f2338a53"
     },
     {
@@ -11980,7 +11709,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8c7f4d57a91e63f7b0a39b54395b59d747d54de72e06b558b419f0a4d3a54938"
     },
     {
@@ -12035,7 +11763,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -12090,7 +11817,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "34ad7d783af6479068f51caf3151a5ba4736d7552dfdda303435c2d33a077677"
     },
     {
@@ -12145,7 +11871,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -12200,7 +11925,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2e6e3913b622d81c90cf7add51fd8ae2e658ce2a2fb2f3a14ab03ca7d28ea7dc"
     },
     {
@@ -12255,7 +11979,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "baae3d3556a57a76be3d14314a2c5780741de5f226b5e5e95eff8b0b17b7b8af"
     },
     {
@@ -12310,7 +12033,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -12365,7 +12087,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4465c51b8f2fe1b195519b4609b233aa99e6709c8045ac2bf90fadd6949e2ac4"
     },
     {
@@ -12420,7 +12141,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3539e89aa8b22fbad9136e5df77592bb5fb49356e65a6eb5e0682f0aaf15175a"
     },
     {
@@ -12475,7 +12195,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "311bcd60f0cf20df754d70404b17bed053002be229eb496623d6e887ca853c4d"
     },
     {
@@ -12530,7 +12249,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5c9ee1986b94422e76181ffe046330f2eed7ebcc277566757a6af3d799b20ede"
     },
     {
@@ -12585,7 +12303,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -12640,7 +12357,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1e1f2d7f084f77312dcc2f8bf4b689ec2924d3c6334995b32bde393cb096a330"
     },
     {
@@ -12695,7 +12411,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "251bf44f1e3a8827962fd2b3bd9554c91b89d6837e0cdca17b595fe54e066c63"
     },
     {
@@ -12750,7 +12465,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "43681cc802223954ae7aba7bfaa21b03637b74f5e19982175ee81d05821dc3f8"
     },
     {
@@ -12805,7 +12519,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e2935b97ab58e33c084a2a71798e3cffe0a85f01a4eda481cc048099ea06fa8e"
     },
     {
@@ -12860,7 +12573,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "54e8dc4d49c2af5b8876f76343392af4fa5e8711fb61e25061b5c2f09d01f107"
     },
     {
@@ -12915,7 +12627,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0a886877eda33b7d25080b51d450013f604b33f3b9f10f4642247b04856c45e4"
     },
     {
@@ -12970,7 +12681,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9f3a5936e50aa2d43d16763611e26decf4fcd8fd1a963269859dc69dc60946a6"
     },
     {
@@ -13025,7 +12735,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4b47fed8cb0d77f8c6dbb4dfe774693bee8b33693afa347f0b2e9967bae4f87a"
     },
     {
@@ -13080,7 +12789,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0add0e7598438bd9da706b151cd8cc7189a4452e50237d65b612e677172ab901"
     },
     {
@@ -13135,7 +12843,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -13190,7 +12897,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d28d4133521cd9de3dd82d6878a6af3e4cdf11119037e7a3a6aaf54f1851d840"
     },
     {
@@ -13245,7 +12951,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "23a91614eed1654e83cd871b92c93530b7c68d442ff5cbe1c9b3fdc3e7740fc9"
     },
     {
@@ -13300,7 +13005,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a23e426eba980635cdb0f0b440c03082f45d659f77df07956cebafe76ad5e811"
     },
     {
@@ -13355,7 +13059,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8a7fc095b2a11ba1cb4495604d7f65d5af3369fad22d5dabac69b7e38e727ee7"
     },
     {
@@ -13412,7 +13115,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8633f74f79026a34e807f51d84d7560e9139c99874c958c49d519f4706b63f2e"
     },
     {
@@ -13471,7 +13173,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "fc0e2503943b1074f1e54c873aea75ab198b608ec195f45ba17c683f5760580e"
     },
     {
@@ -13528,7 +13229,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1ec2820c98d1dd7aced98a4239b3f144a878933b21dfbf6b70fe88714ebdf7a8"
     },
     {
@@ -13585,7 +13285,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "380b8231eaee9d8c6f2b64c2e503866fc2abbfeb942a3846ff1f287fdd857472"
     },
     {
@@ -13642,7 +13341,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d838e4da9fd68b9facf7445ae21c42663eb318d9963dea46a834340029fdbdba"
     },
     {
@@ -13699,7 +13397,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "cee818c52f25ab86dc56214b67ebb74dc0c8cf67e66bf84ef1a3d44357f04d25"
     },
     {
@@ -13758,7 +13455,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "70d7e4252f6180cfeaa0f8cac2c40317b9ad93f754b9fa5acf5f6c0aeb7ff745"
     },
     {
@@ -13815,7 +13511,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "61e0de4db20bfc29ef9c52803519545c17b257cf1b5f1c5f33efd803fec61867"
     },
     {
@@ -13874,7 +13569,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a4c3bea1fd8ba1681f49e69276ab33f448f80b38bb4e21a498750af641af67d0"
     },
     {
@@ -13934,7 +13628,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e88141ce350316ffb3b38c0cf1aa7e364fa67f929bb3bc98f5254555cef38c4f"
     },
     {
@@ -13995,7 +13688,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1c41df2a775ed92f5b40246a6524e43057020f7fb56589f3565ad1cf86c18388"
     },
     {
@@ -14052,7 +13744,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a5c6dee0a44c5732aaadf34d486ea2874a440b5d077522c1b6a7bc2f7fe25bb8"
     },
     {
@@ -14111,7 +13802,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e4534b655c3330e0ae47e315d706ed3db76f43a035c7425c74b3fd9c27521e87"
     },
     {
@@ -14166,7 +13856,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f9f91c390a161ed305352290ae86f843577de67954275bf255e6533f385058a0"
     },
     {
@@ -14221,7 +13910,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "02e120b6450fa3c49080ecd74df0dc3b2b90430f5928cebca4bbe9bdfd2d8f10"
     },
     {
@@ -14278,7 +13966,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3962c55efaae423ff21dddca39f25c612443db57396ff2e2c26eebb86cbfd1a6"
     },
     {
@@ -14337,7 +14024,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7d674e39da2cbfa93394255d03995e55a10bd48d682d6885a6bd33a50abb87f8"
     },
     {
@@ -14396,7 +14082,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6f81f52f9f604b47b9dec5163c6d319eab5f7798eb528edf3bfd284eeb799af7"
     },
     {
@@ -14455,7 +14140,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d0b759049ec59dea49648010404053183265d94b07da5bdc9321a8534d44f32d"
     },
     {
@@ -14514,7 +14198,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b4d9824cc6822e51aa2581788f8808ceffe38f0fe2d84bdc16a556d8693f8359"
     },
     {
@@ -14571,7 +14254,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7eaad729472336c3aaa496d8171bf71af12dd8884e83a826990e64df96ea4f7a"
     },
     {
@@ -14628,7 +14310,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1858f06f42d75794a20b7e13c31558969ade6815ee9174cdadae5b2a842599dd"
     },
     {
@@ -14683,7 +14364,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d5ef5e14bd09eefb8d2d64e78471f37bac7b3315006e57572d5a8e32cb89614f"
     },
     {
@@ -14742,7 +14422,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c0f4632279d30952446a3339acec2a834f56f1b4d7dfd7a872fdc3160d0b06a6"
     },
     {
@@ -14801,7 +14480,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3e2a189babd6b819cde9d450dd0e2302e5d102c0219a70c5b1e945a697414fb8"
     },
     {
@@ -14858,7 +14536,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "042b300de056531fe7b2d81595bedd51334bc978cd38942e465d3070d30e5d5e"
     },
     {
@@ -14913,7 +14590,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "175246333b9f989e65f3fecca084ba6cbac104da6d50962bf54523dbe0605f6b"
     },
     {
@@ -14970,7 +14646,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6facea9be2865f6e02195e7481a608f85695ba77285de5cfcec969d317e1d659"
     },
     {
@@ -15025,7 +14700,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15080,7 +14754,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5dd012642e99d7c94057610ba126e967daab787e38833452030321c6ab958f61"
     },
     {
@@ -15137,7 +14810,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "39423be96b8f867b60dbcd55d8886f0177f127431a77d4d5978cd449d7710d45"
     },
     {
@@ -15194,7 +14866,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b4e86f1581427a07fd18c9526989d3b99a904c4483e3df4eba6195b0e325777c"
     },
     {
@@ -15251,7 +14922,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "be0de84f2c25667e902132f86bba662431d72c172aed7e5e76902e348d2ae0e2"
     },
     {
@@ -15306,7 +14976,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a3255039a7f4fc8a1d6bc77baf93272f37c16cadf14f757d9fcfe80f8567b75e"
     },
     {
@@ -15363,7 +15032,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "aea7487a2fdd02f9f89c3a1df68b62ff6d39e4f8ed4f92548905d6ff77d62439"
     },
     {
@@ -15422,7 +15090,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7500f86ff4f26223d451139d4574e890573e244638d964ba613bbf1cdad9f824"
     },
     {
@@ -15477,7 +15144,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15532,7 +15198,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15587,7 +15252,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15644,7 +15308,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5f927a2b7db401763a5aeca6e6db9f1c78267a8b2402d26e2d690715028be162"
     },
     {
@@ -15699,7 +15362,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15754,7 +15416,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15809,7 +15470,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -15864,7 +15524,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a87a9b1c229cf3d24663740cf3e676430a5e371f7502872a812ade33426d9cbb"
     },
     {
@@ -15919,7 +15578,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ccd179ba37345875ee8c0b01cf315cf5fc4d39985798f0a910d4a80ac8176ea7"
     },
     {
@@ -15974,7 +15632,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "eb1cf366a5ceba6d92e45f628a79fe3229d22aee690a9020a20363a3e915eb58"
     },
     {
@@ -16029,7 +15686,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f0543fe941525ca813520aaf59e1c11e4dae7559e8801a54c0274df6d689ec29"
     },
     {
@@ -16084,7 +15740,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "43f275e24d4bd4315427f27a775f4e62c953db15bb02802f77944f7b651f1edb"
     },
     {
@@ -16139,7 +15794,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "10a914a6ae6db2c62ec54822ed4a6edd4a6ed8e98e8751eec582187235558f37"
     },
     {
@@ -16194,7 +15848,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -16249,7 +15902,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -16304,7 +15956,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f2da643edb208ae400d272b382053411c9a4af93379a7ef0dfa918f3ca08b809"
     },
     {
@@ -16361,7 +16012,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "886e23652202bfc8f3dad817bf0647e9af805d07bffcc1bd9546313821227c3a"
     },
     {
@@ -16418,7 +16068,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e3d60d0a8cdabfffcf508f4ae0d15d2e25e38350b27144d9fb76c4050b4d9dc8"
     },
     {
@@ -16473,7 +16122,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "790520df8dd3d14a645cf10ca74ebfc5f373c687a00c28e58213089b8618dbad"
     },
     {
@@ -16528,7 +16176,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9adafa99d168b3fa18264fca0f2749014e70d097c20e2b33b5043a5bac8fe3cf"
     },
     {
@@ -16583,7 +16230,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8b8eb3f53b5de78b0c1dcb2a6db74a9c0483b7a78df48936d9d95d02e05e1670"
     },
     {
@@ -16640,7 +16286,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b06a6602e25cd88debbda64c408f1f76518bb56c6f5058ba191cca4081b96a1c"
     },
     {
@@ -16695,7 +16340,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "597e20f6286cedf2d73368eb494a9fa29c0846ab1f94e41dea41b1f4e1dd1645"
     },
     {
@@ -16750,7 +16394,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "510588126f25248f5a6c8d914d6fbfa36ba08a8cf5966c67bade045569836dab"
     },
     {
@@ -16809,7 +16452,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "203c2b98a895c7219bc408192edfab00d7ac0a2fb4c58c39f17385fa8a91d3e8"
     },
     {
@@ -16866,7 +16508,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "aa86f5501d6a266459647e432d33a3e54e4312dc08b45f023e85ecb4356700ae"
     },
     {
@@ -16925,7 +16566,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b957ba67bc46df1c9feefdfb2fd259041d754eb922cdbaebc772457a0adc5eff"
     },
     {
@@ -16984,7 +16624,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "418cb548b04221fa1976d22bd4fe6e2e8d7851dbfaaeb1494854025044f80170"
     },
     {
@@ -17039,7 +16678,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3376725ac0af54a8e355e75644b6172844e9dd9874524fde273a5a8504a38948"
     },
     {
@@ -17094,7 +16732,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2fe0393b273b2b05f002f9d1f305d9e5903e1d0cb27cee0170a8006487bad737"
     },
     {
@@ -17149,7 +16786,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9aca08b068f52e94444bd2e650548b98b18ae034f754d1d79cb89e881bf4945e"
     },
     {
@@ -17204,7 +16840,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "489d0d837744d5e5eb9916dbc331d7f314a1c90e3a7cc758a8a26b043c930362"
     },
     {
@@ -17259,7 +16894,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f2aeec88c0a124e33866313602abac51f188d8df40c3059ee4742e9747e1bea9"
     },
     {
@@ -17314,7 +16948,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "503427faa32d3d0f026ecfdfc5c31105af9e6127a1a8a49f03c81046de5a175b"
     },
     {
@@ -17369,7 +17002,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "739a403da9e58118ca8871f12b77efb4b5d589e0c7bda91cfd108d1312f21c0b"
     },
     {
@@ -17424,7 +17056,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "33320f63560179a540e1ef4a84ea4e7e1c2799bea9a3d2b4458469d76221bd7e"
     },
     {
@@ -17479,7 +17110,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8085326008bc19cabf176f60e0a39aeda2aa46681a4523be2d67a342b7c5b575"
     },
     {
@@ -17534,7 +17164,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "28bfad6a7944dde9757f334ba762fcb5f81472d9f6271e93eb71d136e51c8319"
     },
     {
@@ -17589,7 +17218,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b7be5e8e65251a7bb8af154b4cbee73e4e1cd72c5f8d81da2ee4cdb36fe81149"
     },
     {
@@ -17644,7 +17272,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -17699,7 +17326,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -17756,7 +17382,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a7658f4e2e6d7af4ac25328d6f3b1418eaa6013bf37ba742d535e332f43ab8d9"
     },
     {
@@ -17813,7 +17438,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "177fa83feae5aa5d0f091e06cad1ab56d5499b8dac7a1edfad6bed5f9e843186"
     },
     {
@@ -17870,7 +17494,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ef075d43361901183d236c3997868832043d0ea6f8018495db5c39be11fa3f91"
     },
     {
@@ -17925,7 +17548,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a620434486dab506d25f02627f5297957c9560d13f01f9e22d803f70c5da3476"
     },
     {
@@ -17982,7 +17604,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b2f605039156d6fe1230181db52fe61a4ed379c43aff524e5f11867c673916c9"
     },
     {
@@ -18037,7 +17658,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "048e7175b397de9be631b8ef0bb04ae5673dba2b2b1df527595a27f53ac56eb0"
     },
     {
@@ -18094,7 +17714,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c11eaa593a6344b8061df0a1356ed90477abe3c9e6067e6adffd6cacbbf9a306"
     },
     {
@@ -18149,7 +17768,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b47ae1da77452890c0e9fb0f3126523d3b959aa78ea976190a49d8e5edc0cb73"
     },
     {
@@ -18204,7 +17822,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ce8add643b76e4f81fcf0c42bb457460d6cdce4ead9a270f93a2d23a8c2bb51d"
     },
     {
@@ -18261,7 +17878,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6b04d4040985f9f1d49165df4ffbc9ca32a5de08fbebb785253b2435c22a1aae"
     },
     {
@@ -18318,7 +17934,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "86c97941c595f42d1950e5e44749529680d2c3a86ee85ff444a88475d69e88c3"
     },
     {
@@ -18375,7 +17990,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b7609b008125699e98b9a024716b177577c6827f93d27f6f0fb852890f198462"
     },
     {
@@ -18432,7 +18046,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f375e6b65c0db5f70aed0754ac6dab2e8a8068986c31f7ecf6e8da7846833acd"
     },
     {
@@ -18491,7 +18104,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3184b28174e3a86e88e4f873a6301fdd77c77af556fb3e99a3c7445583fc8358"
     },
     {
@@ -18550,7 +18162,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f8b1b3972c5e0010edf08d37daceb66fcb1f007dd3aa00d70de191a2d5cab9db"
     },
     {
@@ -18605,7 +18216,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4bcdf3a0fbe5a3fcb5b652c0e84e5cefe6ea4f67e85c2205d3e82a0a7a46e896"
     },
     {
@@ -18664,7 +18274,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "729430f72b46a4f569db25562c3dfcd1d19a8e1a052299946101d35898a55adc"
     },
     {
@@ -18723,7 +18332,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8a50a41da023f31f6d62aa1cfd252f31e08721ee77474438e9aa824023888711"
     },
     {
@@ -18778,7 +18386,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c7a59e9554b043cae584cddb12dd6e7766af48cfbbfc7903d290aa938c44f5fb"
     },
     {
@@ -18837,7 +18444,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "753a0688442c32b4900e2eab8fdeeb36f1fc1abfd838085ec47f6ee32b2272b2"
     },
     {
@@ -18896,7 +18502,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "eaca91c53198c6d127de32e5c8857b39a1a87492b21b9656b9c39484a593cdd8"
     },
     {
@@ -18955,7 +18560,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e2b5e3620f81bf7d4bbd9d447edb83e2a13963c2c228a94f2fa3e9c21e02dc74"
     },
     {
@@ -19014,7 +18618,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ca5825bd2119d16569a48c7e962aee4ae23e52a621c44afe2794123111098e5f"
     },
     {
@@ -19069,7 +18672,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9a303ce4a4f8e391a0ff4dc327808156634fb02a4c8bc8798ca1fca1180441ac"
     },
     {
@@ -19124,7 +18726,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "20bdfc2baf62a7c6c59b6757094aeeb0f5f3a07481996007314f91a30390c721"
     },
     {
@@ -19181,7 +18782,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f0b3b86fd1f78a11b36c8ee97e0f8578cc1be2e776e2e3dd9c8684032774a341"
     },
     {
@@ -19236,7 +18836,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "cdd29995934420238ece1b68a5751308831c42df9f384cf0e10dbfa938d008cc"
     },
     {
@@ -19291,7 +18890,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "fc694c10383430dbe49a6e4ed152bc83ca0edd9b58c45f509754682893a51e3d"
     },
     {
@@ -19346,7 +18944,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "42acdc946cde41a5fbd27ccf768121476c70e93322f95c0e4998b6910e81628b"
     },
     {
@@ -19403,7 +19000,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1018750117a65fd031e1e912f4b0917ffbb0722969460416c3cf297d59664a1b"
     },
     {
@@ -19460,7 +19056,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c47082efddf39c7bdf0b2375665769e2505bfba7facdfcc2fe9af0de081785e9"
     },
     {
@@ -19517,7 +19112,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8f5f2bb8fddc6afb38e89011416ac8a17a6970a56e6ed423985af908f1034315"
     },
     {
@@ -19576,7 +19170,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7bec033ecc847cb227cadbd36a17ac045df13e6deb51b03ed009d49c86b1c9d4"
     },
     {
@@ -19635,7 +19228,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "74e57dcf67db0aef2d14114b46369f3555a72bddb38b23126751090c89aa1387"
     },
     {
@@ -19690,7 +19282,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "602feab04b4665d0653286ce9bff6c09060f2ae470b2d66b16e728df00562f45"
     },
     {
@@ -19745,7 +19336,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0d08804c9fc7925961ec7a6602245f8db55293542d82dafb82877ce398878b63"
     },
     {
@@ -19804,7 +19394,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f7b397cde8d96ee625a6235ea6bff534a2995404e837b8427ab3d066e3291b87"
     },
     {
@@ -19859,7 +19448,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e4d574bd339ad0b4487d1da63adee14e63d80d84a93bb05ac3f31bf9ae7eda70"
     },
     {
@@ -19918,7 +19506,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "81255d2633303d822efd3ff19f925204e779a735db901c1e4f8323f7b7c1e9e2"
     },
     {
@@ -19973,7 +19560,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6d26aa7badde9d193301a05de5004cda1c4ea6ec377d727326a61b94e7a1470c"
     },
     {
@@ -20032,7 +19618,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ff38ea779c9667c96e12920ffae038cf47cc941c3be0adebe55b194dfe9401cb"
     },
     {
@@ -20089,7 +19674,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8547faf783ae5d27ce2a8ee59d3d897ca12239503975ce6199d9af00f798e5f9"
     },
     {
@@ -20146,7 +19730,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "064f899c4b7324554eea7ed1b74313962e2ee8880cb18a4198178e57e9f1f4d3"
     },
     {
@@ -20203,7 +19786,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8f6dd45b9656cb9a7b80a42e4914badee98d30d54b1868f1742c5d9754b0212d"
     },
     {
@@ -20262,7 +19844,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ada4ac55da0f233d5ffb8dfaf400bf5ced1f866eb220675200d76f9b1f8c73b6"
     },
     {
@@ -20319,7 +19900,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f2e63e144f9927ee5f8d59f415b5c6630d1e728563a23156f7f7c40284dec919"
     },
     {
@@ -20376,7 +19956,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f2e63e144f9927ee5f8d59f415b5c6630d1e728563a23156f7f7c40284dec919"
     },
     {
@@ -20431,7 +20010,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a975cbbd41897436ac537aaa6f88bbe2b0f4df60ef2a0cb7a62e5dded96fcc37"
     },
     {
@@ -20488,7 +20066,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "86effecb05f6fee02eb0551031eb110793886191c5417af0efb9d34f8692083b"
     },
     {
@@ -20545,7 +20122,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3447d01796e5ad342ee2ffd1f8777bf24705e67b501653c0247a63e1d3f6d8b5"
     },
     {
@@ -20600,7 +20176,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "80340c9496573725a666b81dd08141974abdae5cc1c7f6b52100fcf821428fd5"
     },
     {
@@ -20657,7 +20232,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d1ee713c5982ba1b086c5a6292512e83d8787edc391415edacab666a867b0bca"
     },
     {
@@ -20714,7 +20288,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0e34c6fd3d9aaa0da34e56e81e7a8c8df91ffe3b20cb74610a10fb43261bf1ca"
     },
     {
@@ -20771,7 +20344,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "458a01c6374204eda21b77f8ac9be9dfe2763c7ca28b3e8b1e6a35b679a789bd"
     },
     {
@@ -20828,7 +20400,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4c9e4ed536e8c00d287147e32d9063c3c347c623050c7696eb06f352c125ea2f"
     },
     {
@@ -20887,7 +20458,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "bae9e7a3802b15272a13bfd38131582a5095291445e66489d1ac3340a8270601"
     },
     {
@@ -20946,7 +20516,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "bcd5eb1b774e737648b44a2697782b6444c2cecdbddda7304b8d3ebc6a274e5c"
     },
     {
@@ -21005,7 +20574,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "79350490fb8617212d336f02bb056a31513b4317710f4738b3345d4e0657c755"
     },
     {
@@ -21064,7 +20632,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "829b5205574cb27a57a20ea648e2c2ed0e6545ae78523154299697951bdc63a6"
     },
     {
@@ -21123,7 +20690,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6ac6a732ffee2211173ff305ce00e959d2b7215c345bad4b4964ae5b3a77d929"
     },
     {
@@ -21182,7 +20748,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "43e70399accb5681026a28f9ec94f089c82fc38e1ac308dac6a372cddbc5df75"
     },
     {
@@ -21239,7 +20804,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b003e8e02659589d18f99cdad637b50cec0783429be260a9d5cf83e9353a44df"
     },
     {
@@ -21298,7 +20862,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9064f794814a45a75d3a96f003c5bbb109a5f2c6d01f04b5983eda7bb51a2cf8"
     },
     {
@@ -21355,7 +20918,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8b4ce90f75d0a7644f038beda2f0158dd1011fad5d860a883830acc425af2a44"
     },
     {
@@ -21414,7 +20976,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f6f6acca6a44c0aa05782a9d444ffc4f0b3c4f1a00c99429f5f7b078f2810f6a"
     },
     {
@@ -21471,7 +21032,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "77cac0cea68cf5f2bf3ea3f6e7b44381b964488e3a0cb56e842ece77aabb3012"
     },
     {
@@ -21530,7 +21090,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d274ce79b05beb0c4e40a7fac775181bf28c961777c2ac75cee87b1d24a84d95"
     },
     {
@@ -21589,7 +21148,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e74397abf65d4c3847b996230454f6ae95c8a4c59216994cdde8cecad1bdcbcb"
     },
     {
@@ -21648,7 +21206,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "05d83007b88a35d1474a37f2a4587eb9aabb4fa618e1328b44bc685ab52950aa"
     },
     {
@@ -21707,7 +21264,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ffa45ed62fb30e5421dc1618a902483e8d0bb7a3e58d1485a0e2fae6ca6b4e7f"
     },
     {
@@ -21766,7 +21322,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ecef1759375b7df0c692ad77bdab22fef7bb33bf9b526ee24a4be86fd2514c6c"
     },
     {
@@ -21825,7 +21380,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6c7ca980ed341ffb2b5f9c05a7d9367a766de47b49d9a09cc9e2a2a515032468"
     },
     {
@@ -21884,7 +21438,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "27253fa5358fca4a008d53615836bddac097ccc15d2bf8e1f1c2551627a09fc9"
     },
     {
@@ -21941,7 +21494,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4a5c8b4988c79083526c5f54509b47d05105c05dc2187e704a9eaa8afe7db818"
     },
     {
@@ -21998,7 +21550,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "00544c61f35532f9597905bc08709a2e6f07d30fdb35877bc3a5bc29c0e5eecf"
     },
     {
@@ -22057,7 +21608,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5ac2e673f44c6e6153e23a4e2e73e011035a6f2ac5f3cec0d045b9b4c8023541"
     },
     {
@@ -22114,7 +21664,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f8a8f15fb2ca58e0c603169a03e70f51c2ddb374f098e3ec2fadc5af26a93d3d"
     },
     {
@@ -22169,7 +21718,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b5e4f2ccf8f5fb21f56b2ea2b08bf222d9e0a3869c84f3dbac2f51cefcd98e16"
     },
     {
@@ -22228,7 +21776,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5ef403159653b420f080053a78ad7fcb96437e4362b4d3d0b1c6e43683f53f5f"
     },
     {
@@ -22285,7 +21832,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3c7b01d680a4ad00e08a3576852b035fd0c2d13be5418e7ca3cfe1bef1c8c501"
     },
     {
@@ -22340,7 +21886,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ef5c7dd75052ead93e7d04740f025e7600dd73e26bcea8f49ed4c7c108c4b55d"
     },
     {
@@ -22399,7 +21944,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "78ad7251833d217984af11e26fa6665dcc351909d387cc38d7ddbcc8fb023cec"
     },
     {
@@ -22456,7 +22000,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "51342863d2e89e1667ef6f9c5c240d6dcd2b23ae2ccda485557cd959742b8571"
     },
     {
@@ -22515,7 +22058,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "3306ff9672df7fd8ac5f0dbeac8b78b1d311feeb9b55fbdd2d436174f9381c39"
     },
     {
@@ -22570,7 +22112,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "87d2ff17974a2a00411955157e0e799d39709f1872436d2221447879783a1381"
     },
     {
@@ -22627,7 +22168,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6c1bd09676aa4d31970f70821b3ea338c53e38dfaa635c03783b3c195455d66b"
     },
     {
@@ -22682,7 +22222,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b7c2962ba01f7ea83dbc94e99e31576311821f09ee1a83f3226cdee16cccb226"
     },
     {
@@ -22737,7 +22276,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "945a293bea6770871ed1898ac34253e72e1f46c1b36aca01033dcec06381454a"
     },
     {
@@ -22794,7 +22332,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f2e63e144f9927ee5f8d59f415b5c6630d1e728563a23156f7f7c40284dec919"
     },
     {
@@ -22851,7 +22388,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2e302a6ee02bd2db0af0544b8b532b33487893efdbdc8da4710e00fa77e4dc6b"
     },
     {
@@ -22908,7 +22444,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "696c143f61ffc34e7c87dc887d4ccd5739c9ead64493082aecfb2247fcef83ff"
     },
     {
@@ -22963,7 +22498,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "42f0580a5c5b0067ae85b44d03f7f1ff303fd52dc8f88aeeb70d7643e8718c61"
     },
     {
@@ -23018,7 +22552,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8d8053214b80516611654acaf683591f2170835de7fd148391e442c9c2d03bf9"
     },
     {
@@ -23075,7 +22608,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6a7e47641f3e25cd971820e093b17e3f7124f4eefb254744dc0fb4aec6e506ca"
     },
     {
@@ -23132,7 +22664,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a6f8dae2ac96ffe523de87ea49ded82364e8c04e95d6923871ee11cd64fab5d6"
     },
     {
@@ -23191,7 +22722,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "221e8c6ba4073d5ff6172ee83928cfa305b97e6e8d78f2fb1dc9187382be5786"
     },
     {
@@ -23246,7 +22776,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "02e120b6450fa3c49080ecd74df0dc3b2b90430f5928cebca4bbe9bdfd2d8f10"
     },
     {
@@ -23301,7 +22830,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "55eb0f069a624f035a8e151861dbf4b1b97ccefcb8be9a93f48a834a0c2c4ed7"
     },
     {
@@ -23356,7 +22884,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "82d831d84cd78b69a7220506c58819845b06c3c90990fc9864fd652c5a20d1d1"
     },
     {
@@ -23411,7 +22938,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23466,7 +22992,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23521,7 +23046,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23576,7 +23100,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23631,7 +23154,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23686,7 +23208,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23741,7 +23262,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23796,7 +23316,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23851,7 +23370,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23906,7 +23424,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -23961,7 +23478,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -24016,7 +23532,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -24071,7 +23586,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -24126,7 +23640,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -24185,7 +23698,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "fe3a126edb302f88f586dd34667a0b755da7c4a2805616eda5b890306f520b18"
     },
     {
@@ -24244,7 +23756,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ed4e8c0d6ca188e1f0a91efba5fe1ea7f332247e4f45429e5787f5bebe8d3938"
     },
     {
@@ -24301,7 +23812,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d1bfad158b9872698a3c0de4960260df548c9221ca028372f2b93fb55b130557"
     },
     {
@@ -24356,7 +23866,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b0eb15356e1645aa23a7747111ccfca23de71187bdb5380413a7ab7d35087f03"
     },
     {
@@ -24415,7 +23924,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b36c24839767de5825feeabe2eff748cfaef472fd45f2dbeff21665c6a26e9cc"
     },
     {
@@ -24474,7 +23982,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0f7a1f4f009b6959dc947170c9f92f081a8235990d1c49ee66051a33b72aebff"
     },
     {
@@ -24531,7 +24038,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "02e437dfe1abec42782d91c059894d660a24b38b683a27e37b98646dc79320c9"
     },
     {
@@ -24592,7 +24098,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "264dc9e34d2f11d74937061ae899a2ced1c7ec89742a44dc10ce1a8cfe4f44b7"
     },
     {
@@ -24649,7 +24154,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d51431542f0cd125f57e0bf717e6cf13dc59b750a12929cb02a9bb2c65abcc39"
     },
     {
@@ -24711,7 +24215,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4bf186bbcc4d667ae3701b8810c78ae13d23806a31332b0588a6539ce616fcb0"
     },
     {
@@ -24770,7 +24273,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e49a9367c4b963a303a4047adc2415344053a8d0125e1d5fc7db7cf3d558d79"
     },
     {
@@ -24829,7 +24331,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e49a9367c4b963a303a4047adc2415344053a8d0125e1d5fc7db7cf3d558d79"
     },
     {
@@ -24890,7 +24391,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4999497216a7d0a6a89589635312e55c02c5e2312995c9d0bdc174eb681d70bc"
     },
     {
@@ -24949,7 +24449,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "afe1fecb8b2866f39dd7e9c6a04b279d5c6fd132e87b278e127eaecf07e65a7e"
     },
     {
@@ -25010,7 +24509,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6079d56871b5a4521ab0f9c65a9853dadf77727cccc43667200976fc078e1570"
     },
     {
@@ -25067,7 +24565,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "95c1bf551af8fe607376ff20bbabc9a924e4e7625ad0a90524a61235bc08648f"
     },
     {
@@ -25126,7 +24623,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e49a9367c4b963a303a4047adc2415344053a8d0125e1d5fc7db7cf3d558d79"
     },
     {
@@ -25185,7 +24681,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e49a9367c4b963a303a4047adc2415344053a8d0125e1d5fc7db7cf3d558d79"
     },
     {
@@ -25244,7 +24739,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e49a9367c4b963a303a4047adc2415344053a8d0125e1d5fc7db7cf3d558d79"
     },
     {
@@ -25303,7 +24797,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e49a9367c4b963a303a4047adc2415344053a8d0125e1d5fc7db7cf3d558d79"
     },
     {
@@ -25362,7 +24855,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "49353552074bf3e94542a18d8688c510b134fadec8be6094d76b43e19b822cd3"
     },
     {
@@ -25417,7 +24909,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "eece69cd271364cbfc6c88aaa7974a337f780e03c9641018bbdc2ed512baa99d"
     },
     {
@@ -25474,7 +24965,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "14b3b6e895a0639cbdb093c191c6c72c8a4516aafb5c8423832227a3f256694f"
     },
     {
@@ -25531,7 +25021,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "208c9a099d9eac6ff6a2b03fefb6f5a496b37b8f2ec49d7e7f8f9d4d3494ca7f"
     },
     {
@@ -25588,7 +25077,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "077ff0ba295f0a4f4b979597f133580ea2898274be75d6ff27cb1c254864c284"
     },
     {
@@ -25647,7 +25135,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a798b3d04b36c01fd1d09a223ae271d2f74b723aedd912d048ef5588e2ec3a49"
     },
     {
@@ -25706,7 +25193,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a798b3d04b36c01fd1d09a223ae271d2f74b723aedd912d048ef5588e2ec3a49"
     },
     {
@@ -25765,7 +25251,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "8c26964dda8e905fe0a6da07c6a05678ba0eacefac7a0fdb6df63745e6864f1d"
     },
     {
@@ -25824,7 +25309,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "20600753eb287e641089f137313ac203bb9e9ed5af0d31bee97ca6ec7490f2fe"
     },
     {
@@ -25883,7 +25367,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7939c2c639b53f9edf431cffb7d730d8807111ebef27234b813af0b0f29b257b"
     },
     {
@@ -25942,7 +25425,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9ec78cc4176aa4a734369dde45e76412d0b905e65641f458c827c51d5668f36d"
     },
     {
@@ -26001,7 +25483,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9ec78cc4176aa4a734369dde45e76412d0b905e65641f458c827c51d5668f36d"
     },
     {
@@ -26060,7 +25541,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9d802d6eeeac2ac6442f3ebf7ed5ee36dc319bb5e4386f7a668a519dba710ea6"
     },
     {
@@ -26119,7 +25599,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ec80a6a211dcdc47555126248d7a5c8bab110cbedb5297217d76222a66164268"
     },
     {
@@ -26178,7 +25657,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b927cdd7a649bdc97e6428dfa22b96864b40539dd1a931ac1b49694fb99fbb25"
     },
     {
@@ -26235,7 +25713,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2bc5b018231fd8c981c21224de989f225636d7d176130266c7addb9739d77904"
     },
     {
@@ -26294,7 +25771,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "81cd4401c89fdc75c7d9412949a0782319897eb14fef0d64c613875d438339f0"
     },
     {
@@ -26351,7 +25827,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2bc5b018231fd8c981c21224de989f225636d7d176130266c7addb9739d77904"
     },
     {
@@ -26410,7 +25885,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "81cd4401c89fdc75c7d9412949a0782319897eb14fef0d64c613875d438339f0"
     },
     {
@@ -26469,7 +25943,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "86191576277fc95fee5c93899958024a711fe60659333fe88e10485834ed3de2"
     },
     {
@@ -26524,7 +25997,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e8dae7e422a432d9d95682d00bbd3922c52862e16251110d7af0a139d473d962"
     },
     {
@@ -26579,7 +26051,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ab31912417d29ada577400c70e00cc1cf160b4ac2cfdd2919b1134bc83cd4dec"
     },
     {
@@ -26634,7 +26105,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "822ed37874cbff772a21aa6cfe86187effd7b51de6fd06166bf07de41e139e44"
     },
     {
@@ -26691,7 +26161,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "766801558daded88dc6bb851bcf6858642b884056572ad721a702b5fd1820fbe"
     },
     {
@@ -26748,7 +26217,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "2eed5359cdad51d54cd22f30b2e9afa17605fe8bafad31f882feeec43ba258b3"
     },
     {
@@ -26807,7 +26275,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0a1e77fb880c722c67a45b7c9e83cc24c51ef1e2b3db99b4c850e6e31fb07eae"
     },
     {
@@ -26864,7 +26331,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "39c13f3fcdb05374a05804d83ab59083601e684b9b41a9cacebdd62709148644"
     },
     {
@@ -26921,7 +26387,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "75a14e9763321716db900384559b9c1d7b701bffbd2fd02441406f3c342d813b"
     },
     {
@@ -26976,7 +26441,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "a23e426eba980635cdb0f0b440c03082f45d659f77df07956cebafe76ad5e811"
     },
     {
@@ -27033,7 +26497,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5c9a1e1f4d83e3155a593cf6f6a0113e4a0ccd434c4aedd542983cee6e4d5522"
     },
     {
@@ -27090,7 +26553,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "e3081f0306b8676fc681f32ca8f8d7f50d7ea85c4d82511e7bcf22a96041c4ac"
     },
     {
@@ -27145,7 +26607,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "477ad27f4f6ccdcf8bb14643048640390ccb4b85f30be740dc4cdef6171739ce"
     },
     {
@@ -27202,7 +26663,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "12ef99e6076d8b4c4d3290fb169997524e2bd06424d33ce5a6c79d9919ff4335"
     },
     {
@@ -27257,7 +26717,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "27470064f144acbb753bd4cdd8e1214401cd02d9a28936078c29b5eb5e2aaf0a"
     },
     {
@@ -27314,7 +26773,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ef9e6729961092dc6cad3c0173ddcde514bd3cf59a8ed8bba6e840815ca6c80a"
     },
     {
@@ -27371,7 +26829,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c19533d647c0f88b00b3d8913669a691ceb127dd1df1b725043fd701fed93ba9"
     },
     {
@@ -27428,7 +26885,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "691742ffd1a3f279d5f3329efdb823c44e8770ec0b38de857a4c6af4443617e8"
     },
     {
@@ -27485,7 +26941,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "695c8ae0dbaad5d5805287566e15f70c5fdef21f1dd58dcb6b434f3ee4d11664"
     },
     {
@@ -27542,7 +26997,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1a5cf4e53ff6feeb9e78b9f71e3bf16103e9c5a5b30de09d29b4e49e6aa2d10a"
     },
     {
@@ -27599,7 +27053,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "49ffd8171a21abb015b37c8e8b89d7ac56d7ccffe1058dd1b1f0fcd1fccf88e5"
     },
     {
@@ -27656,7 +27109,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5a2862cc29a977aaa41702599182cc74a4d4cf839d5cced120a68b9732991049"
     },
     {
@@ -27713,7 +27165,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f7722eeb22b092e22468c7ae3ac00a3cc71e5ff5ca4c58044a2b0181ce47eefa"
     },
     {
@@ -27770,7 +27221,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "772a3c6dd1aff0b8a6bd577a01c993ef16fa5dd1e528f02ecbc361fa26786bca"
     },
     {
@@ -27829,7 +27279,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "77192acb11ad15d2c790eb93159685a1388333e1c480e668450dc8bcd6f532ee"
     },
     {
@@ -27888,7 +27337,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "680b506ceeee9e9e1f879af691c394a3da35f5ed6c06ccc93c2eb37cc99bf17a"
     },
     {
@@ -27943,7 +27391,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "520de720ccca1a33f86c06a0fc4286ce6b53cbd8832cdebb9721b3ed53cf3524"
     },
     {
@@ -27998,7 +27445,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "93df7e89084905bf55b37fc89eeb37053959672fcec574a563c30053fe8a31db"
     },
     {
@@ -28055,7 +27501,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d9d3fa040c8daa912ebb19845c8c1c61fd5fef836de9aa8805f6d1c4cca5a820"
     },
     {
@@ -28112,7 +27557,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f6f2019e59115d8b610aeae71838513153665d6eff242eea2c87d4a228777c50"
     },
     {
@@ -28169,7 +27613,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9a7136649de17a3366dde2ea13de7ed93c29f133d0994342cd2473f45b5ef3b6"
     },
     {
@@ -28228,7 +27671,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "dc466d0b55294617c7b3a0a3928bb843a6133a27f59050ff935a0c16eb66cc7b"
     },
     {
@@ -28285,7 +27727,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "16995be58371f6239a9170beee4ef3510c298a82ef0e26ed906285c718da0301"
     },
     {
@@ -28344,7 +27785,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "f8f8e7900a6023d6e1aa03cf38aa73ab82e389ae1249ec8f2bb07b85daed07e3"
     },
     {
@@ -28401,7 +27841,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "93819bb7ed05628c2083721e7ce6ee16cdbded4942e8cddce433b6f193234cfe"
     },
     {
@@ -28458,7 +27897,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0e44ab8c2e77e190c90cdebfe045bec31ba6f200c9c2a7efbbe2dd67d41be4bc"
     },
     {
@@ -28517,7 +27955,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6fc461639259f5f594a8c04a83f83cb1c3d88bb0671250509ba95d6816114e9f"
     },
     {
@@ -28574,7 +28011,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6181630a1efc771824d207177fc9ce38deccda4e3d9a221d553b9d92a3ecd150"
     },
     {
@@ -28631,7 +28067,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ddee10520a54ad4abc9fdc2541da84a376b9622e9a099d5b7a6430a96427dcce"
     },
     {
@@ -28686,7 +28121,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "cfdc96706ed9b71cc4e91dc5b85a91826d77301ffb5cfba506eb4d0a032645e9"
     },
     {
@@ -28743,7 +28177,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "1845b831da37ad02c9c70d1007208382c9a04c674137c49eaee1a26051019fb7"
     },
     {
@@ -28800,7 +28233,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "343a6e6ebbddb2d3a961784bceccd1a31d88046e6fc1397e9710902e544bf952"
     },
     {
@@ -28859,7 +28291,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5431351084dc88b9b3ce3157f81b6e07ffbec4f6a7e879bc14249e1b165471c0"
     },
     {
@@ -28916,7 +28347,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ca5ef13bcfe237bfe8b88837bed2d7b0e5cc9127455683cc5b06bf34f9c6eab4"
     },
     {
@@ -28971,7 +28401,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "bd7b5579872b107156822f603f68b910a3ec08fa4e347d69559c6d11e7ea9986"
     },
     {
@@ -29028,7 +28457,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d27eddb628bde592970a3cde359c95392914d434b6ae1912f6c508f35b95d0eb"
     },
     {
@@ -29083,7 +28511,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "329d666943a827f68ef7cf19fbcd5f412861f30f4874d05f39f540dcfc8c86bd"
     },
     {
@@ -29138,7 +28565,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4bcdf3a0fbe5a3fcb5b652c0e84e5cefe6ea4f67e85c2205d3e82a0a7a46e896"
     },
     {
@@ -29193,7 +28619,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c6ff8a285babde7235603f5a6de3b1478c7364c0a8c269484b0565c067035e65"
     },
     {
@@ -29248,7 +28673,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "cf68a37bbf4d0cf26dc73f56c47b7c5b0921b5498d21327c53a365574a74c5fd"
     },
     {
@@ -29303,7 +28727,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "ad4b381bedc4576c10e12277090856f8798a5de40e4457720f24e5b6de643932"
     },
     {
@@ -29358,7 +28781,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c6ff8a285babde7235603f5a6de3b1478c7364c0a8c269484b0565c067035e65"
     },
     {
@@ -29413,7 +28835,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "059381a0f1be6426ba325126853da90826413023ebe92f53f9ff65e1893c6b95"
     },
     {
@@ -29470,7 +28891,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d50576de589a5f5cb399f5cddc39ba814ef513872b759b366b5d7c3978b50db5"
     },
     {
@@ -29525,7 +28945,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4769710d5fea86e02d582dd198950d5233cbaf6061fee2f3a4cfd106620263d7"
     },
     {
@@ -29580,7 +28999,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "31c3d29b5d267f1ad95dd10f6e57efe414075542e216d06aa2a3947d46add604"
     },
     {
@@ -29637,7 +29055,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "193ce0f4a4f4983907fac967114e62d565d39f7ecf8b8ad8a3bbcd32f2d03c73"
     },
     {
@@ -29692,7 +29109,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "7dbc09a576a3ba17744c6ac3dacd71f95573b7b7bc7446cd26688faaa88035bd"
     },
     {
@@ -29747,7 +29163,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "d8f817cd7d85c11ca91ce550a16d677ee7e93d9e8dbbef7bb290d9b0aa992587"
     },
     {
@@ -29804,7 +29219,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "85bad03f40e49c45a675d5ac69779d72e3965d08a86151b80cf091fdb4e96f36"
     },
     {
@@ -29861,7 +29275,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "5f2af78ad3f228c32dcf91864410c3ea2955ed8cf888496d1377cecba916cd75"
     },
     {
@@ -29920,7 +29333,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0a1d8e5d0e36e217ee58b61ea4073426edec7da595242f3f5491a159b76ac91a"
     },
     {
@@ -29979,7 +29391,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "0a1d8e5d0e36e217ee58b61ea4073426edec7da595242f3f5491a159b76ac91a"
     },
     {
@@ -30034,7 +29445,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "aa6bb42162ad4cf65174bc9122f326e4afe42f06f794709aaca30829e0d5cace"
     },
     {
@@ -30089,7 +29499,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
@@ -30144,7 +29553,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "efe39c42ba96d9c515886eb6eacb340be416e8c17b9aebe336f63b45c3bcdd3f"
     },
     {
@@ -30199,7 +29607,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "eda25552cac65400b5ae0db3c8eae16ff3f7725b131a92773813024cbbab2639"
     },
     {
@@ -30254,7 +29661,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "6ea008590a42e21431e20fb66a54a090c6a69a96e121a05d39e053832d26626b"
     },
     {
@@ -30311,7 +29717,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "9e70d479ff3e044b2d358a82bd4f4d1de5f75a78933cba59140cd46b27d5046b"
     },
     {
@@ -30366,7 +29771,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "b7df88a699627d230a1279076cddac88d878f5e08b726a441998c22e0152f04b"
     },
     {
@@ -30421,7 +29825,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "c9d038e8f2d962f50a6620b3f01c37539a2dbf42405b4e78b6e89d1d694d371f"
     },
     {
@@ -30476,7 +29879,6 @@
         "schema": null,
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
-      "contract": null,
       "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     }
   ]
