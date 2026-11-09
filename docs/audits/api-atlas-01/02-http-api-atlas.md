@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T16:29:40.381Z for branch `fix/gubic-socket-auth`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T21:45:19.615Z for branch `mosaic/pr148-update`; this does not claim deployment.
 
 - Runtime method routes: 758
 - Application routes: 535
@@ -228,20 +228,20 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Connectors | GET | `/v1/connectors` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1294` | candidate-registered-not-production-probed |
 | Connectors | GET | `/v1/connectors/:providerId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1297` | candidate-registered-not-production-probed |
 | Connectors | POST | `/v1/connectors/:providerId/authorise` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1302` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:37` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:58` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:203` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:70` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:82` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:134` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:122` | candidate-registered-not-production-probed |
-| Reactions | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:157` | candidate-registered-not-production-probed |
-| Reactions | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:146` | candidate-registered-not-production-probed |
-| Social | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:192` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:97` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:181` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:169` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:48` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:54` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:75` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:227` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:94` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:106` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:158` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:146` | candidate-registered-not-production-probed |
+| Reactions | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:181` | candidate-registered-not-production-probed |
+| Reactions | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:170` | candidate-registered-not-production-probed |
+| Social | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:216` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:121` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:205` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:193` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:65` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/insights` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:44` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/payouts` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
@@ -328,10 +328,10 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:72` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/live` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:264` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/ready` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:268` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:248` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:259` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:271` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:282` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:272` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:283` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:295` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:306` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:23` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:14` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:29` | candidate-registered-not-production-probed |
@@ -357,9 +357,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/me/verification/applications/:applicationId/appeals` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:89` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2157` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:137` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:214` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:224` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:236` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:238` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:248` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:260` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/meta` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:280` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:473` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1583` | candidate-registered-not-production-probed |
@@ -607,6 +607,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP versionless; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -646,6 +656,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP versionless; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -685,6 +705,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -724,6 +754,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -763,6 +803,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -802,6 +852,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -841,6 +901,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -880,6 +950,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -919,6 +999,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -958,6 +1048,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -997,6 +1097,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1036,6 +1146,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1075,6 +1195,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1114,6 +1244,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1153,6 +1293,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1192,6 +1342,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1231,6 +1391,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1270,6 +1440,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1309,6 +1489,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1348,6 +1538,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1387,6 +1587,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1426,6 +1636,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1465,6 +1685,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1504,6 +1734,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1543,6 +1783,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1582,6 +1832,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1621,6 +1881,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1660,6 +1930,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1699,6 +1979,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1738,6 +2028,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1777,6 +2077,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1816,6 +2126,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1855,6 +2175,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (400)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1894,6 +2224,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1933,6 +2273,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -1972,6 +2322,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2011,6 +2371,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Activity
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2050,6 +2420,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2089,6 +2469,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2128,6 +2518,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2167,6 +2567,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2206,6 +2616,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2245,6 +2665,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2284,6 +2714,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2323,6 +2763,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2362,6 +2812,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2401,6 +2861,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2440,6 +2910,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2479,6 +2959,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2518,6 +3008,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2557,6 +3057,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2596,6 +3106,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2635,6 +3155,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2674,6 +3204,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2713,6 +3253,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2752,6 +3302,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2791,6 +3351,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2830,6 +3400,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2869,6 +3449,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2908,6 +3498,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2947,6 +3547,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -2986,6 +3596,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3025,6 +3645,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: none
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3064,6 +3694,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3103,6 +3743,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3142,6 +3792,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3181,6 +3841,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3220,6 +3890,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3259,6 +3939,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3298,6 +3988,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3337,6 +4037,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3376,6 +4086,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3415,6 +4135,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3454,6 +4184,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -3493,6 +4233,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3532,6 +4282,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3571,6 +4331,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3610,6 +4380,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3649,6 +4429,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3688,6 +4478,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3727,6 +4527,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3766,6 +4576,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3805,6 +4625,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3844,6 +4674,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3883,6 +4723,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -3922,6 +4772,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 400; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -3961,6 +4821,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -4000,6 +4870,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4039,6 +4919,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -4078,6 +4968,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4117,6 +5017,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4156,6 +5066,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4195,6 +5115,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4234,6 +5164,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4273,6 +5213,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4312,6 +5262,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4351,6 +5311,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4390,6 +5360,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4429,6 +5409,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4468,6 +5458,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -4507,6 +5507,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4546,6 +5556,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4585,6 +5605,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Admin
+- Contract authentication: greenfield bearer access session
+- Contract authorization: ADMIN
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4624,6 +5654,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4663,6 +5703,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4702,6 +5752,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4741,6 +5801,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4780,6 +5850,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4819,6 +5899,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4858,6 +5948,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4897,6 +5997,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4936,6 +6046,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -4975,6 +6095,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5014,6 +6144,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5053,6 +6193,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5092,6 +6242,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5131,6 +6291,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5170,6 +6340,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5209,6 +6389,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5248,6 +6438,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5287,6 +6487,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: AT Protocol
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5326,6 +6536,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5365,6 +6585,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5404,6 +6634,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5443,6 +6683,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5482,6 +6732,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5521,6 +6781,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5560,6 +6830,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5599,6 +6879,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5638,6 +6928,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5677,6 +6977,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5716,6 +7026,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5755,6 +7075,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5794,6 +7124,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5833,6 +7173,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5872,6 +7222,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5911,6 +7271,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5950,6 +7320,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -5989,6 +7369,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6028,6 +7418,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6067,6 +7467,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6106,6 +7516,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6145,6 +7565,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6184,6 +7614,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6223,6 +7663,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6262,6 +7712,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6301,6 +7761,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6340,6 +7810,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6379,6 +7859,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6418,6 +7908,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6457,6 +7957,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6496,6 +8006,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6535,6 +8055,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6574,6 +8104,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6613,6 +8153,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6652,6 +8202,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6691,6 +8251,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6730,6 +8300,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6769,6 +8349,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6808,6 +8398,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6847,6 +8447,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6886,6 +8496,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6925,6 +8545,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -6964,6 +8594,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7003,6 +8643,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7042,6 +8692,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7081,6 +8741,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7120,6 +8790,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7159,6 +8839,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7198,6 +8888,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Module Runtime
+- Contract authentication: signed service assertion
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7237,6 +8937,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7276,6 +8986,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7315,6 +9035,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7354,6 +9084,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7393,6 +9133,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7432,6 +9182,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7471,6 +9231,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7510,6 +9280,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7549,6 +9329,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7588,6 +9378,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7627,6 +9427,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7666,6 +9476,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Commerce
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7705,6 +9525,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Commerce
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7744,6 +9574,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Commerce
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7783,6 +9623,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Commerce
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7822,6 +9672,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7861,6 +9721,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7900,6 +9770,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7939,6 +9819,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -7978,6 +9868,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8017,6 +9917,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8056,6 +9966,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8095,6 +10015,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8134,6 +10064,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Connectors
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8146,7 +10086,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations`
 - Public URL: `https://api.modula.digital/v1/conversations`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:37`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:54`
 - Handler: inline
 - Controller/service calls: `messaging.listConversations`
 - Authentication: legacy or bridged bearer session
@@ -8173,6 +10113,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8185,7 +10135,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations`
 - Public URL: `https://api.modula.digital/v1/conversations`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:58`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:75`
 - Handler: inline
 - Controller/service calls: `messaging.startConversation`
 - Authentication: legacy or bridged bearer session
@@ -8199,9 +10149,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Request body: none observed
 - Pagination: none observed
 - Response schema: not declared in Fastify
-- Success codes: `201`
+- Success codes: `200`, `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `follows`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_reactions`, `profiles`
+- Database reads: `actors`, `blocks`, `follows`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
 - Database writes: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
 - Storage: none observed
 - Events produced: none observed
@@ -8212,7 +10162,17 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+- Contract purpose: Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.
+- Contract owner: Direct messaging
+- Contract authentication: Bearer session required with post:engage capability; the sender actor is resolved only from the authenticated session.
+- Contract authorization: The target handle must resolve to a live profile on an active account. Self-conversations and either-direction account blocks are rejected. A new recipient becomes active only when they follow the sender; otherwise the conversation is a message request.
+- Contract request: {"params":{},"query":{},"body":{"handle":"required target profile handle, string 1-80 characters; an optional leading @ is normalized away","text":"optional initial message, string maximum 5000 characters; blank non-empty values are rejected"},"validation":"Unknown fields, including client-supplied sender or actor identifiers, are rejected. The target is resolved server-side and must remain active. Subsequent messages to a reused conversation use POST /v1/conversations/:id/messages."}
+- Contract success: {"status":"201 when created; 200 when an existing conversation is reused","body":"Envelope data {created:boolean, conversation:{id,kind,participants,lastMessage,unreadCount,updatedAt}}. The conversation ID and participant fields are sufficient for native thread navigation."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none","filtering":"none"}
+- Idempotency/concurrency: The sorted authenticated-sender/target actor pair forms the unique direct_key database invariant. Concurrent inserts use INSERT ON CONFLICT and return the same committed conversation. Optional text is creation-only and commits atomically with the conversation and two members, so retry after a lost response cannot duplicate it. A reused conversation returns 200 and does not append text.
+- Versioning/compatibility: HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
 
@@ -8224,7 +10184,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/archive`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/archive`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:203`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:227`
 - Handler: inline
 - Controller/service calls: `messaging.setArchived`
 - Authentication: legacy or bridged bearer session
@@ -8251,6 +10211,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8263,7 +10233,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:70`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:94`
 - Handler: inline
 - Controller/service calls: `messaging.listMessages`
 - Authentication: legacy or bridged bearer session
@@ -8290,6 +10260,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8302,7 +10282,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:82`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:106`
 - Handler: inline
 - Controller/service calls: `log.warn`, `messaging.send`
 - Authentication: legacy or bridged bearer session
@@ -8329,6 +10309,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8341,7 +10331,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:134`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:158`
 - Handler: inline
 - Controller/service calls: `messaging.unsendMessage`
 - Authentication: legacy or bridged bearer session
@@ -8368,6 +10358,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8380,7 +10380,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:122`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:146`
 - Handler: inline
 - Controller/service calls: `messaging.editMessage`
 - Authentication: legacy or bridged bearer session
@@ -8407,6 +10407,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8419,7 +10429,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:157`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:181`
 - Handler: inline
 - Controller/service calls: `messaging.react`
 - Authentication: legacy or bridged bearer session
@@ -8446,6 +10456,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8458,7 +10478,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:146`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:170`
 - Handler: inline
 - Controller/service calls: `messaging.react`
 - Authentication: legacy or bridged bearer session
@@ -8485,6 +10505,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8497,7 +10527,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/mute`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/mute`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:192`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:216`
 - Handler: inline
 - Controller/service calls: `messaging.setMuted`
 - Authentication: legacy or bridged bearer session
@@ -8524,6 +10554,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8536,7 +10576,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/read`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/read`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:97`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:121`
 - Handler: inline
 - Controller/service calls: `messaging.markRead`
 - Authentication: legacy or bridged bearer session
@@ -8563,6 +10603,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8575,7 +10625,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/typing`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/typing`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:181`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:205`
 - Handler: inline
 - Controller/service calls: `messaging.typing`
 - Authentication: legacy or bridged bearer session
@@ -8602,6 +10652,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8614,7 +10674,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/typing`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/typing`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:169`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:193`
 - Handler: inline
 - Controller/service calls: `messaging.setTyping`
 - Authentication: legacy or bridged bearer session
@@ -8641,6 +10701,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -8653,7 +10723,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/unread`
 - Public URL: `https://api.modula.digital/v1/conversations/unread`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:48`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:65`
 - Handler: inline
 - Controller/service calls: `messaging.unreadSummary`
 - Authentication: legacy or bridged bearer session
@@ -8680,6 +10750,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8719,6 +10799,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8758,6 +10848,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8797,6 +10897,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8836,6 +10946,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8875,6 +10995,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8914,6 +11044,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8953,6 +11093,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -8992,6 +11142,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9031,6 +11191,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9070,6 +11240,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9109,6 +11289,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9148,6 +11338,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9187,6 +11387,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9226,6 +11436,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9265,6 +11485,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9304,6 +11534,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9343,6 +11583,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9382,6 +11632,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9421,6 +11681,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9460,6 +11730,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9499,6 +11779,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9538,6 +11828,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9577,6 +11877,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9616,6 +11926,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Developer
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9655,6 +11975,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Discover
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9694,6 +12024,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9733,6 +12073,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9772,6 +12122,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9811,6 +12171,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9850,6 +12220,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9889,6 +12269,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9928,6 +12318,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -9967,6 +12367,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10006,6 +12416,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10045,6 +12465,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10084,6 +12514,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10123,6 +12563,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10162,6 +12612,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10201,6 +12661,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10240,6 +12710,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10279,6 +12759,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10318,6 +12808,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Feed
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10357,6 +12857,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Feed
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10396,6 +12906,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10435,6 +12955,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10474,6 +13004,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10513,6 +13053,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10552,6 +13102,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10591,6 +13151,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10630,6 +13200,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10669,6 +13249,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10708,6 +13298,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: offset
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10747,6 +13347,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10786,6 +13396,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: offset
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10825,6 +13445,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10864,6 +13494,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10903,6 +13543,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10942,6 +13592,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -10981,6 +13641,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11020,6 +13690,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11059,6 +13739,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11098,6 +13788,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11137,6 +13837,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11176,6 +13886,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11215,6 +13935,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11254,6 +13984,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11293,6 +14033,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11332,6 +14082,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11371,6 +14131,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11410,6 +14180,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11449,6 +14229,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11488,6 +14278,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11527,6 +14327,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11566,6 +14376,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11605,6 +14425,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11644,6 +14474,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11683,6 +14523,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11722,6 +14572,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11761,6 +14621,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11800,6 +14670,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11839,6 +14719,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11878,6 +14768,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11917,6 +14817,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11956,6 +14866,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -11995,6 +14915,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Operations
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12034,6 +14964,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Operations
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12046,7 +14986,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail`
 - Public URL: `https://api.modula.digital/v1/in-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:248`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:272`
 - Handler: inline
 - Controller/service calls: `messaging.listInMail`
 - Authentication: legacy or bridged bearer session
@@ -12073,6 +15013,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12085,7 +15035,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail`
 - Public URL: `https://api.modula.digital/v1/in-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:259`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:283`
 - Handler: inline
 - Controller/service calls: `messaging.composeInMail`
 - Authentication: legacy or bridged bearer session
@@ -12101,7 +15051,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
 - Database writes: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
 - Storage: none observed
 - Events produced: none observed
@@ -12112,6 +15062,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12124,7 +15084,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail/:id`
 - Public URL: `https://api.modula.digital/v1/in-mail/:id`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:271`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:295`
 - Handler: inline
 - Controller/service calls: `messaging.getInMail`
 - Authentication: legacy or bridged bearer session
@@ -12151,6 +15111,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -12163,7 +15133,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail/:id/replies`
 - Public URL: `https://api.modula.digital/v1/in-mail/:id/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:282`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:306`
 - Handler: inline
 - Controller/service calls: `messaging.replyInMail`
 - Authentication: legacy or bridged bearer session
@@ -12190,6 +15160,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -12229,6 +15209,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12268,6 +15258,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12307,6 +15307,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12346,6 +15356,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12385,6 +15405,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12424,6 +15454,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12463,6 +15503,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12502,6 +15552,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12541,6 +15601,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12580,6 +15650,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12619,6 +15699,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12658,6 +15748,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Internal
+- Contract authentication: build-service id plus request signature
+- Contract authorization: INTERNAL (nginx-reachable; handler/service guard applies)
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12697,6 +15797,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Internal
+- Contract authentication: build-service id plus request signature
+- Contract authorization: INTERNAL (nginx-reachable; handler/service guard applies)
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12736,6 +15846,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Internal
+- Contract authentication: none
+- Contract authorization: INTERNAL (nginx-reachable; handler/service guard applies)
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12775,6 +15895,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12814,6 +15944,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12853,6 +15993,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12892,6 +16042,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -12931,6 +16091,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -12970,6 +16140,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13009,6 +16189,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13048,6 +16238,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13087,6 +16287,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -13126,6 +16336,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13165,6 +16385,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13177,7 +16407,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests`
 - Public URL: `https://api.modula.digital/v1/message-requests`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:214`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:238`
 - Handler: inline
 - Controller/service calls: `messaging.listRequests`
 - Authentication: legacy or bridged bearer session
@@ -13204,6 +16434,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13216,7 +16456,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests/:id/accept`
 - Public URL: `https://api.modula.digital/v1/message-requests/:id/accept`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:224`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:248`
 - Handler: inline
 - Controller/service calls: `messaging.acceptRequest`
 - Authentication: legacy or bridged bearer session
@@ -13243,6 +16483,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -13255,7 +16505,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests/:id/decline`
 - Public URL: `https://api.modula.digital/v1/message-requests/:id/decline`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:236`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:260`
 - Handler: inline
 - Controller/service calls: `messaging.declineRequest`
 - Authentication: legacy or bridged bearer session
@@ -13282,6 +16532,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -13321,6 +16581,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Operations
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13360,6 +16630,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13399,6 +16679,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: module backend bearer token plus HMAC signature
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13438,6 +16728,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13477,6 +16777,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13516,6 +16826,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13555,6 +16875,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13594,6 +16924,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13633,6 +16973,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13672,6 +17022,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13711,6 +17071,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13750,6 +17120,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: module backend bearer token plus HMAC signature
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13789,6 +17169,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13828,6 +17218,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: module backend bearer token plus HMAC signature
+- Contract authorization: SERVICE/WORKER
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13867,6 +17267,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13906,6 +17316,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13945,6 +17365,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -13984,6 +17414,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14023,6 +17463,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14062,6 +17512,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14101,6 +17561,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14140,6 +17610,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14179,6 +17659,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14218,6 +17708,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14257,6 +17757,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14296,6 +17806,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14335,6 +17855,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14374,6 +17904,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14413,6 +17953,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14452,6 +18002,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14491,6 +18051,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14530,6 +18100,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14569,6 +18149,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14608,6 +18198,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14647,6 +18247,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14686,6 +18296,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 304; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14725,6 +18345,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14764,6 +18394,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14803,6 +18443,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14842,6 +18492,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14881,6 +18541,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14920,6 +18590,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14959,6 +18639,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -14998,6 +18688,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15037,6 +18737,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15076,6 +18786,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15115,6 +18835,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15154,6 +18884,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15193,6 +18933,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15232,6 +18982,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15271,6 +19031,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15310,6 +19080,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15349,6 +19129,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15388,6 +19178,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15427,6 +19227,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15466,6 +19276,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15505,6 +19325,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15544,6 +19374,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15583,6 +19423,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15622,6 +19472,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15661,6 +19521,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15700,6 +19570,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15739,6 +19619,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15778,6 +19668,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15817,6 +19717,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15856,6 +19766,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15895,6 +19815,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15934,6 +19864,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -15973,6 +19913,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16012,6 +19962,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16051,6 +20011,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16090,6 +20060,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16129,6 +20109,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16168,6 +20158,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 202; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16207,6 +20207,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16246,6 +20256,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16285,6 +20305,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16324,6 +20354,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16363,6 +20403,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16402,6 +20452,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16441,6 +20501,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16480,6 +20550,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16519,6 +20599,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16558,6 +20648,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 304; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16597,6 +20697,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16636,6 +20746,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16675,6 +20795,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16714,6 +20844,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -16753,6 +20893,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -16792,6 +20942,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -16831,6 +20991,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -16870,6 +21040,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16909,6 +21089,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16948,6 +21138,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -16987,6 +21187,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -17026,6 +21236,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -17065,6 +21285,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17104,6 +21334,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -17143,6 +21383,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Activity
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17182,6 +21432,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Activity
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17221,6 +21481,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Activity
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17260,6 +21530,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17299,6 +21579,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17338,6 +21628,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17377,6 +21677,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17416,6 +21726,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17455,6 +21775,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17494,6 +21824,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Comments
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17533,6 +21873,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17572,6 +21922,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17611,6 +21971,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17650,6 +22020,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17689,6 +22069,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17728,6 +22118,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Reactions
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17767,6 +22167,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17806,6 +22216,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17845,6 +22265,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17884,6 +22314,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17923,6 +22363,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Sharing
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -17962,6 +22412,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18001,6 +22461,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18040,6 +22510,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18079,6 +22559,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (404)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18118,6 +22608,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18157,6 +22657,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18196,6 +22706,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18235,6 +22755,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18274,6 +22804,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18313,6 +22853,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -18352,6 +22902,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -18391,6 +22951,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18430,6 +23000,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18469,6 +23049,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18508,6 +23098,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18547,6 +23147,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18586,6 +23196,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18625,6 +23245,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18664,6 +23294,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Profile
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -18703,6 +23343,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18742,6 +23392,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18781,6 +23441,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18820,6 +23490,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18859,6 +23539,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -18898,6 +23588,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -18937,6 +23637,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -18976,6 +23686,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19015,6 +23735,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Feed
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19054,6 +23784,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19093,6 +23833,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19132,6 +23882,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (404)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19171,6 +23931,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19210,6 +23980,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19249,6 +24029,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19288,6 +24078,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19327,6 +24127,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19366,6 +24176,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Social
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19405,6 +24225,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19444,6 +24274,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19483,6 +24323,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19522,6 +24372,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (404)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 304; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19561,6 +24421,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19600,6 +24470,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Moderation
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19639,6 +24519,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Moderation
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19678,6 +24568,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19717,6 +24617,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19756,6 +24666,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19795,6 +24715,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19834,6 +24764,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19873,6 +24813,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19912,6 +24862,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19951,6 +24911,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Account
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -19990,6 +24960,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20029,6 +25009,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20068,6 +25058,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20107,6 +25107,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20146,6 +25156,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20185,6 +25205,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20224,6 +25254,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20263,6 +25303,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20302,6 +25352,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20341,6 +25401,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Search
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20380,6 +25450,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20419,6 +25499,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20458,6 +25548,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20497,6 +25597,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20536,6 +25646,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20575,6 +25695,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20614,6 +25744,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20653,6 +25793,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20692,6 +25842,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20731,6 +25891,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20770,6 +25940,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20809,6 +25989,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20848,6 +26038,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Authentication
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20887,6 +26087,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Operations
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 503; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20926,6 +26136,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -20965,6 +26185,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21004,6 +26234,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21043,6 +26283,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21082,6 +26332,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21121,6 +26381,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21160,6 +26430,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Support
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21199,6 +26479,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Support
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21238,6 +26528,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Support
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21277,6 +26577,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21316,6 +26626,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21355,6 +26675,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Operations
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21394,6 +26724,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Modules
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
@@ -21433,6 +26773,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Operations
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP versionless; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>

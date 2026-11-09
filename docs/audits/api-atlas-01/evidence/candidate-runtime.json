@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T16:29:40.381Z",
+  "capturedAt": "2026-11-09T21:45:19.615Z",
   "source": {
-    "branch": "fix/gubic-socket-auth",
-    "headAtCapture": "7a8c48af1e1dcc108c73a93fb9d4842488d69b23",
+    "branch": "mosaic/pr148-update",
+    "headAtCapture": "28e91a70b65e6fcdd116b6d1e6112fb51a837e2a",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "a151ef17e4496a533f1ed728372bf70b223008fa7724bdc1ce17db0c78f84d27"
+    "apiSourceSha256": "1e767a26328c4ed3edaa0d8cd04bedb0cb512460d104d9ae0d404a13280172a4"
   },
   "runtimeRoutes": [
     {
@@ -5454,7 +5454,26 @@
       "url": "/v1/conversations",
       "path": "/v1/conversations",
       "prefix": "",
-      "schema": null,
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "handle"
+          ],
+          "properties": {
+            "handle": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 5000
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },
