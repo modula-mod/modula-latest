@@ -53,8 +53,8 @@ This matrix distinguishes transport reachability from application authorization.
 | POST | `/v1/admin/developer/namespaces/:namespace/verify` | no | yes | no | yes | no | none | yes | no | no | `services/greenfield-api/src/developers/routes.ts:48` |
 | PATCH | `/v1/admin/developer/programme/:accountId` | no | yes | no | yes | no | none | yes | no | no | `services/greenfield-api/src/developers/routes.ts:47` |
 | POST | `/v1/admin/gubic/games/:gameId/review` | no | yes | no | yes | no | none | yes | no | no | `services/greenfield-api/src/developers/routes.ts:51` |
-| GET | `/v1/admin/gubic/submissions` | yes | no | no | no | no | none | yes | no | no | `services/greenfield-api/src/gubic/routes.ts:107` |
-| POST | `/v1/admin/gubic/submissions/:submissionId/decision` | yes | no | no | no | no | none | yes | no | no | `services/greenfield-api/src/gubic/routes.ts:108` |
+| GET | `/v1/admin/gubic/submissions` | yes | no | no | no | no | none | yes | no | no | `services/greenfield-api/src/gubic/routes.ts:121` |
+| POST | `/v1/admin/gubic/submissions/:submissionId/decision` | yes | no | no | no | no | none | yes | no | no | `services/greenfield-api/src/gubic/routes.ts:122` |
 | GET | `/v1/admin/moderation/reports` | no | yes | no | no | no | admin:moderation | yes | no | no | `services/greenfield-api/src/app/register-routes.ts:1945` |
 | GET | `/v1/admin/moderation/reports/:reportId` | no | yes | no | no | no | admin:moderation | yes | no | no | `services/greenfield-api/src/app/register-routes.ts:1963` |
 | PATCH | `/v1/admin/moderation/reports/:reportId` | no | yes | no | yes | no | admin:moderation | yes | no | no | `services/greenfield-api/src/app/register-routes.ts:1974` |
@@ -217,9 +217,9 @@ This matrix distinguishes transport reachability from application authorization.
 | POST | `/v1/developer/agreements/:agreementId/:version/accept` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:45` |
 | GET | `/v1/developer/board` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:38` |
 | PUT | `/v1/developer/gubic/games/:gameId` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:50` |
-| GET | `/v1/developer/gubic/submissions` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:105` |
-| POST | `/v1/developer/gubic/submissions` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:104` |
-| POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:106` |
+| GET | `/v1/developer/gubic/submissions` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:119` |
+| POST | `/v1/developer/gubic/submissions` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:118` |
+| POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:120` |
 | POST | `/v1/developer/organisations` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:40` |
 | POST | `/v1/developer/organisations/:organisationId/invitations/accept` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:42` |
 | POST | `/v1/developer/organisations/:organisationId/members` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:41` |
@@ -285,7 +285,7 @@ This matrix distinguishes transport reachability from application authorization.
 | POST | `/v1/gubic/lobbies/:lobbyId/join` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:73` |
 | POST | `/v1/gubic/lobbies/:lobbyId/leave` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:74` |
 | POST | `/v1/gubic/lobbies/:lobbyId/ready` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:75` |
-| GET | `/v1/gubic/lobbies/:lobbyId/socket` | yes | no | no | yes | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:80` |
+| GET | `/v1/gubic/lobbies/:lobbyId/socket` | yes | no | no | yes | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:84` |
 | POST | `/v1/gubic/lobbies/:lobbyId/start` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:76` |
 | POST | `/v1/gubic/lobbies/join` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:71` |
 | GET | `/v1/gubic/me/achievements` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/gubic/routes.ts:67` |
