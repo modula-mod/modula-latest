@@ -43,6 +43,15 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
     this.planningSelection = selection
   }
 
+  /** Test/inspection helper: in-memory writes not yet committed. */
+  bufferedState(missionId: string): {proposalIds: string[]; eventIds: string[]} {
+    const pending = this.buffers.get(missionId)
+    return {
+      proposalIds: pending ? [...pending.proposals.keys()] : [],
+      eventIds: pending ? pending.events.map(event => event.id) : [],
+    }
+  }
+
   async readMission(missionId: string): Promise<IntelligenceMission | undefined> {
     const row = await this.db.selectFrom('intelligence_missions').selectAll().where('mission_id', '=', missionId).executeTakeFirst()
     return row ? toMission(row) : undefined
@@ -167,7 +176,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
   }
 
   async writePlan(plan: GaiaPlan): Promise<void> {
-    await this.db.transaction().execute(async trx => {
+    await this.withBufferedTransaction(plan.missionId, async (trx, pending) => {
       const existing = await trx.selectFrom('intelligence_plans').select('plan_id').where('plan_id', '=', plan.id).executeTakeFirst()
       if (!existing) {
         await trx.insertInto('intelligence_plans').values({
@@ -180,7 +189,6 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
       } else {
         await trx.updateTable('intelligence_plans').set({summary: plan.summary, version: plan.version}).where('plan_id', '=', plan.id).execute()
       }
-      const pending = this.buffer(plan.missionId)
       for (const step of plan.steps) {
         const existingStep = await trx.selectFrom('intelligence_plan_steps').select('step_id').where('step_id', '=', step.id).executeTakeFirst()
         if (!existingStep) {
@@ -201,7 +209,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
         await this.insertProposal(trx, plan, step.id, proposal, plan.createdAt)
         pending.proposals.delete(proposal.id)
       }
-      await this.flushEvents(trx, plan.missionId)
+      await this.flushEvents(trx, pending)
     })
   }
 
@@ -264,7 +272,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
   }
 
   async writeDecision(decision: AkiDecision): Promise<void> {
-    await this.db.transaction().execute(async trx => {
+    await this.withBufferedTransaction(decision.missionId, async (trx, pending) => {
       await trx.insertInto('intelligence_aki_decisions').values({
         decision_id: decision.id,
         mission_id: decision.missionId,
@@ -293,7 +301,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
           created_at: new Date(decision.createdAt),
         }).onConflict(oc => oc.column('evidence_id').doNothing()).execute()
       }
-      await this.flushEvents(trx, decision.missionId)
+      await this.flushEvents(trx, pending)
     })
   }
 
@@ -308,7 +316,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
   }
 
   async writeAuthorization(decision: GovernorDecision): Promise<void> {
-    await this.db.transaction().execute(async trx => {
+    await this.withBufferedTransaction(decision.missionId, async (trx, pending) => {
       await trx.insertInto('intelligence_governor_decisions').values({
         governor_decision_id: decision.id,
         mission_id: decision.missionId,
@@ -319,7 +327,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
         constraints: jsonb(decision.constraints),
         created_at: new Date(decision.createdAt),
       }).execute()
-      await this.flushEvents(trx, decision.missionId)
+      await this.flushEvents(trx, pending)
     })
   }
 
@@ -334,7 +342,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
   }
 
   async writeApproval(approval: IntelligenceApproval): Promise<void> {
-    await this.db.transaction().execute(async trx => {
+    await this.withBufferedTransaction(approval.missionId, async (trx, pending) => {
       const existing = await trx.selectFrom('intelligence_approvals').select('approval_id').where('approval_id', '=', approval.id).executeTakeFirst()
       if (!existing) {
         await trx.insertInto('intelligence_approvals').values({
@@ -356,7 +364,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
           resolved_at: approval.resolvedAt ? new Date(approval.resolvedAt) : null,
         }).where('approval_id', '=', approval.id).execute()
       }
-      await this.flushEvents(trx, approval.missionId)
+      await this.flushEvents(trx, pending)
     })
   }
 
@@ -376,7 +384,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
   }
 
   async writeExecution(execution: IntelligenceExecution): Promise<void> {
-    await this.db.transaction().execute(async trx => {
+    await this.withBufferedTransaction(execution.missionId, async (trx, pending) => {
       const existing = await trx.selectFrom('intelligence_runs').selectAll().where('execution_id', '=', execution.id).forUpdate().executeTakeFirst()
       if (!existing) {
         const proposal = await trx.selectFrom('intelligence_proposals').select('step_id').where('proposal_id', '=', execution.proposalId).executeTakeFirst()
@@ -418,12 +426,12 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
           error_code: execution.errorCode ?? null,
         }).where('execution_id', '=', execution.id).execute()
       }
-      await this.flushEvents(trx, execution.missionId)
+      await this.flushEvents(trx, pending)
     })
   }
 
   async writeArtifact(artifact: IntelligenceArtifact): Promise<void> {
-    await this.db.transaction().execute(async trx => {
+    await this.withBufferedTransaction(artifact.missionId, async (trx, pending) => {
       await trx.insertInto('intelligence_artifacts').values({
         artifact_id: artifact.id,
         mission_id: artifact.missionId,
@@ -435,7 +443,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
         metadata: jsonb(artifact.metadata ?? {}),
         created_at: new Date(artifact.createdAt),
       }).execute()
-      await this.flushEvents(trx, artifact.missionId)
+      await this.flushEvents(trx, pending)
     })
   }
 
@@ -457,6 +465,33 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
     return created
   }
 
+  private cloneBuffer(source: MissionBuffers): MissionBuffers {
+    return {proposals: new Map(source.proposals), events: [...source.events]}
+  }
+
+  /**
+   * Persist parent rows and any now-flushable buffered writes in a single
+   * transaction. The in-memory buffer is updated only after commit. On
+   * failure the transaction rolls back and the mission buffer is discarded
+   * so a retry cannot double-write.
+   */
+  private async withBufferedTransaction(
+    missionId: string,
+    body: (trx: Trx, pending: MissionBuffers) => Promise<void>,
+  ): Promise<void> {
+    const working = this.cloneBuffer(this.buffer(missionId))
+    try {
+      await this.db.transaction().execute(async trx => {
+        await body(trx, working)
+      })
+      if (working.proposals.size === 0 && working.events.length === 0) this.buffers.delete(missionId)
+      else this.buffers.set(missionId, working)
+    } catch (error) {
+      this.buffers.delete(missionId)
+      throw error
+    }
+  }
+
   private async insertProposal(trx: Trx, plan: GaiaPlan, stepId: string, proposal: ModulaActionProposal, createdAt: string): Promise<void> {
     const existing = await trx.selectFrom('intelligence_proposals').select('proposal_id').where('proposal_id', '=', proposal.id).executeTakeFirst()
     if (existing) return
@@ -476,8 +511,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
     }).execute()
   }
 
-  private async flushEvents(executor: Executor, missionId: string): Promise<void> {
-    const pending = this.buffer(missionId)
+  private async flushEvents(executor: Executor, pending: MissionBuffers): Promise<void> {
     const remaining: IntelligenceLedgerEvent[] = []
     for (const event of pending.events) {
       if (await this.canPersistEvent(executor, event)) await this.insertEvent(executor, event)
