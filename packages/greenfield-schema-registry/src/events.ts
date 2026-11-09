@@ -82,6 +82,7 @@ export const greenfieldEventSchemas: readonly GreenfieldEventSchemaDefinition[] 
   event('reaction.removed', 'social', 'reaction', 'internal', 'safe-idempotent'),
   event('follow.created', 'social', 'follow', 'internal', 'safe-idempotent'),
   event('follow.removed', 'social', 'follow', 'internal', 'safe-idempotent'),
+  event('message.story-replied', 'messaging', 'conversation-message', 'private', 'safe-idempotent', 'messaging-retention'),
 
   event('module.discovered', 'modules', 'moduleRelease', 'internal'),
   event('module.install-requested', 'modules', 'moduleInstallation', 'private', 'manual-approval-required'),

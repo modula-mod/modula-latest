@@ -8,19 +8,19 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/pr148-update",
-      "sourceSha256": "963cdc92c2b1cd38ae637602c7046ef1fcf54c2de68c8a8f535d22c36886e981",
-      "capturedAt": "2026-11-09T22:40:55.671Z",
-      "routeCount": 793
+      "branch": "mosaic/pr149-update",
+      "sourceSha256": "b3154ffd1bc8e239923ab9d583e5e8f47a3a098c75b8bb3255a694633f5991f2",
+      "capturedAt": "2026-11-09T22:42:08.672Z",
+      "routeCount": 794
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 793,
-    "applicationRuntimeRoutes": 557,
-    "mappedApplicationRoutes": 557,
+    "runtimeMethodRoutes": 794,
+    "applicationRuntimeRoutes": 558,
+    "mappedApplicationRoutes": 558,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 557,
+    "sourceRoutes": 558,
     "sourceOnlyRoutes": 0,
     "explicitlyExcludedFrameworkRoutes": 236,
     "frameworkRoutes": [
@@ -1206,7 +1206,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "793 = 557 application + 236 framework-derived"
+    "equation": "794 = 558 application + 236 framework-derived"
   },
   "routes": [
     {
@@ -2333,6 +2333,7 @@
           "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
           "services/greenfield-api/tests/settings-v2.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -2780,6 +2781,7 @@
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
           "services/greenfield-api/tests/settings-v2.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -2928,6 +2930,7 @@
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
           "services/greenfield-api/tests/settings-v2.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -4978,6 +4981,7 @@
           "services/greenfield-api/tests/push.routes.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
       },
@@ -5363,6 +5367,7 @@
           "services/greenfield-api/tests/push.routes.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
       },
@@ -15242,7 +15247,8 @@
           "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
           "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
           "services/greenfield-api/src/modules/runtime-access.ts#enforceCapability",
           "services/greenfield-api/src/modules/runtime-access.ts#resolve"
         ],
@@ -23173,7 +23179,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -23278,6 +23285,9 @@
         ],
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#ensureDirectConversationInTransaction",
+          "services/greenfield-api/src/domains/messaging/service.ts#insertDirectMessageInTransaction",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -23299,7 +23309,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -23412,7 +23423,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -23505,6 +23517,7 @@
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
+          "greenfield_domain_events",
           "greenfield_message_reactions",
           "profiles"
         ],
@@ -23515,7 +23528,8 @@
           "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
           "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
-          "services/greenfield-api/src/domains/messaging/service.ts#participants"
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#storyContexts"
         ],
         "confidence": "method-level-static"
       },
@@ -23529,7 +23543,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -23635,6 +23650,7 @@
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
           "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
           "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
           "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
@@ -23654,7 +23670,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -23769,7 +23786,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -23888,7 +23906,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -24008,7 +24027,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -24126,7 +24146,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -24239,7 +24260,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -24351,7 +24373,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -24461,7 +24484,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -24574,7 +24598,8 @@
         "tests": [
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
-          "services/greenfield-api/tests/push.routes.test.ts"
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34210,6 +34235,7 @@
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#composeInMail",
           "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -34449,6 +34475,7 @@
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
           "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
           "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -37558,7 +37585,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 137
+        "line": 179
       },
       "handler": "inline",
       "controllerServices": [
@@ -37629,7 +37656,8 @@
         "writes": [],
         "evidence": [
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
         ],
         "confidence": "partial-static"
       },
@@ -37752,7 +37780,8 @@
         "clients": [],
         "server": [],
         "tests": [
-          "services/greenfield-api/tests/messaging.integration.test.ts"
+          "services/greenfield-api/tests/messaging.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -37870,7 +37899,8 @@
         "clients": [],
         "server": [],
         "tests": [
-          "services/greenfield-api/tests/messaging.integration.test.ts"
+          "services/greenfield-api/tests/messaging.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -37981,7 +38011,8 @@
         "clients": [],
         "server": [],
         "tests": [
-          "services/greenfield-api/tests/messaging.integration.test.ts"
+          "services/greenfield-api/tests/messaging.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -55813,6 +55844,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -55962,6 +55994,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56097,6 +56130,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56231,6 +56265,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56364,6 +56399,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56500,6 +56536,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56642,6 +56679,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56784,6 +56822,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -56917,6 +56956,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -57051,6 +57091,7 @@
           "services/greenfield-api/tests/phase7l.profile-update.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts",
           "tests/phase7l-b-public-routes.test.ts"
@@ -63913,6 +63954,7 @@
           "services/greenfield-api/tests/push.routes.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -64061,6 +64103,7 @@
           "services/greenfield-api/tests/push.routes.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts",
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -65532,7 +65575,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 79
+        "line": 102
       },
       "handler": "inline",
       "controllerServices": [
@@ -65613,10 +65656,11 @@
         ],
         "evidence": [
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
           "services/greenfield-api/src/domains/stories/service.ts#create",
           "services/greenfield-api/src/domains/stories/service.ts#findIdempotent",
           "services/greenfield-api/src/domains/stories/service.ts#getGroup",
-          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
         ],
         "confidence": "method-level-static"
       },
@@ -65636,7 +65680,8 @@
           "scripts/verify-phase7h-api-contract-parity.mjs",
           "scripts/verify-phase7h-live-contracts.mjs",
           "scripts/verify-phase7i-live-api-parity.mjs",
-          "services/greenfield-api/tests/phase7i.f5-stories.test.ts"
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -65659,7 +65704,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 67
+        "line": 90
       },
       "handler": "inline",
       "controllerServices": [
@@ -65731,8 +65776,9 @@
         "writes": [],
         "evidence": [
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
           "services/greenfield-api/src/domains/stories/service.ts#getGroup",
-          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
         ],
         "confidence": "partial-static"
       },
@@ -65752,7 +65798,8 @@
           "scripts/verify-phase7h-api-contract-parity.mjs",
           "scripts/verify-phase7h-live-contracts.mjs",
           "scripts/verify-phase7i-live-api-parity.mjs",
-          "services/greenfield-api/tests/phase7i.f5-stories.test.ts"
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -65766,6 +65813,130 @@
       "contract": null
     },
     {
+      "id": "POST /v1/stories/:storyId/replies",
+      "domain": "Media",
+      "method": "POST",
+      "effectiveRoute": "/v1/stories/:storyId/replies",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/stories/:storyId/replies",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
+        "line": 148
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "stories.reply"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{storyId?: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "blocks",
+          "follows",
+          "greenfield_story_groups",
+          "greenfield_story_items",
+          "idempotency_keys"
+        ],
+        "writes": [
+          "idempotency_keys"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
+          "services/greenfield-api/src/domains/stories/service.ts#reply"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "host bind mount: /var/lib/modula/greenfield-media"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [
+          "src/api/local/routes/storyRoutes.ts",
+          "src/data/repositories/api/ApiStoriesRepository.ts"
+        ],
+        "server": [],
+        "tests": [
+          "scripts/verify-phase7h-api-contract-parity.mjs",
+          "scripts/verify-phase7h-live-contracts.mjs",
+          "scripts/verify-phase7i-live-api-parity.mjs",
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
       "id": "DELETE /v1/stories/items/:itemId",
       "domain": "Media",
       "method": "DELETE",
@@ -65775,7 +65946,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 125
+        "line": 167
       },
       "handler": "inline",
       "controllerServices": [
@@ -65869,7 +66040,8 @@
         ],
         "server": [],
         "tests": [
-          "services/greenfield-api/tests/phase7i.f5-stories.test.ts"
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -65892,7 +66064,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 113
+        "line": 136
       },
       "handler": "inline",
       "controllerServices": [
@@ -65969,7 +66141,8 @@
         ],
         "evidence": [
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
           "services/greenfield-api/src/domains/stories/service.ts#markViewed"
         ],
         "confidence": "method-level-static"
@@ -65987,7 +66160,8 @@
         ],
         "server": [],
         "tests": [
-          "services/greenfield-api/tests/phase7i.f5-stories.test.ts"
+          "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -66010,7 +66184,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
-        "line": 61
+        "line": 84
       },
       "handler": "inline",
       "controllerServices": [
@@ -66080,7 +66254,8 @@
         "writes": [],
         "evidence": [
           "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
-          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+          "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
+          "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
           "services/greenfield-api/src/domains/stories/service.ts#listRail"
         ],
         "confidence": "method-level-static"
@@ -67196,6 +67371,7 @@
         "POST /v1/posts/:postId/quote",
         "PATCH /v1/profiles/me",
         "POST /v1/stories",
+        "POST /v1/stories/:storyId/replies",
         "GET /v1/stories/rail"
       ],
       "routeWrites": [
@@ -71054,6 +71230,7 @@
         "PATCH /v1/profiles/me",
         "POST /v1/stories",
         "GET /v1/stories/:groupId",
+        "POST /v1/stories/:storyId/replies",
         "POST /v1/stories/items/:itemId/viewed",
         "GET /v1/stories/rail"
       ],
@@ -71403,6 +71580,7 @@
         "PATCH /v1/profiles/me",
         "POST /v1/stories",
         "GET /v1/stories/:groupId",
+        "POST /v1/stories/:storyId/replies",
         "POST /v1/stories/items/:itemId/viewed",
         "GET /v1/stories/rail"
       ],
@@ -80594,6 +80772,7 @@
       ],
       "migrationIntroduced": "018_phase7e_internal_events.sql",
       "sourceReads": [
+        "services/greenfield-api/src/domains/messaging/service.ts",
         "services/greenfield-api/src/events/domain-events.ts",
         "services/greenfield-api/src/events/replay.ts",
         "services/greenfield-worker/src/events/runner.ts",
@@ -80615,7 +80794,8 @@
       "routeReads": [
         "POST /v1/admin/ops/events/dead-letters/retry",
         "POST /v1/admin/ops/events/replay",
-        "GET /v1/admin/ops/events/subscriber-failures"
+        "GET /v1/admin/ops/events/subscriber-failures",
+        "GET /v1/conversations/:id/messages"
       ],
       "routeWrites": [],
       "orphanCandidate": false,
@@ -101957,6 +102137,7 @@
         "POST /v1/reports",
         "POST /v1/stories",
         "GET /v1/stories/:groupId",
+        "POST /v1/stories/:storyId/replies",
         "DELETE /v1/stories/items/:itemId",
         "POST /v1/stories/items/:itemId/viewed",
         "GET /v1/stories/rail"
@@ -102092,6 +102273,7 @@
         "POST /v1/reports",
         "POST /v1/stories",
         "GET /v1/stories/:groupId",
+        "POST /v1/stories/:storyId/replies",
         "DELETE /v1/stories/items/:itemId",
         "POST /v1/stories/items/:itemId/viewed",
         "GET /v1/stories/rail"
@@ -103188,15 +103370,21 @@
       ],
       "migrationIntroduced": "001_init_schema.sql",
       "sourceReads": [
-        "services/greenfield-api/src/backend-fabric/routes.ts"
+        "services/greenfield-api/src/backend-fabric/routes.ts",
+        "services/greenfield-api/src/domains/stories/service.ts"
       ],
       "sourceWrites": [
-        "services/greenfield-api/src/backend-fabric/routes.ts"
+        "services/greenfield-api/src/backend-fabric/routes.ts",
+        "services/greenfield-api/src/domains/stories/service.ts"
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "POST /v1/stories/:storyId/replies"
+      ],
+      "routeWrites": [
+        "POST /v1/stories/:storyId/replies"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false

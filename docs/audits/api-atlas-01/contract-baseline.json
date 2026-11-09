@@ -31556,6 +31556,65 @@
       "sourceContractSha256": "5f2af78ad3f228c32dcf91864410c3ea2955ed8cf888496d1377cecba916cd75"
     },
     {
+      "id": "POST /v1/stories/:storyId/replies",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{storyId?: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "b5751962a56770a70c223732d1afa5cea79ffe4a2da1fca1021e3b6a29359a09"
+    },
+    {
       "id": "DELETE /v1/stories/items/:itemId",
       "authorization": {
         "visibility": "AUTHENTICATED",
