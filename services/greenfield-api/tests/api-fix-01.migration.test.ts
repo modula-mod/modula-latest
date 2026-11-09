@@ -9,6 +9,17 @@ import {listMigrationFiles, migrateDown, migrateStatus, migrateUp} from '../src/
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
+const pre084PackageMediaTypes = [
+  'application/vnd.modula.game-web+tgz',
+  'application/vnd.modula.web-runtime+tgz',
+  'application/vnd.modula.asset-pack+tgz',
+] as const
+const mediaTypesAfter084 = [...pre084PackageMediaTypes, 'application/vnd.modula.moliboo-asset-pack+json'] as const
+
+function expectMediaTypes(definition: string | undefined, expected: readonly string[]) {
+  expect(definition).toBeTruthy()
+  for (const mediaType of expected) expect(definition).toContain(mediaType)
+}
 
 describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 088', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
@@ -112,7 +123,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '088_greenfield_premium_apple_sandbox',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '088_greenfield_premium_apple_sandbox',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -144,38 +155,95 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
+    expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
+    const canonicalMolibooItems = await client.query(`
+      SELECT count(*)::int AS count, count(*) FILTER (WHERE item_type = 'cosmetic')::int AS cosmetics
+      FROM greenfield_moliboo_items
+    `)
+    expect(canonicalMolibooItems.rows[0]?.count).toBeGreaterThan(0)
+    expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
 
     expect(await migrateDown(freshUrl)).toBe('088_greenfield_premium_apple_sandbox')
-
     const rolledBackApplePremium = new pg.Client({connectionString: freshUrl})
     await rolledBackApplePremium.connect()
     const appleTransactions = await rolledBackApplePremium.query(`SELECT to_regclass('public.greenfield_premium_apple_transactions') AS name`)
     const versionAfter088 = await rolledBackApplePremium.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
     expect(appleTransactions.rows[0]?.name).toBeNull()
     expect(versionAfter088.rows[0]?.value).toBe('087')
+    const publisherStillPresent = await rolledBackApplePremium.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs`)
+    expect(publisherStillPresent.rows[0]?.jobs).toBe('greenfield_publisher_release_jobs')
     await rolledBackApplePremium.end()
 
-    // 084 (#147/#160 moliboo signed packs), 085 (Gate 01 publisher release
-    // console), 086 (#150 communities) and 087 (#151 collections and drafts)
-    // are not on this branch yet. 088 down restores schema_version 087; the
-    // next ledger entry present here is 083.
+    // 086 (#150 communities) and 087 (#151 collections and drafts) are reserved
+    // and not present on this unstacked branch. 088 down restores schema_version
+    // 087; the next ledger file present here is 085_publisher_release_console.
+    expect(await migrateDown(freshUrl)).toBe('085_publisher_release_console')
+    const rolledBackConsole = new pg.Client({connectionString: freshUrl})
+    await rolledBackConsole.connect()
+    const consoleTables = await rolledBackConsole.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs, to_regclass('public.greenfield_publisher_release_job_logs') AS logs`)
+    const dispatchCheck = await rolledBackConsole.query(`SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conname = 'background_jobs_dispatch_mode_check'`)
+    const versionAfterPublisher = await rolledBackConsole.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(consoleTables.rows[0]).toEqual({jobs: null, logs: null})
+    expect(dispatchCheck.rows[0]?.definition).not.toContain('PUBLISHER_RELEASE_RUNNER')
+    expect(versionAfterPublisher.rows[0]?.value).toBe('084')
+    const molibooAfterPublisher = await rolledBackConsole.query(`
+      SELECT to_regclass('public.greenfield_moliboo_characters') AS characters,
+             to_regclass('public.greenfield_moliboo_pack_releases') AS packs
+    `)
+    const mediaAfterPublisher = await rolledBackConsole.query(`
+      SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+      WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
+    `)
+    expect(molibooAfterPublisher.rows[0]).toEqual({
+      characters: 'greenfield_moliboo_characters', packs: 'greenfield_moliboo_pack_releases',
+    })
+    expectMediaTypes(mediaAfterPublisher.rows[0]?.definition, mediaTypesAfter084)
+    await rolledBackConsole.end()
+
+    expect(await migrateDown(freshUrl)).toBe('084_moliboo_signed_packs')
+    const rolledBackMoliboo = new pg.Client({connectionString: freshUrl})
+    await rolledBackMoliboo.connect()
+    const molibooTable = await rolledBackMoliboo.query(`SELECT to_regclass('public.greenfield_moliboo_characters') AS name`)
+    const canonicalTables = await rolledBackMoliboo.query(`
+      SELECT to_regclass('public.greenfield_moliboo_items') AS items,
+             to_regclass('public.greenfield_moliboo_inventory') AS inventory,
+             to_regclass('public.greenfield_moliboo_equipped') AS equipped
+    `)
+    const extensionColumns = await rolledBackMoliboo.query(`
+      SELECT count(*)::int AS count FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'greenfield_moliboo_items'
+        AND column_name IN ('item_type', 'character_id', 'wearable', 'revoked_at', 'updated_at')
+    `)
+    const versionAfter084 = await rolledBackMoliboo.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    const mediaConstraintAfter084 = await rolledBackMoliboo.query(`
+      SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+      WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
+    `)
+    expect(molibooTable.rows[0]?.name).toBeNull()
+    expect(canonicalTables.rows[0]).toEqual({
+      items: 'greenfield_moliboo_items', inventory: 'greenfield_moliboo_inventory', equipped: 'greenfield_moliboo_equipped',
+    })
+    expect(extensionColumns.rows[0]?.count).toBe(0)
+    expectMediaTypes(mediaConstraintAfter084.rows[0]?.definition, pre084PackageMediaTypes)
+    expect(versionAfter084.rows[0]?.value).toBe('083')
+    await rolledBackMoliboo.end()
+
     expect(await migrateDown(freshUrl)).toBe('083_moliboo_game_systems')
 
-    const rolledBackMoliboo = new pg.Client({connectionString: freshUrl})
+    const rolledBackMolibooGame = new pg.Client({connectionString: freshUrl})
 
-    await rolledBackMoliboo.connect()
+    await rolledBackMolibooGame.connect()
 
-    const molibooTable = await rolledBackMoliboo.query(`SELECT to_regclass('public.greenfield_moliboo_inventory') AS name`)
+    const molibooGameTable = await rolledBackMolibooGame.query(`SELECT to_regclass('public.greenfield_moliboo_inventory') AS name`)
 
-    const versionAfter083 = await rolledBackMoliboo.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    const versionAfter083 = await rolledBackMolibooGame.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
 
-    expect(molibooTable.rows[0]?.name).toBeNull()
+    expect(molibooGameTable.rows[0]?.name).toBeNull()
 
     expect(versionAfter083.rows[0]?.value).toBe('082')
 
-    await rolledBackMoliboo.end()
+    await rolledBackMolibooGame.end()
 
 
     expect(await migrateDown(freshUrl)).toBe('082_gubic_play_platform')
@@ -279,7 +347,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '088_greenfield_premium_apple_sandbox',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '088_greenfield_premium_apple_sandbox',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -309,7 +377,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '088_greenfield_premium_apple_sandbox',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '088_greenfield_premium_apple_sandbox',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
@@ -326,7 +394,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     `)
     expect(version.rows[0]?.value).toBe('088')
     expect(account.rows[0]?.count).toBe(1)
-    expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
+    expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     await after.end()
   }, 120_000)
 })

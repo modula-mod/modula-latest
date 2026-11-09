@@ -388,6 +388,22 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
 
+  packages/mar-runtime:
+    dependencies:
+      '@modula/intelligence-contracts':
+        specifier: workspace:*
+        version: link:../intelligence-contracts
+      '@modula/intelligence-governance':
+        specifier: workspace:*
+        version: link:../intelligence-governance
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+
   packages/modula-cli:
     dependencies:
       '@modula/create-module':
@@ -466,9 +482,15 @@ importers:
       '@modula/intelligence-contracts':
         specifier: workspace:*
         version: link:../../packages/intelligence-contracts
+      '@modula/intelligence-core':
+        specifier: workspace:*
+        version: link:../../packages/intelligence-core
       '@modula/intelligence-governance':
         specifier: workspace:*
         version: link:../../packages/intelligence-governance
+      '@modula/mar-runtime':
+        specifier: workspace:*
+        version: link:../../packages/mar-runtime
       '@modula/module-backend-protocol':
         specifier: file:../../../modula-mod/modula-module-standard/packages/module-backend-protocol
         version: file:../modula-mod/modula-module-standard/packages/module-backend-protocol

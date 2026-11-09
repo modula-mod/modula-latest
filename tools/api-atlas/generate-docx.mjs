@@ -21,10 +21,10 @@ function escapeXml(value) {
     .replaceAll("'", '&apos;')
 }
 
-function value(input) {
-  if (input === null || input === undefined) return 'none'
-  if (typeof input === 'string') return input
-  return JSON.stringify(input)
+function value(value) {
+  if (value === null || value === undefined) return 'none'
+  if (typeof value === 'string') return value
+  return JSON.stringify(value)
 }
 
 function paragraph(text, style = null) {

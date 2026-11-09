@@ -1,407 +1,131 @@
 {
   "schemaVersion": 1,
+  "mission": "GREENFIELD-FEATURE-REALITY-01",
   "routes": {
-    "GET /v1/premium/tiers": {
-      "purpose": "Return the active server-maintained Premium tier and capability catalogue, mission-supplied display-price labels, and the currently configured Apple sandbox purchase products.",
-      "owningDomain": "Premium catalogue and entitlements",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Any authenticated account may read the catalogue. Product mappings are server-selected; clients cannot submit tier, price or entitlement facts.",
+    "GET /v1/moliboos/packs": {
+      "purpose": "List the latest cryptographically trusted, approved Moliboo content-pack release for each package.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public approved-release catalogue; no session required.",
+      "authorization": "Only approved, published or superseded first-party releases with live publisher and signer trust are projected.",
       "request": {
         "params": {},
-        "query": {},
+        "query": {"cursor": "optional opaque cursor, max 256 bytes", "limit": "integer 1-50, default 20", "familyId": "optional lowercase slug", "series": "optional integer 1-99", "availability": "optional; only approved is accepted"},
         "body": null,
-        "validation": "No route parameters, query parameters or request body."
+        "validation": "Unknown query keys and non-approved availability values are rejected."
       },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{schemaVersion:1,catalogueVersion,pricingStatus:'supplied_display_only',purchase:{enabled,environment:'sandbox',reason,products[]},tiers:[{id,displayName,rank,paid,price:null,displayPrice,products[],metadata}],capabilities:[{id,displayName,minimumRank,availabilityMode,metadata}]}"
-      },
-      "errors": {
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Read-only. Repeated and concurrent reads do not mutate entitlement state; Cache-Control no-store prevents stale commercial state.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Display prices are labels only and do not declare a billing period or purchasable App Store product."
+      "success": {"status": 200, "body": "Envelope data {items: MolibooPackageDescriptor[], nextCursor: string|null, hasMore: boolean}."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED", "INVALID_CURSOR"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "cursor", "ordering": "packageId ascending after latest-version projection", "default": 20, "maximum": 50},
+      "idempotencyConcurrency": "Safe read. Invalid or concurrently withdrawn releases fail closed and are omitted.",
+      "versioningCompatibility": "HTTP v1; descriptor schema modula.package.1; native catalogue schema modula.moliboo.catalog.1; additive descriptor fields only."
     },
-    "GET /v1/me/membership": {
-      "purpose": "Return the authenticated account's effective server-authoritative membership, billing status, badge preference and purchase availability.",
-      "owningDomain": "Premium memberships",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Strictly self-scoped. The account and actor identifiers are resolved from the authenticated session; no client-supplied owner identifier is accepted.",
-      "request": {
-        "params": {},
-        "query": {},
-        "body": null,
-        "validation": "No route parameters, query parameters or request body."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{schemaVersion:1,accountId,tier,recordedTier,subscriptionStatus,entitlementSource,effectiveAt,expiresAt,membershipSince,badgeVisible,revision,renewal,purchase,publicIdentity,serverTime}"
-      },
-      "errors": {
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Read-only account projection. Expired active/grace records are projected as Core without deleting historical membership or user data.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    "GET /v1/moliboos/packs/catalog.json": {
+      "purpose": "Return the exact raw catalogue shape consumed by the existing native Moliboo PackageManager.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public approved-release catalogue; no session required.",
+      "authorization": "Same live release, publisher, signer, revocation and quarantine checks as the paginated catalogue.",
+      "request": {"params": {}, "query": {}, "body": null, "validation": "No request fields."},
+      "success": {"status": 200, "body": "Raw {schemaVersion:'modula.moliboo.catalog.1', packages: MolibooPackageDescriptor[]} with Cache-Control: no-cache."},
+      "errors": [{"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none", "ordering": "packageId ascending", "maximum": "Registry bounded to approved Moliboo identities."},
+      "idempotencyConcurrency": "Safe read; every request re-evaluates current trust and withdrawal state.",
+      "versioningCompatibility": "Compatibility endpoint for native PackageManager; catalogue schema is fixed at modula.moliboo.catalog.1."
     },
-    "GET /v1/me/entitlements": {
-      "purpose": "Evaluate every Premium capability for the authenticated account from the active catalogue and effective membership state.",
-      "owningDomain": "Premium entitlement evaluation",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Strictly self-scoped; the server derives account and actor identity from the bearer session.",
-      "request": {
-        "params": {},
-        "query": {},
-        "body": null,
-        "validation": "No route parameters, query parameters or request body."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{schemaVersion:1,catalogueVersion,tier,subscriptionStatus,capabilities:[{id,available,value,mode,reason}]}"
-      },
-      "errors": {
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Read-only deterministic evaluation for a catalogue and membership revision. A client flag such as premium=true is never consulted.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    "GET /v1/moliboos/packs/:packId/manifest": {
+      "purpose": "Resolve a trusted install descriptor for a requested Moliboo package and optional immutable version.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public content metadata; no session required.",
+      "authorization": "The selected release must be approved and pass live publisher, release-signature, artifact-signature, revocation and quarantine checks.",
+      "request": {"params": {"packId": "moliboo.character.<1-4 digit number>"}, "query": {"version": "optional semantic version; omitted selects newest approved version"}, "body": null, "validation": "Unknown fields, malformed IDs and malformed versions are rejected."},
+      "success": {"status": 200, "body": "Envelope data {manifest: MolibooPackageDescriptor}."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED"]}, {"status": 403, "codes": ["UNTRUSTED_RELEASE", "RELEASE_REVOKED", "SIGNER_REVOKED"]}, {"status": 404, "codes": ["NOT_FOUND"]}, {"status": 409, "codes": ["ARTIFACT_DIGEST_MISMATCH"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none"},
+      "idempotencyConcurrency": "Safe read. Explicit withdrawn versions fail; an unversioned request falls back to the newest still-approved version.",
+      "versioningCompatibility": "HTTP v1; descriptor schema modula.package.1; artifact runtimeVersion 1 and minimumHostVersion are enforced by PackageManager."
     },
-    "GET /v1/me/entitlements/:capabilityId": {
-      "purpose": "Evaluate one named Premium capability for the authenticated account.",
-      "owningDomain": "Premium entitlement evaluation",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Strictly self-scoped; the server derives account and actor identity from the bearer session.",
-      "request": {
-        "path": {
-          "capabilityId": "Required lowercase identifier matching ^[a-z][a-z0-9_]{2,79}$."
-        },
-        "query": {},
-        "body": null,
-        "validation": "Fastify rejects malformed capability identifiers; the service resolves the identifier only from the active server catalogue."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{id,available,value,mode,reason,catalogueVersion,tier}"
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for a malformed capabilityId."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "404": [
-          "NOT_FOUND when capabilityId is absent from the active catalogue."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when the active Premium catalogue is unavailable."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Read-only deterministic evaluation for a catalogue and membership revision.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    "GET /v1/moliboos/packs/:packId/download": {
+      "purpose": "Deliver exact immutable bytes for a trusted Moliboo content pack.",
+      "owningDomain": "Moliboo signed distribution",
+      "authentication": "Public immutable content; no session required.",
+      "authorization": "Pack selection and trust checks are identical to the manifest endpoint; clients cannot choose storage paths.",
+      "request": {"params": {"packId": "moliboo.character.<1-4 digit number>"}, "query": {"version": "optional semantic version"}, "body": null, "validation": "Unknown fields, malformed IDs and malformed versions are rejected."},
+      "success": {"status": 200, "body": "Raw application/vnd.modula.moliboo-asset-pack+json bytes with immutable cache, ETag, content length and X-Modula-Artifact-Sha256 headers."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED"]}, {"status": 403, "codes": ["UNTRUSTED_RELEASE", "RELEASE_REVOKED", "SIGNER_REVOKED"]}, {"status": 404, "codes": ["NOT_FOUND"]}, {"status": 409, "codes": ["ARTIFACT_DIGEST_MISMATCH"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none"},
+      "idempotencyConcurrency": "Safe immutable read; content address and release identity never change.",
+      "versioningCompatibility": "Content-only JSON container schema modula.moliboo.assetpack.1; maximum 6 MiB artifact, 8 MiB decoded, 16 files, 4 MiB per file; JSON and PNG only."
     },
-    "PATCH /v1/me/membership/badge-visibility": {
-      "purpose": "Set whether the authenticated account's eligible Premium membership badge is publicly visible, independently of membership entitlement and identity verification.",
-      "owningDomain": "Premium membership preferences",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Strictly self-scoped; the account and actor are resolved from the bearer session. The request cannot alter tier, payment state or identity verification.",
-      "request": {
-        "body": {
-          "visible": "Required boolean; the only accepted field."
-        },
-        "validation": "A JSON object is required. Unknown fields, missing visible and non-boolean values are rejected."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "Updated membership projection with badgeVisible and incremented preference audit state."
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for missing, non-boolean or unknown body fields."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "A transaction upserts the account preference and appends an audit event. Last committed write is authoritative; repeating the same value is safe but creates another auditable preference event.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification."
+    "GET /v1/me/moliboos/ownership": {
+      "purpose": "Return the authenticated account's server-authoritative Moliboo ownership inventory.",
+      "owningDomain": "Moliboo ownership and wardrobe",
+      "authentication": "Bearer session required with social:read capability.",
+      "authorization": "Account ID is resolved from the authenticated session; no client-supplied owner is accepted.",
+      "request": {"params": {}, "query": {"cursor": "optional opaque cursor, max 512 bytes", "limit": "integer 1-50, default 20"}, "body": null, "validation": "Unknown keys and invalid cursors are rejected."},
+      "success": {"status": 200, "body": "Envelope data {items: OwnershipItem[], nextCursor: string|null, hasMore: boolean}."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED", "INVALID_CURSOR"]}, {"status": 401, "codes": ["UNAUTHENTICATED", "SESSION_EXPIRED"]}, {"status": 403, "codes": ["FORBIDDEN"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "cursor", "ordering": "grantedAt descending, itemId ascending", "default": 20, "maximum": 50},
+      "idempotencyConcurrency": "Safe account-scoped read; duplicate grants are prevented by (accountId,itemId) and grantId uniqueness.",
+      "versioningCompatibility": "HTTP v1; additive ownership item fields only."
     },
-    "POST /v1/me/membership/apple-purchase-context": {
-      "purpose": "Create or return the authenticated account's stable Apple appAccountToken and the operator-confirmed sandbox products to pass into StoreKit purchase operations.",
-      "owningDomain": "Premium Apple sandbox billing",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Strictly self-scoped. The server generates and binds the UUID to the authenticated account; client-supplied account IDs, tokens, products and tiers are rejected.",
-      "request": {
-        "body": "Required empty JSON object {}.",
-        "validation": "Unknown fields and non-object bodies are rejected."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{environment:'sandbox',appAccountToken:<UUID>,products:[{productId,tier,billingPeriod,environment:'sandbox',state:'active'}]}"
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for unknown body fields."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when the Apple verifier is disabled, the catalogue is unavailable or no sandbox products are configured."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Idempotent per account. Database uniqueness on account_id and app_account_token makes concurrent initialization return one stable binding.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Products must be explicitly confirmed and configured by a QA operator; no product identifiers are seeded."
+    "GET /v1/me/moliboos/outfit": {
+      "purpose": "Return the authenticated account's persisted equipped Moliboo items and revision.",
+      "owningDomain": "Moliboo ownership and wardrobe",
+      "authentication": "Bearer session required with social:read capability.",
+      "authorization": "Account ID is resolved from the authenticated session.",
+      "request": {"params": {}, "query": {}, "body": null, "validation": "No request fields."},
+      "success": {"status": 200, "body": "Envelope data {revision: integer, updatedAt: ISO timestamp|null, items: OutfitItem[]}."},
+      "errors": [{"status": 401, "codes": ["UNAUTHENTICATED", "SESSION_EXPIRED"]}, {"status": 403, "codes": ["FORBIDDEN"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none", "maximum": 16},
+      "idempotencyConcurrency": "Safe account-scoped read.",
+      "versioningCompatibility": "HTTP v1; revision is required for optimistic synchronization across devices."
     },
-    "POST /v1/premium/apple/transactions": {
-      "purpose": "Verify an Apple StoreKit 2 sandbox signed transaction and transactionally project the authenticated account's Premium membership.",
-      "owningDomain": "Premium Apple sandbox billing",
-      "authentication": "Required GreenField bearer access session plus a cryptographically valid Apple signed transaction.",
-      "authorization": "The verified appAccountToken and original transaction chain must belong to the authenticated account. Only PURCHASED auto-renewable sandbox subscriptions mapped to active server products are accepted; family-shared, production, forged and cross-account transactions fail closed.",
-      "request": {
-        "body": {
-          "signedTransaction": "Required compact JWS string, 16 to 200000 characters; the only accepted field."
-        },
-        "validation": "Apple certificate chain, signature, bundle ID, Sandbox environment, transaction type, ownership, product mapping, dates and account binding are validated server-side. Raw signed data is redacted from logs and not persisted."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{accepted:true,replay,environment:'sandbox',transactionId,originalTransactionId,productId,tier,status:'active|grace|expired|revoked',expiresAt,membershipRevision}"
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for malformed/unknown input, signature or certificate failure, invalid verified fields, inconsistent dates or a future signedDate."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "403": [
-          "FORBIDDEN for production/family-shared/unsupported transactions, absent or mismatched account binding, or an original transaction owned by another account."
-        ],
-        "409": [
-          "CONFLICT for a transaction concurrency invariant violation."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when verification is disabled, the product is not enabled or the Premium catalogue is unavailable."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "The signed evidence SHA-256 and unique (transaction_id,evidence_sha256) event constraint make exact retries idempotent. A per-account PostgreSQL advisory transaction lock serializes projection updates; revision changes only when effective membership changes.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. Uses Apple App Store Server Library signed-data verification in Sandbox only. Production transactions are rejected."
+    "PUT /v1/me/moliboos/outfit": {
+      "purpose": "Atomically replace the authenticated account's equipped Moliboo items after ownership and wearability checks.",
+      "owningDomain": "Moliboo ownership and wardrobe",
+      "authentication": "Bearer session required with profile:customize capability.",
+      "authorization": "Every item must belong to the authenticated account, match its server-owned slot, remain wearable and not be revoked; Legends 101-115 are non-wearable.",
+      "request": {"params": {}, "query": {}, "body": {"expectedRevision": "optional integer >=0", "items": "required array, maximum 16, unique slot and itemId; each {slot,itemId}"}, "validation": "Unknown privileged fields, invalid slots, duplicates, unowned items and revoked/non-wearable items are rejected."},
+      "success": {"status": 200, "body": "Envelope data {revision, updatedAt, items}; ownership and equipped state commit in one transaction."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED"]}, {"status": 401, "codes": ["UNAUTHENTICATED", "SESSION_EXPIRED"]}, {"status": 403, "codes": ["FORBIDDEN"]}, {"status": 409, "codes": ["REVISION_CONFLICT", "CONFLICT"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none"},
+      "idempotencyConcurrency": "Outfit row is locked in a transaction. expectedRevision makes competing writes deterministic: one succeeds and stale writes return REVISION_CONFLICT without partial state.",
+      "versioningCompatibility": "HTTP v1; clients should persist the returned revision and send it on subsequent writes."
     },
-    "POST /v1/premium/apple/notifications": {
-      "purpose": "Receive, verify and replay-protect Apple App Store Server Notifications V2 for sandbox Premium subscriptions.",
-      "owningDomain": "Premium Apple sandbox billing",
-      "authentication": "No user bearer session. Authorization is the verified Apple JWS certificate chain, signature, bundle identity and Sandbox environment.",
-      "authorization": "Only cryptographically verified Apple notifications are processed. Embedded transaction and renewal JWS values are independently verified. Account binding is resolved only from verified appAccountToken or an existing original-transaction ownership record.",
-      "request": {
-        "body": {
-          "signedPayload": "Required App Store Server Notifications V2 compact JWS, 16 to 200000 characters; the only accepted field."
-        },
-        "validation": "Outer notification and nested transaction/renewal signatures, bundle ID, environment, identifiers, dates and stored product mappings are validated. Raw JWS data is redacted and never stored."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "Either {accepted:true,replay,notificationUuid,notificationType,state:'processed|ignored|unbound',reasonCode,transactionId} or the verified transaction projection response."
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for malformed/unknown input, signature/certificate failure or invalid verified fields."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "403": [
-          "FORBIDDEN for non-Sandbox or unsupported verified transaction ownership/type."
-        ],
-        "409": [
-          "CONFLICT when a notification UUID is replayed with different signed evidence."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when sandbox verification or required catalogue/product state is unavailable."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "notificationUUID is the replay key. Same UUID plus same evidence returns replay=true; same UUID with different evidence is rejected. Transaction evidence uniqueness and per-account advisory locks prevent duplicate entitlement side effects.",
-      "versioningCompatibility": "HTTP v1 and response schemaVersion 1 where present. The server remains authoritative; sandbox transactions cannot establish production entitlement or identity verification. App Store Server Notifications V2 Sandbox only; no production notification URL is activated by this PR."
+    "POST /v1/admin/qa/moliboos/packs/:packId/withdraw": {
+      "purpose": "Withdraw one approved Moliboo release from QA advertisement while retaining its immutable bytes and prior releases.",
+      "owningDomain": "Moliboo signed distribution operations",
+      "authentication": "Bearer session required with admin:ops capability; route is not registered in production.",
+      "authorization": "QA/development only. Release, publisher and signer facts remain immutable; a reason is mandatory.",
+      "request": {"params": {"packId": "Moliboo package ID"}, "query": {}, "body": {"version": "optional semantic version; omitted selects latest", "reason": "required non-empty string, max 500"}, "validation": "Unknown fields and malformed identities are rejected."},
+      "success": {"status": 200, "body": "Envelope data {packageId, version, availability:'withdrawn', revision}."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED"]}, {"status": 401, "codes": ["UNAUTHENTICATED"]}, {"status": 403, "codes": ["FORBIDDEN"]}, {"status": 404, "codes": ["NOT_FOUND"]}, {"status": 409, "codes": ["CONFLICT"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none"},
+      "idempotencyConcurrency": "Release row is locked. Repeating an already-withdrawn transition returns the current revision without a duplicate event; transitions append immutable audit events.",
+      "versioningCompatibility": "QA-only HTTP v1 operations contract; never present in production runtime."
     },
-    "PUT /v1/admin/qa/premium/:handle": {
-      "purpose": "Assign an auditable synthetic Premium membership fixture to a test account in isolated QA.",
-      "owningDomain": "Premium QA administration",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Requires admin:ops. The route is registered only when the non-production QA assignment flag is enabled and is refused by configuration in production.",
-      "request": {
-        "path": {
-          "handle": "Required account handle, 1 to 80 characters."
-        },
-        "headers": {
-          "Idempotency-Key": "Required non-empty key, maximum 200 characters."
-        },
-        "body": {
-          "tier": "Required: core, plus, horizon, horizon_plus or studio.",
-          "subscriptionStatus": "Optional: active, expired, revoked or downgraded; defaults active.",
-          "effectiveAt": "Optional ISO date-time.",
-          "expiresAt": "Optional ISO date-time later than effectiveAt.",
-          "membershipSince": "Optional ISO date-time."
-        },
-        "validation": "Unknown and privileged fields are rejected; the target account is resolved server-side."
-      },
-      "success": {
-        "status": 200,
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "Updated target membership projection; entitlementSource is qa_fixture."
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for malformed fields, invalid timestamps, invalid tier/status, expiry ordering or missing Idempotency-Key."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "403": [
-          "FORBIDDEN without admin:ops."
-        ],
-        "404": [
-          "NOT_FOUND when the handle or account actor does not exist."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Idempotency-Key is unique in the membership event ledger. Exact retries return the current membership without a duplicate fixture event; membership revision advances on a new assignment.",
-      "versioningCompatibility": "HTTP v1, QA-only synthetic operation. It cannot process payment, grant identity verification or be enabled in production."
+    "POST /v1/admin/qa/moliboos/packs/:packId/restore": {
+      "purpose": "Restore a QA-withdrawn Moliboo release only while its release and signer trust remain valid.",
+      "owningDomain": "Moliboo signed distribution operations",
+      "authentication": "Bearer session required with admin:ops capability; route is not registered in production.",
+      "authorization": "QA/development only. Revoked, quarantined, invalidly signed or signer-revoked releases cannot be restored.",
+      "request": {"params": {"packId": "Moliboo package ID"}, "query": {}, "body": {"version": "optional semantic version; omitted selects latest", "reason": "optional string, max 500"}, "validation": "Unknown fields and malformed identities are rejected."},
+      "success": {"status": 200, "body": "Envelope data {packageId, version, availability:'approved', revision}."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED"]}, {"status": 401, "codes": ["UNAUTHENTICATED"]}, {"status": 403, "codes": ["FORBIDDEN", "RELEASE_REVOKED", "SIGNER_REVOKED", "UNTRUSTED_RELEASE"]}, {"status": 404, "codes": ["NOT_FOUND"]}, {"status": 409, "codes": ["CONFLICT"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "none"},
+      "idempotencyConcurrency": "Release row is locked. Repeating an already-approved transition returns current state without a duplicate event; restore appends an immutable audit event only on change.",
+      "versioningCompatibility": "QA-only HTTP v1 operations contract; never present in production runtime."
     },
-    "PUT /v1/admin/qa/premium/apple-products/:productId": {
-      "purpose": "Configure or disable one operator-confirmed Apple sandbox product-to-tier mapping for QA purchase verification.",
-      "owningDomain": "Premium Apple sandbox administration",
-      "authentication": "Required GreenField bearer access session.",
-      "authorization": "Requires admin:ops. The route is available only with QA assignments and Apple sandbox verification enabled; both are refused in production.",
-      "request": {
-        "path": {
-          "productId": "Required App Store product identifier matching ^[A-Za-z0-9][A-Za-z0-9._-]{2,159}$."
-        },
-        "body": {
-          "tier": "Required paid tier: plus, horizon, horizon_plus or studio.",
-          "billingPeriod": "Required: monthly or annual.",
-          "state": "Optional: active or disabled; defaults active."
-        },
-        "validation": "Unknown fields, Core mappings, invented billing periods and malformed identifiers are rejected. The server selects the active Premium catalogue."
-      },
-      "success": {
-        "status": 200,
-        "headers": {
-          "Cache-Control": "no-store"
-        },
-        "envelope": "{ok:true,data:<route data>,meta:{requestId,serverTime}}",
-        "data": "{productId,tier,billingPeriod,environment:'sandbox',state:'active|disabled'}"
-      },
-      "errors": {
-        "400": [
-          "VALIDATION_FAILED for malformed path/body values or unknown fields."
-        ],
-        "401": [
-          "UNAUTHENTICATED when a required GreenField bearer session is missing, invalid or expired."
-        ],
-        "403": [
-          "FORBIDDEN without admin:ops."
-        ],
-        "409": [
-          "CONFLICT when another active product already maps to the same catalogue tier and billing period."
-        ],
-        "500": [
-          "SERVER_ERROR for an unclassified internal failure; signed billing payloads and private account facts are never returned."
-        ],
-        "503": [
-          "CAPABILITY_UNAVAILABLE when sandbox verification or the active catalogue is unavailable."
-        ],
-        "envelope": "{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta:{requestId,serverTime}}"
-      },
-      "pagination": "Not paginated and accepts no filtering parameters.",
-      "idempotencyConcurrency": "Upsert by productId. A PostgreSQL advisory lock and partial unique index allow only one active product per catalogue tier, billing period and Sandbox environment.",
-      "versioningCompatibility": "HTTP v1, QA Sandbox only. Product identifiers are never seeded or inferred; App Store Connect confirmation is an external prerequisite."
+    "GET /v1/stickers/packs": {
+      "purpose": "List backward-compatible emoji packs plus approved signed Sprout image packs for composer, message and reaction consumers.",
+      "owningDomain": "Composer sticker content",
+      "authentication": "Public approved content catalogue; no session required.",
+      "authorization": "Database packs are returned only when the signed manifest, publisher, signer, release, revocation/quarantine state and every image digest match.",
+      "request": {"params": {}, "query": {"cursor": "optional opaque cursor, max 256 bytes", "limit": "integer 1-50, default 20", "series": "optional integer 1-99; filters signed packs and excludes legacy emoji packs"}, "body": null, "validation": "Unknown fields, invalid cursors and invalid bounds are rejected."},
+      "success": {"status": 200, "body": "Envelope data {packs: StickerPack[], nextCursor: string|null, hasMore: boolean}; signed packs include version, releaseId, package signature/download and per-sticker immutable PNG asset metadata."},
+      "errors": [{"status": 400, "codes": ["VALIDATION_FAILED", "INVALID_CURSOR"]}, {"status": 500, "codes": ["SERVER_ERROR"]}],
+      "pagination": {"style": "cursor", "ordering": "packId ascending", "default": 20, "maximum": 50},
+      "idempotencyConcurrency": "Safe read. Invalid or withdrawn database releases are omitted. Comment writes resolve sticker label, emoji and pack server-side and reject unknown IDs.",
+      "versioningCompatibility": "HTTP v1; existing {id,title,icon,stickers:[{id,emoji,label}]} fields remain; signed package and asset fields are additive."
     }
   }
 }
-
