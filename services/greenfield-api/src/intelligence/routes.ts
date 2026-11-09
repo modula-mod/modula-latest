@@ -4,12 +4,14 @@ import type {ModulaDb} from '../database/client.js'
 import type {AppConfig} from '../config/index.js'
 import type {GreenfieldSessionService} from '../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
+import {createGreenfieldCancelRuntime, sessionPrincipal} from './mission-cancel.js'
 import {GovernedIntelligenceService} from './service.js'
 
 type RouteConfig = Record<string, unknown>
 
 export async function registerIntelligenceRoutes(app: FastifyInstance, db: ModulaDb, sessions: GreenfieldSessionService, routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig}, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
   const intelligence = new GovernedIntelligenceService(db, config)
+  const cancelRuntime = createGreenfieldCancelRuntime(db)
 
   app.post('/v1/intelligence/missions', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
@@ -37,6 +39,13 @@ export async function registerIntelligenceRoutes(app: FastifyInstance, db: Modul
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try { return reply.send(successEnvelope(await intelligence.start(auth.accountId, param(request, 'missionId')), request.id)) }
+    catch (error) { return sendIntelligenceError(reply, error, request.id) }
+  })
+
+  app.post('/v1/intelligence/missions/:missionId/cancel', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try { return reply.send(successEnvelope(await cancelRuntime.cancel(sessionPrincipal(auth.accountId), param(request, 'missionId')), request.id)) }
     catch (error) { return sendIntelligenceError(reply, error, request.id) }
   })
 

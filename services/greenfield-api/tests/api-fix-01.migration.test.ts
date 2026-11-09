@@ -21,7 +21,7 @@ function expectMediaTypes(definition: string | undefined, expected: readonly str
   for (const mediaType of expected) expect(definition).toContain(mediaType)
 }
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 084', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 085', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -123,7 +123,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs',
+      '084_moliboo_signed_packs', '085_publisher_release_console',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -131,7 +131,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('084')
+    expect(version.rows[0]?.value).toBe('085')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -140,7 +140,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('084_moliboo_signed_packs')
+    expect(applied.at(-1)).toBe('085_publisher_release_console')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -163,6 +163,29 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(canonicalMolibooItems.rows[0]?.count).toBeGreaterThan(0)
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
+
+    expect(await migrateDown(freshUrl)).toBe('085_publisher_release_console')
+    const rolledBackConsole = new pg.Client({connectionString: freshUrl})
+    await rolledBackConsole.connect()
+    const consoleTables = await rolledBackConsole.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs, to_regclass('public.greenfield_publisher_release_job_logs') AS logs`)
+    const dispatchCheck = await rolledBackConsole.query(`SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conname = 'background_jobs_dispatch_mode_check'`)
+    const versionAfterPublisher = await rolledBackConsole.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(consoleTables.rows[0]).toEqual({jobs: null, logs: null})
+    expect(dispatchCheck.rows[0]?.definition).not.toContain('PUBLISHER_RELEASE_RUNNER')
+    expect(versionAfterPublisher.rows[0]?.value).toBe('084')
+    const molibooAfterPublisher = await rolledBackConsole.query(`
+      SELECT to_regclass('public.greenfield_moliboo_characters') AS characters,
+             to_regclass('public.greenfield_moliboo_pack_releases') AS packs
+    `)
+    const mediaAfterPublisher = await rolledBackConsole.query(`
+      SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+      WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
+    `)
+    expect(molibooAfterPublisher.rows[0]).toEqual({
+      characters: 'greenfield_moliboo_characters', packs: 'greenfield_moliboo_pack_releases',
+    })
+    expectMediaTypes(mediaAfterPublisher.rows[0]?.definition, mediaTypesAfter084)
+    await rolledBackConsole.end()
 
     expect(await migrateDown(freshUrl)).toBe('084_moliboo_signed_packs')
     const rolledBackMoliboo = new pg.Client({connectionString: freshUrl})
@@ -310,7 +333,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs',
+      '084_moliboo_signed_packs', '085_publisher_release_console',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -340,7 +363,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs',
+      '084_moliboo_signed_packs', '085_publisher_release_console',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
@@ -355,7 +378,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(version.rows[0]?.value).toBe('084')
+    expect(version.rows[0]?.value).toBe('085')
     expect(account.rows[0]?.count).toBe(1)
     expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     await after.end()

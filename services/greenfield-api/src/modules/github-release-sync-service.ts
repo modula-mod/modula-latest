@@ -19,8 +19,12 @@ import {GreenfieldModuleReleaseService, type GreenfieldModuleReleaseEvidence} fr
 export type GithubReleaseAsset = {name: string; size: number; apiUrl: string; digest: string | null}
 export type GithubRelease = {tagName: string; draft: boolean; prerelease: boolean; assets: GithubReleaseAsset[]}
 
+export type GithubReleaseListing = GithubRelease & {name: string | null; publishedAt: string | null}
+
 export interface GithubReleaseSource {
   getRelease(repository: string, tag: string): Promise<GithubRelease>
+  /** Metadata-only listing of recent releases (no asset downloads). Optional for older sources. */
+  listReleases?(repository: string, limit: number): Promise<GithubReleaseListing[]>
   resolveTagCommit(repository: string, tag: string): Promise<string>
   downloadAsset(asset: GithubReleaseAsset, maxBytes: number): Promise<Buffer>
 }
@@ -56,6 +60,24 @@ export class HttpGithubReleaseSource implements GithubReleaseSource {
         digest: typeof asset.digest === 'string' ? asset.digest : null,
       })),
     }
+  }
+
+  async listReleases(repository: string, limit: number): Promise<GithubReleaseListing[]> {
+    const perPage = Math.max(1, Math.min(100, Math.floor(limit)))
+    const body = await this.api(`/repos/${normalizeRepository(repository)}/releases?per_page=${perPage}`) as any
+    return (Array.isArray(body) ? body : []).map((release: any) => ({
+      tagName: String(release.tag_name ?? ''),
+      name: typeof release.name === 'string' ? release.name : null,
+      draft: Boolean(release.draft),
+      prerelease: Boolean(release.prerelease),
+      publishedAt: typeof release.published_at === 'string' ? release.published_at : null,
+      assets: (Array.isArray(release.assets) ? release.assets : []).map((asset: any) => ({
+        name: String(asset.name ?? ''),
+        size: Number(asset.size ?? 0),
+        apiUrl: String(asset.url ?? ''),
+        digest: typeof asset.digest === 'string' ? asset.digest : null,
+      })),
+    }))
   }
 
   async resolveTagCommit(repository: string, tag: string): Promise<string> {
@@ -344,27 +366,9 @@ export class GreenfieldGithubReleaseSyncService {
       }
       if (dryRun) return {mode: 'DRY_RUN' as const, ...base}
 
-      let release = existing ?? await releases.importPendingReview(verified.manifest, verified.evidence)
-      if (release.releaseState === 'quarantined' || release.releaseState === 'revoked') throw moduleError('FORBIDDEN', `Release is ${release.releaseState}; sync will not change it`)
-      if (release.releaseState === 'pendingReview') release = await releases.verifyRelease(verified.productId, verified.version)
-      await this.storePackageBlob(release.releaseId, verified)
-      const ingested = await new GreenfieldMpsIngestService(this.db).ingest({
-        filename: 'modula.product.json',
-        bytes: verified.mpsBytes,
-        releaseId: release.releaseId,
-        frontend: verified.frontend,
-        schemas: verified.schemas,
-        assets: verified.assets,
-        packageArtifact: verified.optionalPackage,
-        distributionVerified: true,
-      })
-      if (!ingested || ingested.productId !== verified.productId || ingested.version !== verified.version) throw moduleError('VALIDATION_FAILED', 'MPS ingest did not persist the release')
-      const channel = releaseChannelFromMps(verified.mpsBytes)
-      if (release.releaseState === 'published' || release.releaseState === 'superseded') {
-        if (release.releaseChannel !== channel) throw moduleError('CONFLICT', 'Published release channel is immutable')
-      } else {
-        await this.db.updateTable('greenfield_module_releases').set({release_channel: channel}).where('release_id', '=', release.releaseId).execute()
-      }
+      const applied = await this.applyVerified(verified, existing ?? null)
+      let release = applied.release
+      const channel = applied.channel
       if (input.publish && release.releaseState === 'verified') release = await releases.publishRelease(verified.productId, verified.version)
       const summary = {...base, releaseId: release.releaseId, releaseState: release.releaseState, releaseChannel: channel, packageStored: true, assetsStored: verified.assets.length}
       await this.db.updateTable('greenfield_module_sync_runs').set({status: 'completed', completed_at: new Date(), summary: JSON.stringify(summary)}).where('sync_run_id', '=', runId).execute()
@@ -378,6 +382,39 @@ export class GreenfieldGithubReleaseSyncService {
       }
       throw error
     }
+  }
+
+  /**
+   * Imports (or continues) a fetched-and-verified release into the registry,
+   * verifies it, stores the immutable package blob and ingests MPS. Never
+   * publishes. Shared by sync() and the publisher release console runner.
+   */
+  async applyVerified(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    const releases = new GreenfieldModuleReleaseService(this.db)
+    const current = existing === undefined ? await releases.getRelease(verified.productId, verified.version) : existing
+    if (current) assertStoredProvenance(verified, current)
+    let release = current ?? await releases.importPendingReview(verified.manifest, verified.evidence)
+    if (release.releaseState === 'quarantined' || release.releaseState === 'revoked') throw moduleError('FORBIDDEN', `Release is ${release.releaseState}; sync will not change it`)
+    if (release.releaseState === 'pendingReview') release = await releases.verifyRelease(verified.productId, verified.version)
+    await this.storePackageBlob(release.releaseId, verified)
+    const ingested = await new GreenfieldMpsIngestService(this.db).ingest({
+      filename: 'modula.product.json',
+      bytes: verified.mpsBytes,
+      releaseId: release.releaseId,
+      frontend: verified.frontend,
+      schemas: verified.schemas,
+      assets: verified.assets,
+      packageArtifact: verified.optionalPackage,
+      distributionVerified: true,
+    })
+    if (!ingested || ingested.productId !== verified.productId || ingested.version !== verified.version) throw moduleError('VALIDATION_FAILED', 'MPS ingest did not persist the release')
+    const channel = releaseChannelFromMps(verified.mpsBytes)
+    if (release.releaseState === 'published' || release.releaseState === 'superseded') {
+      if (release.releaseChannel !== channel) throw moduleError('CONFLICT', 'Published release channel is immutable')
+    } else {
+      await this.db.updateTable('greenfield_module_releases').set({release_channel: channel}).where('release_id', '=', release.releaseId).execute()
+    }
+    return {release, channel}
   }
 
   private async storePackageBlob(releaseId: string, verified: VerifiedGithubRelease) {
@@ -494,7 +531,7 @@ function hasNativeExecutableMagic(bytes: Buffer): boolean {
     ['feedface', 'cefaedfe', 'feedfacf', 'cffaedfe', 'cafebabe', 'bebafeca'].includes(head)
 }
 
-function releaseChannelFromMps(bytes: Buffer): 'stable' | 'beta' | 'rc' | 'dev' {
+export function releaseChannelFromMps(bytes: Buffer): 'stable' | 'beta' | 'rc' | 'dev' {
   const raw = parseJson(bytes, 'modula.product.json') as Record<string, any>
   const channel = raw.release?.channel
   return channel === 'beta' || channel === 'rc' || channel === 'dev' ? channel : 'stable'
@@ -642,12 +679,12 @@ function assertAssetDigest(asset: GithubReleaseAsset, bytes: Buffer) {
   if (asset.digest && asset.digest !== `sha256:${sha256(bytes)}`) throw moduleError('VALIDATION_FAILED', `GitHub digest mismatch for ${asset.name}`)
 }
 
-function normalizeRepository(value: unknown): string {
+export function normalizeRepository(value: unknown): string {
   if (typeof value !== 'string' || !/^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9._-]{1,100}$/.test(value.trim())) throw moduleError('VALIDATION_FAILED', 'repository must be owner/name')
   return value.trim()
 }
 
-function normalizeTag(value: unknown): string {
+export function normalizeTag(value: unknown): string {
   if (typeof value !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._\/-]{0,199}$/.test(value.trim()) || value.includes('..')) throw moduleError('VALIDATION_FAILED', 'releaseTag is invalid')
   return value.trim()
 }

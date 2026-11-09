@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T21:22:47.564Z",
+  "capturedAt": "2026-11-09T21:10:05.020Z",
   "source": {
-    "branch": "mosaic/pr160-084-privileges",
-    "headAtCapture": "afe483aa8733998c2e412b4831d5c8e3df3e2b04",
+    "branch": "integration/gate-01",
+    "headAtCapture": "0b1e8da89eb871a94459e7cd8a974da3b4f1ff54",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "deff9dffdeb95008d9d099f800a52eeb838e060da6d3afead7b006dfd4422771"
+    "apiSourceSha256": "ae54a8e50b3c47d850ae78cdf7b20733a5e297897aabe03ff0a9945356392257"
   },
   "runtimeRoutes": [
     {
@@ -2337,6 +2337,15 @@
       "method": "POST",
       "url": "/v1/intelligence/missions/:missionId/start",
       "path": "/v1/intelligence/missions/:missionId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/cancel",
+      "path": "/v1/intelligence/missions/:missionId/cancel",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -7376,6 +7385,177 @@
       "method": "POST",
       "url": "/v1/internal/build-service/builds/:buildId/result",
       "path": "/v1/internal/build-service/builds/:buildId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules",
+      "path": "/v1/publisher/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules",
+      "path": "/v1/publisher/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId",
+      "path": "/v1/publisher/modules/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId",
+      "path": "/v1/publisher/modules/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/versions",
+      "path": "/v1/publisher/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/versions",
+      "path": "/v1/publisher/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/github-releases",
+      "path": "/v1/publisher/modules/:moduleId/github-releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/github-releases",
+      "path": "/v1/publisher/modules/:moduleId/github-releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/release-jobs",
+      "path": "/v1/publisher/modules/:moduleId/release-jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/release-jobs",
+      "path": "/v1/publisher/modules/:moduleId/release-jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/modules/:moduleId/release-jobs",
+      "path": "/v1/publisher/modules/:moduleId/release-jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/release-jobs/:jobId",
+      "path": "/v1/publisher/release-jobs/:jobId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/release-jobs/:jobId",
+      "path": "/v1/publisher/release-jobs/:jobId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/release-jobs/:jobId/logs",
+      "path": "/v1/publisher/release-jobs/:jobId/logs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/release-jobs/:jobId/logs",
+      "path": "/v1/publisher/release-jobs/:jobId/logs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/validate",
+      "path": "/v1/publisher/release-jobs/:jobId/validate",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/publish",
+      "path": "/v1/publisher/release-jobs/:jobId/publish",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/cancel",
+      "path": "/v1/publisher/release-jobs/:jobId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/resume",
+      "path": "/v1/publisher/release-jobs/:jobId/resume",
       "prefix": "",
       "schema": null,
       "config": null,

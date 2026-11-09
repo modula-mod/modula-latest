@@ -1,13 +1,13 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 84 ordered up migrations, latest `084_moliboo_signed_packs.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 85 ordered up migrations, latest `085_publisher_release_console.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 350
-- Tables with API/worker source references: 336
+- Production tables: 352
+- Tables with API/worker source references: 338
 - Orphan candidates requiring manual confirmation: 14
 - Write-only candidates: 39
 - Read-only candidates: 35
@@ -452,8 +452,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `002_phase6_social_atproto.sql`
 - Routes reading: `POST /v1/backend/products/:productId/jobs`, `POST /v1/backend/products/:productId/jobs/:jobId/cancel`, `POST /v1/backend/products/:productId/jobs/:jobId/fail`, `GET /v1/backend/products/:productId/jobs/:jobId/result`, `POST /v1/backend/products/:productId/jobs/:jobId/start`, `POST /v1/backend/products/:productId/jobs/:jobId/succeed`, `POST /v1/backend/products/:productId/jobs/claim`
 - Routes writing: `POST /v1/accounts/me/modula-mail/forwarding`, `POST /v1/accounts/me/modula-mail/provision`, `POST /v1/admin/ops/queue/dead-letters/:deadLetterId/retry`, `POST /v1/backend/products/:productId/jobs`, `POST /v1/backend/products/:productId/jobs/:jobId/cancel`, `POST /v1/backend/products/:productId/jobs/:jobId/fail`, `POST /v1/backend/products/:productId/jobs/:jobId/start`, `POST /v1/backend/products/:productId/jobs/:jobId/succeed`, `POST /v1/backend/products/:productId/jobs/claim`
-- API/worker source reads: `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/notifications/reaction-dead-letter-retry.ts`, `services/greenfield-api/src/domains/system/status.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/outbox/drain.ts`
-- API/worker source writes: `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/notifications/reaction-dead-letter-retry.ts`, `services/greenfield-api/src/domains/outbox/repository.ts`, `services/greenfield-api/src/domains/search/repository.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/mail/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/events/runner.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/modules/extension-event-handler.ts`, `services/greenfield-worker/src/outbox/drain.ts`
+- API/worker source reads: `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/notifications/reaction-dead-letter-retry.ts`, `services/greenfield-api/src/domains/system/status.ts`, `services/greenfield-api/src/publisher/release-job-runner.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/outbox/drain.ts`
+- API/worker source writes: `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/notifications/reaction-dead-letter-retry.ts`, `services/greenfield-api/src/domains/outbox/repository.ts`, `services/greenfield-api/src/domains/search/repository.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/mail/service.ts`, `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-runner.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/events/runner.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/modules/extension-event-handler.ts`, `services/greenfield-worker/src/outbox/drain.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `blocks`
@@ -1521,9 +1521,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `047_greenfield_backend_v1_developer_domain.sql`
-- Routes reading: `GET /v1/developer/board`, `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`, `POST /v1/developer/organisations/:organisationId/members`, `GET /v1/developer/products`, `POST /v1/developer/products`, `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/developer/products/:productId/releases`, `PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/products/:productId/sources`, `POST /v1/developer/products/:productId/test-groups`, `POST /v1/developer/publishers`, `POST /v1/developer/publishers/:publisherId/namespaces`, `POST /v1/intelligence/missions`
+- Routes reading: `GET /v1/developer/board`, `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`, `POST /v1/developer/organisations/:organisationId/members`, `GET /v1/developer/products`, `POST /v1/developer/products`, `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/developer/products/:productId/releases`, `PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/products/:productId/sources`, `POST /v1/developer/products/:productId/test-groups`, `POST /v1/developer/publishers`, `POST /v1/developer/publishers/:publisherId/namespaces`, `POST /v1/intelligence/missions`, `GET /v1/publisher/modules`
 - Routes writing: `POST /v1/developer/organisations`, `POST /v1/developer/organisations/:organisationId/invitations/accept`, `POST /v1/developer/organisations/:organisationId/members`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/intelligence/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/intelligence/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -1555,9 +1555,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `047_greenfield_backend_v1_developer_domain.sql`
-- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/developer/board`, `GET /v1/developer/products`, `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/developer/products/:productId/releases`, `PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/products/:productId/sources`, `POST /v1/developer/products/:productId/test-groups`
+- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/developer/board`, `GET /v1/developer/products`, `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/developer/products/:productId/releases`, `PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/products/:productId/sources`, `POST /v1/developer/products/:productId/test-groups`, `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/versions`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/developer/products`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/developers/service.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -1657,9 +1657,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`, `revoked_at`
 - Migration introduced: `047_greenfield_backend_v1_developer_domain.sql`
-- Routes reading: `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/internal/build-service/builds/:buildId/result`, `POST /v1/internal/build-service/claims`
+- Routes reading: `GET /v1/developer/products/:productId`, `POST /v1/developer/products/:productId/builds`, `POST /v1/internal/build-service/builds/:buildId/result`, `POST /v1/internal/build-service/claims`, `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/versions`
 - Routes writing: `POST /v1/developer/products/:productId/sources`
-- API/worker source reads: `services/greenfield-api/src/developers/build-coordinator.ts`, `services/greenfield-api/src/developers/service.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/build-coordinator.ts`, `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3323,9 +3323,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `verified_at`, `revoked_at`, `observed_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `GET /v1/modules/:moduleId/installation-descriptor`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/rollback`, `POST /v1/modules/:moduleId/update`, `POST /v1/modules/:moduleId/update-plan`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/registry/releases/:releaseId/descriptor`
+- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `GET /v1/modules/:moduleId/installation-descriptor`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/rollback`, `POST /v1/modules/:moduleId/update`, `POST /v1/modules/:moduleId/update-plan`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/versions`, `GET /v1/registry/releases/:releaseId/descriptor`
 - Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`
-- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3340,9 +3340,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `published_at`, `quarantined_at`, `revoked_at`, `superseded_at`, `created_at`, `updated_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `GET /v1/gubic/categories`, `GET /v1/gubic/featured`, `GET /v1/gubic/games`, `GET /v1/gubic/games/:gameId`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/games/:gameId/versions`, `GET /v1/gubic/my-games`, `GET /v1/gubic/new-releases`, `GET /v1/gubic/publishers/:publisherId`, `GET /v1/module-host/:targetProductId/composition`, `POST /v1/modules/:moduleId/ai/requests`, `GET /v1/modules/:moduleId/backend`, `POST /v1/modules/:moduleId/backend/disable`, `POST /v1/modules/:moduleId/backend/discover`, `POST /v1/modules/:moduleId/backend/health`, `POST /v1/modules/:moduleId/disable`, `POST /v1/modules/:moduleId/enable`, `DELETE /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install`, `GET /v1/modules/:moduleId/install-descriptor`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/permissions/review`, `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `POST /v1/modules/:moduleId/rollback`, `GET /v1/modules/:moduleId/runtime`, `POST /v1/modules/:moduleId/services/:serviceId/invoke`, `POST /v1/modules/:moduleId/uninstall-preview`, `POST /v1/modules/:moduleId/update`, `GET /v1/modules/contributions`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/installed`, `GET /v1/modules/installed/:moduleId`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/providers/:capabilityRole`, `PUT /v1/providers/:capabilityRole/default`, `GET /v1/providers/:capabilityRole/resolve`, `GET /v1/registry/artifacts/:sha256`, `GET /v1/registry/modules`, `GET /v1/registry/modules/:moduleId`, `PUT /v1/registry/modules/:moduleId/rating`, `GET /v1/registry/modules/:moduleId/versions`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products`, `GET /v1/registry/products/:productId`, `GET /v1/registry/products/:productId/relationships`, `GET /v1/registry/releases/:releaseId/artifact`, `GET /v1/registry/releases/:releaseId/assets/:assetId`, `GET /v1/registry/releases/:releaseId/descriptor`
+- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `GET /v1/gubic/categories`, `GET /v1/gubic/featured`, `GET /v1/gubic/games`, `GET /v1/gubic/games/:gameId`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/games/:gameId/versions`, `GET /v1/gubic/my-games`, `GET /v1/gubic/new-releases`, `GET /v1/gubic/publishers/:publisherId`, `GET /v1/module-host/:targetProductId/composition`, `POST /v1/modules/:moduleId/ai/requests`, `GET /v1/modules/:moduleId/backend`, `POST /v1/modules/:moduleId/backend/disable`, `POST /v1/modules/:moduleId/backend/discover`, `POST /v1/modules/:moduleId/backend/health`, `POST /v1/modules/:moduleId/disable`, `POST /v1/modules/:moduleId/enable`, `DELETE /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install`, `GET /v1/modules/:moduleId/install-descriptor`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/permissions/review`, `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `POST /v1/modules/:moduleId/rollback`, `GET /v1/modules/:moduleId/runtime`, `POST /v1/modules/:moduleId/services/:serviceId/invoke`, `POST /v1/modules/:moduleId/uninstall-preview`, `POST /v1/modules/:moduleId/update`, `GET /v1/modules/contributions`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/installed`, `GET /v1/modules/installed/:moduleId`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/providers/:capabilityRole`, `PUT /v1/providers/:capabilityRole/default`, `GET /v1/providers/:capabilityRole/resolve`, `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/versions`, `POST /v1/publisher/release-jobs/:jobId/publish`, `POST /v1/publisher/release-jobs/:jobId/resume`, `GET /v1/registry/artifacts/:sha256`, `GET /v1/registry/modules`, `GET /v1/registry/modules/:moduleId`, `PUT /v1/registry/modules/:moduleId/rating`, `GET /v1/registry/modules/:moduleId/versions`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products`, `GET /v1/registry/products/:productId`, `GET /v1/registry/products/:productId/relationships`, `GET /v1/registry/releases/:releaseId/artifact`, `GET /v1/registry/releases/:releaseId/assets/:assetId`, `GET /v1/registry/releases/:releaseId/descriptor`
 - Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `POST /v1/admin/registry/sync`
-- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/modules/contribution-service.ts`, `services/greenfield-api/src/modules/dependency-resolver.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/installation-service.ts`, `services/greenfield-api/src/modules/legacy-upgrade-progress.ts`, `services/greenfield-api/src/modules/marketplace-service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-api/src/modules/permission-reconciliation-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-api/src/modules/record-sharing-service.ts`, `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/runtime-access.ts`, `services/greenfield-api/src/modules/runtime2-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-api/src/providers/service.ts`, `services/greenfield-worker/src/modules/disable-handler.ts`, `services/greenfield-worker/src/modules/enable-handler.ts`, `services/greenfield-worker/src/modules/installation-handler.ts`, `services/greenfield-worker/src/modules/standard2-runtime-registration.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`, `services/greenfield-worker/src/modules/update-handler.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/module-projector.ts`, `services/greenfield-worker/src/search/module-release-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/modules/contribution-service.ts`, `services/greenfield-api/src/modules/dependency-resolver.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/installation-service.ts`, `services/greenfield-api/src/modules/legacy-upgrade-progress.ts`, `services/greenfield-api/src/modules/marketplace-service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-api/src/modules/permission-reconciliation-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-api/src/modules/record-sharing-service.ts`, `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/runtime-access.ts`, `services/greenfield-api/src/modules/runtime2-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-api/src/providers/service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/disable-handler.ts`, `services/greenfield-worker/src/modules/enable-handler.ts`, `services/greenfield-worker/src/modules/installation-handler.ts`, `services/greenfield-worker/src/modules/standard2-runtime-registration.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`, `services/greenfield-worker/src/modules/update-handler.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/module-projector.ts`, `services/greenfield-worker/src/search/module-release-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/github-release-sync-service.ts`, `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3476,9 +3476,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `fetched_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `GET /v1/registry/releases/:releaseId/artifact`
+- Routes reading: `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/versions`, `GET /v1/registry/releases/:releaseId/artifact`
 - Routes writing: `POST /v1/admin/registry/modules/import`
-- API/worker source reads: `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3578,9 +3578,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `GET /v1/module-host/:targetProductId/composition`, `POST /v1/modules/:moduleId/ai/requests`, `GET /v1/modules/:moduleId/backend`, `POST /v1/modules/:moduleId/backend/disable`, `POST /v1/modules/:moduleId/backend/discover`, `POST /v1/modules/:moduleId/backend/health`, `GET /v1/modules/updates`, `GET /v1/providers/:capabilityRole`, `PUT /v1/providers/:capabilityRole/default`, `GET /v1/providers/:capabilityRole/resolve`, `GET /v1/registry/modules`, `GET /v1/registry/modules/:moduleId`, `GET /v1/registry/modules/:moduleId/versions`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products`, `GET /v1/registry/products/:productId`, `GET /v1/registry/products/:productId/relationships`
+- Routes reading: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `GET /v1/module-host/:targetProductId/composition`, `POST /v1/modules/:moduleId/ai/requests`, `GET /v1/modules/:moduleId/backend`, `POST /v1/modules/:moduleId/backend/disable`, `POST /v1/modules/:moduleId/backend/discover`, `POST /v1/modules/:moduleId/backend/health`, `GET /v1/modules/updates`, `GET /v1/providers/:capabilityRole`, `PUT /v1/providers/:capabilityRole/default`, `GET /v1/providers/:capabilityRole/resolve`, `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/versions`, `GET /v1/registry/modules`, `GET /v1/registry/modules/:moduleId`, `GET /v1/registry/modules/:moduleId/versions`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products`, `GET /v1/registry/products/:productId`, `GET /v1/registry/products/:productId/relationships`
 - Routes writing: `POST /v1/admin/registry/modules/import`
-- API/worker source reads: `services/greenfield-api/src/modules/dependency-resolver.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/marketplace-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/runtime-access.ts`, `services/greenfield-api/src/providers/service.ts`, `services/greenfield-worker/src/modules/standard2-runtime-registration.ts`, `services/greenfield-worker/src/search/module-projector.ts`, `services/greenfield-worker/src/search/module-release-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/dependency-resolver.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/marketplace-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/runtime-access.ts`, `services/greenfield-api/src/providers/service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/standard2-runtime-registration.ts`, `services/greenfield-worker/src/search/module-projector.ts`, `services/greenfield-worker/src/search/module-release-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4209,7 +4209,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `POST /v1/developer/products`, `POST /v1/developer/publishers/:publisherId/namespaces`
 - Routes writing: `POST /v1/admin/developer/namespaces/:namespace/verify`, `POST /v1/admin/registry/publishers/:publisherId/revoke`, `POST /v1/developer/publishers/:publisherId/namespaces`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4224,10 +4224,44 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`
 - Migration introduced: `047_greenfield_backend_v1_developer_domain.sql`
-- Routes reading: `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`, `POST /v1/developer/products`, `POST /v1/developer/publishers/:publisherId/namespaces`
+- Routes reading: `PUT /v1/developer/gubic/games/:gameId`, `GET /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions`, `POST /v1/developer/gubic/submissions/:submissionId/withdraw`, `POST /v1/developer/products`, `POST /v1/developer/publishers/:publisherId/namespaces`, `GET /v1/publisher/modules`
 - Routes writing: `POST /v1/developer/publishers`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/gubic/play-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_publisher_release_job_logs`
+
+- Purpose: application state for greenfield publisher release job logs
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `085_publisher_release_console.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/publisher/release-job-core.ts`
+- API/worker source writes: `services/greenfield-api/src/publisher/release-job-core.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_publisher_release_jobs`
+
+- Purpose: application state for greenfield publisher release jobs
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `085_publisher_release_console.sql`
+- Routes reading: `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/versions`, `POST /v1/publisher/release-jobs/:jobId/cancel`
+- Routes writing: `POST /v1/publisher/modules/:moduleId/release-jobs`
+- API/worker source reads: `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
+- API/worker source writes: `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_publisher_signing_key_events`
@@ -4275,9 +4309,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`, `verified_at`, `suspended_at`, `revoked_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/publishers/:publisherId/revoke`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/suspend`, `POST /v1/admin/registry/publishers/:publisherId/verify`, `POST /v1/developer/products`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/publishers`, `GET /v1/gubic/publishers/:publisherId`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-preview`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/registry/modules`, `GET /v1/registry/products`, `GET /v1/registry/publishers/:publisherId`
+- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/publishers/:publisherId/revoke`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/suspend`, `POST /v1/admin/registry/publishers/:publisherId/verify`, `POST /v1/developer/products`, `POST /v1/developer/products/:productId/reviews`, `POST /v1/developer/publishers`, `GET /v1/gubic/publishers/:publisherId`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-preview`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/registry/modules`, `GET /v1/registry/products`, `GET /v1/registry/publishers/:publisherId`
 - Routes writing: `POST /v1/admin/registry/publishers/:publisherId/revoke`, `POST /v1/admin/registry/publishers/:publisherId/suspend`, `POST /v1/admin/registry/publishers/:publisherId/verify`, `POST /v1/developer/publishers`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/installation-service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/installation-service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -5025,8 +5059,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_approvals`
@@ -5042,8 +5076,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_artifacts`
@@ -5059,8 +5093,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_circuit_revisions`
@@ -5110,8 +5144,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_governor_decisions`
@@ -5127,8 +5161,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_ledger_events`
@@ -5144,8 +5178,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_missions`
@@ -5161,8 +5195,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_plan_steps`
@@ -5178,8 +5212,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_plans`
@@ -5195,8 +5229,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_proposals`
@@ -5212,8 +5246,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_run_steps`
@@ -5230,7 +5264,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: none observed
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: WRITE-ONLY CANDIDATE
 
 ### `intelligence_runs`
@@ -5246,8 +5280,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-runtime-store.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `job_failures`

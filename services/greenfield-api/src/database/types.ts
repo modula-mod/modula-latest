@@ -43,7 +43,7 @@ export type DeveloperReleaseChannel = 'DEVELOPMENT' | 'INTERNAL' | 'ALPHA' | 'BE
 export type DeveloperReviewState = 'DRAFT' | 'SUBMITTED' | 'AUTOMATED_REVIEW' | 'MANUAL_REVIEW' | 'CHANGES_REQUIRED' | 'APPROVED' | 'REJECTED' | 'PUBLISHED' | 'SUSPENDED' | 'REMOVED'
 export type BackgroundJobStatus = 'QUEUED' | 'LEASED' | 'RUNNING' | 'RETRYING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'DEAD_LETTER'
 export type BackgroundJobOwnerType = 'platform' | 'account' | 'organisation' | 'product' | 'installation'
-export type BackgroundJobDispatchMode = 'GREENFIELD_WORKER' | 'SERVICE_PULL'
+export type BackgroundJobDispatchMode = 'GREENFIELD_WORKER' | 'SERVICE_PULL' | 'PUBLISHER_RELEASE_RUNNER'
 export type EventProducerKind = 'platform' | 'product' | 'service' | 'connector' | 'user'
 export type GreenfieldEngineExecutionMode = 'IN_PROCESS' | 'SERVICE_FABRIC' | 'CONTRACT_ONLY'
 export type GreenfieldEngineRuntimeStatus = 'READY' | 'CONTRACT_ONLY' | 'DISABLED' | 'QUARANTINED'
@@ -1292,6 +1292,36 @@ export interface Database {
   greenfield_developer_profiles: {account_id: string; display_name: string; biography: string; website: string | null; status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED'; created_at: Date; updated_at: Date}
   greenfield_developer_organisations: {organisation_id: string; slug: string; display_name: string; status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED'; created_by_account_id: string; created_at: Date; updated_at: Date}
   greenfield_developer_organisation_memberships: {membership_id: string; organisation_id: string; account_id: string; role: 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'RELEASE_MANAGER' | 'VIEWER'; state: 'INVITED' | 'ACTIVE' | 'SUSPENDED' | 'REMOVED'; invited_by_account_id: string | null; created_at: Date; updated_at: Date}
+  greenfield_publisher_release_jobs: {
+    job_id: string
+    module_id: string
+    publisher_id: string
+    created_by_account_id: string
+    source_repository: string
+    release_tag: string
+    source_commit: string | null
+    version: string | null
+    channel: 'stable' | 'beta' | 'rc' | 'dev' | null
+    artifact_sha256: string | null
+    release_id: string | null
+    state: string
+    cancelled_from_state: string | null
+    preview: unknown
+    signature: unknown
+    validation: unknown
+    permission_delta: unknown | null
+    permission_change_acknowledged: Generated<boolean>
+    error: unknown | null
+    idempotency_key: string | null
+    publish_requested_by_account_id: string | null
+    publish_started_at: Date | null
+    revision: Generated<number>
+    created_at: Date
+    updated_at: Date
+    published_at: Date | null
+    cancelled_at: Date | null
+  }
+  greenfield_publisher_release_job_logs: {log_id: Generated<number>; job_id: string; level: 'info' | 'warn' | 'error'; step: string | null; message: string; created_at: Generated<Date>}
   greenfield_publisher_owners: {publisher_owner_id: string; publisher_id: string; owner_type: 'ACCOUNT' | 'ORGANISATION'; account_id: string | null; organisation_id: string | null; created_at: Date}
   greenfield_developer_agreements: {agreement_id: string; version: string; document_hash: string; effective_at: Date; superseded_at: Date | null; created_at: Date}
   greenfield_developer_agreement_acceptances: {acceptance_id: string; agreement_id: string; agreement_version: string; accepted_by_account_id: string; accepted_at: Date; document_hash: string}
