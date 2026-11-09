@@ -68,6 +68,7 @@ export function domainFor(path) {
     [/^\/v1\/repositories\b/, 'Account'],
     [/^\/v1\/(board)\b/, 'Account'],
     [/^\/v1\/saves\b/, 'Posts'],
+    [/^\/v1\/stories\b/, 'Media'],
     [/\/comments?(?:\/|$)|\/replies(?:\/|$)/, 'Comments'],
     [/\/reactions?(?:\/|$)|\/likes?(?:\/|$)/, 'Reactions'],
     [/\/(?:followers|following|follow|unfollow|relationships?|blocks?|mutes?)(?:\/|$)/, 'Social'],

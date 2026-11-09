@@ -1,11 +1,16 @@
 import {createHash, randomUUID} from 'node:crypto'
 import {mkdir, rm, writeFile} from 'node:fs/promises'
 import {join} from 'node:path'
+import {sql, type Transaction} from 'kysely'
 
 import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
+import type {Database} from '../../database/types.js'
+import {GreenfieldDomainEventRepository} from '../../events/domain-events.js'
 import {AttachmentPolicy} from '../attachments/policy.js'
 import {inspectImageDimensions, verifyAttachmentSignature} from '../attachments/service.js'
+import {MessagingService, normalizeMessageText, type StoryMessageContext} from '../messaging/service.js'
+import {OutboxRepository} from '../outbox/repository.js'
 
 const STORY_TTL_MS = 24 * 60 * 60 * 1000
 const IMAGE_DURATION_MS = 5_000
@@ -75,6 +80,13 @@ type CreateStoryInput = {
   idempotencyKey?: string
 }
 
+export type StoryReplyResult = {
+  conversationId: string
+  messageId: string
+  created: boolean
+  conversationCreated: boolean
+}
+
 const SUPPORTED = {
   'image/jpeg': {extension: 'jpg', kind: 'image' as const},
   'image/jpg': {extension: 'jpg', kind: 'image' as const},
@@ -84,10 +96,14 @@ const SUPPORTED = {
 } as const
 
 export class StoryService {
+  private readonly messaging: MessagingService
+
   constructor(
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
-  ) {}
+  ) {
+    this.messaging = new MessagingService(db)
+  }
 
   async listRail(viewerActorId: string | null): Promise<StoryRailEntry[]> {
     const now = new Date()
@@ -279,6 +295,157 @@ export class StoryService {
         createdAt: item.created_at.toISOString(),
       })),
     }
+  }
+
+  async reply(
+    actorId: string,
+    storyId: string,
+    input: {text?: unknown; idempotencyKey?: unknown},
+    requestId: string,
+  ): Promise<StoryReplyResult> {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(storyId)) {
+      throw domainError('Story item not found', 'NOT_FOUND')
+    }
+    const text = normalizeMessageText(input.text)
+    const suppliedKey = normalizeRequiredIdempotencyKey(input.idempotencyKey)
+    const ledgerKey = `story-reply:${suppliedKey}`
+    const requestHash = createHash('sha256').update(JSON.stringify({storyId, text})).digest('hex')
+
+    return this.db.transaction().execute(async trx => {
+      await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`${actorId}:${ledgerKey}`}, 0))`.execute(trx)
+      const previous = await trx
+        .selectFrom('idempotency_keys')
+        .select(['request_hash', 'response_status', 'response_body'])
+        .where('actor_id', '=', actorId)
+        .where('key', '=', ledgerKey)
+        .executeTakeFirst()
+      if (previous) {
+        if (previous.request_hash !== requestHash) {
+          throw domainError('Story reply idempotency key was reused with a different request', 'CONFLICT')
+        }
+        const replay = parseStoredStoryReply(previous.response_body)
+        if (previous.response_status === null || !replay) {
+          throw domainError('Story reply retry is still in progress', 'CONFLICT')
+        }
+        return {...replay, created: false}
+      }
+
+      const now = new Date()
+      const reservationId = `story-reply-idempotency:${randomUUID()}`
+      await trx
+        .insertInto('idempotency_keys')
+        .values({
+          id: reservationId,
+          actor_id: actorId,
+          key: ledgerKey,
+          request_hash: requestHash,
+          response_status: null,
+          response_body: null,
+          created_at: now,
+          updated_at: now,
+          expires_at: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+        })
+        .execute()
+
+      const story = await trx
+        .selectFrom('greenfield_story_items as i')
+        .innerJoin('greenfield_story_groups as g', 'g.group_id', 'i.group_id')
+        .innerJoin('actors as owner', 'owner.id', 'g.owner_actor_id')
+        .select([
+          'i.item_id', 'i.group_id', 'i.media_kind', 'i.status', 'i.created_at as item_created_at',
+          'i.deleted_at as item_deleted_at', 'g.owner_actor_id', 'g.visibility', 'g.expires_at',
+          'g.deleted_at as group_deleted_at', 'owner.account_id as owner_account_id',
+        ])
+        .where('i.item_id', '=', storyId)
+        .forUpdate()
+        .executeTakeFirst()
+      if (
+        !story || story.item_deleted_at || story.group_deleted_at || story.status !== 'ready' ||
+        story.expires_at <= now || story.item_created_at <= storyItemLiveCutoff(now)
+      ) {
+        throw domainError('Story item not found', 'NOT_FOUND')
+      }
+      if (story.owner_actor_id === actorId) {
+        throw domainError('You cannot reply to your own story', 'VALIDATION_FAILED')
+      }
+      if (!(await this.canViewGroupWith(trx, actorId, story.owner_actor_id, story.visibility))) {
+        // Match the story read contract so guessed item identifiers do not
+        // disclose whether inaccessible private content exists.
+        throw domainError('Story item not found', 'NOT_FOUND')
+      }
+
+      const direct = await this.messaging.ensureDirectConversationInTransaction(
+        trx,
+        actorId,
+        story.owner_actor_id,
+      )
+      if (direct.recipientState === 'declined') {
+        throw domainError('You cannot message this account', 'FORBIDDEN')
+      }
+      const messageId = randomUUID()
+      const message = await this.messaging.insertDirectMessageInTransaction(
+        trx,
+        direct.conversationId,
+        actorId,
+        text,
+        messageId,
+        now,
+      )
+      const storyContext: StoryMessageContext = {
+        type: 'story',
+        storyId: story.item_id,
+        groupId: story.group_id,
+        ownerActorId: story.owner_actor_id,
+        mediaKind: story.media_kind,
+        createdAt: story.item_created_at.toISOString(),
+        expiresAt: story.expires_at.toISOString(),
+      }
+      await new GreenfieldDomainEventRepository(trx).append({
+        eventType: 'message.story-replied',
+        aggregateType: 'conversation-message',
+        aggregateId: message.messageId,
+        accountId: story.owner_account_id,
+        actorId,
+        requestId,
+        correlationId: requestId,
+        idempotencyKey: ledgerKey,
+        visibility: 'actor',
+        classification: 'private',
+        payload: {
+          conversationId: direct.conversationId,
+          messageId: message.messageId,
+          recipientActorId: story.owner_actor_id,
+          storyContext,
+        },
+      })
+      await new OutboxRepository(trx).enqueue(trx, {
+        eventType: 'notification.create',
+        aggregateType: 'conversation-message',
+        aggregateId: message.messageId,
+        payload: {
+          type: 'reply',
+          actorId,
+          recipientActorId: story.owner_actor_id,
+          resourceType: 'conversation',
+          resourceId: direct.conversationId,
+          dedupeKey: `story-reply:${message.messageId}`,
+          deliveryMode: 'idempotent',
+          body: 'replied to your story',
+        },
+      })
+
+      const stored = {
+        conversationId: direct.conversationId,
+        messageId: message.messageId,
+        conversationCreated: direct.created,
+      }
+      await trx
+        .updateTable('idempotency_keys')
+        .set({response_status: 201, response_body: stored, updated_at: now})
+        .where('id', '=', reservationId)
+        .execute()
+      return {...stored, created: true}
+    })
   }
 
   async create(actorId: string, input: CreateStoryInput): Promise<StoryGroupDto> {
@@ -504,12 +671,21 @@ export class StoryService {
     ownerActorId: string,
     visibility: 'public' | 'followers' | 'close',
   ): Promise<boolean> {
+    return this.canViewGroupWith(this.db, viewerActorId, ownerActorId, visibility)
+  }
+
+  private async canViewGroupWith(
+    db: ModulaDb | Transaction<Database>,
+    viewerActorId: string | null,
+    ownerActorId: string,
+    visibility: 'public' | 'followers' | 'close',
+  ): Promise<boolean> {
     if (viewerActorId === ownerActorId) return true
-    if (viewerActorId && (await this.isBlockedEitherDirection(viewerActorId, ownerActorId))) return false
+    if (viewerActorId && (await this.isBlockedEitherDirectionWith(db, viewerActorId, ownerActorId))) return false
     if (visibility === 'public') return true
     if (!viewerActorId) return false
     if (visibility === 'close' || visibility === 'followers') {
-      const follow = await this.db
+      const follow = await db
         .selectFrom('follows')
         .select('id')
         .where('follower_actor_id', '=', viewerActorId)
@@ -521,8 +697,12 @@ export class StoryService {
     return false
   }
 
-  private async isBlockedEitherDirection(actorA: string, actorB: string): Promise<boolean> {
-    const row = await this.db
+  private async isBlockedEitherDirectionWith(
+    db: ModulaDb | Transaction<Database>,
+    actorA: string,
+    actorB: string,
+  ): Promise<boolean> {
+    const row = await db
       .selectFrom('blocks')
       .select('id')
       .where('deleted_at', 'is', null)
@@ -577,6 +757,27 @@ function normalizeIdempotencyKey(value: unknown): string | null {
     throw domainError('Invalid story idempotency key', 'VALIDATION_FAILED')
   }
   return value
+}
+
+function normalizeRequiredIdempotencyKey(value: unknown): string {
+  const key = normalizeIdempotencyKey(value)
+  if (!key) throw domainError('Story reply idempotency key is required', 'VALIDATION_FAILED')
+  return key
+}
+
+function parseStoredStoryReply(value: unknown): Omit<StoryReplyResult, 'created'> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const stored = value as Record<string, unknown>
+  if (
+    typeof stored.conversationId !== 'string' ||
+    typeof stored.messageId !== 'string' ||
+    typeof stored.conversationCreated !== 'boolean'
+  ) return null
+  return {
+    conversationId: stored.conversationId,
+    messageId: stored.messageId,
+    conversationCreated: stored.conversationCreated,
+  }
 }
 
 function normalizeCaption(value: unknown): string | null {

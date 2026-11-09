@@ -1,8 +1,8 @@
 -- Numbered 088 to follow #151 collections and drafts (087) and #150
 -- communities (086). 084 (moliboo signed packs) and 085 (publisher release
--- console) are on main 3206e114. 086 and 087 are reserved for #150 and #151
--- and are not on this unstacked branch, so the files here go 083, 084, 085,
--- then 088. Down still restores schema_version 087.
+-- console) landed with Gate 01; 086 and 087 are now on main after #150 and
+-- #151 merged, so the files here go 083, 084, 085, 086, 087, then 088 with
+-- no gaps. Down still restores schema_version 087.
 
 -- GREENFIELD-FEATURE-REALITY-01 / PR-07: verified Apple sandbox Premium state.
 -- This migration does not enable production billing and deliberately seeds no

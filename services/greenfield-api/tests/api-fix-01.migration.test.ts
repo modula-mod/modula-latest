@@ -123,7 +123,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '088_greenfield_premium_apple_sandbox',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -164,6 +164,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
 
+
     expect(await migrateDown(freshUrl)).toBe('088_greenfield_premium_apple_sandbox')
     const rolledBackApplePremium = new pg.Client({connectionString: freshUrl})
     await rolledBackApplePremium.connect()
@@ -171,13 +172,34 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     const versionAfter088 = await rolledBackApplePremium.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
     expect(appleTransactions.rows[0]?.name).toBeNull()
     expect(versionAfter088.rows[0]?.value).toBe('087')
-    const publisherStillPresent = await rolledBackApplePremium.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs`)
-    expect(publisherStillPresent.rows[0]?.jobs).toBe('greenfield_publisher_release_jobs')
+    const collectionsStillPresentAfter088 = await rolledBackApplePremium.query(`SELECT to_regclass('public.greenfield_saved_collections') AS name`)
+    expect(collectionsStillPresentAfter088.rows[0]?.name).toBe('greenfield_saved_collections')
     await rolledBackApplePremium.end()
 
-    // 086 (#150 communities) and 087 (#151 collections and drafts) are reserved
-    // and not present on this unstacked branch. 088 down restores schema_version
-    // 087; the next ledger file present here is 085_publisher_release_console.
+    expect(await migrateDown(freshUrl)).toBe('087_greenfield_collections_and_drafts')
+    const rolledBackCollections = new pg.Client({connectionString: freshUrl})
+    await rolledBackCollections.connect()
+    const collectionsTable = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_saved_collections') AS name`)
+    const draftsTable = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_post_drafts') AS name`)
+    const versionAfter087 = await rolledBackCollections.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(collectionsTable.rows[0]?.name).toBeNull()
+    expect(draftsTable.rows[0]?.name).toBeNull()
+    expect(versionAfter087.rows[0]?.value).toBe('086')
+    const communitiesStillPresent = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_communities') AS name`)
+    expect(communitiesStillPresent.rows[0]?.name).toBe('greenfield_communities')
+    await rolledBackCollections.end()
+
+    expect(await migrateDown(freshUrl)).toBe('086_greenfield_communities')
+    const rolledBackCommunities = new pg.Client({connectionString: freshUrl})
+    await rolledBackCommunities.connect()
+    const communitiesTable = await rolledBackCommunities.query(`SELECT to_regclass('public.greenfield_communities') AS name`)
+    const versionAfter086 = await rolledBackCommunities.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(communitiesTable.rows[0]?.name).toBeNull()
+    expect(versionAfter086.rows[0]?.value).toBe('085')
+    const publisherStillPresent = await rolledBackCommunities.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs`)
+    expect(publisherStillPresent.rows[0]?.jobs).toBe('greenfield_publisher_release_jobs')
+    await rolledBackCommunities.end()
+
     expect(await migrateDown(freshUrl)).toBe('085_publisher_release_console')
     const rolledBackConsole = new pg.Client({connectionString: freshUrl})
     await rolledBackConsole.connect()
@@ -347,7 +369,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '088_greenfield_premium_apple_sandbox',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -377,7 +399,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '088_greenfield_premium_apple_sandbox',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
