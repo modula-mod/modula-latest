@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T21:21:10.631Z",
+  "capturedAt": "2026-11-09T21:22:47.564Z",
   "source": {
-    "branch": "mosaic/pr147-update",
-    "headAtCapture": "b693f922c75d57831725ffc58a8e1eba6199c39f",
+    "branch": "mosaic/pr160-084-privileges",
+    "headAtCapture": "afe483aa8733998c2e412b4831d5c8e3df3e2b04",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "deff9dffdeb95008d9d099f800a52eeb838e060da6d3afead7b006dfd4422771"
   },

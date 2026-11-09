@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T21:21:10.631Z for branch `mosaic/pr147-update`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T21:22:47.564Z for branch `mosaic/pr160-084-privileges`; this does not claim deployment.
 
 - Runtime method routes: 773
 - Application routes: 544

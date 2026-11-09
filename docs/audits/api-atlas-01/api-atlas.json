@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/pr147-update",
+      "branch": "mosaic/pr160-084-privileges",
       "sourceSha256": "deff9dffdeb95008d9d099f800a52eeb838e060da6d3afead7b006dfd4422771",
-      "capturedAt": "2026-11-09T21:21:10.631Z",
+      "capturedAt": "2026-11-09T21:22:47.564Z",
       "routeCount": 773
     },
     "status": "PASS"
