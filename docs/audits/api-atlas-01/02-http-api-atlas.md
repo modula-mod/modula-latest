@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T20:41:12.811Z for branch `integration/gate-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T21:00:11.875Z for branch `integration/gate-01`; this does not claim deployment.
 
 - Runtime method routes: 793
 - Application routes: 557
@@ -15808,7 +15808,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `500`
-- Database reads: none observed
+- Database reads: `cancelled`
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed

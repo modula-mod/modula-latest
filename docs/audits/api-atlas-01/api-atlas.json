@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "integration/gate-01",
-      "sourceSha256": "8bd6877890f55c6d72316fbe0ba1dcaaa6525f3225fe1b27c2797c3f4dc29695",
-      "capturedAt": "2026-11-09T20:41:12.811Z",
+      "sourceSha256": "ac45dc1785e5b2905826d06f8e36c7bb7b0d3377fe4f13e0aca187039328ba1e",
+      "capturedAt": "2026-11-09T21:00:11.875Z",
       "routeCount": 793
     },
     "status": "PASS"
@@ -35577,7 +35577,9 @@
         500
       ],
       "data": {
-        "reads": [],
+        "reads": [
+          "cancelled"
+        ],
         "writes": [],
         "evidence": [
           "services/greenfield-api/src/intelligence/service.ts#execute",

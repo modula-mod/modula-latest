@@ -5142,7 +5142,9 @@
     ]
   },
   "POST /v1/intelligence/missions/:missionId/proposals/:proposalId/execute": {
-    "reads": [],
+    "reads": [
+      "cancelled"
+    ],
     "writes": [],
     "emits": [],
     "jobs": [],
