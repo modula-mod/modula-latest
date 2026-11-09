@@ -1,5 +1,7 @@
 -- GREENFIELD-FEATURE-REALITY-01 PR-04: persistent Communities domain.
--- Migration 084 is reserved by the preceding Moliboo signed-pack workstream.
+-- Numbered 086 to follow Gate 01's 085_publisher_release_console.
+-- 084 is #147/#160 moliboo signed packs; 085 is Gate 01 publisher release console.
+-- Those branches are not on main yet, so this tree still goes 083 then 086.
 
 CREATE TABLE greenfield_communities (
   community_id TEXT PRIMARY KEY,
@@ -240,5 +242,5 @@ GRANT SELECT ON
   greenfield_community_poll_votes
 TO modula_worker, modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '085')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '086')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();
