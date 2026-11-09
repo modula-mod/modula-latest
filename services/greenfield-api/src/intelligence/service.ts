@@ -94,6 +94,9 @@ export class GovernedIntelligenceService {
     const existing = await this.repository.getExecution(proposalId)
     if (existing?.status === 'completed') return {idempotent: true, executionId: existing.execution_id, result: existing.result}
     const mission = await this.repository.ownedMission(accountId, missionId)
+    if (mission.status === 'cancelled') {
+      throw new IntelligenceError('INVALID_MISSION_STATE', 'Mission cannot execute from cancelled')
+    }
     try {
       await this.runtime.execute(this.principal(accountId, mission), missionId, proposalId)
     } catch (error) {

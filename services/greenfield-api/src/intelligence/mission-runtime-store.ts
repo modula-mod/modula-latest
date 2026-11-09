@@ -86,6 +86,8 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
     await this.db.transaction().execute(async trx => {
       const row = await trx.selectFrom('intelligence_missions').selectAll().where('mission_id', '=', mission.id).forUpdate().executeTakeFirst()
       if (!row) throw new IntelligenceError('MISSION_NOT_FOUND', 'Mission not found')
+      // Cancelled is terminal in the mission check constraint; do not attempt a later status write.
+      if (row.status === 'cancelled' && mission.status !== 'cancelled') return
       await trx.updateTable('intelligence_missions').set({
         status: mission.status,
         updated_at: new Date(mission.updatedAt),
@@ -120,6 +122,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
           },
         }
       : event
+    if (next.type !== 'mission.cancelled' && await this.isCancelled(this.db, next.missionId)) return
     if (await this.canPersistEvent(this.db, next)) {
       await this.insertEvent(this.db, next)
       return
@@ -385,6 +388,12 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
 
   async writeExecution(execution: IntelligenceExecution): Promise<void> {
     await this.withBufferedTransaction(execution.missionId, async (trx, pending) => {
+      // A cancelled mission has no cancelled run status. The kernel still
+      // terminalizes the in-flight row as failed; any other post-cancel write is dropped.
+      if (execution.status !== 'failed' && await this.isCancelled(trx, execution.missionId, pending)) {
+        await this.flushEvents(trx, pending)
+        return
+      }
       const existing = await trx.selectFrom('intelligence_runs').selectAll().where('execution_id', '=', execution.id).forUpdate().executeTakeFirst()
       if (!existing) {
         const proposal = await trx.selectFrom('intelligence_proposals').select('step_id').where('proposal_id', '=', execution.proposalId).executeTakeFirst()
@@ -432,6 +441,10 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
 
   async writeArtifact(artifact: IntelligenceArtifact): Promise<void> {
     await this.withBufferedTransaction(artifact.missionId, async (trx, pending) => {
+      if (await this.isCancelled(trx, artifact.missionId, pending)) {
+        await this.flushEvents(trx, pending)
+        return
+      }
       await trx.insertInto('intelligence_artifacts').values({
         artifact_id: artifact.id,
         mission_id: artifact.missionId,
@@ -513,11 +526,30 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
 
   private async flushEvents(executor: Executor, pending: MissionBuffers): Promise<void> {
     const remaining: IntelligenceLedgerEvent[] = []
+    let cancelled = pending.events[0] ? await this.isCancelled(executor, pending.events[0].missionId) : false
     for (const event of pending.events) {
-      if (await this.canPersistEvent(executor, event)) await this.insertEvent(executor, event)
-      else remaining.push(event)
+      if (cancelled && event.type !== 'mission.cancelled') continue
+      if (await this.canPersistEvent(executor, event)) {
+        await this.insertEvent(executor, event)
+        if (event.type === 'mission.cancelled') cancelled = true
+      } else if (!cancelled) {
+        remaining.push(event)
+      }
     }
     pending.events = remaining
+  }
+
+  private async isCancelled(executor: Executor, missionId: string, pending?: MissionBuffers): Promise<boolean> {
+    if (pending?.events.some(event => event.type === 'mission.cancelled')) return true
+    const mission = await executor.selectFrom('intelligence_missions').select('status').where('mission_id', '=', missionId).executeTakeFirst()
+    if (mission?.status === 'cancelled') return true
+    const event = await executor
+      .selectFrom('intelligence_ledger_events')
+      .select('event_id')
+      .where('mission_id', '=', missionId)
+      .where('event_type', '=', 'mission.cancelled')
+      .executeTakeFirst()
+    return Boolean(event)
   }
 
   private async canPersistEvent(executor: Executor, event: IntelligenceLedgerEvent): Promise<boolean> {
@@ -538,6 +570,7 @@ export class GreenfieldMissionRuntimeStore implements MissionRuntimeStore {
   }
 
   private async insertEvent(executor: Executor, event: IntelligenceLedgerEvent): Promise<void> {
+    if (event.type !== 'mission.cancelled' && await this.isCancelled(executor, event.missionId)) return
     await executor.insertInto('intelligence_ledger_events').values({
       event_id: event.id,
       schema_version: event.schemaVersion,
