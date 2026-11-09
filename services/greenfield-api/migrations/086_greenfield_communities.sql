@@ -1,7 +1,6 @@
 -- GREENFIELD-FEATURE-REALITY-01 PR-04: persistent Communities domain.
 -- Numbered 086 to follow Gate 01's 085_publisher_release_console.
--- 084 is #147/#160 moliboo signed packs; 085 is Gate 01 publisher release console.
--- Those branches are not on main yet, so this tree still goes 083 then 086.
+-- 084 (moliboo signed packs) and 085 (publisher release console) are on main 3206e114.
 
 CREATE TABLE greenfield_communities (
   community_id TEXT PRIMARY KEY,

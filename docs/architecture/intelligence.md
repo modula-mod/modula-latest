@@ -46,10 +46,13 @@ Within Modula, “AGI” names the Governor subsystem. It is not a claim of huma
 | Provider semantics | `@modula/intelligence-core` | Provider, privacy, local/remote routing, generic tools |
 | Governed domain | `@modula/intelligence-contracts` | Missions, plans, proposals, decisions, approvals, executions, evidence, ledger, circuits |
 | Deterministic governance | `@modula/intelligence-governance` | GAIA planner interface, deterministic planner, AKI v0, Governor v0, Command boundary rules |
+| Agent runtime kernel | `@modula/mar-runtime` | Mission cycle over the frozen `IntelligenceMissionStatus` graph. Injected planner, decision engine, governor, capability catalog, and tool gateway. No product module is built in |
 | Persistent runtime | `services/greenfield-api/src/intelligence` | Ownership, persistence, state changes, runtime revalidation, API orchestration |
 | Real capability runtime | Existing Greenfield module runtime | Account-scoped record query/create and future registered actions |
 
 Contracts do not depend on React, Swift, Fastify, Kysely, database clients, or model SDKs.
+
+`@modula/mar-runtime` is the MAR-FAST-01 kernel. It calls `assertMissionTransition` and `assertCommandBoundary`. Capability discovery uses `GaiaAvailableAction`. An empty catalog leaves the mission in `planning` until a caller registers a module. Installable modules stay outside this package and appear only through that catalog.
 
 ## GAI-01 planner
 
@@ -118,7 +121,7 @@ Circuit cards/revisions are versioned and scoped. A successful mission never aut
 
 ## API representation
 
-Authenticated routes under `/v1/intelligence` expose mission list/detail, start, Ledger, evidence, decisions, approvals, approval/rejection, and governed execution. Every lookup starts with owner authorization; UUID entropy is not authorization. Database rows are mapped into explicit lifecycle DTOs rather than being treated as the public contract.
+Authenticated routes under `/v1/intelligence` expose mission list/detail, start, cancel (`POST /v1/intelligence/missions/:missionId/cancel`), Ledger, evidence, decisions, approvals, approval/rejection, and governed execution. Cancel delegates to `MissionRuntime.cancel()` for the owning account: already-cancelled is idempotent success, and other terminal states return `INVALID_MISSION_STATE`. Every lookup starts with owner authorization; UUID entropy is not authorization. Database rows are mapped into explicit lifecycle DTOs rather than being treated as the public contract.
 
 ## Kaizen and Atlas foundations
 

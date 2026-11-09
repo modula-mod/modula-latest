@@ -2204,6 +2204,199 @@
         ]
       }
     },
+    "/v1/admin/qa/moliboos/packs/{packId}/restore": {
+      "post": {
+        "operationId": "post_v1_admin_qa_moliboos_packs_packId_restore",
+        "summary": "Restore a QA-withdrawn Moliboo release only while its release and signer trust remain valid.",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "packId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:175",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Restore a QA-withdrawn Moliboo release only while its release and signer trust remain valid.",
+          "owningDomain": "Moliboo signed distribution operations",
+          "authentication": "Bearer session required with admin:ops capability; route is not registered in production.",
+          "authorization": "QA/development only. Revoked, quarantined, invalidly signed or signer-revoked releases cannot be restored.",
+          "request": {
+            "params": {
+              "packId": "Moliboo package ID"
+            },
+            "query": {},
+            "body": {
+              "version": "optional semantic version; omitted selects latest",
+              "reason": "optional string, max 500"
+            },
+            "validation": "Unknown fields and malformed identities are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {packageId, version, availability:'approved', revision}."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED"
+              ]
+            },
+            {
+              "status": 401,
+              "codes": [
+                "UNAUTHENTICATED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "FORBIDDEN",
+                "RELEASE_REVOKED",
+                "SIGNER_REVOKED",
+                "UNTRUSTED_RELEASE"
+              ]
+            },
+            {
+              "status": 404,
+              "codes": [
+                "NOT_FOUND"
+              ]
+            },
+            {
+              "status": 409,
+              "codes": [
+                "CONFLICT"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none"
+          },
+          "idempotencyConcurrency": "Release row is locked. Repeating an already-approved transition returns current state without a duplicate event; restore appends an immutable audit event only on change.",
+          "versioningCompatibility": "QA-only HTTP v1 operations contract; never present in production runtime."
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/qa/moliboos/packs/{packId}/withdraw": {
+      "post": {
+        "operationId": "post_v1_admin_qa_moliboos_packs_packId_withdraw",
+        "summary": "Withdraw one approved Moliboo release from QA advertisement while retaining its immutable bytes and prior releases.",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "packId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:165",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Withdraw one approved Moliboo release from QA advertisement while retaining its immutable bytes and prior releases.",
+          "owningDomain": "Moliboo signed distribution operations",
+          "authentication": "Bearer session required with admin:ops capability; route is not registered in production.",
+          "authorization": "QA/development only. Release, publisher and signer facts remain immutable; a reason is mandatory.",
+          "request": {
+            "params": {
+              "packId": "Moliboo package ID"
+            },
+            "query": {},
+            "body": {
+              "version": "optional semantic version; omitted selects latest",
+              "reason": "required non-empty string, max 500"
+            },
+            "validation": "Unknown fields and malformed identities are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {packageId, version, availability:'withdrawn', revision}."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED"
+              ]
+            },
+            {
+              "status": 401,
+              "codes": [
+                "UNAUTHENTICATED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "FORBIDDEN"
+              ]
+            },
+            {
+              "status": 404,
+              "codes": [
+                "NOT_FOUND"
+              ]
+            },
+            {
+              "status": 409,
+              "codes": [
+                "CONFLICT"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none"
+          },
+          "idempotencyConcurrency": "Release row is locked. Repeating an already-withdrawn transition returns the current revision without a duplicate event; transitions append immutable audit events.",
+          "versioningCompatibility": "QA-only HTTP v1 operations contract; never present in production runtime."
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/admin/qa/premium/{handle}": {
       "put": {
         "operationId": "put_v1_admin_qa_premium_handle",
@@ -7499,7 +7692,7 @@
       },
       "post": {
         "operationId": "post_v1_conversations",
-        "summary": "Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.",
+        "summary": "Platform: POST /v1/conversations",
         "tags": [
           "Platform"
         ],
@@ -7516,70 +7709,7 @@
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": {
-          "purpose": "Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.",
-          "owningDomain": "Direct messaging",
-          "authentication": "Bearer session required with post:engage capability; the sender actor is resolved only from the authenticated session.",
-          "authorization": "The target handle must resolve to a live profile on an active account. Self-conversations and either-direction account blocks are rejected. A new recipient becomes active only when they follow the sender; otherwise the conversation is a message request.",
-          "request": {
-            "params": {},
-            "query": {},
-            "body": {
-              "handle": "required target profile handle, string 1-80 characters; an optional leading @ is normalized away",
-              "text": "optional initial message, string maximum 5000 characters; blank non-empty values are rejected"
-            },
-            "validation": "Unknown fields, including client-supplied sender or actor identifiers, are rejected. The target is resolved server-side and must remain active. Subsequent messages to a reused conversation use POST /v1/conversations/:id/messages."
-          },
-          "success": {
-            "status": "201 when created; 200 when an existing conversation is reused",
-            "body": "Envelope data {created:boolean, conversation:{id,kind,participants,lastMessage,unreadCount,updatedAt}}. The conversation ID and participant fields are sufficient for native thread navigation."
-          },
-          "errors": [
-            {
-              "status": 400,
-              "codes": [
-                "VALIDATION_FAILED"
-              ]
-            },
-            {
-              "status": 401,
-              "codes": [
-                "UNAUTHENTICATED",
-                "SESSION_EXPIRED"
-              ]
-            },
-            {
-              "status": 403,
-              "codes": [
-                "FORBIDDEN"
-              ]
-            },
-            {
-              "status": 404,
-              "codes": [
-                "NOT_FOUND"
-              ]
-            },
-            {
-              "status": 429,
-              "codes": [
-                "RATE_LIMITED"
-              ]
-            },
-            {
-              "status": 500,
-              "codes": [
-                "SERVER_ERROR"
-              ]
-            }
-          ],
-          "pagination": {
-            "style": "none",
-            "filtering": "none"
-          },
-          "idempotencyConcurrency": "The sorted authenticated-sender/target actor pair forms the unique direct_key database invariant. Concurrent inserts use INSERT ON CONFLICT and return the same committed conversation. Optional text is creation-only and commits atomically with the conversation and two members, so retry after a lost response cannot duplicate it. A reused conversation returns 200 and does not append text.",
-          "versioningCompatibility": "HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged."
-        },
+        "x-modula-contract": null,
         "security": [
           {
             "bearerAuth": []
@@ -7622,7 +7752,7 @@
     "/v1/conversations/{id}/messages": {
       "get": {
         "operationId": "get_v1_conversations_id_messages",
-        "summary": "List a bounded page of messages for an authenticated member of a direct conversation, including optional minimal Story context for real Story-reply messages.",
+        "summary": "Platform: GET /v1/conversations/:id/messages",
         "tags": [
           "Platform"
         ],
@@ -7643,68 +7773,7 @@
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": {
-          "purpose": "List a bounded page of messages for an authenticated member of a direct conversation, including optional minimal Story context for real Story-reply messages.",
-          "owningDomain": "Direct messaging",
-          "authentication": "Bearer session required with social:read capability.",
-          "authorization": "The authenticated actor must be a non-declined member of the requested direct conversation. Non-members and declined members receive NOT_FOUND without participant disclosure.",
-          "request": {
-            "params": {
-              "id": "required conversation ID, 1-64 characters"
-            },
-            "query": {
-              "cursor": "optional opaque base64url cursor for the oldest item in the previous page",
-              "limit": "optional positive integer; default 40, maximum 100"
-            },
-            "body": {},
-            "validation": "Malformed cursors are rejected. Conversation kind and membership are verified server-side."
-          },
-          "success": {
-            "status": "200",
-            "body": "Envelope data {items:[{id,conversationId,sender,body,subject,sentAt,createdAt,isOwn,delivery,storyContext?}],nextCursor:string|null,hasMore:boolean}. storyContext, when present, is {type:'story',storyId,groupId,ownerActorId,mediaKind,createdAt,expiresAt} and intentionally excludes media URLs and captions."
-          },
-          "errors": [
-            {
-              "status": 400,
-              "codes": [
-                "VALIDATION_FAILED"
-              ]
-            },
-            {
-              "status": 401,
-              "codes": [
-                "UNAUTHENTICATED",
-                "SESSION_EXPIRED"
-              ]
-            },
-            {
-              "status": 404,
-              "codes": [
-                "NOT_FOUND"
-              ]
-            },
-            {
-              "status": 429,
-              "codes": [
-                "RATE_LIMITED"
-              ]
-            },
-            {
-              "status": 500,
-              "codes": [
-                "SERVER_ERROR"
-              ]
-            }
-          ],
-          "pagination": {
-            "style": "cursor",
-            "ordering": "created_at descending then message_id descending for selection; items are returned oldest-to-newest within each page",
-            "defaultLimit": 40,
-            "maximumLimit": 100
-          },
-          "idempotencyConcurrency": "Read-only. The optional Story context is joined from the append-only message.story-replied event whose aggregate ID is the message ID; at most one context event exists for an idempotent Story reply.",
-          "versioningCompatibility": "HTTP v1. Existing message fields and pagination behavior are unchanged. storyContext is optional additive response data; clients that do not render Story context continue to display the ordinary body text."
-        },
+        "x-modula-contract": null,
         "security": [
           {
             "bearerAuth": []
@@ -10353,7 +10422,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:72",
+        "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:84",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10530,7 +10599,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:23",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:25",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10553,7 +10622,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:14",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:16",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10585,7 +10654,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:29",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:31",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10617,7 +10686,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:57",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:66",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10655,7 +10724,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:71",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:80",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10693,7 +10762,39 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:78",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:87",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/intelligence/missions/{missionId}/cancel": {
+      "post": {
+        "operationId": "post_v1_intelligence_missions_missionId_cancel",
+        "summary": "Intelligence: POST /v1/intelligence/missions/:missionId/cancel",
+        "tags": [
+          "Intelligence"
+        ],
+        "parameters": [
+          {
+            "name": "missionId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:45",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10725,7 +10826,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:50",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:59",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10757,7 +10858,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:64",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:73",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10789,7 +10890,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:43",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:52",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10827,7 +10928,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:85",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:94",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -10859,7 +10960,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:36",
+        "x-modula-source": "services/greenfield-api/src/intelligence/routes.ts:38",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -11098,6 +11199,232 @@
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/moliboos/outfit": {
+      "get": {
+        "operationId": "get_v1_me_moliboos_outfit",
+        "summary": "Return the authenticated account's persisted equipped Moliboo items and revision.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:120",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Return the authenticated account's persisted equipped Moliboo items and revision.",
+          "owningDomain": "Moliboo ownership and wardrobe",
+          "authentication": "Bearer session required with social:read capability.",
+          "authorization": "Account ID is resolved from the authenticated session.",
+          "request": {
+            "params": {},
+            "query": {},
+            "body": null,
+            "validation": "No request fields."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {revision: integer, updatedAt: ISO timestamp|null, items: OutfitItem[]}."
+          },
+          "errors": [
+            {
+              "status": 401,
+              "codes": [
+                "UNAUTHENTICATED",
+                "SESSION_EXPIRED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "FORBIDDEN"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none",
+            "maximum": 16
+          },
+          "idempotencyConcurrency": "Safe account-scoped read.",
+          "versioningCompatibility": "HTTP v1; revision is required for optimistic synchronization across devices."
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "put_v1_me_moliboos_outfit",
+        "summary": "Atomically replace the authenticated account's equipped Moliboo items after ownership and wearability checks.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:130",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Atomically replace the authenticated account's equipped Moliboo items after ownership and wearability checks.",
+          "owningDomain": "Moliboo ownership and wardrobe",
+          "authentication": "Bearer session required with profile:customize capability.",
+          "authorization": "Every item must belong to the authenticated account, match its server-owned slot, remain wearable and not be revoked; Legends 101-115 are non-wearable.",
+          "request": {
+            "params": {},
+            "query": {},
+            "body": {
+              "expectedRevision": "optional integer >=0",
+              "items": "required array, maximum 16, unique slot and itemId; each {slot,itemId}"
+            },
+            "validation": "Unknown privileged fields, invalid slots, duplicates, unowned items and revoked/non-wearable items are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {revision, updatedAt, items}; ownership and equipped state commit in one transaction."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED"
+              ]
+            },
+            {
+              "status": 401,
+              "codes": [
+                "UNAUTHENTICATED",
+                "SESSION_EXPIRED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "FORBIDDEN"
+              ]
+            },
+            {
+              "status": 409,
+              "codes": [
+                "REVISION_CONFLICT",
+                "CONFLICT"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none"
+          },
+          "idempotencyConcurrency": "Outfit row is locked in a transaction. expectedRevision makes competing writes deterministic: one succeeds and stale writes return REVISION_CONFLICT without partial state.",
+          "versioningCompatibility": "HTTP v1; clients should persist the returned revision and send it on subsequent writes."
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/moliboos/ownership": {
+      "get": {
+        "operationId": "get_v1_me_moliboos_ownership",
+        "summary": "Return the authenticated account's server-authoritative Moliboo ownership inventory.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:105",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Return the authenticated account's server-authoritative Moliboo ownership inventory.",
+          "owningDomain": "Moliboo ownership and wardrobe",
+          "authentication": "Bearer session required with social:read capability.",
+          "authorization": "Account ID is resolved from the authenticated session; no client-supplied owner is accepted.",
+          "request": {
+            "params": {},
+            "query": {
+              "cursor": "optional opaque cursor, max 512 bytes",
+              "limit": "integer 1-50, default 20"
+            },
+            "body": null,
+            "validation": "Unknown keys and invalid cursors are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {items: OwnershipItem[], nextCursor: string|null, hasMore: boolean}."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED",
+                "INVALID_CURSOR"
+              ]
+            },
+            {
+              "status": 401,
+              "codes": [
+                "UNAUTHENTICATED",
+                "SESSION_EXPIRED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "FORBIDDEN"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "cursor",
+            "ordering": "grantedAt descending, itemId ascending",
+            "default": 20,
+            "maximum": 50
+          },
+          "idempotencyConcurrency": "Safe account-scoped read; duplicate grants are prevented by (accountId,itemId) and grantId uniqueness.",
+          "versioningCompatibility": "HTTP v1; additive ownership item fields only."
+        },
         "security": [
           {
             "bearerAuth": []
@@ -14638,6 +14965,290 @@
         "x-modula-contract": null
       }
     },
+    "/v1/moliboos/packs": {
+      "get": {
+        "operationId": "get_v1_moliboos_packs",
+        "summary": "List the latest cryptographically trusted, approved Moliboo content-pack release for each package.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:42",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "List the latest cryptographically trusted, approved Moliboo content-pack release for each package.",
+          "owningDomain": "Moliboo signed distribution",
+          "authentication": "Public approved-release catalogue; no session required.",
+          "authorization": "Only approved, published or superseded first-party releases with live publisher and signer trust are projected.",
+          "request": {
+            "params": {},
+            "query": {
+              "cursor": "optional opaque cursor, max 256 bytes",
+              "limit": "integer 1-50, default 20",
+              "familyId": "optional lowercase slug",
+              "series": "optional integer 1-99",
+              "availability": "optional; only approved is accepted"
+            },
+            "body": null,
+            "validation": "Unknown query keys and non-approved availability values are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {items: MolibooPackageDescriptor[], nextCursor: string|null, hasMore: boolean}."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED",
+                "INVALID_CURSOR"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "cursor",
+            "ordering": "packageId ascending after latest-version projection",
+            "default": 20,
+            "maximum": 50
+          },
+          "idempotencyConcurrency": "Safe read. Invalid or concurrently withdrawn releases fail closed and are omitted.",
+          "versioningCompatibility": "HTTP v1; descriptor schema modula.package.1; native catalogue schema modula.moliboo.catalog.1; additive descriptor fields only."
+        }
+      }
+    },
+    "/v1/moliboos/packs/{packId}/download": {
+      "get": {
+        "operationId": "get_v1_moliboos_packs_packId_download",
+        "summary": "Deliver exact immutable bytes for a trusted Moliboo content pack.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "packId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:84",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Deliver exact immutable bytes for a trusted Moliboo content pack.",
+          "owningDomain": "Moliboo signed distribution",
+          "authentication": "Public immutable content; no session required.",
+          "authorization": "Pack selection and trust checks are identical to the manifest endpoint; clients cannot choose storage paths.",
+          "request": {
+            "params": {
+              "packId": "moliboo.character.<1-4 digit number>"
+            },
+            "query": {
+              "version": "optional semantic version"
+            },
+            "body": null,
+            "validation": "Unknown fields, malformed IDs and malformed versions are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Raw application/vnd.modula.moliboo-asset-pack+json bytes with immutable cache, ETag, content length and X-Modula-Artifact-Sha256 headers."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "UNTRUSTED_RELEASE",
+                "RELEASE_REVOKED",
+                "SIGNER_REVOKED"
+              ]
+            },
+            {
+              "status": 404,
+              "codes": [
+                "NOT_FOUND"
+              ]
+            },
+            {
+              "status": 409,
+              "codes": [
+                "ARTIFACT_DIGEST_MISMATCH"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none"
+          },
+          "idempotencyConcurrency": "Safe immutable read; content address and release identity never change.",
+          "versioningCompatibility": "Content-only JSON container schema modula.moliboo.assetpack.1; maximum 6 MiB artifact, 8 MiB decoded, 16 files, 4 MiB per file; JSON and PNG only."
+        }
+      }
+    },
+    "/v1/moliboos/packs/{packId}/manifest": {
+      "get": {
+        "operationId": "get_v1_moliboos_packs_packId_manifest",
+        "summary": "Resolve a trusted install descriptor for a requested Moliboo package and optional immutable version.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "packId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:71",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Resolve a trusted install descriptor for a requested Moliboo package and optional immutable version.",
+          "owningDomain": "Moliboo signed distribution",
+          "authentication": "Public content metadata; no session required.",
+          "authorization": "The selected release must be approved and pass live publisher, release-signature, artifact-signature, revocation and quarantine checks.",
+          "request": {
+            "params": {
+              "packId": "moliboo.character.<1-4 digit number>"
+            },
+            "query": {
+              "version": "optional semantic version; omitted selects newest approved version"
+            },
+            "body": null,
+            "validation": "Unknown fields, malformed IDs and malformed versions are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {manifest: MolibooPackageDescriptor}."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED"
+              ]
+            },
+            {
+              "status": 403,
+              "codes": [
+                "UNTRUSTED_RELEASE",
+                "RELEASE_REVOKED",
+                "SIGNER_REVOKED"
+              ]
+            },
+            {
+              "status": 404,
+              "codes": [
+                "NOT_FOUND"
+              ]
+            },
+            {
+              "status": 409,
+              "codes": [
+                "ARTIFACT_DIGEST_MISMATCH"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none"
+          },
+          "idempotencyConcurrency": "Safe read. Explicit withdrawn versions fail; an unversioned request falls back to the newest still-approved version.",
+          "versioningCompatibility": "HTTP v1; descriptor schema modula.package.1; artifact runtimeVersion 1 and minimumHostVersion are enforced by PackageManager."
+        }
+      }
+    },
+    "/v1/moliboos/packs/catalog.json": {
+      "get": {
+        "operationId": "get_v1_moliboos_packs_catalog_json",
+        "summary": "Return the exact raw catalogue shape consumed by the existing native Moliboo PackageManager.",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/app/register-moliboo-routes.ts:63",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": {
+          "purpose": "Return the exact raw catalogue shape consumed by the existing native Moliboo PackageManager.",
+          "owningDomain": "Moliboo signed distribution",
+          "authentication": "Public approved-release catalogue; no session required.",
+          "authorization": "Same live release, publisher, signer, revocation and quarantine checks as the paginated catalogue.",
+          "request": {
+            "params": {},
+            "query": {},
+            "body": null,
+            "validation": "No request fields."
+          },
+          "success": {
+            "status": 200,
+            "body": "Raw {schemaVersion:'modula.moliboo.catalog.1', packages: MolibooPackageDescriptor[]} with Cache-Control: no-cache."
+          },
+          "errors": [
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "none",
+            "ordering": "packageId ascending",
+            "maximum": "Registry bounded to approved Moliboo identities."
+          },
+          "idempotencyConcurrency": "Safe read; every request re-evaluates current trust and withdrawal state.",
+          "versioningCompatibility": "Compatibility endpoint for native PackageManager; catalogue schema is fixed at modula.moliboo.catalog.1."
+        }
+      }
+    },
     "/v1/notifications": {
       "get": {
         "operationId": "get_v1_notifications",
@@ -15867,6 +16478,321 @@
             "bearerAuth": []
           }
         ]
+      }
+    },
+    "/v1/publisher/modules": {
+      "get": {
+        "operationId": "get_v1_publisher_modules",
+        "summary": "Platform: GET /v1/publisher/modules",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:87",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/modules/{moduleId}": {
+      "get": {
+        "operationId": "get_v1_publisher_modules_moduleId",
+        "summary": "Platform: GET /v1/publisher/modules/:moduleId",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:88",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/modules/{moduleId}/github-releases": {
+      "get": {
+        "operationId": "get_v1_publisher_modules_moduleId_github_releases",
+        "summary": "Platform: GET /v1/publisher/modules/:moduleId/github-releases",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:90",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/modules/{moduleId}/release-jobs": {
+      "get": {
+        "operationId": "get_v1_publisher_modules_moduleId_release_jobs",
+        "summary": "Platform: GET /v1/publisher/modules/:moduleId/release-jobs",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:91",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      },
+      "post": {
+        "operationId": "post_v1_publisher_modules_moduleId_release_jobs",
+        "summary": "Platform: POST /v1/publisher/modules/:moduleId/release-jobs",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:95",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/modules/{moduleId}/versions": {
+      "get": {
+        "operationId": "get_v1_publisher_modules_moduleId_versions",
+        "summary": "Platform: GET /v1/publisher/modules/:moduleId/versions",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:89",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/release-jobs/{jobId}": {
+      "get": {
+        "operationId": "get_v1_publisher_release_jobs_jobId",
+        "summary": "Platform: GET /v1/publisher/release-jobs/:jobId",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:100",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/release-jobs/{jobId}/cancel": {
+      "post": {
+        "operationId": "post_v1_publisher_release_jobs_jobId_cancel",
+        "summary": "Platform: POST /v1/publisher/release-jobs/:jobId/cancel",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:112",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/release-jobs/{jobId}/logs": {
+      "get": {
+        "operationId": "get_v1_publisher_release_jobs_jobId_logs",
+        "summary": "Platform: GET /v1/publisher/release-jobs/:jobId/logs",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:101",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/release-jobs/{jobId}/publish": {
+      "post": {
+        "operationId": "post_v1_publisher_release_jobs_jobId_publish",
+        "summary": "Platform: POST /v1/publisher/release-jobs/:jobId/publish",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:106",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/release-jobs/{jobId}/resume": {
+      "post": {
+        "operationId": "post_v1_publisher_release_jobs_jobId_resume",
+        "summary": "Platform: POST /v1/publisher/release-jobs/:jobId/resume",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:116",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
+      }
+    },
+    "/v1/publisher/release-jobs/{jobId}/validate": {
+      "post": {
+        "operationId": "post_v1_publisher_release_jobs_jobId_validate",
+        "summary": "Platform: POST /v1/publisher/release-jobs/:jobId/validate",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/publisher/routes.ts:102",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "x-modula-contract": null
       }
     },
     "/v1/push/devices": {
@@ -17224,7 +18150,7 @@
     "/v1/stickers/packs": {
       "get": {
         "operationId": "get_v1_stickers_packs",
-        "summary": "Platform: GET /v1/stickers/packs",
+        "summary": "List backward-compatible emoji packs plus approved signed Sprout image packs for composer, message and reaction consumers.",
         "tags": [
           "Platform"
         ],
@@ -17238,7 +18164,49 @@
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": {
+          "purpose": "List backward-compatible emoji packs plus approved signed Sprout image packs for composer, message and reaction consumers.",
+          "owningDomain": "Composer sticker content",
+          "authentication": "Public approved content catalogue; no session required.",
+          "authorization": "Database packs are returned only when the signed manifest, publisher, signer, release, revocation/quarantine state and every image digest match.",
+          "request": {
+            "params": {},
+            "query": {
+              "cursor": "optional opaque cursor, max 256 bytes",
+              "limit": "integer 1-50, default 20",
+              "series": "optional integer 1-99; filters signed packs and excludes legacy emoji packs"
+            },
+            "body": null,
+            "validation": "Unknown fields, invalid cursors and invalid bounds are rejected."
+          },
+          "success": {
+            "status": 200,
+            "body": "Envelope data {packs: StickerPack[], nextCursor: string|null, hasMore: boolean}; signed packs include version, releaseId, package signature/download and per-sticker immutable PNG asset metadata."
+          },
+          "errors": [
+            {
+              "status": 400,
+              "codes": [
+                "VALIDATION_FAILED",
+                "INVALID_CURSOR"
+              ]
+            },
+            {
+              "status": 500,
+              "codes": [
+                "SERVER_ERROR"
+              ]
+            }
+          ],
+          "pagination": {
+            "style": "cursor",
+            "ordering": "packId ascending",
+            "default": 20,
+            "maximum": 50
+          },
+          "idempotencyConcurrency": "Safe read. Invalid or withdrawn database releases are omitted. Comment writes resolve sticker label, emoji and pack server-side and reject unknown IDs.",
+          "versioningCompatibility": "HTTP v1; existing {id,title,icon,stickers:[{id,emoji,label}]} fields remain; signed package and asset fields are additive."
+        }
       }
     },
     "/v1/stories": {
@@ -17296,7 +18264,7 @@
     "/v1/stories/{storyId}/replies": {
       "post": {
         "operationId": "post_v1_stories_storyId_replies",
-        "summary": "Deliver an authenticated viewer's reply to a concrete live Story item as a persistent message in the Story author's canonical one-to-one conversation.",
+        "summary": "Media: POST /v1/stories/:storyId/replies",
         "tags": [
           "Media"
         ],
@@ -17317,78 +18285,7 @@
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": {
-          "purpose": "Deliver an authenticated viewer's reply to a concrete live Story item as a persistent message in the Story author's canonical one-to-one conversation.",
-          "owningDomain": "Stories integrated with direct messaging",
-          "authentication": "Bearer session required with post:engage capability; the replying actor is resolved only from the authenticated session.",
-          "authorization": "The Story item must be ready, undeleted and unexpired and must remain visible to the replying actor. The author is resolved from the Story and cannot be redirected by request data. Self replies, either-direction blocks, inactive authors and previously declined recipient message requests are rejected. When no active thread exists, the existing message-request policy determines whether the author's membership is active or pending.",
-          "request": {
-            "params": {
-              "storyId": "required UUID of a greenfield_story_items item; this is not a Story group ID"
-            },
-            "query": {},
-            "body": {
-              "text": "required non-blank reply text, string maximum 5000 characters after trimming",
-              "idempotencyKey": "required client retry key, 8-200 characters from A-Z, a-z, 0-9, dot, underscore, colon or hyphen"
-            },
-            "validation": "Unknown fields, including recipient or author identifiers, are rejected. Invalid or inaccessible Story identifiers return the same NOT_FOUND contract. Story media URLs and captions are not copied into the retained DM context."
-          },
-          "success": {
-            "status": "201 when the reply message is first created; 200 when the same idempotent request is replayed",
-            "body": "Envelope data {conversationId:string, messageId:string, created:boolean, conversationCreated:boolean}. The message is an ordinary direct-message row; a private append-only event provides optional minimal Story context on message reads."
-          },
-          "errors": [
-            {
-              "status": 400,
-              "codes": [
-                "VALIDATION_FAILED"
-              ]
-            },
-            {
-              "status": 401,
-              "codes": [
-                "UNAUTHENTICATED",
-                "SESSION_EXPIRED"
-              ]
-            },
-            {
-              "status": 403,
-              "codes": [
-                "FORBIDDEN"
-              ]
-            },
-            {
-              "status": 404,
-              "codes": [
-                "NOT_FOUND"
-              ]
-            },
-            {
-              "status": 409,
-              "codes": [
-                "CONFLICT"
-              ]
-            },
-            {
-              "status": 429,
-              "codes": [
-                "RATE_LIMITED"
-              ]
-            },
-            {
-              "status": 500,
-              "codes": [
-                "SERVER_ERROR"
-              ]
-            }
-          ],
-          "pagination": {
-            "style": "none",
-            "filtering": "none"
-          },
-          "idempotencyConcurrency": "The server namespaces the supplied key to the authenticated actor, stores a SHA-256 request hash, and serializes identical retries with a transaction-scoped advisory lock. Story authorization, canonical conversation creation/reuse, message insertion, private context event, idempotent notification outbox job and stored response commit in one PostgreSQL transaction. Identical retries return the original IDs without another message or event; reuse with different Story text or ID returns CONFLICT. The sorted actor pair retains the direct_key uniqueness invariant.",
-          "versioningCompatibility": "HTTP v1 additive route. storyId means the concrete Story item ID already exposed as StoryItem.itemId. The DM body remains a normal message consumable by existing conversation clients. Optional storyContext fields on message reads are additive and may be ignored by older clients. Deleted or expired Stories cannot receive new replies, while an already-created DM and its non-media context remain readable under normal conversation retention."
-        },
+        "x-modula-contract": null,
         "security": [
           {
             "bearerAuth": []
