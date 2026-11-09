@@ -15,6 +15,7 @@ import {projectAiCallableAvailableActions} from '../src/intelligence/action-boun
 
 const boundarySource = readFileSync(new URL('../src/intelligence/action-boundary.ts', import.meta.url), 'utf8')
 const serviceSource = readFileSync(new URL('../src/intelligence/service.ts', import.meta.url), 'utf8')
+const bindingSource = readFileSync(new URL('../src/intelligence/mission-runtime-binding.ts', import.meta.url), 'utf8')
 
 describe('generic intelligence discovery and router selection', () => {
   it('projects declared AI-callable actions rather than synthesizing collection permissions or product IDs', () => {
@@ -25,7 +26,8 @@ describe('generic intelligence discovery and router selection', () => {
     expect(boundarySource).not.toContain('digital.modula.vault-notes')
     expect(boundarySource).not.toContain('RECENT_VAULT_NOTES')
     expect(serviceSource).toContain('selectGovernedIntelligenceProvider')
-    expect(serviceSource).toContain('this.boundary.availableActions')
+    expect(serviceSource).toContain('this.runtime.start')
+    expect(bindingSource).toContain('boundary.availableActions')
   })
 
   it('selects the deterministic test adapter through IntelligenceRouter and never presents it as a live model', async () => {

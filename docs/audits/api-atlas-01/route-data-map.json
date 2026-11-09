@@ -5089,7 +5089,7 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/intelligence/service.ts#approve",
-      "services/greenfield-api/src/intelligence/service.ts#execute"
+      "services/greenfield-api/src/intelligence/service.ts#principal"
     ]
   },
   "POST /v1/intelligence/missions/:missionId/approvals/:approvalId/reject": {
@@ -5099,6 +5099,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#principal",
       "services/greenfield-api/src/intelligence/service.ts#reject"
     ]
   },
@@ -5147,7 +5148,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/intelligence/service.ts#execute"
+      "services/greenfield-api/src/intelligence/service.ts#execute",
+      "services/greenfield-api/src/intelligence/service.ts#principal"
     ]
   },
   "POST /v1/intelligence/missions/:missionId/start": {
@@ -5157,7 +5159,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/intelligence/service.ts#execute",
+      "services/greenfield-api/src/intelligence/service.ts#principal",
+      "services/greenfield-api/src/intelligence/service.ts#settleStart",
       "services/greenfield-api/src/intelligence/service.ts#start"
     ]
   },

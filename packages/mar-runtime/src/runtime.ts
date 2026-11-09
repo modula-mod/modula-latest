@@ -61,6 +61,15 @@ export type MissionRuntimeDependencies = {
   ids?: () => string
   clock?: {nowIso(): string; nowMs(): number}
   budget?: Partial<MissionRuntimeBudget>
+  /**
+   * How a proposal for a capability missing from the catalog is handled.
+   * `block` (default) blocks at planning. `verify` records the raw proposal and
+   * routes it through AKI and the Governor so they record a fail-closed
+   * decision; the runtime still blocks it with CAPABILITY_UNKNOWN after
+   * authorization, whatever those decisions say, so it can never be approved
+   * or dispatched. CAPABILITY_DENIED and INVALID_ACTION_SCHEMA always block.
+   */
+  unregisteredCapabilities?: 'block' | 'verify'
 }
 
 type Cycle = {
@@ -88,6 +97,7 @@ export class MissionRuntime {
   private readonly ids: () => string
   private readonly clock: {nowIso(): string; nowMs(): number}
   private readonly budget: MissionRuntimeBudget
+  private readonly unregisteredCapabilities: 'block' | 'verify'
   private readonly controllers = new Map<string, AbortController>()
   private readonly locks = new Map<string, Promise<void>>()
 
@@ -101,6 +111,7 @@ export class MissionRuntime {
     this.ids = dependencies.ids ?? (() => crypto.randomUUID())
     this.clock = dependencies.clock ?? {nowIso: () => new Date().toISOString(), nowMs: () => Date.now()}
     this.budget = {...DEFAULT_MISSION_RUNTIME_BUDGET, ...dependencies.budget}
+    this.unregisteredCapabilities = dependencies.unregisteredCapabilities ?? 'block'
     if (this.budget.maxPlanSteps < 1 || this.budget.maxIterations < 1 || this.budget.maxDurationMs < 0) {
       throw new IntelligenceError('INVALID_ACTION_SCHEMA', 'Mission runtime budget is invalid')
     }
@@ -318,14 +329,18 @@ export class MissionRuntime {
       throw new Error('unreachable')
     }
     const assessed = assessProposal({...step.actionProposal, missionId: mission.id}, actions)
-    if (isProposalRejection(assessed)) {
+    const routeUnregistered = isProposalRejection(assessed) &&
+      assessed.code === 'CAPABILITY_UNKNOWN' &&
+      this.unregisteredCapabilities === 'verify'
+    if (isProposalRejection(assessed) && !routeUnregistered) {
       await this.block(cycle, assessed.code, assessed.message)
       throw new Error('unreachable')
     }
+    const bound = isProposalRejection(assessed) ? step.actionProposal : assessed.proposal
     const proposal: ModulaActionProposal = {
-      ...assessed.proposal,
+      ...bound,
       missionId: mission.id,
-      idempotencyKey: assessed.proposal.idempotencyKey ?? `mission:${mission.id}:proposal:${assessed.proposal.id}`,
+      idempotencyKey: bound.idempotencyKey ?? `mission:${mission.id}:proposal:${bound.id}`,
     }
     const boundPlan: GaiaPlan = {...plan, missionId: mission.id, steps: [{...step, actionProposal: proposal, capability: proposal.capability}]}
     await this.store.writeProposal(proposal)
@@ -382,6 +397,11 @@ export class MissionRuntime {
     }, {proposalId: proposal.id, akiDecisionId: aki.id, governorDecisionId: governor.id})
     if (aki.verdict === 'deny' || governor.authorization === 'blocked') {
       await this.block(cycle, aki.verdict === 'deny' ? 'AKI_DENIED' : 'GOVERNOR_BLOCKED', 'Authorization refused the proposal', proposal.id)
+      throw new Error('unreachable')
+    }
+    const boundary = await this.tools.revalidate(cycle.principal.accountId, mission.workspaceId, proposal)
+    if (!boundary.registered) {
+      await this.block(cycle, 'CAPABILITY_UNKNOWN', 'Proposal does not match a registered capability', proposal.id)
       throw new Error('unreachable')
     }
     if (aki.verdict === 'abstain' && governor.authorization === 'autonomous') {

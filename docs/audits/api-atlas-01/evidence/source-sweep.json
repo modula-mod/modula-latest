@@ -1144,56 +1144,42 @@
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 279,
+      "line": 290,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 298,
+      "line": 309,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 300,
+      "line": 311,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!plan) throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 313,
+      "line": 324,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 318,
+      "line": 329,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 323,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('unreachable')"
-    },
-    {
-      "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 374,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('unreachable')"
-    },
-    {
-      "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 385,
+      "line": 337,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
@@ -1207,28 +1193,49 @@
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 397,
+      "line": 400,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 428,
+      "line": 405,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 409,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 417,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 448,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/tests/runtime.test.ts",
-      "line": 379,
+      "line": 440,
       "marker": "throw new Error",
       "classification": "test-fixture-or-development",
       "excerpt": "throw new Error('synthetic tool failure')"
     },
     {
       "file": "packages/mar-runtime/tests/runtime.test.ts",
-      "line": 426,
+      "line": 487,
       "marker": "throw new Error",
       "classification": "test-fixture-or-development",
       "excerpt": "throw new Error('planner must not run')"
@@ -3253,56 +3260,42 @@
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 279,
+      "line": 290,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 298,
+      "line": 309,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 300,
+      "line": 311,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!plan) throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 313,
+      "line": 324,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 318,
+      "line": 329,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 323,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('unreachable')"
-    },
-    {
-      "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 374,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('unreachable')"
-    },
-    {
-      "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 385,
+      "line": 337,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
@@ -3316,14 +3309,35 @@
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 397,
+      "line": 400,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/mar-runtime/src/runtime.ts",
-      "line": 428,
+      "line": 405,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 409,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 417,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 448,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('unreachable')"

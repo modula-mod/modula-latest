@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T20:29:01.757Z for branch `integration/gate-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T20:39:41.475Z for branch `integration/gate-01`; this does not claim deployment.
 
 - Runtime method routes: 793
 - Application routes: 557
@@ -15325,7 +15325,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
@@ -15374,7 +15374,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15423,7 +15423,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15472,7 +15472,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15521,7 +15521,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15570,7 +15570,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15619,7 +15619,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15668,7 +15668,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15717,7 +15717,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15766,7 +15766,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15815,7 +15815,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15864,7 +15864,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed

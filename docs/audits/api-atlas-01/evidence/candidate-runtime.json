@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T20:29:01.757Z",
+  "capturedAt": "2026-11-09T20:39:41.475Z",
   "source": {
     "branch": "integration/gate-01",
-    "headAtCapture": "95f9de2d2b16923e6eeae8af52921524e011336f",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "03d323beb43e5ad6279493fe6caabb7b5e3d2ccb22feb33c4eb5849f9ef59cdd"
+    "headAtCapture": "b4aa8135e2b01e7d527175e7fb1ffd5fbbcc6a4f",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "8bd6877890f55c6d72316fbe0ba1dcaaa6525f3225fe1b27c2797c3f4dc29695"
   },
   "runtimeRoutes": [
     {

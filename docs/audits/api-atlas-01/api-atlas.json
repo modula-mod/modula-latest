@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "integration/gate-01",
-      "sourceSha256": "03d323beb43e5ad6279493fe6caabb7b5e3d2ccb22feb33c4eb5849f9ef59cdd",
-      "capturedAt": "2026-11-09T20:29:01.757Z",
+      "sourceSha256": "8bd6877890f55c6d72316fbe0ba1dcaaa6525f3225fe1b27c2797c3f4dc29695",
+      "capturedAt": "2026-11-09T20:39:41.475Z",
       "routeCount": 793
     },
     "status": "PASS"
@@ -34567,7 +34567,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34685,7 +34686,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34784,7 +34786,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34883,7 +34886,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34971,7 +34975,7 @@
         "writes": [],
         "evidence": [
           "services/greenfield-api/src/intelligence/service.ts#approve",
-          "services/greenfield-api/src/intelligence/service.ts#execute"
+          "services/greenfield-api/src/intelligence/service.ts#principal"
         ],
         "confidence": "method-level-static"
       },
@@ -34985,7 +34989,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35072,6 +35077,7 @@
         "reads": [],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/intelligence/service.ts#principal",
           "services/greenfield-api/src/intelligence/service.ts#reject"
         ],
         "confidence": "method-level-static"
@@ -35086,7 +35092,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35185,7 +35192,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35284,7 +35292,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35383,7 +35392,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35482,7 +35492,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35569,7 +35580,8 @@
         "reads": [],
         "writes": [],
         "evidence": [
-          "services/greenfield-api/src/intelligence/service.ts#execute"
+          "services/greenfield-api/src/intelligence/service.ts#execute",
+          "services/greenfield-api/src/intelligence/service.ts#principal"
         ],
         "confidence": "method-level-static"
       },
@@ -35583,7 +35595,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -35670,7 +35683,8 @@
         "reads": [],
         "writes": [],
         "evidence": [
-          "services/greenfield-api/src/intelligence/service.ts#execute",
+          "services/greenfield-api/src/intelligence/service.ts#principal",
+          "services/greenfield-api/src/intelligence/service.ts#settleStart",
           "services/greenfield-api/src/intelligence/service.ts#start"
         ],
         "confidence": "method-level-static"
@@ -35685,7 +35699,8 @@
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
           "services/greenfield-api/tests/gai01.integration.test.ts",
-          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+          "services/greenfield-api/tests/intelligence-cancel.test.ts",
+          "services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -103296,9 +103311,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -103441,9 +103458,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -103548,9 +103567,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -103864,9 +103885,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -103975,9 +103998,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104189,10 +104214,12 @@
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
         "services/greenfield-api/src/intelligence/mission-cancel.ts",
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/intelligence/mission-cancel.ts",
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104311,10 +104338,12 @@
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
         "services/greenfield-api/src/intelligence/mission-cancel.ts",
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/intelligence/mission-cancel.ts",
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104434,9 +104463,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104523,9 +104554,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104676,9 +104709,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104781,6 +104816,7 @@
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -104944,9 +104980,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-runtime-store.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],

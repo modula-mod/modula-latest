@@ -6,15 +6,15 @@ import {
 } from '@modula/mar-runtime'
 import type {ModulaDb} from '../database/client.js'
 import type {Database} from '../database/types.js'
+import {getOrCreateGreenfieldMissionRuntime} from './mission-runtime-binding.js'
 
 /**
- * Thin GreenField binding for HTTP mission cancel.
- * Persistence uses the existing intelligence tables. Planning, verification,
- * authorization, and dispatch stay with GovernedIntelligenceService.
+ * Verified GreenField session principal for MissionRuntime.
  */
-export function sessionPrincipal(accountId: string): VerifiedPrincipal {
+export function sessionPrincipal(accountId: string, workspaceId?: string): VerifiedPrincipal {
   return {
     accountId,
+    ...(workspaceId ? {workspaceId} : {}),
     assurance: {
       kind: 'verified',
       method: 'greenfield-session',
@@ -38,7 +38,7 @@ export function createCancelRuntime(store: MissionRuntimeStore): MissionRuntime 
 }
 
 export function createGreenfieldCancelRuntime(db: ModulaDb): MissionRuntime {
-  return createCancelRuntime(new GreenfieldMissionCancelStore(db))
+  return getOrCreateGreenfieldMissionRuntime(db).runtime
 }
 
 function unusedCancelPort(): never {
