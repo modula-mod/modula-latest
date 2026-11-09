@@ -148,6 +148,11 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     })
     expect(undeclaredReadable.permissionGranted).toBe(true)
     expect(undeclaredReadable).toMatchObject({registered: false, schemaValid: false})
+
+    const unregistered = {id: `syn-revalidate-unreg-${suffix}`, missionId: `syn-revalidate-mission-${suffix}`, input: {}, requestedBy: 'gaia' as const}
+    for (const family of ['financial.fixture', 'unknown.superpower'] as const) {
+      expect(await boundary.revalidate(accountA, undefined, {...unregistered, family, capability: family})).toMatchObject({registered: false})
+    }
   })
 
   it('runs start, plan, verify, and execute to completion through MissionRuntime', async () => {
