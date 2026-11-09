@@ -229,7 +229,10 @@ export class MissionRuntime {
 
   async execute(principal: VerifiedPrincipal, missionId: string, proposalId: string): Promise<IntelligenceMission> {
     assertVerifiedPrincipal(principal)
-    await this.owned(principal, missionId)
+    const owned = await this.owned(principal, missionId)
+    if (owned.status === 'cancelled') {
+      throw new IntelligenceError('INVALID_MISSION_STATE', 'Mission cannot execute from cancelled')
+    }
     const existing = await this.store.readExecution(proposalId)
     if (existing) {
       if (existing.missionId !== missionId) throw new IntelligenceError('MISSION_ACCESS_DENIED', 'Execution belongs to another mission')
@@ -645,6 +648,9 @@ export class MissionRuntime {
   ): Promise<void> {
     await this.withMission(mission.id, async () => {
       const current = await this.store.readMission(mission.id)
+      // mission.cancelled is the last ledger event: an in-flight cycle that
+      // returns or throws after a cancel records nothing further.
+      if (current?.status === 'cancelled') return
       await this.append(current ?? mission, type, payload, actorFor(type, cycle.principal.accountId), refs)
     })
   }
