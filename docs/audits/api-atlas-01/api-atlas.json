@@ -8,19 +8,19 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "fix/gubic-socket-auth",
-      "sourceSha256": "a151ef17e4496a533f1ed728372bf70b223008fa7724bdc1ce17db0c78f84d27",
-      "capturedAt": "2026-11-09T16:29:40.381Z",
-      "routeCount": 758
+      "branch": "rebase-check/mar-fast-01-on-9f2ab96",
+      "sourceSha256": "32e53b965f749f35f4ac1650c8a741476aa6d99e9bb1356eb680b662f94a3a2c",
+      "capturedAt": "2026-11-09T20:13:12.458Z",
+      "routeCount": 759
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 758,
-    "applicationRuntimeRoutes": 535,
-    "mappedApplicationRoutes": 535,
+    "runtimeMethodRoutes": 759,
+    "applicationRuntimeRoutes": 536,
+    "mappedApplicationRoutes": 536,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 535,
+    "sourceRoutes": 536,
     "sourceOnlyRoutes": 0,
     "explicitlyExcludedFrameworkRoutes": 223,
     "frameworkRoutes": [
@@ -1141,7 +1141,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "758 = 535 application + 223 framework-derived"
+    "equation": "759 = 536 application + 223 framework-derived"
   },
   "routes": [
     {
@@ -33752,7 +33752,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 23
+        "line": 25
       },
       "handler": "inline",
       "controllerServices": [
@@ -33827,7 +33827,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -33863,7 +33864,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 14
+        "line": 16
       },
       "handler": "inline",
       "controllerServices": [
@@ -33943,7 +33944,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -33965,7 +33967,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 29
+        "line": 31
       },
       "handler": "inline",
       "controllerServices": [
@@ -34040,7 +34042,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34062,7 +34065,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 57
+        "line": 66
       },
       "handler": "inline",
       "controllerServices": [
@@ -34137,7 +34140,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34159,7 +34163,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 71
+        "line": 80
       },
       "handler": "inline",
       "controllerServices": [
@@ -34237,7 +34241,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34259,7 +34264,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 78
+        "line": 87
       },
       "handler": "inline",
       "controllerServices": [
@@ -34336,7 +34341,106 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/intelligence/missions/:missionId/cancel",
+      "domain": "Intelligence",
+      "method": "POST",
+      "effectiveRoute": "/v1/intelligence/missions/:missionId/cancel",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/intelligence/missions/:missionId/cancel",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/intelligence/routes.ts",
+        "line": 45
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "cancelRuntime.cancel"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [],
+        "evidence": [],
+        "confidence": "unresolved"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gai01.contract.test.ts",
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34358,7 +34462,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 50
+        "line": 59
       },
       "handler": "inline",
       "controllerServices": [
@@ -34433,7 +34537,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34455,7 +34560,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 64
+        "line": 73
       },
       "handler": "inline",
       "controllerServices": [
@@ -34530,7 +34635,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34552,7 +34658,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 43
+        "line": 52
       },
       "handler": "inline",
       "controllerServices": [
@@ -34627,7 +34733,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34649,7 +34756,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 85
+        "line": 94
       },
       "handler": "inline",
       "controllerServices": [
@@ -34726,7 +34833,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -34748,7 +34856,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/intelligence/routes.ts",
-        "line": 36
+        "line": 38
       },
       "handler": "inline",
       "controllerServices": [
@@ -34826,7 +34934,8 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/gai01.contract.test.ts",
-          "services/greenfield-api/tests/gai01.integration.test.ts"
+          "services/greenfield-api/tests/gai01.integration.test.ts",
+          "services/greenfield-api/tests/intelligence-cancel.test.ts"
         ]
       },
       "automatedTest": true,
@@ -100249,9 +100358,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-cancel.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-cancel.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],
@@ -100369,9 +100480,11 @@
       ],
       "migrationIntroduced": "056_gai01_governed_intelligence.sql",
       "sourceReads": [
+        "services/greenfield-api/src/intelligence/mission-cancel.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "sourceWrites": [
+        "services/greenfield-api/src/intelligence/mission-cancel.ts",
         "services/greenfield-api/src/intelligence/repository.ts"
       ],
       "jobReads": [],

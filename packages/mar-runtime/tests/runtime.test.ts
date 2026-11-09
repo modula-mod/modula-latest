@@ -101,6 +101,7 @@ function harness(options: {
   decisions?: DecisionEngine
   governor?: {decide(input: {id: string; proposal: ModulaActionProposal; aki: import('@modula/intelligence-contracts').AkiDecision; createdAt?: string}): import('@modula/intelligence-contracts').GovernorDecision}
   store?: InMemoryMissionRuntimeStore
+  unregisteredCapabilities?: 'block' | 'verify'
 } = {}) {
   const store = options.store ?? new InMemoryMissionRuntimeStore()
   const tools = options.tools ?? new RecordingTools()
@@ -117,6 +118,7 @@ function harness(options: {
     ids: ids(),
     clock,
     budget: options.budget,
+    unregisteredCapabilities: options.unregisteredCapabilities,
   })
   return {
     store,
@@ -224,6 +226,65 @@ describe('mission runtime cycle', () => {
     expect((await runtime.events(principal, created.id)).map(event => event.type)).toEqual(expect.arrayContaining(['execution.blocked', 'mission.blocked']))
     const mission = await runtime.recover(principal, created.id).catch(error => error)
     expect(mission).toMatchObject({code: 'INVALID_MISSION_STATE'})
+    expect(tools.executions).toHaveLength(0)
+  })
+
+  it('routes an unregistered proposal through AKI and the Governor when opted in, then blocks it', async () => {
+    const action = syntheticActions()[0]!
+    const planner = new ScriptedPlanner(input => planWith(input.mission.id, [{
+      ...proposalFor(input.mission.id, action, {}),
+      family: 'financial.fixture',
+      capability: 'financial.fixture',
+      moduleId: undefined,
+    }]))
+    const tools = new RecordingTools()
+    tools.revalidateResult = {registered: false, schemaValid: false, permissionGranted: false, workspaceAccess: true}
+    const {runtime, store} = harness({planner, tools, unregisteredCapabilities: 'verify'})
+    const created = await runtime.createMission(principal, {...request, correlationId: 'corr-unreg-verify1'})
+    await expect(runtime.start(principal, created.id)).rejects.toMatchObject({code: expect.stringMatching(/^(AKI_DENIED|GOVERNOR_BLOCKED|CAPABILITY_UNKNOWN)$/)})
+    const types = (await runtime.events(principal, created.id)).map(event => event.type)
+    expect(types).toEqual(expect.arrayContaining(['proposal.created', 'aki.decision_created', 'governor.authorization_created', 'mission.blocked']))
+    expect(types).not.toContain('approval.requested')
+    expect(types).not.toContain('execution.started')
+    expect((await store.readMission(created.id))?.status).toBe('blocked')
+    expect(tools.executions).toHaveLength(0)
+  })
+
+  it('never dispatches an unregistered proposal even if AKI and the Governor allow it', async () => {
+    const action = syntheticActions()[0]!
+    const planner = new ScriptedPlanner(input => planWith(input.mission.id, [{
+      ...proposalFor(input.mission.id, action, {}),
+      family: 'unknown.superpower',
+      capability: 'unknown.superpower',
+      moduleId: undefined,
+    }]))
+    const tools = new RecordingTools()
+    tools.revalidateResult = {registered: false, schemaValid: true, permissionGranted: true, workspaceAccess: true}
+    const {runtime, store} = harness({
+      planner,
+      tools,
+      unregisteredCapabilities: 'verify',
+      decisions: {async evaluate(input) {
+        return {missionId: input.mission.id, proposalId: input.proposal.id, verdict: 'allow', risk: input.risk, reversibility: input.reversibility, checks: [], evidence: [], evidenceState: 'NO_EVIDENCE', conflicts: [], conditions: []}
+      }},
+      governor: {decide(input) {
+        return {id: input.id, missionId: input.proposal.missionId, proposalId: input.proposal.id, authorization: 'autonomous', allowedCapabilities: [input.proposal.capability], constraints: [], akiDecisionId: input.aki.id, createdAt: input.createdAt ?? NOW}
+      }},
+    })
+    const created = await runtime.createMission(principal, {...request, correlationId: 'corr-unreg-allow01'})
+    await expect(runtime.start(principal, created.id)).rejects.toMatchObject({code: 'CAPABILITY_UNKNOWN'})
+    expect((await store.readMission(created.id))?.status).toBe('blocked')
+    expect((await runtime.events(principal, created.id)).map(event => event.type)).not.toContain('execution.started')
+    expect(tools.executions).toHaveLength(0)
+  })
+
+  it('still refuses a shell proposal at planning when unregistered routing is opted in', async () => {
+    const shell: GaiaAvailableAction = {family: 'shell.exec', capability: 'shell.exec', moduleId: SYNTHETIC_MODULE_ID}
+    const planner = new ScriptedPlanner(input => planWith(input.mission.id, [proposalFor(input.mission.id, shell, {command: 'uname'})]))
+    const {runtime, tools} = harness({planner, actions: [], unregisteredCapabilities: 'verify'})
+    const created = await runtime.createMission(principal, {...request, correlationId: 'corr-unreg-shell1'})
+    await expect(runtime.start(principal, created.id)).rejects.toMatchObject({code: 'CAPABILITY_DENIED'})
+    expect((await runtime.events(principal, created.id)).map(event => event.type)).not.toContain('proposal.created')
     expect(tools.executions).toHaveLength(0)
   })
 

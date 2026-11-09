@@ -1122,6 +1122,97 @@
       "excerpt": "throw new Error('remote must not be selected unexpectedly')"
     },
     {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 279,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 298,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 300,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!plan) throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 313,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 318,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 323,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 374,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 385,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 389,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 397,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 428,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/tests/runtime.test.ts",
+      "line": 379,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('synthetic tool failure')"
+    },
+    {
+      "file": "packages/mar-runtime/tests/runtime.test.ts",
+      "line": 426,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('planner must not run')"
+    },
+    {
       "file": "packages/modula-cli/src/cli.ts",
       "line": 132,
       "marker": "hardcoded",
@@ -3117,6 +3208,83 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 279,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 298,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 300,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!plan) throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 313,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 318,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 323,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 374,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 385,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 389,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 397,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 428,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/modula-cli/src/cli.ts",

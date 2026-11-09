@@ -5042,8 +5042,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_missions`
@@ -5059,8 +5059,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `056_gai01_governed_intelligence.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/intelligence/repository.ts`
-- API/worker source writes: `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source reads: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/repository.ts`
+- API/worker source writes: `services/greenfield-api/src/intelligence/mission-cancel.ts`, `services/greenfield-api/src/intelligence/repository.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `intelligence_plan_steps`

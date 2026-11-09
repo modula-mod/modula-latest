@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T16:29:40.381Z",
+  "capturedAt": "2026-11-09T20:13:12.458Z",
   "source": {
-    "branch": "fix/gubic-socket-auth",
-    "headAtCapture": "7a8c48af1e1dcc108c73a93fb9d4842488d69b23",
+    "branch": "rebase-check/mar-fast-01-on-9f2ab96",
+    "headAtCapture": "78df4d83f1afb48b2a72a1e99c6546db016723b7",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "a151ef17e4496a533f1ed728372bf70b223008fa7724bdc1ce17db0c78f84d27"
+    "apiSourceSha256": "32e53b965f749f35f4ac1650c8a741476aa6d99e9bb1356eb680b662f94a3a2c"
   },
   "runtimeRoutes": [
     {
@@ -2295,6 +2295,15 @@
       "method": "POST",
       "url": "/v1/intelligence/missions/:missionId/start",
       "path": "/v1/intelligence/missions/:missionId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/cancel",
+      "path": "/v1/intelligence/missions/:missionId/cancel",
       "prefix": "",
       "schema": null,
       "config": null,

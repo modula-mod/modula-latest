@@ -5043,6 +5043,14 @@
       "services/greenfield-api/src/intelligence/service.ts#reject"
     ]
   },
+  "POST /v1/intelligence/missions/:missionId/cancel": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "unresolved",
+    "evidence": []
+  },
   "GET /v1/intelligence/missions/:missionId/decisions": {
     "reads": [],
     "writes": [],
