@@ -1,5 +1,6 @@
 import type {AkiDecision, GovernorDecision, IntelligenceMission, ModulaActionProposal} from '@modula/intelligence-contracts'
 import {IntelligenceError} from '@modula/intelligence-contracts'
+import type {IntelligenceProviderRegistry, IntelligenceRouter} from '@modula/intelligence-core'
 import {
   assertCommandBoundary,
   classifyActionRisk,
@@ -11,6 +12,7 @@ import type {ModulaDb} from '../database/client.js'
 import type {AppConfig} from '../config/index.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {IntelligenceActionBoundary} from './action-boundary.js'
+import {createGovernedIntelligenceRouter, selectGovernedIntelligenceProvider} from './provider-selection.js'
 import {IntelligenceRepository} from './repository.js'
 
 export class GovernedIntelligenceService {
@@ -19,10 +21,12 @@ export class GovernedIntelligenceService {
   private readonly planner = new DeterministicTestPlanner(uuidv7)
   private readonly aki = new DeterministicAkiDecisionFabric()
   private readonly governor = new GovernorV0()
+  private readonly router: IntelligenceRouter
 
-  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
+  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>, options?: {providers?: IntelligenceProviderRegistry}) {
     this.repository = new IntelligenceRepository(db)
     this.boundary = new IntelligenceActionBoundary(db, config)
+    this.router = createGovernedIntelligenceRouter(options?.providers).router
   }
 
   async createMission(accountId: string, input: {objective?: unknown; workspaceId?: unknown; correlationId?: string}) {
@@ -60,7 +64,8 @@ export class GovernedIntelligenceService {
   async start(accountId: string, missionId: string) {
     let mission = await this.repository.ownedMission(accountId, missionId)
     if (mission.status !== 'draft') throw new IntelligenceError('INVALID_MISSION_STATE', 'Only a draft mission can start planning')
-    mission = await this.repository.transition(accountId, missionId, 'planning', 'mission.planning_started', {planner: 'deterministic-test-v0'})
+    const selection = await selectGovernedIntelligenceProvider(this.router)
+    mission = await this.repository.transition(accountId, missionId, 'planning', 'mission.planning_started', selection)
     try {
       const planningStarted = Date.now()
       const plan = await this.planner.plan({mission, availableActions: await this.boundary.availableActions(accountId)})
