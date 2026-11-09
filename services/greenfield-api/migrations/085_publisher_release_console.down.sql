@@ -9,5 +9,5 @@ DROP FUNCTION IF EXISTS greenfield_publisher_release_job_logs_append_only();
 DROP TABLE IF EXISTS greenfield_publisher_release_jobs;
 DROP FUNCTION IF EXISTS greenfield_publisher_release_jobs_published_terminal();
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '083')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '084')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

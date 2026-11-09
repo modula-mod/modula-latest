@@ -114,5 +114,5 @@ GRANT SELECT, INSERT ON greenfield_publisher_release_job_logs TO modula_api;
 GRANT USAGE, SELECT ON SEQUENCE greenfield_publisher_release_job_logs_log_id_seq TO modula_api;
 GRANT SELECT ON greenfield_publisher_release_jobs, greenfield_publisher_release_job_logs TO modula_worker, modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '084')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '085')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
