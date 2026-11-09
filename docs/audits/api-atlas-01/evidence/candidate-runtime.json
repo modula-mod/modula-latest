@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T22:11:19.132Z",
+  "capturedAt": "2026-11-09T22:40:55.671Z",
   "source": {
-    "branch": "mosaic/pr149-update",
-    "headAtCapture": "c2d1bc0ae59ac16c520e78273a1a766c65491eb9",
+    "branch": "mosaic/pr148-update",
+    "headAtCapture": "883211197116b8a0469c06783b55d4b31f2e8de3",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "b3154ffd1bc8e239923ab9d583e5e8f47a3a098c75b8bb3255a694633f5991f2"
+    "apiSourceSha256": "963cdc92c2b1cd38ae637602c7046ef1fcf54c2de68c8a8f535d22c36886e981"
   },
   "runtimeRoutes": [
     {
@@ -5434,50 +5434,6 @@
       "path": "/v1/stories/items/:itemId/viewed",
       "prefix": "",
       "schema": null,
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "POST",
-      "url": "/v1/stories/:storyId/replies",
-      "path": "/v1/stories/:storyId/replies",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "storyId"
-          ],
-          "properties": {
-            "storyId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "body": {
-          "type": "object",
-          "additionalProperties": true,
-          "required": [
-            "text",
-            "idempotencyKey"
-          ],
-          "properties": {
-            "text": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 5000
-            },
-            "idempotencyKey": {
-              "type": "string",
-              "minLength": 8,
-              "maxLength": 200,
-              "pattern": "^[A-Za-z0-9._:-]+$"
-            }
-          }
-        }
-      },
       "config": null,
       "handler": ""
     },
