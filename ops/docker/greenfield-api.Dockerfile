@@ -23,6 +23,7 @@ COPY packages/greenfield-product-standard/package.json packages/greenfield-produ
 COPY packages/dimon-contracts/package.json packages/dimon-contracts/
 COPY packages/intelligence-contracts/package.json packages/intelligence-contracts/
 COPY packages/intelligence-governance/package.json packages/intelligence-governance/
+COPY packages/mar-runtime/package.json packages/mar-runtime/
 COPY services/greenfield-api/package.json services/greenfield-api/
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard
 RUN pnpm install --frozen-lockfile --filter @modula/greenfield-api...
@@ -51,6 +52,7 @@ RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/dimon-contracts build \
  && pnpm --filter @modula/intelligence-contracts build \
  && pnpm --filter @modula/intelligence-governance build \
+ && pnpm --filter @modula/mar-runtime build \
  && pnpm --filter @modula/greenfield-api build
 RUN pnpm --config.inject-workspace-packages=true --filter @modula/greenfield-api deploy --prod /prod/api
 

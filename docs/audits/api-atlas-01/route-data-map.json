@@ -1321,6 +1321,64 @@
       "services/greenfield-api/src/product-standard/ingest-service.ts#ingest"
     ]
   },
+  "POST /v1/admin/qa/moliboos/packs/:packId/restore": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [
+      "greenfield_moliboo_pack_release_events",
+      "greenfield_moliboo_pack_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#setAvailability"
+    ]
+  },
+  "POST /v1/admin/qa/moliboos/packs/:packId/withdraw": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [
+      "greenfield_moliboo_pack_release_events",
+      "greenfield_moliboo_pack_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#setAvailability"
+    ]
+  },
   "PUT /v1/admin/qa/premium/:handle": {
     "reads": [
       "actors",
@@ -1645,6 +1703,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/github-release-sync-service.ts#applyVerified",
       "services/greenfield-api/src/modules/github-release-sync-service.ts#fetchVerified",
       "services/greenfield-api/src/modules/github-release-sync-service.ts#storePackageBlob",
       "services/greenfield-api/src/modules/github-release-sync-service.ts#sync",
@@ -5037,7 +5096,7 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/intelligence/service.ts#approve",
-      "services/greenfield-api/src/intelligence/service.ts#execute"
+      "services/greenfield-api/src/intelligence/service.ts#principal"
     ]
   },
   "POST /v1/intelligence/missions/:missionId/approvals/:approvalId/reject": {
@@ -5047,8 +5106,17 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#principal",
       "services/greenfield-api/src/intelligence/service.ts#reject"
     ]
+  },
+  "POST /v1/intelligence/missions/:missionId/cancel": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "unresolved",
+    "evidence": []
   },
   "GET /v1/intelligence/missions/:missionId/decisions": {
     "reads": [],
@@ -5081,13 +5149,16 @@
     ]
   },
   "POST /v1/intelligence/missions/:missionId/proposals/:proposalId/execute": {
-    "reads": [],
+    "reads": [
+      "cancelled"
+    ],
     "writes": [],
     "emits": [],
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/intelligence/service.ts#execute"
+      "services/greenfield-api/src/intelligence/service.ts#execute",
+      "services/greenfield-api/src/intelligence/service.ts#principal"
     ]
   },
   "POST /v1/intelligence/missions/:missionId/start": {
@@ -5097,7 +5168,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/intelligence/service.ts#execute",
+      "services/greenfield-api/src/intelligence/service.ts#principal",
+      "services/greenfield-api/src/intelligence/service.ts#settleStart",
       "services/greenfield-api/src/intelligence/service.ts#start"
     ]
   },
@@ -5235,6 +5307,54 @@
       "services/greenfield-api/src/premium/service.ts#invalidateAccount",
       "services/greenfield-api/src/premium/service.ts#membership",
       "services/greenfield-api/src/premium/service.ts#setBadgeVisibility"
+    ]
+  },
+  "GET /v1/me/moliboos/outfit": {
+    "reads": [
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#outfit",
+      "services/greenfield-api/src/domains/moliboos/service.ts#outfitItems"
+    ]
+  },
+  "PUT /v1/me/moliboos/outfit": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items"
+    ],
+    "writes": [
+      "Moliboo",
+      "greenfield_moliboo_equipped"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#setOutfit"
+    ]
+  },
+  "GET /v1/me/moliboos/ownership": {
+    "reads": [
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#ownership"
     ]
   },
   "GET /v1/me/verification": {
@@ -7387,6 +7507,113 @@
       "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet"
     ]
   },
+  "GET /v1/moliboos/packs": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#descriptor",
+      "services/greenfield-api/src/domains/moliboos/service.ts#listPacks",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#trustedRows"
+    ]
+  },
+  "GET /v1/moliboos/packs/:packId/download": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#download",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState"
+    ]
+  },
+  "GET /v1/moliboos/packs/:packId/manifest": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#descriptor",
+      "services/greenfield-api/src/domains/moliboos/service.ts#manifest",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState"
+    ]
+  },
+  "GET /v1/moliboos/packs/catalog.json": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#catalog",
+      "services/greenfield-api/src/domains/moliboos/service.ts#descriptor",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#trustedRows"
+    ]
+  },
   "GET /v1/notifications": {
     "reads": [
       "blocks",
@@ -8215,6 +8442,219 @@
     "evidence": [
       "services/greenfield-api/src/providers/service.ts#list",
       "services/greenfield-api/src/providers/service.ts#resolve"
+    ]
+  },
+  "GET /v1/publisher/modules": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_publisher_owners",
+      "greenfield_publisher_release_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#accessiblePublisherIds",
+      "services/greenfield-api/src/publisher/release-job-service.ts#listModules",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
+      "services/greenfield-api/src/publisher/release-job-service.ts#summary"
+    ]
+  },
+  "GET /v1/publisher/modules/:moduleId": {
+    "reads": [
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_sources",
+      "greenfield_module_versions",
+      "greenfield_publisher_release_jobs",
+      "greenfield_publishers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#jobsFor",
+      "services/greenfield-api/src/publisher/release-job-service.ts#moduleDetail",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
+      "services/greenfield-api/src/publisher/release-job-service.ts#summary",
+      "services/greenfield-api/src/publisher/release-job-service.ts#versionsFor"
+    ]
+  },
+  "GET /v1/publisher/modules/:moduleId/github-releases": {
+    "reads": [
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_publisher_release_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#githubReleases",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "GET /v1/publisher/modules/:moduleId/release-jobs": {
+    "reads": [
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_publisher_release_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#jobsFor",
+      "services/greenfield-api/src/publisher/release-job-service.ts#listJobs",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "POST /v1/publisher/modules/:moduleId/release-jobs": {
+    "reads": [
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_publisher_release_jobs"
+    ],
+    "writes": [
+      "greenfield_publisher_release_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#createJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "GET /v1/publisher/modules/:moduleId/versions": {
+    "reads": [
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_sources",
+      "greenfield_module_versions",
+      "greenfield_publisher_release_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
+      "services/greenfield-api/src/publisher/release-job-service.ts#versions",
+      "services/greenfield-api/src/publisher/release-job-service.ts#versionsFor"
+    ]
+  },
+  "GET /v1/publisher/release-jobs/:jobId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#getJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "POST /v1/publisher/release-jobs/:jobId/cancel": {
+    "reads": [
+      "greenfield_publisher_release_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#cancel",
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "GET /v1/publisher/release-jobs/:jobId/logs": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#logs",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "POST /v1/publisher/release-jobs/:jobId/publish": {
+    "reads": [
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#publish",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "POST /v1/publisher/release-jobs/:jobId/resume": {
+    "reads": [
+      "fetching",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
+      "services/greenfield-api/src/publisher/release-job-service.ts#resume",
+      "services/greenfield-api/src/publisher/release-job-service.ts#startFetching"
+    ]
+  },
+  "POST /v1/publisher/release-jobs/:jobId/validate": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
+      "services/greenfield-api/src/publisher/release-job-service.ts#startFetching",
+      "services/greenfield-api/src/publisher/release-job-service.ts#validate"
     ]
   },
   "GET /v1/push/devices": {

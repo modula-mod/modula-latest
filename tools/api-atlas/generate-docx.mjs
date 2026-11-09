@@ -83,6 +83,8 @@ try {
     const target = join(temporaryDirectory, relativePath)
     mkdirSync(join(target, '..'), {recursive: true})
     writeFileSync(target, contents)
+    // ZIP central-directory entries preserve source modes. Pin them so the
+    // generated DOCX is byte-identical under developer and CI process umasks.
     chmodSync(target, 0o644)
     utimesSync(target, fixedDate, fixedDate)
   }
