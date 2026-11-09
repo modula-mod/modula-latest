@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "integration/gate-01",
+      "branch": "mosaic/pr160-084-privileges",
       "sourceSha256": "ae54a8e50b3c47d850ae78cdf7b20733a5e297897aabe03ff0a9945356392257",
-      "capturedAt": "2026-11-09T21:10:05.020Z",
+      "capturedAt": "2026-11-09T22:02:27.020Z",
       "routeCount": 793
     },
     "status": "PASS"
