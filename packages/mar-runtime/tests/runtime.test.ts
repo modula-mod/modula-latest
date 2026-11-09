@@ -388,6 +388,39 @@ describe('mission runtime cycle', () => {
     expect((await store.readMission(created.id))?.status).toBe('cancelled')
   })
 
+  for (const outcome of ['throws', 'resolves'] as const) {
+    it(`records nothing after mission.cancelled when a running tool ${outcome} after cancel`, async () => {
+      const tools = new RecordingTools()
+      let runtimeRef: MissionRuntime | undefined
+      let missionId = ''
+      tools.executeImpl = async () => {
+        // Sequential: the cancel lands while the mission is running, before the tool returns.
+        await runtimeRef!.cancel(principal, missionId)
+        if (outcome === 'throws') throw new IntelligenceError('EXECUTION_FAILED', 'tool failed after cancel')
+        return {ok: true}
+      }
+      const {runtime, store} = harness({tools})
+      runtimeRef = runtime
+      const created = await runtime.createMission(principal, {...request, correlationId: `corr-cancel-${outcome}`})
+      missionId = created.id
+      await expect(runtime.start(principal, created.id)).resolves.toMatchObject({status: 'cancelled'})
+      const types = (await runtime.events(principal, created.id)).map(event => event.type)
+      expect(types).toContain('execution.started')
+      expect(types.at(-1)).toBe('mission.cancelled')
+      expect(types.filter(type => type === 'mission.cancelled')).toHaveLength(1)
+      expect(types).not.toContain('execution.completed')
+      expect(types).not.toContain('artifact.created')
+      expect((await store.readMission(created.id))?.status).toBe('cancelled')
+      const [execution] = await store.listExecutions(created.id)
+      expect(execution?.status).not.toBe('completed')
+      await expect(runtime.execute(principal, created.id, execution!.proposalId)).rejects.toMatchObject({code: 'INVALID_MISSION_STATE'})
+      await expect(runtime.start(principal, created.id)).rejects.toMatchObject({code: 'INVALID_MISSION_STATE'})
+      await expect(runtime.decideApproval(principal, created.id, 'any-approval', 'approved')).rejects.toMatchObject({code: 'INVALID_MISSION_STATE'})
+      expect((await runtime.events(principal, created.id)).map(event => event.type)).toEqual(types)
+      expect((await store.readMission(created.id))?.status).toBe('cancelled')
+    })
+  }
+
   it('returns the same mission for a duplicate idempotency key', async () => {
     const {runtime, store} = harness()
     const first = await runtime.createMission(principal, request)
