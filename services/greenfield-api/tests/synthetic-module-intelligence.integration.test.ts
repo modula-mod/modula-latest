@@ -219,6 +219,60 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     installGreenfieldMissionRuntimeTestHooks(db)
   })
 
+  for (const outcome of ['resolves', 'rejects'] as const) {
+    it(`keeps a mid-run cancel terminal when the blocked tool ${outcome} (D2)`, async () => {
+      resetGreenfieldMissionRuntimeTrace(db)
+      let settle!: (error?: Error) => void
+      const entered = new Promise<void>(resolve => {
+        installGreenfieldMissionRuntimeTestHooks(db, {
+          beforeExecute: async () => {
+            resolve()
+            await new Promise<void>((ok, err) => {
+              settle = error => { error ? err(error) : ok() }
+            })
+          },
+        })
+      })
+      const mission = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-d2-${outcome}-${suffix}`})
+      const started = service.start(accountA, mission.id)
+      await entered
+      const cancelled = await app.inject({
+        method: 'POST',
+        url: `/v1/intelligence/missions/${mission.id}/cancel`,
+        headers: {authorization: 'Bearer token-a'},
+      })
+      expect(cancelled.statusCode).toBe(200)
+      expect(cancelled.json().data.status).toBe('cancelled')
+      if (outcome === 'rejects') settle(new IntelligenceError('EXECUTION_FAILED', 'tool failed after cancel'))
+      else settle()
+      const detail = await started
+      expect(detail.mission.status).toBe('cancelled')
+
+      const run = await db.selectFrom('intelligence_runs').selectAll().where('mission_id', '=', mission.id).executeTakeFirstOrThrow()
+      expect(run.status).toBe('failed')
+      expect(run.completed_at).toBeTruthy()
+      expect(run.status).not.toBe('cancelled')
+
+      const events = await service.ledger(accountA, mission.id)
+      assertStrictlyMonotonicLedger(events)
+      const types = events.map(event => event.type)
+      const cancelledAt = types.indexOf('mission.cancelled')
+      expect(cancelledAt).toBeGreaterThanOrEqual(0)
+      expect(types.filter(type => type === 'mission.cancelled')).toHaveLength(1)
+      expect(types.slice(cancelledAt + 1)).not.toContain('execution.failed')
+      expect(types.slice(cancelledAt + 1)).not.toContain('execution.completed')
+
+      const executed = await app.inject({
+        method: 'POST',
+        url: `/v1/intelligence/missions/${mission.id}/proposals/${run.proposal_id}/execute`,
+        headers: {authorization: 'Bearer token-a'},
+      })
+      expect(executed.statusCode).toBe(409)
+      expect(executed.json().error.code).toBe('INVALID_MISSION_STATE')
+      installGreenfieldMissionRuntimeTestHooks(db)
+    })
+  }
+
   it('returns a structured authorization error for a write-only grant without throwing a raw error', async () => {
     const deniedAccount = `syn-denied-struct-${suffix}`
     const now = new Date()
