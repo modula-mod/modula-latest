@@ -71,5 +71,11 @@ ALTER TABLE greenfield_release_asset_blobs
     'application/vnd.modula.asset-pack+tgz'
   ));
 
+-- 083 granted modula_api SELECT only on greenfield_moliboo_items. 084 raised
+-- that to SELECT, INSERT, UPDATE. Restore the prior privilege state on rollback.
+-- Do not revoke INSERT/UPDATE on inventory or equipped: 083 already grants them
+-- full DML to modula_api and modula_worker.
+REVOKE INSERT, UPDATE ON greenfield_moliboo_items FROM modula_api;
+
 INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '083')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
