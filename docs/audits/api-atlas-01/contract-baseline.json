@@ -23252,9 +23252,7 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "Record<string, unknown> | null) ?? {}"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
         "manualValidationObserved": true,
         "pagination": {
@@ -23272,7 +23270,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "d1ee713c5982ba1b086c5a6292512e83d8787edc391415edacab666a867b0bca"
+      "sourceContractSha256": "33dd4e38b81208f4e9996f8adf99c8f635e0e950bb6f4bd85ea4963856d25e81"
     },
     {
       "id": "POST /v1/modules/:moduleId/permissions/review",

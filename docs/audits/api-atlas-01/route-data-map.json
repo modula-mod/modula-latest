@@ -6779,6 +6779,7 @@
     "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#assertPackageEntitlements",
       "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#installationDescriptorFor",
       "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
@@ -6904,9 +6905,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "partial-static",
+    "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#assertPackageEntitlements",
       "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
@@ -7641,10 +7643,12 @@
   },
   "POST /v1/modules/:moduleId/update": {
     "reads": [
+      "greenfield_entitlements",
       "greenfield_module_install_plans",
       "greenfield_module_release_signatures",
       "greenfield_module_releases",
       "greenfield_mps_ingestions",
+      "greenfield_offers",
       "greenfield_release_artifacts",
       "greenfield_release_asset_blobs",
       "greenfield_release_frontends"
@@ -7662,6 +7666,7 @@
     "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/modules/distribution-service.ts#artifactDescriptor",
+      "services/greenfield-api/src/modules/distribution-service.ts#assertPackageEntitlements",
       "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
@@ -9422,7 +9427,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/modules/distribution-service.ts#readArtifact"
+      "services/greenfield-api/src/modules/distribution-service.ts#readArtifact",
+      "services/greenfield-api/src/modules/distribution-service.ts#verifyStoredArtifact"
     ]
   },
   "GET /v1/registry/modules": {
@@ -9596,6 +9602,7 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/distribution-service.ts#readArtifact",
+      "services/greenfield-api/src/modules/distribution-service.ts#verifyStoredArtifact",
       "services/greenfield-api/src/modules/registry-presentation-service.ts#readReleaseArtifact"
     ]
   },

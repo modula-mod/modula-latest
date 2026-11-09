@@ -287,7 +287,7 @@ export class GreenfieldGithubReleaseSyncService {
         if (!game || game.sha256 !== digest || game.path !== path) {
           throw moduleError('VALIDATION_FAILED', 'Game content package must match the verified game archive')
         }
-      } else if (distribution.category === 'web-runtime' || distribution.category === 'asset-pack') {
+      } else if (distribution.category === 'module' || distribution.category === 'web-runtime' || distribution.category === 'asset-pack') {
         verifyOptionalArchive(bytes, distribution.category)
       } else if (/(?:^|\/)\S+\.(?:app|framework|dylib|so|dll|exe|node|ipa|wasm)$/i.test(path)) {
         throw moduleError('VALIDATION_FAILED', 'Native executable package artifacts are forbidden')
@@ -492,7 +492,7 @@ export function verifyWebGameArchive(bytes: Buffer): void {
   }
 }
 
-export function verifyOptionalArchive(bytes: Buffer, category: 'web-runtime' | 'asset-pack'): void {
+export function verifyOptionalArchive(bytes: Buffer, category: 'module' | 'web-runtime' | 'asset-pack'): void {
   if (bytes.length > 50 * 1024 * 1024) throw moduleError('VALIDATION_FAILED', 'Optional archive exceeds 50 MiB')
   let files: TarEntries
   try { files = readTarGz(bytes, {maxUncompressedBytes: 64 * 1024 * 1024, maxEntries: 512, strictUstar: true}) }
