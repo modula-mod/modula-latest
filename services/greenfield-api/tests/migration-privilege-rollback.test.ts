@@ -113,8 +113,14 @@ describeIfDb.sequential('migration privilege rollback for 084 and 085', () => {
     expect(await migrateUp(url, dirThrough084)).toEqual(['084_moliboo_signed_packs'])
     const after084Up = await snapshotPrivileges(url)
     expect(privilege(after084Up, 'greenfield_moliboo_items', 'modula_api')).toMatchObject({
-      can_select: true, can_insert: true, can_update: true, can_delete: false,
+      can_select: true, can_insert: false, can_update: false, can_delete: false,
     })
+    for (const role of roles) {
+      expect(
+        privilege(after084Up, 'greenfield_moliboo_items', role),
+        `084 up must not change 083 privileges on greenfield_moliboo_items for ${role}`,
+      ).toEqual(privilege(after083, 'greenfield_moliboo_items', role))
+    }
 
     expect(await migrateDown(url, dirThrough084)).toBe('084_moliboo_signed_packs')
     const after084Down = await snapshotPrivileges(url)
