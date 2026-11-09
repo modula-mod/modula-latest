@@ -77,6 +77,7 @@ import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
 import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
 import {registerDeveloperRoutes} from '../developers/routes.js'
+import {registerPublisherConsoleRoutes, type PublisherConsoleTestOptions} from '../publisher/routes.js'
 import {registerGubicPlayRoutes} from '../gubic/routes.js'
 import {registerEntitlementRoutes} from '../entitlements/routes.js'
 import {registerAccountDataRoutes} from '../account-data/routes.js'
@@ -88,6 +89,7 @@ import {registerAttachmentRoutes} from './register-attachment-routes.js'
 import {registerComposerRoutes} from './register-composer-routes.js'
 import {registerCommunitiesRoutes} from './register-communities-routes.js'
 import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
+import {registerMolibooRoutes} from './register-moliboo-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -159,7 +161,7 @@ function releaseIdentity(config: AppConfig) {
   }
 }
 
-export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
+export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig, options: {publisherConsole?: PublisherConsoleTestOptions} = {}) {
   app.addContentTypeParser('application/octet-stream', (request, payload, done) => done(null, payload))
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db, config.publicApiUrl)
@@ -253,7 +255,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   const mutationsAllowed = config.mutationsEnabled
   await registerAttachmentRoutes(app, db, config, {writeConfig, feedConfig, mutationsAllowed})
-  await registerComposerRoutes(app, db, {feedConfig})
+  await registerComposerRoutes(app, db, {feedConfig, publicApiUrl: config.publicApiUrl})
   await registerCommunitiesRoutes(app, db, config, {profileConfig, writeConfig, mutationsAllowed})
   await registerCollectionsDraftsRoutes(app, db, config, {profileConfig, writeConfig, mutationsAllowed})
 
@@ -2714,17 +2716,20 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   await registerMessagingRoutes(app, db, {feedConfig, writeConfig})
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
+  await registerMolibooRoutes(app, db, config, {feedConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  const publisherReleaseJobRunner = await registerPublisherConsoleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig}, options.publisherConsole)
   await registerGubicPlayRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerEntitlementRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerAccountDataRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerSupportRoutes(app, db, config, greenfieldSessions, {healthConfig, profileConfig, writeConfig})
   await registerSettingsV2Routes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerProviderRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  return {publisherReleaseJobRunner}
 }
 
 function idempotencyKey(request: any, body: unknown): string | undefined {

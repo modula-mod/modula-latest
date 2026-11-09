@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T21:56:54.572Z for branch `mosaic/pr151-update`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T22:16:44.280Z for branch `mosaic/pr150-update`; this does not claim deployment.
 
-- Runtime method routes: 808
-- Application routes: 571
-- Automatically generated HEAD routes: 236
+- Runtime method routes: 824
+- Application routes: 579
+- Automatically generated HEAD routes: 244
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `808 = 571 application + 237 framework-derived`
+- Reconciliation: `824 = 579 application + 245 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,10 +17,10 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 571 |
+| yes | yes | not yet | candidate-registered | 579 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 237 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 245 |
 
 ## Error contract
 
@@ -51,8 +51,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Authentication | PATCH | `/v1/accounts/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:575` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:40` | candidate-registered-not-production-probed |
 | Authentication | PATCH | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:41` | candidate-registered-not-production-probed |
-| Authentication | GET | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:270` | candidate-registered-not-production-probed |
-| Authentication | PATCH | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:275` | candidate-registered-not-production-probed |
+| Authentication | GET | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:263` | candidate-registered-not-production-probed |
+| Authentication | PATCH | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:268` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/blocks` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:43` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/me/handle` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:584` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/modula-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:534` | candidate-registered-not-production-probed |
@@ -64,8 +64,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Authentication | POST | `/v1/accounts/me/password` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:595` | candidate-registered-not-production-probed |
 | Authentication | DELETE | `/v1/accounts/me/sessions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:626` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/sessions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:621` | candidate-registered-not-production-probed |
-| Authentication | POST | `/v1/accounts/recovery/complete` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:296` | candidate-registered-not-production-probed |
-| Authentication | POST | `/v1/accounts/recovery/request` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:288` | candidate-registered-not-production-probed |
+| Authentication | POST | `/v1/accounts/recovery/complete` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:289` | candidate-registered-not-production-probed |
+| Authentication | POST | `/v1/accounts/recovery/request` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:281` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/register` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:450` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/resend-verification` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:486` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/reset-password` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:508` | candidate-registered-not-production-probed |
@@ -119,6 +119,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | GET | `/v1/admin/ops/search/projections` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2517` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2537` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:304` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/qa/moliboos/packs/:packId/restore` | ADMIN | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:175` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/qa/moliboos/packs/:packId/withdraw` | ADMIN | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:165` | candidate-registered-not-production-probed |
 | Admin | PUT | `/v1/admin/qa/premium/:handle` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:63` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/qa/verification/appeals/:appealId/transitions` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:114` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/qa/verification/applications` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:99` | candidate-registered-not-production-probed |
@@ -206,15 +208,15 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Module Runtime | POST | `/v1/backend/products/:productId/usage` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:342` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/board/layout` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1077` | candidate-registered-not-production-probed |
 | Account | PATCH | `/v1/board/layout` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1087` | candidate-registered-not-production-probed |
-| Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:173` | candidate-registered-not-production-probed |
-| Comments | PATCH | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:155` | candidate-registered-not-production-probed |
-| Comments | DELETE | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:199` | candidate-registered-not-production-probed |
-| Comments | PUT | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:199` | candidate-registered-not-production-probed |
-| Comments | PUT | `/v1/comments/:commentId/poll/vote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:185` | candidate-registered-not-production-probed |
-| Comments | DELETE | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:224` | candidate-registered-not-production-probed |
-| Comments | PUT | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:211` | candidate-registered-not-production-probed |
-| Comments | GET | `/v1/comments/:commentId/replies` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:132` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/comments/:commentId/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:141` | candidate-registered-not-production-probed |
+| Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:172` | candidate-registered-not-production-probed |
+| Comments | PATCH | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:154` | candidate-registered-not-production-probed |
+| Comments | DELETE | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:198` | candidate-registered-not-production-probed |
+| Comments | PUT | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:198` | candidate-registered-not-production-probed |
+| Comments | PUT | `/v1/comments/:commentId/poll/vote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:184` | candidate-registered-not-production-probed |
+| Comments | DELETE | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:223` | candidate-registered-not-production-probed |
+| Comments | PUT | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:210` | candidate-registered-not-production-probed |
+| Comments | GET | `/v1/comments/:commentId/replies` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:131` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/comments/:commentId/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:140` | candidate-registered-not-production-probed |
 | Commerce | GET | `/v1/commerce/billing-adapters` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:32` | candidate-registered-not-production-probed |
 | Commerce | GET | `/v1/commerce/entitlements` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:30` | candidate-registered-not-production-probed |
 | Commerce | POST | `/v1/commerce/entitlements/check` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:31` | candidate-registered-not-production-probed |
@@ -290,9 +292,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Discover | GET | `/v1/discover` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2188` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1207` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions/:extensionId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1215` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/extensions/:extensionId/configuration` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:327` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:317` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:307` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/extensions/:extensionId/configuration` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:320` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:310` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:300` | candidate-registered-not-production-probed |
 | Modules | DELETE | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1239` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1227` | candidate-registered-not-production-probed |
 | Modules | PATCH | `/v1/extensions/:extensionId/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1249` | candidate-registered-not-production-probed |
@@ -309,11 +311,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | DELETE | `/v1/follow-requests/:requestId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1793` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/follow-requests/:requestId/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1769` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/follow-requests/:requestId/reject` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1781` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/function-jobs/:jobId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:344` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/function-jobs/:jobId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:354` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/function-jobs/:jobId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:337` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/function-jobs/:jobId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:347` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/functions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1275` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/functions/:functionId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1280` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/functions/:functionId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:366` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/functions/:functionId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:359` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/search` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:36` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/status` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:21` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/trending` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:26` | candidate-registered-not-production-probed |
@@ -346,47 +348,37 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/gubic/sessions/:sessionId/achievements/:key` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:60` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/sessions/:sessionId/end` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:59` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/sessions/:sessionId/heartbeat` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:58` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:72` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:84` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/live` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:268` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/ready` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:272` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:272` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:283` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:295` | candidate-registered-not-production-probed |
 | Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:306` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:23` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:14` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:29` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/approvals` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:57` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/approve` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:71` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/reject` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:78` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/decisions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:50` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/evidence` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:64` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/ledger` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:43` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:85` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/start` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:36` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:25` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:16` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:31` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/approvals` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:66` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/approve` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:80` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/reject` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:87` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:45` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/decisions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:59` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/evidence` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:73` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/ledger` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:52` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:94` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/start` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:38` | candidate-registered-not-production-probed |
 | Internal | POST | `/v1/internal/build-service/builds/:buildId/result` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/developers/routes.ts:76` | candidate-registered-not-production-probed |
 | Internal | POST | `/v1/internal/build-service/claims` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/developers/routes.ts:75` | candidate-registered-not-production-probed |
 | Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2685` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/link-previews` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:46` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/link-safety` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:58` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/collections` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:77` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/me/collections` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:88` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/me/collections/:collectionId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:129` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/collections/:collectionId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:102` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/me/collections/:collectionId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:111` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/collections/:collectionId/items` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:143` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/me/collections/:collectionId/items` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:157` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/me/collections/:collectionId/items/:itemId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:173` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/drafts` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:186` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/me/drafts` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:197` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/me/drafts/:draftId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:238` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/drafts/:draftId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:212` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/me/drafts/:draftId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:221` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/me/drafts/:draftId/publish` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:251` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/me/entitlements` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:38` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/me/entitlements/:capabilityId` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:44` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/me/membership` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:32` | candidate-registered-not-production-probed |
 | Platform | PATCH | `/v1/me/membership/badge-visibility` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:53` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/moliboos/outfit` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:120` | candidate-registered-not-production-probed |
+| Platform | PUT | `/v1/me/moliboos/outfit` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:130` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/moliboos/ownership` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:105` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/me/verification` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:77` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/me/verification/applications` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:83` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/me/verification/applications/:applicationId/appeals` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:89` | candidate-registered-not-production-probed |
@@ -493,6 +485,10 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | PATCH | `/v1/moliboo/outfits/:outfitId` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:56` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/moliboo/quests` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:65` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/moliboo/quests/:questId/claim` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:66` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboos/packs` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:42` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboos/packs/:packId/download` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:84` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboos/packs/:packId/manifest` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:71` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboos/packs/catalog.json` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:63` | candidate-registered-not-production-probed |
 | Activity | GET | `/v1/notifications` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2014` | candidate-registered-not-production-probed |
 | Activity | POST | `/v1/notifications/:notificationId/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2029` | candidate-registered-not-production-probed |
 | Activity | POST | `/v1/notifications/read-all` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2038` | candidate-registered-not-production-probed |
@@ -501,14 +497,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Posts | DELETE | `/v1/posts/:postId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1573` | candidate-registered-not-production-probed |
 | Posts | GET | `/v1/posts/:postId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1530` | candidate-registered-not-production-probed |
 | Posts | PATCH | `/v1/posts/:postId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1556` | candidate-registered-not-production-probed |
-| Comments | GET | `/v1/posts/:postId/comments` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:109` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/posts/:postId/comments` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:118` | candidate-registered-not-production-probed |
+| Comments | GET | `/v1/posts/:postId/comments` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:108` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/posts/:postId/comments` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:117` | candidate-registered-not-production-probed |
 | Reactions | DELETE | `/v1/posts/:postId/like` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1597` | candidate-registered-not-production-probed |
 | Reactions | POST | `/v1/posts/:postId/like` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1597` | candidate-registered-not-production-probed |
-| Sharing | POST | `/v1/posts/:postId/quote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:238` | candidate-registered-not-production-probed |
-| Reactions | DELETE | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:86` | candidate-registered-not-production-probed |
-| Reactions | PUT | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:73` | candidate-registered-not-production-probed |
-| Reactions | GET | `/v1/posts/:postId/reactions` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:97` | candidate-registered-not-production-probed |
+| Sharing | POST | `/v1/posts/:postId/quote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:237` | candidate-registered-not-production-probed |
+| Reactions | DELETE | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:85` | candidate-registered-not-production-probed |
+| Reactions | PUT | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:72` | candidate-registered-not-production-probed |
+| Reactions | GET | `/v1/posts/:postId/reactions` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:96` | candidate-registered-not-production-probed |
 | Sharing | DELETE | `/v1/posts/:postId/repost` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1597` | candidate-registered-not-production-probed |
 | Sharing | POST | `/v1/posts/:postId/repost` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1597` | candidate-registered-not-production-probed |
 | Posts | DELETE | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1597` | candidate-registered-not-production-probed |
@@ -536,6 +532,18 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Modules | GET | `/v1/providers/:capabilityRole` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:28` | candidate-registered-not-production-probed |
 | Modules | PUT | `/v1/providers/:capabilityRole/default` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:32` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/providers/:capabilityRole/resolve` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:30` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:87` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:88` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/github-releases` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:90` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/release-jobs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:91` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/modules/:moduleId/release-jobs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:95` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:89` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/release-jobs/:jobId` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:100` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/cancel` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:112` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/release-jobs/:jobId/logs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:101` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/publish` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:106` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/resume` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:116` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/validate` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:102` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/push/devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:59` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/push/devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:48` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/push/devices/:token` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:69` | candidate-registered-not-production-probed |
@@ -566,7 +574,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Account | DELETE | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1164` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1113` | candidate-registered-not-production-probed |
 | Account | PATCH | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1140` | candidate-registered-not-production-probed |
-| Posts | GET | `/v1/saves` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:252` | candidate-registered-not-production-probed |
+| Posts | GET | `/v1/saves` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:251` | candidate-registered-not-production-probed |
 | Search | GET | `/v1/search` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2071` | candidate-registered-not-production-probed |
 | Search | DELETE | `/v1/search/recent` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2108` | candidate-registered-not-production-probed |
 | Search | GET | `/v1/search/recent` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2088` | candidate-registered-not-production-probed |
@@ -1080,7 +1088,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/LocalApiServer.ts`, `src/api/local/routes/appearanceRoutes.ts`, `src/api/local/routes/authRoutes.ts`, `src/api/local/routes/notificationRoutes.ts`, `src/data/repositories/api/ApiActivityRepository.ts`, `src/data/repositories/api/ApiAppearanceRepository.ts`, `src/data/repositories/api/ApiAuthRepository.ts`, `src/features/settings/screens/ModulaMailSettingsScreen.tsx`
-- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-founder-alpha.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-founder-alpha.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -1276,7 +1284,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/appearanceRoutes.ts`, `src/api/local/routes/authRoutes.ts`, `src/api/local/routes/notificationRoutes.ts`, `src/data/repositories/api/ApiActivityRepository.ts`, `src/data/repositories/api/ApiAppearanceRepository.ts`, `src/data/repositories/api/ApiAuthRepository.ts`, `src/features/settings/screens/ModulaMailSettingsScreen.tsx`
-- Tests: `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
@@ -1325,7 +1333,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/appearanceRoutes.ts`, `src/api/local/routes/authRoutes.ts`, `src/api/local/routes/notificationRoutes.ts`, `src/data/repositories/api/ApiActivityRepository.ts`, `src/data/repositories/api/ApiAppearanceRepository.ts`, `src/data/repositories/api/ApiAuthRepository.ts`, `src/features/settings/screens/ModulaMailSettingsScreen.tsx`
-- Tests: `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -1449,7 +1457,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/appearance`
 - Public URL: `https://api.modula.digital/v1/accounts/me/appearance`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:270`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:263`
 - Handler: inline
 - Controller/service calls: `appearance.get`
 - Authentication: greenfield bearer access session
@@ -1498,7 +1506,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/appearance`
 - Public URL: `https://api.modula.digital/v1/accounts/me/appearance`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:275`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:268`
 - Handler: inline
 - Controller/service calls: `appearance.patch`
 - Authentication: greenfield bearer access session
@@ -2086,7 +2094,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/recovery/complete`
 - Public URL: `https://api.modula.digital/v1/accounts/recovery/complete`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:296`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:289`
 - Handler: inline
 - Controller/service calls: `recovery.completeRecovery`
 - Authentication: none
@@ -2135,7 +2143,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/recovery/request`
 - Public URL: `https://api.modula.digital/v1/accounts/recovery/request`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:288`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:281`
 - Handler: inline
 - Controller/service calls: `recovery.requestRecovery`
 - Authentication: none
@@ -2207,7 +2215,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (400)
 - Status: candidate-registered-not-production-probed
@@ -2354,7 +2362,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -4774,6 +4782,104 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>POST /v1/admin/qa/moliboos/packs/:packId/restore</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: POST
+- Effective route: `/v1/admin/qa/moliboos/packs/:packId/restore`
+- Public URL: `https://api.modula.digital/v1/admin/qa/moliboos/packs/:packId/restore`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:175`
+- Handler: inline
+- Controller/service calls: `moliboos.setAvailability`
+- Authentication: legacy or bridged bearer session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: `admin:ops`
+- Rate limit: none registered
+- Request params: `{packId: string}).packId, request.body, 'approved'), request.id))`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_moliboo_characters`, `greenfield_moliboo_pack_releases`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifact_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: `greenfield_moliboo_pack_release_events`, `greenfield_moliboo_pack_releases`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Restore a QA-withdrawn Moliboo release only while its release and signer trust remain valid.
+- Contract owner: Moliboo signed distribution operations
+- Contract authentication: Bearer session required with admin:ops capability; route is not registered in production.
+- Contract authorization: QA/development only. Revoked, quarantined, invalidly signed or signer-revoked releases cannot be restored.
+- Contract request: {"params":{"packId":"Moliboo package ID"},"query":{},"body":{"version":"optional semantic version; omitted selects latest","reason":"optional string, max 500"},"validation":"Unknown fields and malformed identities are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {packageId, version, availability:'approved', revision}."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED"]},{"status":403,"codes":["FORBIDDEN","RELEASE_REVOKED","SIGNER_REVOKED","UNTRUSTED_RELEASE"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none"}
+- Idempotency/concurrency: Release row is locked. Repeating an already-approved transition returns current state without a duplicate event; restore appends an immutable audit event only on change.
+- Versioning/compatibility: QA-only HTTP v1 operations contract; never present in production runtime.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/admin/qa/moliboos/packs/:packId/withdraw</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: POST
+- Effective route: `/v1/admin/qa/moliboos/packs/:packId/withdraw`
+- Public URL: `https://api.modula.digital/v1/admin/qa/moliboos/packs/:packId/withdraw`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:165`
+- Handler: inline
+- Controller/service calls: `moliboos.setAvailability`
+- Authentication: legacy or bridged bearer session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: `admin:ops`
+- Rate limit: none registered
+- Request params: `{packId: string}).packId, request.body, 'withdrawn'), request.id))`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_moliboo_characters`, `greenfield_moliboo_pack_releases`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifact_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: `greenfield_moliboo_pack_release_events`, `greenfield_moliboo_pack_releases`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Withdraw one approved Moliboo release from QA advertisement while retaining its immutable bytes and prior releases.
+- Contract owner: Moliboo signed distribution operations
+- Contract authentication: Bearer session required with admin:ops capability; route is not registered in production.
+- Contract authorization: QA/development only. Release, publisher and signer facts remain immutable; a reason is mandatory.
+- Contract request: {"params":{"packId":"Moliboo package ID"},"query":{},"body":{"version":"optional semantic version; omitted selects latest","reason":"required non-empty string, max 500"},"validation":"Unknown fields and malformed identities are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {packageId, version, availability:'withdrawn', revision}."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none"}
+- Idempotency/concurrency: Release row is locked. Repeating an already-withdrawn transition returns the current revision without a duplicate event; transitions append immutable audit events.
+- Versioning/compatibility: QA-only HTTP v1 operations contract; never present in production runtime.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
 <summary><code>PUT /v1/admin/qa/premium/:handle</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Admin
@@ -6561,14 +6667,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `attachments`, `greenfield_post_draft_content`, `the`
+- Database reads: `attachments`
 - Database writes: `attachments`
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -6617,7 +6723,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -6666,7 +6772,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -6715,7 +6821,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -6764,7 +6870,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
+- Tests: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -9044,7 +9150,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:173`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:172`
 - Handler: inline
 - Controller/service calls: `comments.deleteComment`
 - Authentication: legacy or bridged bearer session
@@ -9093,7 +9199,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:155`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:154`
 - Handler: inline
 - Controller/service calls: `comments.updateComment`
 - Authentication: legacy or bridged bearer session
@@ -9142,7 +9248,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/pin`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/pin`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:199`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:198`
 - Handler: inline
 - Controller/service calls: `comments.setPinned`
 - Authentication: legacy or bridged bearer session
@@ -9191,7 +9297,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/pin`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/pin`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:199`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:198`
 - Handler: inline
 - Controller/service calls: `comments.setPinned`
 - Authentication: legacy or bridged bearer session
@@ -9240,7 +9346,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/poll/vote`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/poll/vote`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:185`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:184`
 - Handler: inline
 - Controller/service calls: `comments.votePoll`
 - Authentication: legacy or bridged bearer session
@@ -9289,7 +9395,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/reaction`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:224`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:223`
 - Handler: inline
 - Controller/service calls: `comments.setCommentReaction`
 - Authentication: legacy or bridged bearer session
@@ -9338,7 +9444,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/reaction`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:211`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:210`
 - Handler: inline
 - Controller/service calls: `comments.setCommentReaction`
 - Authentication: legacy or bridged bearer session
@@ -9387,7 +9493,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/replies`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:132`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:131`
 - Handler: inline
 - Controller/service calls: `comments.listReplies`
 - Authentication: none
@@ -9436,7 +9542,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/replies`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:141`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:140`
 - Handler: inline
 - Controller/service calls: `comments.createReply`, `mentions.storeMentions`
 - Authentication: legacy or bridged bearer session
@@ -9708,16 +9814,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Discover public Communities and list the authenticated viewer's joined Communities with stable server-backed membership state.
-- Contract owner: Communities
-- Contract authentication: Public route with optional Bearer session. Authentication adds private joined Communities and viewer membership/role fields.
-- Contract authorization: Anonymous callers see only undeleted public discoverable Communities. Authenticated callers additionally see private Communities only when their membership is active; banned and left memberships never grant access.
-- Contract request: {"params":{},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional opaque stable cursor","query":"optional name, description or slug search, 1-120 characters","category":"optional exact case-insensitive category, 1-80 characters","membership":"optional joined or notJoined filter"},"body":{},"validation":"Unknown query keys and malformed limits/cursors are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<CommunitySummaryDto> with id, slug, identity, category, visibility, artwork, memberCount, membership, viewerRole, recentActivityAt and version."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"featured descending, recent activity descending, community ID descending","defaultLimit":20,"maximumLimit":50,"filtering":"query, category and viewer membership"}
-- Idempotency/concurrency: Read-only. The cursor contains the complete stable ordering tuple; member counts are derived from active membership rows.
-- Versioning/compatibility: HTTP v1 additive route. Fields are camelCase and additive response fields may be ignored by older clients. Private Communities are deliberately indistinguishable from absent records without active membership.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -9757,16 +9863,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Create a persistent Community and atomically establish its settings and authenticated owner membership.
-- Contract owner: Communities
-- Contract authentication: Bearer session required; owner actor and account are resolved server-side.
-- Contract authorization: Any authenticated active actor may create a Community while preview mutations are enabled. featured and owner fields are never client-controlled.
-- Contract request: {"params":{},"query":{},"body":{"name":"required 1-120 characters","category":"required 1-80 characters","slug":"optional URL slug, normalized and unique","description":"optional maximum 5000 characters","visibility":"public or private; default public","discoverable":"optional boolean; forced false for private Communities","membershipPolicy":"open or approval","postingPolicy":"members or moderators","iconAttachmentId":"optional owned ready image attachment UUID","coverAttachmentId":"optional owned ready image attachment UUID"},"validation":"Unknown and privileged fields are rejected before schema sanitization. Artwork must belong to the authenticated account, be ready, unattached and image content."}
-- Contract success: {"status":"201","body":"Envelope data {community:CommunityDto}; the caller is an active owner and memberCount is 1."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Community, settings and owner membership commit in one transaction. A case-insensitive partial unique slug index prevents concurrent duplicate active slugs.
-- Versioning/compatibility: HTTP v1 new route. Community IDs are immutable UUIDs. version starts at 1 for optimistic updates. Private discoverability is server-enforced.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -9806,16 +9912,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Load one Community with authoritative membership, role, policy and member-count state.
-- Contract owner: Communities
-- Contract authentication: Public for public Communities; optional Bearer session supplies viewer state and is required for private Communities.
-- Contract authorization: Private Communities require an active membership. Inaccessible private, deleted and unknown IDs all return NOT_FOUND.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{},"validation":"Malformed UUIDs are rejected by the route schema."}
-- Contract success: {"status":"200","body":"Envelope data {community:CommunityDto}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Read-only; counts are derived from active membership rows at read time.
-- Versioning/compatibility: HTTP v1 additive route. Private Community existence is not disclosed to unauthorized callers.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -9855,16 +9961,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Optimistically update Community identity, discovery and membership/posting policies.
-- Contract owner: Communities
-- Contract authentication: Bearer session required.
-- Contract authorization: Only an active owner or administrator may update the Community. Owner identity and featured status cannot be supplied.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{"expectedVersion":"required positive integer","slug":"optional normalized unique slug","name":"optional 1-120 characters","description":"optional maximum 5000 characters","category":"optional 1-80 characters","visibility":"optional public or private","discoverable":"optional boolean, ignored as true when private","membershipPolicy":"optional open or approval","postingPolicy":"optional members or moderators","iconAttachmentId":"optional image attachment UUID or null","coverAttachmentId":"optional image attachment UUID or null"},"validation":"At least one change is required. Unknown fields are rejected. New artwork must be owned, ready, unattached image content."}
-- Contract success: {"status":"200","body":"Envelope data {community:CommunityDto} with incremented version."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: UPDATE includes expectedVersion and increments the version atomically; stale writers receive CONFLICT. Membership/posting policy changes serialize with PATCH /settings and also advance the settings revision. Slug uniqueness is database-enforced.
-- Versioning/compatibility: HTTP v1 new route using explicit optimistic concurrency. Changing to private forces discoverable=false without changing immutable Community or owner IDs.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -9904,16 +10010,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: List scheduled and cancelled events for an accessible Community with aggregate and viewer RSVP state.
-- Contract owner: Community events
-- Contract authentication: Public for public Communities; optional Bearer session supplies viewer response and private access.
-- Contract authorization: Private Communities require active membership. Deleted events are excluded.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional schedule cursor"},"body":{},"validation":"Malformed UUID, cursor and limits are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<CommunityEventDto> including location metadata, capacity, status, participant counts and viewerResponse."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"starts_at ascending then event_id ascending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only; counts are derived from one response row per event and actor.
-- Versioning/compatibility: HTTP v1 additive route. This contract is RSVP/event discovery only and does not imply ticketing or payment support.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -9953,16 +10059,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Create a persistent Community event.
-- Contract owner: Community events
-- Contract authentication: Bearer session required.
-- Contract authorization: Active owner, administrator or moderator role required.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{"title":"required 1-160 characters","description":"optional maximum 10000 characters","startsAt":"required ISO date-time","endsAt":"required ISO date-time after startsAt","timezone":"required valid IANA timezone string maximum 100 characters","location":"required {type:online|inPerson|tba,name?,onlineUrl?}; online requires HTTPS URL","coverAttachmentId":"optional owned ready image UUID","capacity":"optional positive integer up to 1000000"},"validation":"Unknown fields are rejected. Times, IANA timezone, HTTPS online URL, capacity and cover ownership/readiness/type are validated server-side."}
-- Contract success: {"status":"201","body":"Envelope data {event:CommunityEventDto}; status=scheduled and version=1."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Event, cover binding, audit and domain event commit in one transaction. Event IDs are server-generated UUIDs.
-- Versioning/compatibility: HTTP v1 new route. Location and capacity are bounded metadata; no ticketing, purchasing or attendee identity list is introduced.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10002,16 +10108,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Load one accessible Community event and authoritative RSVP counts/state.
-- Contract owner: Community events
-- Contract authentication: Public for public Communities; optional Bearer session is required for private access and viewerResponse.
-- Contract authorization: Event must belong to the path Community. Private Communities require active membership; inaccessible IDs return NOT_FOUND.
-- Contract request: {"params":{"communityId":"required Community UUID","eventId":"required event UUID"},"query":{},"body":{},"validation":"Both UUIDs are schema-validated and cross-associated server-side."}
-- Contract success: {"status":"200","body":"Envelope data {event:CommunityEventDto}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Read-only; response counts are transactionally constrained by one response per actor.
-- Versioning/compatibility: HTTP v1 new route. eventId is scoped to communityId to prevent cross-Community object access.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10051,16 +10157,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Optimistically edit or cancel a Community event.
-- Contract owner: Community events
-- Contract authentication: Bearer session required.
-- Contract authorization: The event creator or an active owner, administrator or moderator may edit. Event and Community path association is enforced.
-- Contract request: {"params":{"communityId":"required Community UUID","eventId":"required event UUID"},"query":{},"body":{"expectedVersion":"required positive integer","title":"optional 1-160 characters","description":"optional maximum 10000 characters","startsAt":"optional ISO date-time","endsAt":"optional ISO date-time","timezone":"optional valid IANA timezone","location":"optional validated location object","coverAttachmentId":"optional image UUID or null","capacity":"optional positive integer or null","status":"optional scheduled or cancelled"},"validation":"At least one change is required; unknown fields, invalid time ranges/timezones, non-HTTPS online URLs, invalid cover attachments and capacity below the current Going count are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {event:CommunityEventDto} with incremented version."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: UPDATE locks the event and is guarded by expectedVersion. Stale concurrent edits return CONFLICT. Capacity updates serialize with responses and cannot make existing Going state invalid. Cancellation retains the event and existing response history but rejects new response mutations.
-- Versioning/compatibility: HTTP v1 new route. Cancellation is a status transition, not destructive deletion.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10100,16 +10206,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Set or clear the authenticated member's Going or Interested state for a Community event.
-- Contract owner: Community events
-- Contract authentication: Bearer session required.
-- Contract authorization: Active non-restricted Community membership required. Cancelled events reject response changes.
-- Contract request: {"params":{"communityId":"required Community UUID","eventId":"required event UUID"},"query":{},"body":{"response":"required going, interested or null to remove"},"validation":"Unknown fields and invalid response values are rejected. Event/Community association and capacity are server-validated."}
-- Contract success: {"status":"200","body":"Envelope data {event:CommunityEventDto} with updated counts and viewerResponse."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Primary key (event_id,actor_id) permits one response per actor. A transaction advisory lock serializes capacity checks; identical retries are no-ops and concurrent final Going slots cannot exceed capacity.
-- Versioning/compatibility: HTTP v1 PUT replacement semantics. null removes the response without deleting the event or membership.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10149,16 +10255,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Join a public Community or submit a pending membership when approval is required.
-- Contract owner: Community membership
-- Contract authentication: Bearer session required; member actor is resolved server-side.
-- Contract authorization: Only public Communities accept self-service joins. Banned memberships are rejected and private IDs return NOT_FOUND. Open Communities activate immediately; approval Communities create pending membership.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{},"validation":"Client role, status and actor identifiers are not accepted."}
-- Contract success: {"status":"200","body":"Envelope data {membership:{communityId,role,status,joinedAt,version}}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: A transaction advisory lock plus primary key (community_id,actor_id) serializes retries. Active or pending retries return the same membership without duplicate rows or events.
-- Versioning/compatibility: HTTP v1 new route. Self-service private joining is intentionally absent until an invitation/approval contract is approved.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10198,16 +10304,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Persistently leave a Community without deleting Community content or the membership audit history.
-- Contract owner: Community membership
-- Contract authentication: Bearer session required.
-- Contract authorization: The authenticated member may leave their own membership. Owners must transfer ownership first; banned membership state cannot be rewritten by the banned actor.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{},"validation":"No client actor or role fields are accepted."}
-- Contract success: {"status":"200","body":"Envelope data {left:true}."}
-- Contract errors: [{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: A transaction advisory lock serializes leave/join for one member. Repeated leave calls are successful no-ops. The row is retained with status=left and incremented version.
-- Versioning/compatibility: HTTP v1 new route. Leaving never deletes posts, polls, events or the Community.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10247,16 +10353,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: List the privacy-filtered active member directory for an accessible Community.
-- Contract owner: Community membership
-- Contract authentication: Public for public Communities; optional Bearer session is required for private Community access and viewer-relative profile privacy.
-- Contract authorization: Private membership is required for private Communities. Only active memberships are returned; normal profile visibility and block rules still apply.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional stable member cursor"},"body":{},"validation":"Malformed UUID, cursor and limit values are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<CommunityMemberDto> containing communityId, actorId, role, status, joinedAt and privacy-safe profile."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"joined_at descending then actor_id descending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only; cursor ordering remains stable under inserts. Members hidden by profile privacy or blocking are omitted without leaking identity.
-- Versioning/compatibility: HTTP v1 additive route. actorId is included for stable directory identity; account IDs are never exposed.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10296,16 +10402,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: List single-choice polls for an accessible Community with results visibility enforced per viewer.
-- Contract owner: Community polls
-- Contract authentication: Public for public Communities; optional Bearer session is required for private access and viewer vote state.
-- Contract authorization: Private Communities require active membership. Deleted polls are excluded; results may be hidden until vote or close according to server policy.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional stable poll cursor"},"body":{},"validation":"Malformed UUID, cursor and limit values are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<CommunityPollDto>; voteCount and totalVotes are null when results are not visible."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"created_at descending then poll_id descending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only; aggregates are derived from the unique per-actor vote table.
-- Versioning/compatibility: HTTP v1 additive route. Initial contract is single-choice only; results suppression uses null rather than fabricated zero counts.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10345,16 +10451,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Create a persistent single-choice Community poll.
-- Contract owner: Community polls
-- Contract authentication: Bearer session required.
-- Contract authorization: Active owner, administrator or moderator role required.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{"question":"required 1-500 characters","options":"required 2-10 unique strings, each 1-200 characters","closesAt":"required future ISO date-time","allowVoteChanges":"optional boolean, default true","resultsVisibility":"optional always, afterVote or afterClose; default afterVote"},"validation":"Unknown fields, duplicate normalized options and non-future close times are rejected."}
-- Contract success: {"status":"201","body":"Envelope data {poll:CommunityPollDto}; status=open and version=1."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Poll and all options commit in one transaction. Poll, option and position database constraints prevent partial or conflicting option sets.
-- Versioning/compatibility: HTTP v1 new route. Multi-choice and anonymous voting are not supported by this initial contract.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10394,16 +10500,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Load one Community poll with viewer vote and policy-filtered results.
-- Contract owner: Community polls
-- Contract authentication: Public for public Communities; optional Bearer session is required for private access and viewerOptionId.
-- Contract authorization: Poll must belong to the path Community. Private access requires active membership and inaccessible IDs return NOT_FOUND.
-- Contract request: {"params":{"communityId":"required Community UUID","pollId":"required poll UUID"},"query":{},"body":{},"validation":"UUIDs and Community association are validated server-side."}
-- Contract success: {"status":"200","body":"Envelope data {poll:CommunityPollDto}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Read-only; closed is derived from status or closesAt and counts derive from constrained votes.
-- Versioning/compatibility: HTTP v1 new route. Hidden aggregate fields are null until results policy allows them.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10443,16 +10549,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Optimistically cancel a Community poll without deleting votes or audit history.
-- Contract owner: Community polls
-- Contract authentication: Bearer session required.
-- Contract authorization: The poll creator or an active owner, administrator or moderator may cancel it.
-- Contract request: {"params":{"communityId":"required Community UUID","pollId":"required poll UUID"},"query":{},"body":{"status":"required literal cancelled","expectedVersion":"required positive integer"},"validation":"Unknown fields are rejected and poll/Community association is enforced."}
-- Contract success: {"status":"200","body":"Envelope data {poll:CommunityPollDto} with status=cancelled and incremented version."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: UPDATE includes expectedVersion and increments atomically. Stale cancellations receive CONFLICT; vote history is retained.
-- Versioning/compatibility: HTTP v1 new route. Editing poll choices or close times is intentionally not supported after publication.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10492,16 +10598,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Set the authenticated member's single choice in an open Community poll.
-- Contract owner: Community polls
-- Contract authentication: Bearer session required.
-- Contract authorization: Active non-restricted Community membership required. The option must belong to the path poll and Community.
-- Contract request: {"params":{"communityId":"required Community UUID","pollId":"required poll UUID"},"query":{},"body":{"optionId":"required poll option UUID"},"validation":"Unknown fields, closed/cancelled polls and options from another poll are rejected. allowVoteChanges is server-enforced."}
-- Contract success: {"status":"200","body":"Envelope data {poll:CommunityPollDto} with viewerOptionId and visible results according to policy."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Primary key (poll_id,actor_id) and composite option foreign key enforce one valid choice. A per-poll/actor advisory lock serializes retries and changes; the same option is an idempotent no-op.
-- Versioning/compatibility: HTTP v1 PUT replacement semantics. Vote changes are supported only when allowVoteChanges=true; aggregate results remain server-derived.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10541,16 +10647,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: List canonical social posts associated with a Community without creating a second post store.
-- Contract owner: Communities integrated with social posts
-- Contract authentication: Public for public Communities; optional Bearer session is required for private Community content and viewer social state.
-- Contract authorization: Private Communities require active membership. Hidden, removed and deleted posts are excluded. Existing post/profile block and visibility policy remains authoritative.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional stable post cursor"},"body":{},"validation":"Malformed UUID, cursor and limits are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<CommunityPostDto>; each item wraps one existing SocialPostDto with communityId, moderationState and featuredAt."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"featured_at descending nulls last, created_at descending, post ID descending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only. Post identities are the canonical posts.id values used by reactions, comments, saves and shares.
-- Versioning/compatibility: HTTP v1 additive route. The embedded SocialPostDto is the established social contract, so native clients do not require a fake Community-only post type.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10590,16 +10696,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Create a canonical social post in a Community with server-derived visibility and Community authorization.
-- Contract owner: Communities integrated with social posts
-- Contract authentication: Bearer session required with post:create capability.
-- Contract authorization: The actor must have active non-restricted membership. The Community posting policy allows members or restricts to owner/admin/moderator. Audience and Community association are server-derived.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{"text":"required unless supported media/content is supplied; maximum 5000 characters","media":"optional legacy image media array","content":"optional attachment content array, maximum 10","idempotencyKey":"optional retry key maximum 200 characters"},"validation":"Unknown and privileged fields are rejected. Blocked words, attachment ownership/readiness, allowAttachments, membership and posting policy are revalidated inside the post transaction."}
-- Contract success: {"status":"201","body":"Envelope data {item:CommunityPostDto}. Public Community posts use audience=public; private Community posts use audience=private."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN","CAPABILITY_DISABLED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: posts has a unique (author_actor_id,idempotency_key) invariant. Identical concurrent retries return the committed canonical post; a key reused across Community/generic context or with changed text returns CONFLICT. Post, attachments, audit and domain events commit atomically.
-- Versioning/compatibility: HTTP v1 new route reusing CreatePost and SocialPost contracts. Community packs no new feed identity into normal posts, and Community posts are never AT Protocol cross-posted implicitly.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10639,16 +10745,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Load authoritative Community policy plus the authenticated member's persisted notification preferences.
-- Contract owner: Community settings
-- Contract authentication: Bearer session required.
-- Contract authorization: Any active, non-restricted member may read settings. Private Community existence is not disclosed without active membership.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{},"validation":"Malformed UUIDs are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {settings:{communityId,canManage,membershipPolicy,postingPolicy,inviteLinksEnabled,allowAttachments,reactionsEnabled,featuredPostsEnabled,blockedWords,notificationPreferences:{notifyMentions,weeklyDigest,eventReminders},version,updatedAt}}. blockedWords is null unless canManage is true."}
-- Contract errors: [{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Read-only. Global policy and the caller's notification preferences are read from authoritative server records.
-- Versioning/compatibility: HTTP v1 new route. inviteLinksEnabled is policy metadata only and does not issue an invite. canManage tells the client whether global mutations are available; sensitive blockedWords are returned only to owners and administrators.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -10688,16 +10794,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Update member-owned notification preferences and, for authorized operators, optimistic Community policy settings.
-- Contract owner: Community settings
-- Contract authentication: Bearer session required.
-- Contract authorization: Active non-restricted members may mutate only their own notifyMentions, weeklyDigest and eventReminders fields. Only active owners and administrators may mutate global settings. Client role and target-user fields are not accepted.
-- Contract request: {"params":{"communityId":"required Community UUID"},"query":{},"body":{"expectedVersion":"required positive integer when any global setting changes; omitted for notification-only updates","membershipPolicy":"optional open or approval, owner/admin only","postingPolicy":"optional members or moderators, owner/admin only","inviteLinksEnabled":"optional boolean policy flag, owner/admin only","allowAttachments":"optional boolean, owner/admin only","reactionsEnabled":"optional boolean, owner/admin only","featuredPostsEnabled":"optional boolean, owner/admin only","blockedWords":"optional unique array up to 100 normalized strings, each 1-80 characters, owner/admin only","notifyMentions":"optional boolean for authenticated member","weeklyDigest":"optional boolean for authenticated member","eventReminders":"optional boolean for authenticated member"},"validation":"At least one change is required. Unknown fields are rejected. Blocked words are normalized and deduplicated. A member cannot select another actor or submit role fields."}
-- Contract success: {"status":"200","body":"Envelope data {settings:CommunitySettingsDto}. Global changes increment settings.version; notification-only changes preserve that global version while updating the caller's membership revision."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Global settings UPDATE includes expectedVersion and increments atomically; stale devices receive CONFLICT. Membership/posting policy changes serialize with the Community PATCH contract and advance both Community and settings revisions in the same transaction. Notification patches update only supplied columns on the authenticated membership, so disjoint device writes do not overwrite other fields.
-- Versioning/compatibility: HTTP v1 new route using optimistic concurrency for global policy. Disabling reactions is enforced by the shared post/comment policy engine, including post authors. Invite issuance remains outside this contract.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -11227,16 +11333,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Create or reuse the authenticated sender's one-to-one conversation with an active target account so clients can navigate directly into the thread.
-- Contract owner: Direct messaging
-- Contract authentication: Bearer session required with post:engage capability; the sender actor is resolved only from the authenticated session.
-- Contract authorization: The target handle must resolve to a live profile on an active account. Self-conversations and either-direction account blocks are rejected. A new recipient becomes active only when they follow the sender; otherwise the conversation is a message request.
-- Contract request: {"params":{},"query":{},"body":{"handle":"required target profile handle, string 1-80 characters; an optional leading @ is normalized away","text":"optional initial message, string maximum 5000 characters; blank non-empty values are rejected"},"validation":"Unknown fields, including client-supplied sender or actor identifiers, are rejected. The target is resolved server-side and must remain active. Subsequent messages to a reused conversation use POST /v1/conversations/:id/messages."}
-- Contract success: {"status":"201 when created; 200 when an existing conversation is reused","body":"Envelope data {created:boolean, conversation:{id,kind,participants,lastMessage,unreadCount,updatedAt}}. The conversation ID and participant fields are sufficient for native thread navigation."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: The sorted authenticated-sender/target actor pair forms the unique direct_key database invariant. Concurrent inserts use INSERT ON CONFLICT and return the same committed conversation. Optional text is creation-only and commits atomically with the conversation and two members, so retry after a lost response cannot duplicate it. A reused conversation returns 200 and does not append text.
-- Versioning/compatibility: HTTP v1. The established handle and optional text request fields remain supported. The created boolean and 200 reuse status are additive; existing clients reading data.conversation remain compatible. Group and In-Mail contracts are unchanged.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200, 201; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -11325,16 +11431,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: List a bounded page of messages for an authenticated member of a direct conversation, including optional minimal Story context for real Story-reply messages.
-- Contract owner: Direct messaging
-- Contract authentication: Bearer session required with social:read capability.
-- Contract authorization: The authenticated actor must be a non-declined member of the requested direct conversation. Non-members and declined members receive NOT_FOUND without participant disclosure.
-- Contract request: {"params":{"id":"required conversation ID, 1-64 characters"},"query":{"cursor":"optional opaque base64url cursor for the oldest item in the previous page","limit":"optional positive integer; default 40, maximum 100"},"body":{},"validation":"Malformed cursors are rejected. Conversation kind and membership are verified server-side."}
-- Contract success: {"status":"200","body":"Envelope data {items:[{id,conversationId,sender,body,subject,sentAt,createdAt,isOwn,delivery,storyContext?}],nextCursor:string|null,hasMore:boolean}. storyContext, when present, is {type:'story',storyId,groupId,ownerActorId,mediaKind,createdAt,expiresAt} and intentionally excludes media URLs and captions."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"created_at descending then message_id descending for selection; items are returned oldest-to-newest within each page","defaultLimit":40,"maximumLimit":100}
-- Idempotency/concurrency: Read-only. The optional Story context is joined from the append-only message.story-replied event whose aggregate ID is the message ID; at most one context event exists for an idempotent Story reply.
-- Versioning/compatibility: HTTP v1. Existing message fields and pagination behavior are unchanged. storyContext is optional additive response data; clients that do not render Story context continue to display the ordinary body text.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
@@ -13160,7 +13266,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionId/configuration`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/configuration`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:327`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:320`
 - Handler: inline
 - Controller/service calls: `lifecycle.configure`
 - Authentication: greenfield bearer access session
@@ -13209,7 +13315,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionId/disable`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:317`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:310`
 - Handler: inline
 - Controller/service calls: `lifecycle.disable`
 - Authentication: greenfield bearer access session
@@ -13258,7 +13364,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionId/enable`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/enable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:307`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:300`
 - Handler: inline
 - Controller/service calls: `lifecycle.enable`
 - Authentication: greenfield bearer access session
@@ -14091,7 +14197,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/function-jobs/:jobId`
 - Public URL: `https://api.modula.digital/v1/function-jobs/:jobId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:344`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:337`
 - Handler: inline
 - Controller/service calls: `functionJobs.getJob`
 - Authentication: greenfield bearer access session
@@ -14140,7 +14246,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/function-jobs/:jobId/cancel`
 - Public URL: `https://api.modula.digital/v1/function-jobs/:jobId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:354`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:347`
 - Handler: inline
 - Controller/service calls: `functionJobs.cancel`
 - Authentication: greenfield bearer access session
@@ -14287,7 +14393,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/functions/:functionId/jobs`
 - Public URL: `https://api.modula.digital/v1/functions/:functionId/jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:366`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:359`
 - Handler: inline
 - Controller/service calls: `functionJobs.invoke`
 - Authentication: greenfield bearer access session
@@ -15904,7 +16010,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/hashtags/suggest`
 - Public URL: `https://api.modula.digital/v1/hashtags/suggest`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-composer-routes.ts:72`
+- Source file: `services/greenfield-api/src/app/register-composer-routes.ts:84`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: legacy or bridged bearer session
@@ -16247,7 +16353,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:23`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:25`
 - Handler: inline
 - Controller/service calls: `intelligence.listMissions`
 - Authentication: greenfield bearer access session
@@ -16270,7 +16376,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
@@ -16296,7 +16402,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:14`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:16`
 - Handler: inline
 - Controller/service calls: `intelligence.createMission`
 - Authentication: greenfield bearer access session
@@ -16319,7 +16425,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16345,7 +16451,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:29`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:31`
 - Handler: inline
 - Controller/service calls: `intelligence.detail`
 - Authentication: greenfield bearer access session
@@ -16368,7 +16474,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16394,7 +16500,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/approvals`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/approvals`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:57`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:66`
 - Handler: inline
 - Controller/service calls: `intelligence.approvals`
 - Authentication: greenfield bearer access session
@@ -16417,7 +16523,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16443,7 +16549,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/approvals/:approvalId/approve`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/approvals/:approvalId/approve`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:71`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:80`
 - Handler: inline
 - Controller/service calls: `intelligence.approve`
 - Authentication: greenfield bearer access session
@@ -16466,7 +16572,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16492,7 +16598,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/approvals/:approvalId/reject`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/approvals/:approvalId/reject`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:78`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:87`
 - Handler: inline
 - Controller/service calls: `intelligence.reject`
 - Authentication: greenfield bearer access session
@@ -16515,7 +16621,56 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Intelligence
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/intelligence/missions/:missionId/cancel</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Intelligence
+- Method: POST
+- Effective route: `/v1/intelligence/missions/:missionId/cancel`
+- Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/cancel`
+- API version: v1
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:45`
+- Handler: inline
+- Controller/service calls: `cancelRuntime.cancel`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16541,7 +16696,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/decisions`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/decisions`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:50`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:59`
 - Handler: inline
 - Controller/service calls: `intelligence.decisions`
 - Authentication: greenfield bearer access session
@@ -16564,7 +16719,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16590,7 +16745,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/evidence`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/evidence`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:64`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:73`
 - Handler: inline
 - Controller/service calls: `intelligence.evidence`
 - Authentication: greenfield bearer access session
@@ -16613,7 +16768,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16639,7 +16794,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/ledger`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/ledger`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:43`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:52`
 - Handler: inline
 - Controller/service calls: `intelligence.ledger`
 - Authentication: greenfield bearer access session
@@ -16662,7 +16817,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16688,7 +16843,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/proposals/:proposalId/execute`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:85`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:94`
 - Handler: inline
 - Controller/service calls: `intelligence.execute`
 - Authentication: greenfield bearer access session
@@ -16704,14 +16859,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `500`
-- Database reads: none observed
+- Database reads: `cancelled`
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -16737,7 +16892,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/start`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/start`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:36`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:38`
 - Handler: inline
 - Controller/service calls: `intelligence.start`
 - Authentication: greenfield bearer access session
@@ -16760,7 +16915,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`, `services/greenfield-api/tests/synthetic-module-intelligence.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -17024,692 +17179,6 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
-<summary><code>GET /v1/me/collections</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: GET
-- Effective route: `/v1/me/collections`
-- Public URL: `https://api.modula.digital/v1/me/collections`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:77`
-- Handler: inline
-- Controller/service calls: `collections.list`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: none observed
-- Request query: none observed
-- Request body: none observed
-- Pagination: cursor; default 20, max 50, next cursor yes
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_saved_collection_items`, `greenfield_saved_collections`
-- Database writes: none observed
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: List the authenticated actor's named Saved collections and authoritative active item counts.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Collection owner is resolved from the authenticated actor; another actor's collections are never returned.
-- Contract request: {"params":{},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional updated-at/collection-id cursor"},"body":{},"validation":"Unknown query fields, malformed cursors and invalid limits are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<SavedCollectionDto>."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"updated_at descending then collection_id descending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only; itemCount is derived from active collection-item rows.
-- Versioning/compatibility: HTTP v1 additive route. This is named organization over existing Saved rows, not a replacement bookmarking system.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>POST /v1/me/collections</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: POST
-- Effective route: `/v1/me/collections`
-- Public URL: `https://api.modula.digital/v1/me/collections`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:88`
-- Handler: inline
-- Controller/service calls: `collections.create`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: none observed
-- Request query: none observed
-- Request body: `{name: string}).name, contextFor(request))`
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `201`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: none observed
-- Database writes: `greenfield_saved_collections`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Create an authenticated actor-owned named Saved collection.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Owner identity is server-derived; client owner fields are rejected.
-- Contract request: {"params":{},"query":{},"body":{"name":"required trimmed name, 1-120 characters"},"validation":"Unknown fields and blank names are rejected; active names are case-insensitively unique per owner."}
-- Contract success: {"status":"201","body":"Envelope data {collection:SavedCollectionDto} with itemCount=0 and version=1."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: A partial unique index on owner and normalized active name prevents concurrent duplicates; state and audit commit together.
-- Versioning/compatibility: HTTP v1 new route. Collection IDs are immutable UUIDs and version starts at 1.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>DELETE /v1/me/collections/:collectionId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: DELETE
-- Effective route: `/v1/me/collections/:collectionId`
-- Public URL: `https://api.modula.digital/v1/me/collections/:collectionId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:129`
-- Handler: inline
-- Controller/service calls: `collections.remove`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: `{collectionId: string}`
-- Request query: `{expectedVersion: number}).expectedVersion)`
-- Request body: none observed
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: none observed
-- Database writes: `greenfield_saved_collections`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Soft-delete an authenticated actor-owned collection without deleting source posts or Saved rows.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Only the owner may delete; cross-user IDs return NOT_FOUND.
-- Contract request: {"params":{"collectionId":"required collection UUID"},"query":{"expectedVersion":"required positive integer"},"body":{},"validation":"Unknown query fields and stale revisions are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {deleted:true}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Soft delete is version-guarded and auditable. Collection-item rows may cascade only during physical recovery cleanup; posts and post_saves are never cascaded.
-- Versioning/compatibility: HTTP v1 new route. Deletion does not unsave or delete underlying content.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>GET /v1/me/collections/:collectionId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: GET
-- Effective route: `/v1/me/collections/:collectionId`
-- Public URL: `https://api.modula.digital/v1/me/collections/:collectionId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:102`
-- Handler: inline
-- Controller/service calls: `collections.get`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: `{collectionId: string}`
-- Request query: none observed
-- Request body: none observed
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_saved_collection_items`, `greenfield_saved_collections`
-- Database writes: none observed
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Load one authenticated actor-owned named Saved collection.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Cross-user and deleted collection IDs return NOT_FOUND without ownership disclosure.
-- Contract request: {"params":{"collectionId":"required collection UUID"},"query":{},"body":{},"validation":"collectionId is schema-validated."}
-- Contract success: {"status":"200","body":"Envelope data {collection:SavedCollectionDto}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Read-only; item count is server-derived.
-- Versioning/compatibility: HTTP v1 new route.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>PATCH /v1/me/collections/:collectionId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: PATCH
-- Effective route: `/v1/me/collections/:collectionId`
-- Public URL: `https://api.modula.digital/v1/me/collections/:collectionId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:111`
-- Handler: inline
-- Controller/service calls: `collections.update`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: `{collectionId: string}`
-- Request query: none observed
-- Request body: `{name: string`
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_saved_collection_items`, `greenfield_saved_collections`
-- Database writes: `collection`, `greenfield_saved_collections`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Optimistically rename an authenticated actor-owned Saved collection.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Only the owner may rename; owner identity and version are not inferred from client object state.
-- Contract request: {"params":{"collectionId":"required collection UUID"},"query":{},"body":{"name":"required 1-120 characters","expectedVersion":"required positive integer"},"validation":"Unknown fields, blank names and duplicate active owner/name pairs are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {collection:SavedCollectionDto} with incremented version."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: UPDATE is guarded by owner and expectedVersion; stale or competing renames return CONFLICT.
-- Versioning/compatibility: HTTP v1 new route with optimistic revision semantics.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>GET /v1/me/collections/:collectionId/items</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: GET
-- Effective route: `/v1/me/collections/:collectionId/items`
-- Public URL: `https://api.modula.digital/v1/me/collections/:collectionId/items`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:143`
-- Handler: inline
-- Controller/service calls: `collections.listItems`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: `{collectionId: string}`
-- Request query: none observed
-- Request body: none observed
-- Pagination: cursor; default 20, max 50, next cursor yes
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_saved_collection_items`, `greenfield_saved_collections`, `post_saves`
-- Database writes: none observed
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: List stable ordered items in one actor-owned collection while retaining unavailable source references safely.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Collection ownership is required. Post hydration applies existing post visibility policy.
-- Contract request: {"params":{"collectionId":"required collection UUID"},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional position/item-id cursor"},"body":{},"validation":"Malformed UUID, cursor and limit values are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<SavedCollectionItemDto>; unavailable or unsaved sources return available=false and post=null."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"position ascending then item_id ascending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only; positions are uniquely constrained among active rows per collection.
-- Versioning/compatibility: HTTP v1 new route. Unavailable items remain identifiable for explicit removal and can become available after re-save.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>POST /v1/me/collections/:collectionId/items</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: POST
-- Effective route: `/v1/me/collections/:collectionId/items`
-- Public URL: `https://api.modula.digital/v1/me/collections/:collectionId/items`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:157`
-- Handler: inline
-- Controller/service calls: `collections.addItem`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: `{collectionId: string}`
-- Request query: none observed
-- Request body: `{postId: string}).postId, contextFor(request))`
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_saved_collection_items`, `greenfield_saved_collections`, `post_saves`
-- Database writes: `greenfield_saved_collection_items`, `greenfield_saved_collections`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Add an already-Saved post to an actor-owned named collection.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: The collection and active post_saves row must both belong to the authenticated actor.
-- Contract request: {"params":{"collectionId":"required collection UUID"},"query":{},"body":{"postId":"required UUID of an existing currently Saved post"},"validation":"Unknown fields, cross-user collections and posts not present in the caller's active Saved rows are rejected."}
-- Contract success: {"status":"201 when added; 200 for an existing active membership","body":"Envelope data {item:SavedCollectionItemDto}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: The collection row serializes position allocation and UNIQUE(collection_id,save_id) prevents duplicate membership. Concurrent identical requests converge on one item ID.
-- Versioning/compatibility: HTTP v1 new route. postId references the canonical existing Saved system.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>DELETE /v1/me/collections/:collectionId/items/:itemId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: DELETE
-- Effective route: `/v1/me/collections/:collectionId/items/:itemId`
-- Public URL: `https://api.modula.digital/v1/me/collections/:collectionId/items/:itemId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:173`
-- Handler: inline
-- Controller/service calls: `collections.removeItem`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `saved:manage`
-- Rate limit: none registered
-- Request params: `{collectionId: string`
-- Request query: none observed
-- Request body: none observed
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_saved_collections`
-- Database writes: `greenfield_saved_collection_items`, `greenfield_saved_collections`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Remove one item membership from an actor-owned collection without unsaving or deleting its source post.
-- Contract owner: Saved collections
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Both collection ownership and item-to-collection association are enforced.
-- Contract request: {"params":{"collectionId":"required collection UUID","itemId":"required collection item UUID"},"query":{},"body":{},"validation":"Both UUIDs are schema-validated and cross-associated server-side."}
-- Contract success: {"status":"200","body":"Envelope data {deleted:true}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: The item is soft-deleted under a collection lock; a missing/already-removed item returns NOT_FOUND and no source rows are changed.
-- Versioning/compatibility: HTTP v1 new route.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>GET /v1/me/drafts</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: GET
-- Effective route: `/v1/me/drafts`
-- Public URL: `https://api.modula.digital/v1/me/drafts`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:186`
-- Handler: inline
-- Controller/service calls: `drafts.list`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `post:create`
-- Rate limit: none registered
-- Request params: none observed
-- Request query: none observed
-- Request body: none observed
-- Pagination: cursor; default 20, max 50, next cursor yes
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_post_drafts`
-- Database writes: none observed
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: List the authenticated actor's editable post drafts for multi-device reconciliation.
-- Contract owner: Post drafts
-- Contract authentication: Bearer session with post:create capability required.
-- Contract authorization: Only owner_actor_id matching the authenticated actor is queried.
-- Contract request: {"params":{},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional updated-at/draft-id cursor"},"body":{},"validation":"Unknown query fields, malformed cursors and invalid limits are rejected."}
-- Contract success: {"status":"200","body":"Envelope data CursorPage<PostDraftDto>; each draft includes version and updatedAt for reconciliation."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"updated_at descending then draft_id descending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only; only editing drafts are listed. Published drafts remain addressable by ID for retry confirmation.
-- Versioning/compatibility: HTTP v1 additive route. Initial server contract is post drafts only; Story and In-Mail drafts remain separate Native gaps.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>POST /v1/me/drafts</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: POST
-- Effective route: `/v1/me/drafts`
-- Public URL: `https://api.modula.digital/v1/me/drafts`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:197`
-- Handler: inline
-- Controller/service calls: `drafts.create`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `post:create`
-- Rate limit: none registered
-- Request params: none observed
-- Request query: none observed
-- Request body: `CreatePostDraftInput, contextFor(request))`
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_post_drafts`
-- Database writes: `greenfield_post_drafts`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Persist a post-composer draft and reserve its uploaded attachment references for the authenticated actor.
-- Contract owner: Post drafts
-- Contract authentication: Bearer session with post:create capability required.
-- Contract authorization: Owner is server-derived. Every attachment must be ready, unattached and owned by the authenticated account.
-- Contract request: {"params":{},"query":{},"body":{"idempotencyKey":"optional 1-200 character retry identity","text":"required string up to 5000 characters; may be empty when content is present","feed":"optional following, forYou or modules","audience":"optional public, followers or private","replyPermission":"optional everyone, followers, mentioned or none","content":"optional array of at most 10 typed uploaded attachment references with captions up to 1000 characters","publishToAtproto":"optional boolean; attachments are not supported when true"},"validation":"Unknown/privileged fields, empty text+content, duplicate/cross-account/unready/reserved attachments and legacy base64 media are rejected."}
-- Contract success: {"status":"201 when created; 200 for an identical idempotent retry","body":"Envelope data {draft:PostDraftDto} with state=editing and version=1."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: An optional owner/idempotency-key unique index converges retries; key reuse with a different normalized payload returns CONFLICT. Draft and attachment references commit together.
-- Versioning/compatibility: HTTP v1 new route. Uses the canonical CreatePost content/feed/audience/reply contract; clients must upload local media before syncing.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>DELETE /v1/me/drafts/:draftId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: DELETE
-- Effective route: `/v1/me/drafts/:draftId`
-- Public URL: `https://api.modula.digital/v1/me/drafts/:draftId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:238`
-- Handler: inline
-- Controller/service calls: `drafts.remove`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `post:create`
-- Rate limit: none registered
-- Request params: `{draftId: string}`
-- Request query: `{expectedVersion: number}).expectedVersion), contextFor(request))`
-- Request body: none observed
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_post_drafts`
-- Database writes: `greenfield_post_draft_content`, `greenfield_post_drafts`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Soft-delete an owned draft and release any unpublished attachment reservations.
-- Contract owner: Post drafts
-- Contract authentication: Bearer session with post:create capability required.
-- Contract authorization: Only the authenticated owner may delete; cross-user IDs return NOT_FOUND.
-- Contract request: {"params":{"draftId":"required draft UUID"},"query":{"expectedVersion":"required positive integer"},"body":{},"validation":"Unknown query fields and stale revisions are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {deleted:true}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Draft deletion is row-locked and revision-guarded. It never deletes a published post or attachment bytes.
-- Versioning/compatibility: HTTP v1 new route. A draft is never deleted automatically before post publication is confirmed.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>GET /v1/me/drafts/:draftId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: GET
-- Effective route: `/v1/me/drafts/:draftId`
-- Public URL: `https://api.modula.digital/v1/me/drafts/:draftId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:212`
-- Handler: inline
-- Controller/service calls: `drafts.get`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `post:create`
-- Rate limit: none registered
-- Request params: `{draftId: string}`
-- Request query: none observed
-- Request body: none observed
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_post_drafts`
-- Database writes: none observed
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Load one owned editing or published post draft for synchronization or publish retry recovery.
-- Contract owner: Post drafts
-- Contract authentication: Bearer session with post:create capability required.
-- Contract authorization: Cross-user and deleted draft IDs return NOT_FOUND.
-- Contract request: {"params":{"draftId":"required draft UUID"},"query":{},"body":{},"validation":"draftId is schema-validated."}
-- Contract success: {"status":"200","body":"Envelope data {draft:PostDraftDto}, including state, publishedPostId, version and updatedAt."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: Read-only. Published state is retained so a lost publish response can be reconciled safely.
-- Versioning/compatibility: HTTP v1 new route.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>PATCH /v1/me/drafts/:draftId</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: PATCH
-- Effective route: `/v1/me/drafts/:draftId`
-- Public URL: `https://api.modula.digital/v1/me/drafts/:draftId`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:221`
-- Handler: inline
-- Controller/service calls: `drafts.update`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `post:create`
-- Rate limit: none registered
-- Request params: `{draftId: string}`
-- Request query: none observed
-- Request body: `UpdatePostDraftInput, contextFor(request))`
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_post_drafts`
-- Database writes: `draft`, `greenfield_post_drafts`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Optimistically synchronize changes to an owned editable post draft.
-- Contract owner: Post drafts
-- Contract authentication: Bearer session with post:create capability required.
-- Contract authorization: Only the authenticated owner may edit; published drafts reject edits.
-- Contract request: {"params":{"draftId":"required draft UUID"},"query":{},"body":{"expectedVersion":"required positive integer","text":"optional string up to 5000 characters","feed":"optional following, forYou or modules","audience":"optional public, followers or private","replyPermission":"optional everyone, followers, mentioned or none","content":"optional complete replacement array of up to 10 uploaded attachment references","publishToAtproto":"optional boolean"},"validation":"At least one change is required. Unknown fields, stale revisions and invalid/cross-account/unready/reserved attachments are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {draft:PostDraftDto} with incremented version and updatedAt."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: The draft row is locked and expectedVersion must match. Stale two-device edits return CONFLICT; no newer server revision is overwritten silently.
-- Versioning/compatibility: HTTP v1 new route. Clients should surface conflicts for user resolution and reload the latest draft.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
-<summary><code>POST /v1/me/drafts/:draftId/publish</code> — candidate-registered-not-production-probed</summary>
-
-- Domain: Platform
-- Method: POST
-- Effective route: `/v1/me/drafts/:draftId/publish`
-- Public URL: `https://api.modula.digital/v1/me/drafts/:draftId/publish`
-- API version: v1
-- Source file: `services/greenfield-api/src/app/register-collections-drafts-routes.ts:251`
-- Handler: inline
-- Controller/service calls: `drafts.publish`
-- Authentication: legacy or bridged bearer session
-- Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
-- Workspace rule: none observed
-- Capability/permission: `post:create`
-- Rate limit: none registered
-- Request params: `{draftId: string}`
-- Request query: none observed
-- Request body: `{expectedVersion: number}).expectedVersion, contextFor(request))`
-- Pagination: none observed
-- Response schema: not declared in Fastify
-- Success codes: `200`
-- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_post_drafts`
-- Database writes: `greenfield_post_drafts`
-- Storage: none observed
-- Events produced: none observed
-- Jobs produced: none observed
-- External integrations: none observed
-- Known clients: none observed
-- Tests: `services/greenfield-api/tests/collections-drafts.integration.test.ts`
-- Runtime registration: yes
-- Live probe: not executed
-- Status: candidate-registered-not-production-probed
-- Contract purpose: Validate and publish an owned post draft exactly once through the canonical post creation pipeline.
-- Contract owner: Post drafts integrated with canonical posts
-- Contract authentication: Bearer session with post:create capability required.
-- Contract authorization: Draft owner and attachment ownership are resolved server-side; another actor cannot redirect or publish the draft.
-- Contract request: {"params":{"draftId":"required draft UUID"},"query":{},"body":{"expectedVersion":"required current positive draft version"},"validation":"Unknown fields, stale revisions, invalid composer state and unavailable attachments are rejected before commit."}
-- Contract success: {"status":"201 for the committing publication; 200 for an already-published or concurrent retry","body":"Envelope data {draft:PostDraftDto,postId:string,created:boolean}."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: The server derives idempotency key draft-publish:<draftId>. The existing unique post author/key invariant converges concurrent retries, and post creation, attachment activation, outbox/events/audit and draft state/publishedPostId update commit in one database transaction. A stale finalizer rolls back the post; failed publication leaves state=editing.
-- Versioning/compatibility: HTTP v1 new route. The created post is a normal SocialPostDto record consumable without a fake draft post type.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
-
-</details>
-
-<details>
 <summary><code>GET /v1/me/entitlements</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -17902,6 +17371,153 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/me/moliboos/outfit</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/me/moliboos/outfit`
+- Public URL: `https://api.modula.digital/v1/me/moliboos/outfit`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:120`
+- Handler: inline
+- Controller/service calls: `moliboos.outfit`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: `greenfield_moliboo_characters`, `greenfield_moliboo_equipped`, `greenfield_moliboo_items`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Return the authenticated account's persisted equipped Moliboo items and revision.
+- Contract owner: Moliboo ownership and wardrobe
+- Contract authentication: Bearer session required with social:read capability.
+- Contract authorization: Account ID is resolved from the authenticated session.
+- Contract request: {"params":{},"query":{},"body":null,"validation":"No request fields."}
+- Contract success: {"status":200,"body":"Envelope data {revision: integer, updatedAt: ISO timestamp|null, items: OutfitItem[]}."}
+- Contract errors: [{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none","maximum":16}
+- Idempotency/concurrency: Safe account-scoped read.
+- Versioning/compatibility: HTTP v1; revision is required for optimistic synchronization across devices.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>PUT /v1/me/moliboos/outfit</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PUT
+- Effective route: `/v1/me/moliboos/outfit`
+- Public URL: `https://api.modula.digital/v1/me/moliboos/outfit`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:130`
+- Handler: inline
+- Controller/service calls: `moliboos.setOutfit`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `profile:customize`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_moliboo_characters`, `greenfield_moliboo_equipped`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`
+- Database writes: `Moliboo`, `greenfield_moliboo_equipped`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Atomically replace the authenticated account's equipped Moliboo items after ownership and wearability checks.
+- Contract owner: Moliboo ownership and wardrobe
+- Contract authentication: Bearer session required with profile:customize capability.
+- Contract authorization: Every item must belong to the authenticated account, match its server-owned slot, remain wearable and not be revoked; Legends 101-115 are non-wearable.
+- Contract request: {"params":{},"query":{},"body":{"expectedRevision":"optional integer >=0","items":"required array, maximum 16, unique slot and itemId; each {slot,itemId}"},"validation":"Unknown privileged fields, invalid slots, duplicates, unowned items and revoked/non-wearable items are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {revision, updatedAt, items}; ownership and equipped state commit in one transaction."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":409,"codes":["REVISION_CONFLICT","CONFLICT"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none"}
+- Idempotency/concurrency: Outfit row is locked in a transaction. expectedRevision makes competing writes deterministic: one succeeds and stale writes return REVISION_CONFLICT without partial state.
+- Versioning/compatibility: HTTP v1; clients should persist the returned revision and send it on subsequent writes.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/me/moliboos/ownership</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/me/moliboos/ownership`
+- Public URL: `https://api.modula.digital/v1/me/moliboos/ownership`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:105`
+- Handler: inline
+- Controller/service calls: `moliboos.ownership`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: `any), request.id))`
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: `greenfield_moliboo_characters`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Return the authenticated account's server-authoritative Moliboo ownership inventory.
+- Contract owner: Moliboo ownership and wardrobe
+- Contract authentication: Bearer session required with social:read capability.
+- Contract authorization: Account ID is resolved from the authenticated session; no client-supplied owner is accepted.
+- Contract request: {"params":{},"query":{"cursor":"optional opaque cursor, max 512 bytes","limit":"integer 1-50, default 20"},"body":null,"validation":"Unknown keys and invalid cursors are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {items: OwnershipItem[], nextCursor: string|null, hasMore: boolean}."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED","INVALID_CURSOR"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"cursor","ordering":"grantedAt descending, itemId ascending","default":20,"maximum":50}
+- Idempotency/concurrency: Safe account-scoped read; duplicate grants are prevented by (accountId,itemId) and grantId uniqueness.
+- Versioning/compatibility: HTTP v1; additive ownership item fields only.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
 
@@ -23100,6 +22716,202 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/moliboos/packs</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/moliboos/packs`
+- Public URL: `https://api.modula.digital/v1/moliboos/packs`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:42`
+- Handler: inline
+- Controller/service calls: `moliboos.listPacks`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: `any), request.id))`
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_moliboo_characters`, `greenfield_moliboo_pack_releases`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifact_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: List the latest cryptographically trusted, approved Moliboo content-pack release for each package.
+- Contract owner: Moliboo signed distribution
+- Contract authentication: Public approved-release catalogue; no session required.
+- Contract authorization: Only approved, published or superseded first-party releases with live publisher and signer trust are projected.
+- Contract request: {"params":{},"query":{"cursor":"optional opaque cursor, max 256 bytes","limit":"integer 1-50, default 20","familyId":"optional lowercase slug","series":"optional integer 1-99","availability":"optional; only approved is accepted"},"body":null,"validation":"Unknown query keys and non-approved availability values are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {items: MolibooPackageDescriptor[], nextCursor: string|null, hasMore: boolean}."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED","INVALID_CURSOR"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"cursor","ordering":"packageId ascending after latest-version projection","default":20,"maximum":50}
+- Idempotency/concurrency: Safe read. Invalid or concurrently withdrawn releases fail closed and are omitted.
+- Versioning/compatibility: HTTP v1; descriptor schema modula.package.1; native catalogue schema modula.moliboo.catalog.1; additive descriptor fields only.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/moliboos/packs/:packId/download</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/moliboos/packs/:packId/download`
+- Public URL: `https://api.modula.digital/v1/moliboos/packs/:packId/download`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:84`
+- Handler: inline
+- Controller/service calls: `moliboos.download`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{packId: string}`
+- Request query: `{version?: string}`
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_moliboo_characters`, `greenfield_moliboo_pack_releases`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifact_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: none observed
+- Storage: `host bind mount: /var/lib/modula/greenfield-media`, `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Deliver exact immutable bytes for a trusted Moliboo content pack.
+- Contract owner: Moliboo signed distribution
+- Contract authentication: Public immutable content; no session required.
+- Contract authorization: Pack selection and trust checks are identical to the manifest endpoint; clients cannot choose storage paths.
+- Contract request: {"params":{"packId":"moliboo.character.<1-4 digit number>"},"query":{"version":"optional semantic version"},"body":null,"validation":"Unknown fields, malformed IDs and malformed versions are rejected."}
+- Contract success: {"status":200,"body":"Raw application/vnd.modula.moliboo-asset-pack+json bytes with immutable cache, ETag, content length and X-Modula-Artifact-Sha256 headers."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":403,"codes":["UNTRUSTED_RELEASE","RELEASE_REVOKED","SIGNER_REVOKED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["ARTIFACT_DIGEST_MISMATCH"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none"}
+- Idempotency/concurrency: Safe immutable read; content address and release identity never change.
+- Versioning/compatibility: Content-only JSON container schema modula.moliboo.assetpack.1; maximum 6 MiB artifact, 8 MiB decoded, 16 files, 4 MiB per file; JSON and PNG only.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/moliboos/packs/:packId/manifest</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/moliboos/packs/:packId/manifest`
+- Public URL: `https://api.modula.digital/v1/moliboos/packs/:packId/manifest`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:71`
+- Handler: inline
+- Controller/service calls: `moliboos.manifest`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{packId: string}`
+- Request query: `{version?: string}`
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_moliboo_characters`, `greenfield_moliboo_pack_releases`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifact_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Resolve a trusted install descriptor for a requested Moliboo package and optional immutable version.
+- Contract owner: Moliboo signed distribution
+- Contract authentication: Public content metadata; no session required.
+- Contract authorization: The selected release must be approved and pass live publisher, release-signature, artifact-signature, revocation and quarantine checks.
+- Contract request: {"params":{"packId":"moliboo.character.<1-4 digit number>"},"query":{"version":"optional semantic version; omitted selects newest approved version"},"body":null,"validation":"Unknown fields, malformed IDs and malformed versions are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {manifest: MolibooPackageDescriptor}."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":403,"codes":["UNTRUSTED_RELEASE","RELEASE_REVOKED","SIGNER_REVOKED"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["ARTIFACT_DIGEST_MISMATCH"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none"}
+- Idempotency/concurrency: Safe read. Explicit withdrawn versions fail; an unversioned request falls back to the newest still-approved version.
+- Versioning/compatibility: HTTP v1; descriptor schema modula.package.1; artifact runtimeVersion 1 and minimumHostVersion are enforced by PackageManager.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/moliboos/packs/catalog.json</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/moliboos/packs/catalog.json`
+- Public URL: `https://api.modula.digital/v1/moliboos/packs/catalog.json`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-moliboo-routes.ts:63`
+- Handler: inline
+- Controller/service calls: `moliboos.catalog`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_module_quarantines`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_revocations`, `greenfield_moliboo_characters`, `greenfield_moliboo_pack_releases`, `greenfield_publisher_signing_keys`, `greenfield_publishers`, `greenfield_release_artifact_signatures`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: Return the exact raw catalogue shape consumed by the existing native Moliboo PackageManager.
+- Contract owner: Moliboo signed distribution
+- Contract authentication: Public approved-release catalogue; no session required.
+- Contract authorization: Same live release, publisher, signer, revocation and quarantine checks as the paginated catalogue.
+- Contract request: {"params":{},"query":{},"body":null,"validation":"No request fields."}
+- Contract success: {"status":200,"body":"Raw {schemaVersion:'modula.moliboo.catalog.1', packages: MolibooPackageDescriptor[]} with Cache-Control: no-cache."}
+- Contract errors: [{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"none","ordering":"packageId ascending","maximum":"Registry bounded to approved Moliboo identities."}
+- Idempotency/concurrency: Safe read; every request re-evaluates current trust and withdrawal state.
+- Versioning/compatibility: Compatibility endpoint for native PackageManager; catalogue schema is fixed at modula.moliboo.catalog.1.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/notifications</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Activity
@@ -23319,14 +23131,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `attachments`, `greenfield_communities`, `greenfield_community_memberships`, `greenfield_community_settings`, `greenfield_post_draft_content`, `posts`
+- Database reads: `actors`, `attachments`, `greenfield_communities`, `greenfield_community_memberships`, `greenfield_community_settings`, `posts`
 - Database writes: `attachments`, `post_content`, `post_media`, `posts`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23375,7 +23187,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23424,7 +23236,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23473,7 +23285,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23499,7 +23311,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/comments`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/comments`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:109`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:108`
 - Handler: inline
 - Controller/service calls: `comments.listComments`
 - Authentication: none
@@ -23522,7 +23334,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23548,7 +23360,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/comments`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/comments`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:118`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:117`
 - Handler: inline
 - Controller/service calls: `comments.createComment`, `mentions.storeMentions`
 - Authentication: legacy or bridged bearer session
@@ -23571,7 +23383,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23620,7 +23432,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23669,7 +23481,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23695,7 +23507,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/quote`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/quote`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:238`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:237`
 - Handler: inline
 - Controller/service calls: `mentions.storeMentions`, `quotes.createQuote`
 - Authentication: legacy or bridged bearer session
@@ -23718,7 +23530,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23744,7 +23556,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/reaction`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:86`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:85`
 - Handler: inline
 - Controller/service calls: `reactions.setReaction`
 - Authentication: legacy or bridged bearer session
@@ -23767,7 +23579,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23793,7 +23605,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/reaction`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:73`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:72`
 - Handler: inline
 - Controller/service calls: `reactions.setReaction`
 - Authentication: legacy or bridged bearer session
@@ -23816,7 +23628,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23842,7 +23654,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/reactions`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:97`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:96`
 - Handler: inline
 - Controller/service calls: `reactions.listReactions`
 - Authentication: none
@@ -23865,7 +23677,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23914,7 +23726,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -23963,7 +23775,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -24012,7 +23824,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -24061,7 +23873,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -24110,7 +23922,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -25199,6 +25011,594 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
 - Contract errors: 401, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/modules</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/modules`
+- Public URL: `https://api.modula.digital/v1/publisher/modules`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:87`
+- Handler: inline
+- Controller/service calls: `service.listModules`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_organisation_memberships`, `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publisher_owners`, `greenfield_publisher_release_jobs`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/modules/:moduleId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/modules/:moduleId`
+- Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:88`
+- Handler: inline
+- Controller/service calls: `service.moduleDetail`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_sources`, `greenfield_module_versions`, `greenfield_publisher_release_jobs`, `greenfield_publishers`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/modules/:moduleId/github-releases</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/modules/:moduleId/github-releases`
+- Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/github-releases`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:90`
+- Handler: inline
+- Controller/service calls: `service.githubReleases`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publisher_release_jobs`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: `GitHub release source (automation disabled in production)`
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/modules/:moduleId/release-jobs</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/modules/:moduleId/release-jobs`
+- Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/release-jobs`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:91`
+- Handler: inline
+- Controller/service calls: `service.listJobs`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: `{limit?: string})?.limit ?? 50)`
+- Request body: none observed
+- Pagination: bounded-limit or route-specific list
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publisher_release_jobs`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: bounded-limit or route-specific list
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/publisher/modules/:moduleId/release-jobs</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/publisher/modules/:moduleId/release-jobs`
+- Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/release-jobs`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:95`
+- Handler: inline
+- Controller/service calls: `service.createJob`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_publisher_release_jobs`
+- Database writes: `greenfield_publisher_release_jobs`
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/modules/:moduleId/versions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/modules/:moduleId/versions`
+- Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/versions`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:89`
+- Handler: inline
+- Controller/service calls: `service.versions`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_sources`, `greenfield_module_versions`, `greenfield_publisher_release_jobs`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/release-jobs/:jobId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/release-jobs/:jobId`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:100`
+- Handler: inline
+- Controller/service calls: `service.getJob`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/publisher/release-jobs/:jobId/cancel</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/publisher/release-jobs/:jobId/cancel`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/cancel`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:112`
+- Handler: inline
+- Controller/service calls: `service.cancel`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_publisher_release_jobs`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/release-jobs/:jobId/logs</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/release-jobs/:jobId/logs`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/logs`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:101`
+- Handler: inline
+- Controller/service calls: `service.logs`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/publisher/release-jobs/:jobId/publish</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/publisher/release-jobs/:jobId/publish`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/publish`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:106`
+- Handler: inline
+- Controller/service calls: `service.publish`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_module_releases`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/publisher/release-jobs/:jobId/resume</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/publisher/release-jobs/:jobId/resume`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/resume`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:116`
+- Handler: inline
+- Controller/service calls: `service.resume`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `fetching`, `greenfield_module_releases`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/publisher/release-jobs/:jobId/validate</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/publisher/release-jobs/:jobId/validate`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/validate`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:102`
+- Handler: inline
+- Controller/service calls: `service.validate`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -26684,7 +27084,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/saves`
 - Public URL: `https://api.modula.digital/v1/saves`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:252`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:251`
 - Handler: inline
 - Controller/service calls: `saves.listSaves`
 - Authentication: legacy or bridged bearer session
@@ -26696,7 +27096,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
-- Pagination: cursor; default 20, max 50, next cursor yes
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
@@ -26707,21 +27107,21 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiPostRepository.ts`
-- Tests: `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/phase6s.social.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: List the authenticated actor's existing Saved posts with bounded stable pagination.
-- Contract owner: Saved posts
-- Contract authentication: Bearer session with saved:manage capability required.
-- Contract authorization: Only the authenticated actor's private post_saves rows are queried; inaccessible or deleted source posts are omitted.
-- Contract request: {"params":{},"query":{"limit":"optional integer 1-50, default 20","cursor":"optional opaque created-at/save-id cursor"},"body":{},"validation":"Unknown query fields, malformed cursors and invalid limits are rejected."}
-- Contract success: {"status":"200","body":"Envelope data {items:SocialPostDto[],nextCursor:string|null,hasMore:boolean}; the existing items field is preserved for older clients."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"cursor","ordering":"post_saves.created_at descending then save id descending","defaultLimit":20,"maximumLimit":50}
-- Idempotency/concurrency: Read-only. Cursor identity is based on immutable save creation time and save ID; saving/unsaving continues through the existing post engagement routes.
-- Versioning/compatibility: HTTP v1 additive pagination metadata. Existing consumers that read data.items remain compatible.
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Posts
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
 
@@ -27197,7 +27597,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: `src/api/local/LocalApiServer.ts`, `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -27246,7 +27646,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/LocalApiServer.ts`, `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -27870,7 +28270,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Capability/permission: none observed
 - Rate limit: none registered
 - Request params: none observed
-- Request query: none observed
+- Request query: `any), request.id))`
 - Request body: none observed
 - Pagination: none observed
 - Response schema: not declared in Fastify
@@ -27883,21 +28283,21 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/sticker-packs.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: no mission-specific override; static/runtime record is authoritative
-- Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
-- Contract request: see static request evidence above
-- Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
-- Contract pagination/filtering: none observed
-- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
-- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
-- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+- Contract purpose: List backward-compatible emoji packs plus approved signed Sprout image packs for composer, message and reaction consumers.
+- Contract owner: Composer sticker content
+- Contract authentication: Public approved content catalogue; no session required.
+- Contract authorization: Database packs are returned only when the signed manifest, publisher, signer, release, revocation/quarantine state and every image digest match.
+- Contract request: {"params":{},"query":{"cursor":"optional opaque cursor, max 256 bytes","limit":"integer 1-50, default 20","series":"optional integer 1-99; filters signed packs and excludes legacy emoji packs"},"body":null,"validation":"Unknown fields, invalid cursors and invalid bounds are rejected."}
+- Contract success: {"status":200,"body":"Envelope data {packs: StickerPack[], nextCursor: string|null, hasMore: boolean}; signed packs include version, releaseId, package signature/download and per-sticker immutable PNG asset metadata."}
+- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED","INVALID_CURSOR"]},{"status":500,"codes":["SERVER_ERROR"]}]
+- Contract pagination/filtering: {"style":"cursor","ordering":"packId ascending","default":20,"maximum":50}
+- Idempotency/concurrency: Safe read. Invalid or withdrawn database releases are omitted. Comment writes resolve sticker label, emoji and pack server-side and reject unknown IDs.
+- Versioning/compatibility: HTTP v1; existing {id,title,icon,stickers:[{id,emoji,label}]} fields remain; signed package and asset fields are additive.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
 
@@ -28034,16 +28434,16 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
-- Contract purpose: Deliver an authenticated viewer's reply to a concrete live Story item as a persistent message in the Story author's canonical one-to-one conversation.
-- Contract owner: Stories integrated with direct messaging
-- Contract authentication: Bearer session required with post:engage capability; the replying actor is resolved only from the authenticated session.
-- Contract authorization: The Story item must be ready, undeleted and unexpired and must remain visible to the replying actor. The author is resolved from the Story and cannot be redirected by request data. Self replies, either-direction blocks, inactive authors and previously declined recipient message requests are rejected. When no active thread exists, the existing message-request policy determines whether the author's membership is active or pending.
-- Contract request: {"params":{"storyId":"required UUID of a greenfield_story_items item; this is not a Story group ID"},"query":{},"body":{"text":"required non-blank reply text, string maximum 5000 characters after trimming","idempotencyKey":"required client retry key, 8-200 characters from A-Z, a-z, 0-9, dot, underscore, colon or hyphen"},"validation":"Unknown fields, including recipient or author identifiers, are rejected. Invalid or inaccessible Story identifiers return the same NOT_FOUND contract. Story media URLs and captions are not copied into the retained DM context."}
-- Contract success: {"status":"201 when the reply message is first created; 200 when the same idempotent request is replayed","body":"Envelope data {conversationId:string, messageId:string, created:boolean, conversationCreated:boolean}. The message is an ordinary direct-message row; a private append-only event provides optional minimal Story context on message reads."}
-- Contract errors: [{"status":400,"codes":["VALIDATION_FAILED"]},{"status":401,"codes":["UNAUTHENTICATED","SESSION_EXPIRED"]},{"status":403,"codes":["FORBIDDEN"]},{"status":404,"codes":["NOT_FOUND"]},{"status":409,"codes":["CONFLICT"]},{"status":429,"codes":["RATE_LIMITED"]},{"status":500,"codes":["SERVER_ERROR"]}]
-- Contract pagination/filtering: {"style":"none","filtering":"none"}
-- Idempotency/concurrency: The server namespaces the supplied key to the authenticated actor, stores a SHA-256 request hash, and serializes identical retries with a transaction-scoped advisory lock. Story authorization, canonical conversation creation/reuse, message insertion, private context event, idempotent notification outbox job and stored response commit in one PostgreSQL transaction. Identical retries return the original IDs without another message or event; reuse with different Story text or ID returns CONFLICT. The sorted actor pair retains the direct_key uniqueness invariant.
-- Versioning/compatibility: HTTP v1 additive route. storyId means the concrete Story item ID already exposed as StoryItem.itemId. The DM body remains a normal message consumable by existing conversation clients. Optional storyContext fields on message reads are additive and may be ignored by older clients. Deleted or expired Stories cannot receive new replies, while an already-created DM and its non-media context remain readable under normal conversation retention.
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Media
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>

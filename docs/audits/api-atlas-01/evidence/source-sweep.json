@@ -234,24 +234,17 @@
     },
     {
       "file": "services/greenfield-api/src/database/types.ts",
-      "line": 179,
+      "line": 178,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
     },
     {
-      "file": "services/greenfield-api/src/domains/drafts/service.ts",
-      "line": 154,
+      "file": "services/greenfield-api/src/domains/comments/sticker-service.ts",
+      "line": 223,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
-      "excerpt": "if (!draft.publishedPostId) throw new Error('Published draft is missing its post identity')"
-    },
-    {
-      "file": "services/greenfield-api/src/domains/drafts/service.ts",
-      "line": 185,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('Draft publication did not commit atomically')"
+      "excerpt": "if (!parsed || typeof parsed.packId !== 'string' || !PACK_ID.test(parsed.packId)) throw new Error()"
     },
     {
       "file": "services/greenfield-api/src/domains/gifs/service.ts",
@@ -261,15 +254,22 @@
       "excerpt": "* itself unconfigured instead of returning placeholder content."
     },
     {
-      "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 312,
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 632,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('Failed to load idempotent post replay')"
+      "excerpt": "if (!parsed || typeof parsed.packageId !== 'string' || !PACKAGE_ID.test(parsed.packageId)) throw new Error()"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 647,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Number.isFinite(grantedAt.getTime()) || typeof parsed.itemId !== 'string' || !ITEM_ID.test(parsed.itemId)) throw new Error()"
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 328,
+      "line": 291,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!created) throw new Error('Failed to load created post')"
@@ -318,7 +318,7 @@
     },
     {
       "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
-      "line": 95,
+      "line": 112,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
@@ -1141,6 +1141,104 @@
       "marker": "throw new Error",
       "classification": "test-fixture-or-development",
       "excerpt": "throw new Error('remote must not be selected unexpectedly')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 293,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 312,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 314,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!plan) throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 327,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 332,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 340,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 392,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 403,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 408,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 412,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 420,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 451,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/tests/runtime.test.ts",
+      "line": 473,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('synthetic tool failure')"
+    },
+    {
+      "file": "packages/mar-runtime/tests/runtime.test.ts",
+      "line": 520,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('planner must not run')"
     },
     {
       "file": "packages/modula-cli/src/cli.ts",
@@ -2287,24 +2385,17 @@
     },
     {
       "file": "services/greenfield-api/src/database/types.ts",
-      "line": 179,
+      "line": 178,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
     },
     {
-      "file": "services/greenfield-api/src/domains/drafts/service.ts",
-      "line": 154,
+      "file": "services/greenfield-api/src/domains/comments/sticker-service.ts",
+      "line": 223,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
-      "excerpt": "if (!draft.publishedPostId) throw new Error('Published draft is missing its post identity')"
-    },
-    {
-      "file": "services/greenfield-api/src/domains/drafts/service.ts",
-      "line": 185,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('Draft publication did not commit atomically')"
+      "excerpt": "if (!parsed || typeof parsed.packId !== 'string' || !PACK_ID.test(parsed.packId)) throw new Error()"
     },
     {
       "file": "services/greenfield-api/src/domains/gifs/service.ts",
@@ -2314,15 +2405,22 @@
       "excerpt": "* itself unconfigured instead of returning placeholder content."
     },
     {
-      "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 312,
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 632,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('Failed to load idempotent post replay')"
+      "excerpt": "if (!parsed || typeof parsed.packageId !== 'string' || !PACKAGE_ID.test(parsed.packageId)) throw new Error()"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/moliboos/service.ts",
+      "line": 647,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Number.isFinite(grantedAt.getTime()) || typeof parsed.itemId !== 'string' || !ITEM_ID.test(parsed.itemId)) throw new Error()"
     },
     {
       "file": "services/greenfield-api/src/domains/posts/writes.ts",
-      "line": 328,
+      "line": 291,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!created) throw new Error('Failed to load created post')"
@@ -2371,7 +2469,7 @@
     },
     {
       "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
-      "line": 95,
+      "line": 112,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
@@ -3159,6 +3257,90 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 293,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 312,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 314,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!plan) throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 327,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 332,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 340,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 392,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 403,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 408,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 412,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 420,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
+    },
+    {
+      "file": "packages/mar-runtime/src/runtime.ts",
+      "line": 451,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('unreachable')"
     },
     {
       "file": "packages/modula-cli/src/cli.ts",

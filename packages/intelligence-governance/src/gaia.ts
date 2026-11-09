@@ -42,6 +42,7 @@ export class DeterministicTestPlanner implements GaiaPlanner {
 
   private proposal(input: GaiaPlanningInput): ModulaActionProposal {
     const common = {id: this.id(), missionId: input.mission.id, requestedBy: 'gaia' as const}
+    // Isolated GAI-01 notes special cases — defects to retire, not a pattern to extend.
     if (input.mission.objective === RECENT_VAULT_NOTES_OBJECTIVE) {
       const action = find(input.availableActions, 'record.query', 'note')
       return {
@@ -83,8 +84,43 @@ export class DeterministicTestPlanner implements GaiaPlanner {
     if (input.mission.objective === FINANCIAL_FIXTURE_OBJECTIVE) {
       return {...common, family: 'financial.fixture', capability: 'financial.fixture', input: {}}
     }
-    throw new IntelligenceError('CAPABILITY_UNKNOWN', 'DeterministicTestPlanner only supports declared GAI-01 acceptance objectives')
+    return genericAuthorizedQuery(common, input.availableActions)
   }
+}
+
+function genericAuthorizedQuery(
+  common: Pick<ModulaActionProposal, 'id' | 'missionId' | 'requestedBy'>,
+  availableActions: GaiaAvailableAction[],
+): ModulaActionProposal {
+  const action = availableActions.find(candidate => candidate.family === 'record.query' && candidate.collection)
+  if (!action?.collection) {
+    const absent = isModuleAbsentCatalog(availableActions)
+    return {
+      ...common,
+      family: absent ? 'module.absent' : 'capability.unavailable',
+      capability: absent ? 'module.absent' : 'capability.unavailable',
+      input: {},
+    }
+  }
+  return {
+    ...common,
+    moduleId: action.moduleId,
+    family: action.family,
+    capability: action.capability,
+    actionId: action.actionId,
+    input: {collection: action.collection, limit: queryLimit(action), sort: 'updatedAt', direction: 'desc'},
+  }
+}
+
+function isModuleAbsentCatalog(actions: GaiaAvailableAction[]): boolean {
+  return actions.length === 0 || actions.every(action => action.family === 'module.absent' && action.capability === 'module.absent' && !action.moduleId)
+}
+
+function queryLimit(action: GaiaAvailableAction): number {
+  const max = action.limits?.max ?? 100
+  const min = action.limits?.min ?? 1
+  const requested = action.limits?.default ?? 25
+  return Math.min(max, Math.max(min, requested))
 }
 
 function find(actions: GaiaAvailableAction[], family: string, preferredCollection?: string): GaiaAvailableAction {

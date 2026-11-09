@@ -1,6 +1,5 @@
--- Numbered 087 to follow #150 communities (086). 084 is #147/#160 moliboo
--- signed packs and 085 is Gate 01 publisher release console; those branches
--- are not on main yet, so this tree still goes 083, then 086, then 087.
+-- Numbered 087 to follow #150 communities (086).
+-- 084 (moliboo signed packs) and 085 (publisher release console) are on main 3206e114.
 
 -- GREENFIELD-FEATURE-REALITY-01 PR-05: server-backed named Saved collections and post drafts.
 

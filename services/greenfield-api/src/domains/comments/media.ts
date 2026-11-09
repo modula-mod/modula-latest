@@ -1,7 +1,7 @@
 import type {ModulaDb} from '../../database/client.js'
 import {sql} from 'kysely'
 
-import {findSticker} from './stickers.js'
+import {StickerService} from './sticker-service.js'
 
 /** Stored comment media item. Attachments go through the attachment pipeline; GIFs come from the GIF proxy. */
 export type CommentMediaItem =
@@ -69,7 +69,7 @@ export async function normalizeCommentMedia(db: ModulaDb, accountId: string, raw
         title: typeof entry.title === 'string' ? entry.title.slice(0, 140) : null,
       })
     } else if (entry?.type === 'sticker') {
-      const found = findSticker(entry.stickerId)
+      const found = await new StickerService(db, process.env.MODULA_PUBLIC_API_URL ?? '').find(entry.stickerId)
       if (!found) throw invalid('Unknown sticker')
       items.push({type: 'sticker', packId: found.pack.id, stickerId: found.sticker.id, emoji: found.sticker.emoji, label: found.sticker.label})
     } else if (entry?.type === 'poll') {

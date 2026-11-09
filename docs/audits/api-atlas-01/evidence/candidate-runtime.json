@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T21:56:54.572Z",
+  "capturedAt": "2026-11-09T22:16:44.280Z",
   "source": {
-    "branch": "mosaic/pr151-update",
-    "headAtCapture": "135ef20f2e1d49c27bafb7f471372a5c173c223f",
+    "branch": "mosaic/pr150-update",
+    "headAtCapture": "3e0cea9b477808ac60175ee5f8c3b28c0ad1c8b7",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "8a9b09e22fd5925045070c32d7194fa657ccec4e03329849189026a08c521b8c"
+    "apiSourceSha256": "7c621b65a676fc6e095f73ae5bd47aada44ac5d62771d01e8c288fc7b50cda30"
   },
   "runtimeRoutes": [
     {
@@ -178,7 +178,28 @@
       "url": "/v1/stickers/packs",
       "path": "/v1/stickers/packs",
       "prefix": "",
-      "schema": null,
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "series": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },
@@ -187,7 +208,28 @@
       "url": "/v1/stickers/packs",
       "path": "/v1/stickers/packs",
       "prefix": "",
-      "schema": null,
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "series": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },
@@ -1569,709 +1611,6 @@
             "optionId": {
               "type": "string",
               "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "GET",
-      "url": "/v1/me/collections",
-      "path": "/v1/me/collections",
-      "prefix": "",
-      "schema": {
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "HEAD",
-      "url": "/v1/me/collections",
-      "path": "/v1/me/collections",
-      "prefix": "",
-      "schema": {
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "POST",
-      "url": "/v1/me/collections",
-      "path": "/v1/me/collections",
-      "prefix": "",
-      "schema": {
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "name"
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 120
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "GET",
-      "url": "/v1/me/collections/:collectionId",
-      "path": "/v1/me/collections/:collectionId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "HEAD",
-      "url": "/v1/me/collections/:collectionId",
-      "path": "/v1/me/collections/:collectionId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "PATCH",
-      "url": "/v1/me/collections/:collectionId",
-      "path": "/v1/me/collections/:collectionId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "name",
-            "expectedVersion"
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 120
-            },
-            "expectedVersion": {
-              "type": "integer",
-              "minimum": 1
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "DELETE",
-      "url": "/v1/me/collections/:collectionId",
-      "path": "/v1/me/collections/:collectionId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "expectedVersion"
-          ],
-          "properties": {
-            "expectedVersion": {
-              "type": "integer",
-              "minimum": 1
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "GET",
-      "url": "/v1/me/collections/:collectionId/items",
-      "path": "/v1/me/collections/:collectionId/items",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "HEAD",
-      "url": "/v1/me/collections/:collectionId/items",
-      "path": "/v1/me/collections/:collectionId/items",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "POST",
-      "url": "/v1/me/collections/:collectionId/items",
-      "path": "/v1/me/collections/:collectionId/items",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "postId"
-          ],
-          "properties": {
-            "postId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "DELETE",
-      "url": "/v1/me/collections/:collectionId/items/:itemId",
-      "path": "/v1/me/collections/:collectionId/items/:itemId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "collectionId",
-            "itemId"
-          ],
-          "properties": {
-            "collectionId": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "itemId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "GET",
-      "url": "/v1/me/drafts",
-      "path": "/v1/me/drafts",
-      "prefix": "",
-      "schema": {
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "HEAD",
-      "url": "/v1/me/drafts",
-      "path": "/v1/me/drafts",
-      "prefix": "",
-      "schema": {
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "POST",
-      "url": "/v1/me/drafts",
-      "path": "/v1/me/drafts",
-      "prefix": "",
-      "schema": {
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "text"
-          ],
-          "properties": {
-            "idempotencyKey": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 200
-            },
-            "text": {
-              "type": "string",
-              "maxLength": 5000
-            },
-            "feed": {
-              "type": "string",
-              "enum": [
-                "following",
-                "forYou",
-                "modules"
-              ]
-            },
-            "audience": {
-              "type": "string",
-              "enum": [
-                "public",
-                "followers",
-                "private"
-              ]
-            },
-            "replyPermission": {
-              "type": "string",
-              "enum": [
-                "everyone",
-                "followers",
-                "mentioned",
-                "none"
-              ]
-            },
-            "content": {
-              "type": "array",
-              "maxItems": 10,
-              "uniqueItems": false,
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "type",
-                  "attachmentId"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "image",
-                      "video",
-                      "audio",
-                      "pdf",
-                      "document"
-                    ]
-                  },
-                  "attachmentId": {
-                    "type": "string",
-                    "format": "uuid"
-                  },
-                  "caption": {
-                    "type": "string",
-                    "maxLength": 1000
-                  }
-                }
-              }
-            },
-            "publishToAtproto": {
-              "type": "boolean"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "GET",
-      "url": "/v1/me/drafts/:draftId",
-      "path": "/v1/me/drafts/:draftId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "draftId"
-          ],
-          "properties": {
-            "draftId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "HEAD",
-      "url": "/v1/me/drafts/:draftId",
-      "path": "/v1/me/drafts/:draftId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "draftId"
-          ],
-          "properties": {
-            "draftId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "PATCH",
-      "url": "/v1/me/drafts/:draftId",
-      "path": "/v1/me/drafts/:draftId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "draftId"
-          ],
-          "properties": {
-            "draftId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "expectedVersion"
-          ],
-          "minProperties": 2,
-          "properties": {
-            "expectedVersion": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "text": {
-              "type": "string",
-              "maxLength": 5000
-            },
-            "feed": {
-              "type": "string",
-              "enum": [
-                "following",
-                "forYou",
-                "modules"
-              ]
-            },
-            "audience": {
-              "type": "string",
-              "enum": [
-                "public",
-                "followers",
-                "private"
-              ]
-            },
-            "replyPermission": {
-              "type": "string",
-              "enum": [
-                "everyone",
-                "followers",
-                "mentioned",
-                "none"
-              ]
-            },
-            "content": {
-              "type": "array",
-              "maxItems": 10,
-              "uniqueItems": false,
-              "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "type",
-                  "attachmentId"
-                ],
-                "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "image",
-                      "video",
-                      "audio",
-                      "pdf",
-                      "document"
-                    ]
-                  },
-                  "attachmentId": {
-                    "type": "string",
-                    "format": "uuid"
-                  },
-                  "caption": {
-                    "type": "string",
-                    "maxLength": 1000
-                  }
-                }
-              }
-            },
-            "publishToAtproto": {
-              "type": "boolean"
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "DELETE",
-      "url": "/v1/me/drafts/:draftId",
-      "path": "/v1/me/drafts/:draftId",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "draftId"
-          ],
-          "properties": {
-            "draftId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "expectedVersion"
-          ],
-          "properties": {
-            "expectedVersion": {
-              "type": "integer",
-              "minimum": 1
-            }
-          }
-        }
-      },
-      "config": null,
-      "handler": ""
-    },
-    {
-      "method": "POST",
-      "url": "/v1/me/drafts/:draftId/publish",
-      "path": "/v1/me/drafts/:draftId/publish",
-      "prefix": "",
-      "schema": {
-        "params": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "draftId"
-          ],
-          "properties": {
-            "draftId": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "expectedVersion"
-          ],
-          "properties": {
-            "expectedVersion": {
-              "type": "integer",
-              "minimum": 1
             }
           }
         }
@@ -4365,6 +3704,15 @@
       "method": "POST",
       "url": "/v1/intelligence/missions/:missionId/start",
       "path": "/v1/intelligence/missions/:missionId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/cancel",
+      "path": "/v1/intelligence/missions/:missionId/cancel",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -7281,24 +6629,7 @@
       "url": "/v1/saves",
       "path": "/v1/saves",
       "prefix": "",
-      "schema": {
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
+      "schema": null,
       "config": null,
       "handler": ""
     },
@@ -7307,24 +6638,7 @@
       "url": "/v1/saves",
       "path": "/v1/saves",
       "prefix": "",
-      "schema": {
-        "querystring": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 50
-            },
-            "cursor": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 512
-            }
-          }
-        }
-      },
+      "schema": null,
       "config": null,
       "handler": ""
     },
@@ -8254,6 +7568,443 @@
     },
     {
       "method": "GET",
+      "url": "/v1/moliboos/packs",
+      "path": "/v1/moliboos/packs",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            },
+            "familyId": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+            },
+            "series": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            "availability": {
+              "type": "string",
+              "enum": [
+                "approved"
+              ],
+              "default": "approved"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboos/packs",
+      "path": "/v1/moliboos/packs",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            },
+            "familyId": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+            },
+            "series": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            "availability": {
+              "type": "string",
+              "enum": [
+                "approved"
+              ],
+              "default": "approved"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboos/packs/catalog.json",
+      "path": "/v1/moliboos/packs/catalog.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboos/packs/catalog.json",
+      "path": "/v1/moliboos/packs/catalog.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboos/packs/:packId/manifest",
+      "path": "/v1/moliboos/packs/:packId/manifest",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packId"
+          ],
+          "properties": {
+            "packId": {
+              "type": "string",
+              "pattern": "^moliboo\\.character\\.[0-9]{1,4}$",
+              "maxLength": 80
+            }
+          }
+        },
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboos/packs/:packId/manifest",
+      "path": "/v1/moliboos/packs/:packId/manifest",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packId"
+          ],
+          "properties": {
+            "packId": {
+              "type": "string",
+              "pattern": "^moliboo\\.character\\.[0-9]{1,4}$",
+              "maxLength": 80
+            }
+          }
+        },
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboos/packs/:packId/download",
+      "path": "/v1/moliboos/packs/:packId/download",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packId"
+          ],
+          "properties": {
+            "packId": {
+              "type": "string",
+              "pattern": "^moliboo\\.character\\.[0-9]{1,4}$",
+              "maxLength": 80
+            }
+          }
+        },
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboos/packs/:packId/download",
+      "path": "/v1/moliboos/packs/:packId/download",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packId"
+          ],
+          "properties": {
+            "packId": {
+              "type": "string",
+              "pattern": "^moliboo\\.character\\.[0-9]{1,4}$",
+              "maxLength": 80
+            }
+          }
+        },
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/moliboos/ownership",
+      "path": "/v1/me/moliboos/ownership",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/moliboos/ownership",
+      "path": "/v1/me/moliboos/ownership",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/moliboos/outfit",
+      "path": "/v1/me/moliboos/outfit",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/moliboos/outfit",
+      "path": "/v1/me/moliboos/outfit",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/me/moliboos/outfit",
+      "path": "/v1/me/moliboos/outfit",
+      "prefix": "",
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "expectedRevision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "items": {
+              "type": "array",
+              "maxItems": 16,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "slot",
+                  "itemId"
+                ],
+                "properties": {
+                  "slot": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{1,31}$"
+                  },
+                  "itemId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{1,159}$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/moliboos/packs/:packId/withdraw",
+      "path": "/v1/admin/qa/moliboos/packs/:packId/withdraw",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packId"
+          ],
+          "properties": {
+            "packId": {
+              "type": "string",
+              "pattern": "^moliboo\\.character\\.[0-9]{1,4}$",
+              "maxLength": 80
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+              "maxLength": 80
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/moliboos/packs/:packId/restore",
+      "path": "/v1/admin/qa/moliboos/packs/:packId/restore",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packId"
+          ],
+          "properties": {
+            "packId": {
+              "type": "string",
+              "pattern": "^moliboo\\.character\\.[0-9]{1,4}$",
+              "maxLength": 80
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$",
+              "maxLength": 80
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/premium/tiers",
       "path": "/v1/premium/tiers",
       "prefix": "",
@@ -9064,6 +8815,177 @@
       "method": "POST",
       "url": "/v1/internal/build-service/builds/:buildId/result",
       "path": "/v1/internal/build-service/builds/:buildId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules",
+      "path": "/v1/publisher/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules",
+      "path": "/v1/publisher/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId",
+      "path": "/v1/publisher/modules/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId",
+      "path": "/v1/publisher/modules/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/versions",
+      "path": "/v1/publisher/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/versions",
+      "path": "/v1/publisher/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/github-releases",
+      "path": "/v1/publisher/modules/:moduleId/github-releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/github-releases",
+      "path": "/v1/publisher/modules/:moduleId/github-releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/release-jobs",
+      "path": "/v1/publisher/modules/:moduleId/release-jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/release-jobs",
+      "path": "/v1/publisher/modules/:moduleId/release-jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/modules/:moduleId/release-jobs",
+      "path": "/v1/publisher/modules/:moduleId/release-jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/release-jobs/:jobId",
+      "path": "/v1/publisher/release-jobs/:jobId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/release-jobs/:jobId",
+      "path": "/v1/publisher/release-jobs/:jobId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/release-jobs/:jobId/logs",
+      "path": "/v1/publisher/release-jobs/:jobId/logs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/release-jobs/:jobId/logs",
+      "path": "/v1/publisher/release-jobs/:jobId/logs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/validate",
+      "path": "/v1/publisher/release-jobs/:jobId/validate",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/publish",
+      "path": "/v1/publisher/release-jobs/:jobId/publish",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/cancel",
+      "path": "/v1/publisher/release-jobs/:jobId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/resume",
+      "path": "/v1/publisher/release-jobs/:jobId/resume",
       "prefix": "",
       "schema": null,
       "config": null,
