@@ -1,6 +1,6 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 84 ordered up migrations, latest `085_greenfield_communities.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 84 ordered up migrations, latest `086_greenfield_communities.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
@@ -1129,7 +1129,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `GET /v1/communities`, `POST /v1/communities`, `GET /v1/communities/:communityId`, `PATCH /v1/communities/:communityId`, `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`, `POST /v1/communities/:communityId/join`, `GET /v1/communities/:communityId/members`, `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`, `GET /v1/communities/:communityId/posts`, `GET /v1/communities/:communityId/settings`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/posts`
 - Routes writing: `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `POST /v1/communities/:communityId/polls`, `PATCH /v1/communities/:communityId/settings`
 - API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
@@ -1146,7 +1146,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`
 - Routes writing: `PUT /v1/communities/:communityId/events/:eventId/response`
 - API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
@@ -1163,7 +1163,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`
 - Routes writing: `POST /v1/communities/:communityId/events`, `PATCH /v1/communities/:communityId/events/:eventId`
 - API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`
@@ -1180,7 +1180,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `GET /v1/communities`, `POST /v1/communities`, `GET /v1/communities/:communityId`, `PATCH /v1/communities/:communityId`, `GET /v1/communities/:communityId/events`, `POST /v1/communities/:communityId/events`, `GET /v1/communities/:communityId/events/:eventId`, `PATCH /v1/communities/:communityId/events/:eventId`, `PUT /v1/communities/:communityId/events/:eventId/response`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `GET /v1/communities/:communityId/members`, `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`, `GET /v1/communities/:communityId/posts`, `GET /v1/communities/:communityId/settings`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/posts`, `PATCH /v1/posts/:postId`
 - Routes writing: `POST /v1/communities`, `POST /v1/communities/:communityId/join`, `POST /v1/communities/:communityId/leave`, `PATCH /v1/communities/:communityId/settings`
 - API/worker source reads: `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
@@ -1197,7 +1197,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`
 - Routes writing: `POST /v1/communities/:communityId/polls`
 - API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
@@ -1214,7 +1214,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`
 - Routes writing: `PUT /v1/communities/:communityId/polls/:pollId/vote`
 - API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
@@ -1231,7 +1231,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `GET /v1/communities/:communityId/polls`, `POST /v1/communities/:communityId/polls`, `GET /v1/communities/:communityId/polls/:pollId`, `PATCH /v1/communities/:communityId/polls/:pollId`, `PUT /v1/communities/:communityId/polls/:pollId/vote`
 - Routes writing: `POST /v1/communities/:communityId/polls`, `PATCH /v1/communities/:communityId/polls/:pollId`
 - API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`
@@ -1248,7 +1248,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `085_greenfield_communities.sql`
+- Migration introduced: `086_greenfield_communities.sql`
 - Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/communities/:communityId/settings`, `PATCH /v1/communities/:communityId/settings`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/posts`, `PATCH /v1/posts/:postId`
 - Routes writing: `POST /v1/communities`, `PATCH /v1/communities/:communityId`, `PATCH /v1/communities/:communityId/settings`
 - API/worker source reads: `services/greenfield-api/src/domains/communities/service.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
