@@ -1,0 +1,35 @@
+stateDiagram-v2
+  [*] --> ringing: start committed
+
+  ringing --> connecting: recipient accepts
+  ringing --> declined: recipient explicitly declines
+  ringing --> cancelled: initiator cancels
+  ringing --> missed: ring deadline expires
+  ringing --> failed: push or signalling policy failure
+
+  connecting --> active: both peers report media connected
+  connecting --> ended: participant ends
+  connecting --> failed: negotiation deadline expires
+
+  active --> reconnecting: peer reports media disconnected
+  active --> ended: participant ends or policy revokes
+
+  reconnecting --> active: coordinated ICE restart succeeds
+  reconnecting --> ended: participant ends or policy revokes
+  reconnecting --> failed: reconnect deadline expires
+
+  declined --> [*]
+  cancelled --> [*]
+  missed --> [*]
+  ended --> [*]
+  failed --> [*]
+
+  note right of ringing
+    Exactly one call per conversation.
+    Exactly one terminal transition.
+  end note
+
+  note right of active
+    Signalling loss alone does not prove
+    direct WebRTC media has stopped.
+  end note

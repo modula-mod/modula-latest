@@ -213,21 +213,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 278,
+      "line": 259,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 306,
+      "line": 287,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 308,
+      "line": 289,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -385,13 +385,6 @@
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 24,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('Apple sandbox verifier configuration is incomplete')"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
@@ -2252,21 +2245,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 278,
+      "line": 259,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 306,
+      "line": 287,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 308,
+      "line": 289,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2424,13 +2417,6 @@
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
-    },
-    {
-      "file": "services/greenfield-api/src/premium/apple-verifier.ts",
-      "line": 24,
-      "marker": "throw new Error",
-      "classification": "ordinary-error-handling-review",
-      "excerpt": "throw new Error('Apple sandbox verifier configuration is incomplete')"
     },
     {
       "file": "services/greenfield-api/src/product-standard/record-projection.ts",
