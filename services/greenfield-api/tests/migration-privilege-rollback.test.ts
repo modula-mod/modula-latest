@@ -66,6 +66,7 @@ describeIfDb.sequential('migration privilege rollback for 084 and 085', () => {
   let migrationsDir: string
   let dirThrough083: string
   let dirThrough084: string
+  let dirThrough085: string | undefined
   let has085 = false
 
   beforeAll(async () => {
@@ -85,6 +86,10 @@ describeIfDb.sequential('migration privilege rollback for 084 and 085', () => {
     dirThrough084 = await fs.mkdtemp(path.join(os.tmpdir(), 'modula-migrations-084-'))
     await copyMigrationsThrough(migrationsDir, dirThrough083, 83)
     await copyMigrationsThrough(migrationsDir, dirThrough084, 84)
+    if (has085) {
+      dirThrough085 = await fs.mkdtemp(path.join(os.tmpdir(), 'modula-migrations-085-'))
+      await copyMigrationsThrough(migrationsDir, dirThrough085, 85)
+    }
   }, 60_000)
 
   afterAll(async () => {
@@ -95,6 +100,7 @@ describeIfDb.sequential('migration privilege rollback for 084 and 085', () => {
     }
     if (dirThrough083) await fs.rm(dirThrough083, {recursive: true, force: true})
     if (dirThrough084) await fs.rm(dirThrough084, {recursive: true, force: true})
+    if (dirThrough085) await fs.rm(dirThrough085, {recursive: true, force: true})
   }, 60_000)
 
   it('restores exact prior table privileges after 084 and 085 down/up', async () => {
@@ -139,16 +145,17 @@ describeIfDb.sequential('migration privilege rollback for 084 and 085', () => {
     expect(after084Reup).toEqual(after084Up)
 
     if (!has085) return
+    if (!dirThrough085) throw new Error('085 migration directory was not prepared')
 
-    const applied085 = await migrateUp(url, migrationsDir)
+    const applied085 = await migrateUp(url, dirThrough085)
     expect(applied085).toEqual(['085_publisher_release_console'])
     const after085Up = await snapshotPrivileges(url)
 
-    expect(await migrateDown(url, migrationsDir)).toBe('085_publisher_release_console')
+    expect(await migrateDown(url, dirThrough085)).toBe('085_publisher_release_console')
     const after085Down = await snapshotPrivileges(url)
     expect(after085Down).toEqual(after084Reup)
 
-    expect(await migrateUp(url, migrationsDir)).toEqual(['085_publisher_release_console'])
+    expect(await migrateUp(url, dirThrough085)).toEqual(['085_publisher_release_console'])
     const after085Reup = await snapshotPrivileges(url)
     expect(after085Reup).toEqual(after085Up)
   }, 120_000)
