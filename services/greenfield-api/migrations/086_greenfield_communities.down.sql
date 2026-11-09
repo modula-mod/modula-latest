@@ -30,5 +30,5 @@ DROP TABLE IF EXISTS greenfield_community_memberships;
 DROP TABLE IF EXISTS greenfield_community_settings;
 DROP TABLE IF EXISTS greenfield_communities;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '084')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '085')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();

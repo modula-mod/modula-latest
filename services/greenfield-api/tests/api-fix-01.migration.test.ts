@@ -10,7 +10,7 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 086', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout migrations through 085', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -112,7 +112,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '085_greenfield_communities', '086_greenfield_collections_and_drafts',
+      '086_greenfield_communities',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -129,7 +129,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('086_greenfield_collections_and_drafts')
+    expect(applied.at(-1)).toBe('086_greenfield_communities')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -147,29 +147,18 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(optionalMedia.rows[0]?.definition).toContain('application/vnd.modula.web-runtime+tgz')
     await client.end()
 
-    expect(await migrateDown(freshUrl)).toBe('086_greenfield_collections_and_drafts')
-    const rolledBackCollections = new pg.Client({connectionString: freshUrl})
-    await rolledBackCollections.connect()
-    const collectionsTable = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_saved_collections') AS name`)
-    const draftsTable = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_post_drafts') AS name`)
-    const versionAfter086 = await rolledBackCollections.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
-    expect(collectionsTable.rows[0]?.name).toBeNull()
-    expect(draftsTable.rows[0]?.name).toBeNull()
-    expect(versionAfter086.rows[0]?.value).toBe('085')
-    await rolledBackCollections.end()
-
-    expect(await migrateDown(freshUrl)).toBe('085_greenfield_communities')
+    expect(await migrateDown(freshUrl)).toBe('086_greenfield_communities')
     const rolledBackCommunities = new pg.Client({connectionString: freshUrl})
     await rolledBackCommunities.connect()
     const communitiesTable = await rolledBackCommunities.query(`SELECT to_regclass('public.greenfield_communities') AS name`)
-    const versionAfter085 = await rolledBackCommunities.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    const versionAfter086 = await rolledBackCommunities.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
     expect(communitiesTable.rows[0]?.name).toBeNull()
-    expect(versionAfter085.rows[0]?.value).toBe('084')
+    expect(versionAfter086.rows[0]?.value).toBe('085')
     await rolledBackCommunities.end()
 
-    // Migration 084 belongs to the separately reviewed PR-01 branch. Until
-    // that PR is approved into the shared base, this stacked branch proceeds
-    // from the reserved 084 schema version to the current 083 ledger entry.
+    // 084 (#147/#160 moliboo signed packs) and 085 (Gate 01 publisher
+    // release console) are not on this branch yet. 086 down restores
+    // schema_version 085; the next ledger entry present here is 083.
     expect(await migrateDown(freshUrl)).toBe('083_moliboo_game_systems')
 
     const rolledBackMoliboo = new pg.Client({connectionString: freshUrl})
@@ -288,7 +277,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '085_greenfield_communities', '086_greenfield_collections_and_drafts',
+      '086_greenfield_communities',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -318,7 +307,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution and closeout 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '085_greenfield_communities', '086_greenfield_collections_and_drafts',
+      '086_greenfield_communities',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
