@@ -161,6 +161,7 @@ export function getOrCreateGreenfieldMissionRuntime(
     store,
     ...ports,
     ids: uuidv7,
+    unregisteredCapabilities: 'verify',
   })
   const cached = {runtime, store, boundary, trace}
   cache.set(db, cached)
