@@ -1321,6 +1321,64 @@
       "services/greenfield-api/src/product-standard/ingest-service.ts#ingest"
     ]
   },
+  "POST /v1/admin/qa/moliboos/packs/:packId/restore": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [
+      "greenfield_moliboo_pack_release_events",
+      "greenfield_moliboo_pack_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#setAvailability"
+    ]
+  },
+  "POST /v1/admin/qa/moliboos/packs/:packId/withdraw": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [
+      "greenfield_moliboo_pack_release_events",
+      "greenfield_moliboo_pack_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#setAvailability"
+    ]
+  },
   "PUT /v1/admin/qa/premium/:handle": {
     "reads": [
       "actors",
@@ -5230,6 +5288,54 @@
       "services/greenfield-api/src/premium/service.ts#setBadgeVisibility"
     ]
   },
+  "GET /v1/me/moliboos/outfit": {
+    "reads": [
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#outfit",
+      "services/greenfield-api/src/domains/moliboos/service.ts#outfitItems"
+    ]
+  },
+  "PUT /v1/me/moliboos/outfit": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_equipped",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items"
+    ],
+    "writes": [
+      "Moliboo",
+      "greenfield_moliboo_equipped"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#setOutfit"
+    ]
+  },
+  "GET /v1/me/moliboos/ownership": {
+    "reads": [
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_inventory",
+      "greenfield_moliboo_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#ownership"
+    ]
+  },
   "GET /v1/me/verification": {
     "reads": [
       "greenfield_verification_appeals",
@@ -7377,6 +7483,113 @@
       "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
       "services/greenfield-api/src/domains/moliboo-game/service.ts#claimQuest",
       "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet"
+    ]
+  },
+  "GET /v1/moliboos/packs": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#descriptor",
+      "services/greenfield-api/src/domains/moliboos/service.ts#listPacks",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#trustedRows"
+    ]
+  },
+  "GET /v1/moliboos/packs/:packId/download": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#download",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState"
+    ]
+  },
+  "GET /v1/moliboos/packs/:packId/manifest": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#descriptor",
+      "services/greenfield-api/src/domains/moliboos/service.ts#manifest",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#requireTrustedPack",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState"
+    ]
+  },
+  "GET /v1/moliboos/packs/catalog.json": {
+    "reads": [
+      "greenfield_module_quarantines",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_revocations",
+      "greenfield_moliboo_characters",
+      "greenfield_moliboo_pack_releases",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers",
+      "greenfield_release_artifact_signatures",
+      "greenfield_release_artifacts",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboos/service.ts#catalog",
+      "services/greenfield-api/src/domains/moliboos/service.ts#descriptor",
+      "services/greenfield-api/src/domains/moliboos/service.ts#packRows",
+      "services/greenfield-api/src/domains/moliboos/service.ts#securityState",
+      "services/greenfield-api/src/domains/moliboos/service.ts#trustedRows"
     ]
   },
   "GET /v1/notifications": {
