@@ -207,7 +207,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Evidence: `api-atlas.json#/routes`, `openapi.generated.yaml`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src`
-- Production impact: All 579 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
+- Production impact: All 593 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
 - Recommended fix: Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.
 - Dependencies: API contract ownership
 - Verification: Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.
@@ -516,4 +516,4 @@ The JSON form is canonical for remediation tooling and preserves these fields ve
 
 ## TODO / FIXME / placeholder sweep
 
-The literal sweep found 307 marker occurrences; 300 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=36, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=113, possible-runtime-placeholder=66, test-fixture-or-development=7. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.
+The literal sweep found 310 marker occurrences; 303 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=36, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=116, possible-runtime-placeholder=66, test-fixture-or-development=7. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.

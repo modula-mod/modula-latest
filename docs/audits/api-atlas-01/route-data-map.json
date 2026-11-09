@@ -1953,7 +1953,9 @@
   },
   "DELETE /v1/attachments/:attachmentId": {
     "reads": [
-      "attachments"
+      "attachments",
+      "greenfield_post_draft_content",
+      "the"
     ],
     "writes": [
       "attachments"
@@ -5689,6 +5691,217 @@
     "confidence": "method-level-static",
     "evidence": []
   },
+  "GET /v1/me/collections": {
+    "reads": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#list"
+    ]
+  },
+  "POST /v1/me/collections": {
+    "reads": [],
+    "writes": [
+      "greenfield_saved_collections"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#create"
+    ]
+  },
+  "DELETE /v1/me/collections/:collectionId": {
+    "reads": [],
+    "writes": [
+      "greenfield_saved_collections"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#remove"
+    ]
+  },
+  "GET /v1/me/collections/:collectionId": {
+    "reads": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#get",
+      "services/greenfield-api/src/domains/collections/service.ts#ownedCollection"
+    ]
+  },
+  "PATCH /v1/me/collections/:collectionId": {
+    "reads": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections"
+    ],
+    "writes": [
+      "collection",
+      "greenfield_saved_collections"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#get",
+      "services/greenfield-api/src/domains/collections/service.ts#ownedCollection",
+      "services/greenfield-api/src/domains/collections/service.ts#update"
+    ]
+  },
+  "GET /v1/me/collections/:collectionId/items": {
+    "reads": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections",
+      "post_saves"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#listItems",
+      "services/greenfield-api/src/domains/collections/service.ts#ownedCollection"
+    ]
+  },
+  "POST /v1/me/collections/:collectionId/items": {
+    "reads": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections",
+      "post_saves"
+    ],
+    "writes": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#addItem"
+    ]
+  },
+  "DELETE /v1/me/collections/:collectionId/items/:itemId": {
+    "reads": [
+      "greenfield_saved_collections"
+    ],
+    "writes": [
+      "greenfield_saved_collection_items",
+      "greenfield_saved_collections"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/collections/service.ts#removeItem"
+    ]
+  },
+  "GET /v1/me/drafts": {
+    "reads": [
+      "greenfield_post_drafts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/drafts/service.ts#list",
+      "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+    ]
+  },
+  "POST /v1/me/drafts": {
+    "reads": [
+      "greenfield_post_drafts"
+    ],
+    "writes": [
+      "greenfield_post_drafts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/drafts/service.ts#assertIdempotentPayload",
+      "services/greenfield-api/src/domains/drafts/service.ts#create",
+      "services/greenfield-api/src/domains/drafts/service.ts#get",
+      "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+      "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+    ]
+  },
+  "DELETE /v1/me/drafts/:draftId": {
+    "reads": [
+      "greenfield_post_drafts"
+    ],
+    "writes": [
+      "greenfield_post_draft_content",
+      "greenfield_post_drafts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/drafts/service.ts#remove"
+    ]
+  },
+  "GET /v1/me/drafts/:draftId": {
+    "reads": [
+      "greenfield_post_drafts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/drafts/service.ts#get",
+      "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+      "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+    ]
+  },
+  "PATCH /v1/me/drafts/:draftId": {
+    "reads": [
+      "greenfield_post_drafts"
+    ],
+    "writes": [
+      "draft",
+      "greenfield_post_drafts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/drafts/service.ts#get",
+      "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+      "services/greenfield-api/src/domains/drafts/service.ts#toDto",
+      "services/greenfield-api/src/domains/drafts/service.ts#update"
+    ]
+  },
+  "POST /v1/me/drafts/:draftId/publish": {
+    "reads": [
+      "greenfield_post_drafts"
+    ],
+    "writes": [
+      "greenfield_post_drafts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/drafts/service.ts#get",
+      "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+      "services/greenfield-api/src/domains/drafts/service.ts#publish",
+      "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+    ]
+  },
   "GET /v1/me/entitlements": {
     "reads": [
       "greenfield_premium_capabilities",
@@ -8120,6 +8333,7 @@
       "greenfield_communities",
       "greenfield_community_memberships",
       "greenfield_community_settings",
+      "greenfield_post_draft_content",
       "posts"
     ],
     "writes": [

@@ -19328,6 +19328,840 @@
       "sourceContractSha256": "ef075d43361901183d236c3997868832043d0ea6f8018495db5c39be11fa3f91"
     },
     {
+      "id": "GET /v1/me/collections",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "eeb25b1c10d2105fe4201d2f35f0c2fbaa2a14748a477a4ab16c4379da837836"
+    },
+    {
+      "id": "POST /v1/me/collections",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "{name: string}).name, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "78adb1eca7fd5449abc1bbadac55054910dc1dcd97842f785d1c60838822dbe9"
+    },
+    {
+      "id": "DELETE /v1/me/collections/:collectionId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [
+          "{expectedVersion: number}).expectedVersion)"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "806cc0a17324c0c10ca48fd15ffcc112919d80341b47db7f93e976eb4476ea60"
+    },
+    {
+      "id": "GET /v1/me/collections/:collectionId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "d9362386829ddaf6db7f7ed16e4cb2271cab2749881fd0bd99b8c9283d7df8bc"
+    },
+    {
+      "id": "PATCH /v1/me/collections/:collectionId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{name: string"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "3658b419d1c208a4cb9d1d874519704f575d06712b1bcf307127d72d92b48d21"
+    },
+    {
+      "id": "GET /v1/me/collections/:collectionId/items",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "9965dd987abcae1f8e8ca3ab4bd1966f6c65f909dc06fb00bce95d293d37e847"
+    },
+    {
+      "id": "POST /v1/me/collections/:collectionId/items",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{postId: string}).postId, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "309a1b05a5d1556caf8a636590591c4c3afbc46f2089a35694f7b0b5af6417f3"
+    },
+    {
+      "id": "DELETE /v1/me/collections/:collectionId/items/:itemId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{collectionId: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "9643070299a708170b23fb30efaf30d3268635a12edfdecaae62da6ebe5d8c96"
+    },
+    {
+      "id": "GET /v1/me/drafts",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "eeb25b1c10d2105fe4201d2f35f0c2fbaa2a14748a477a4ab16c4379da837836"
+    },
+    {
+      "id": "POST /v1/me/drafts",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "CreatePostDraftInput, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "6075abc7fd5dc236c94f04350025119e0a61c52b6ce414e08715a3141fe99519"
+    },
+    {
+      "id": "DELETE /v1/me/drafts/:draftId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [
+          "{expectedVersion: number}).expectedVersion), contextFor(request))"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "690dc7d1046ce990b4b2c6cf84982d81b96ff8ba8000ca4ddd7c09b6044045c6"
+    },
+    {
+      "id": "GET /v1/me/drafts/:draftId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "ebba3eb4227195e71441eebf32c311badb41b2dbe98b4ef8ccc209ae0d31076f"
+    },
+    {
+      "id": "PATCH /v1/me/drafts/:draftId",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [
+          "UpdatePostDraftInput, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "56d141f9ca44ebfe45f6ab5419260e81e8d8be3d8e5179ef32b432ba6f4015ea"
+    },
+    {
+      "id": "POST /v1/me/drafts/:draftId/publish",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{expectedVersion: number}).expectedVersion, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "8f0fa2537dbbc1ea650d866b743b59a1cfbb475bd74feb9d682fc2897f12c6fc"
+    },
+    {
       "id": "GET /v1/me/entitlements",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -31247,15 +32081,15 @@
         "params": [],
         "query": [],
         "body": [],
-        "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
         "pagination": {
-          "style": "none observed",
-          "defaultPageSize": null,
-          "maximumPageSize": null,
-          "nextCursor": false,
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
           "previousCursor": false,
-          "stability": "not a list or unpaginated"
+          "stability": "route-specific stable ordering; inspect repository order fields"
         }
       },
       "response": {
@@ -31264,7 +32098,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "93819bb7ed05628c2083721e7ce6ee16cdbded4942e8cddce433b6f193234cfe"
+      "sourceContractSha256": "15026030fe69a4afe7f57f0c3d46ff25d65d3f1db9308184d73a45fae1911387"
     },
     {
       "id": "GET /v1/search",
