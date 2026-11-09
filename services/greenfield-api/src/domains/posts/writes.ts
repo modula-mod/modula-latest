@@ -12,6 +12,8 @@ import {PostRepository} from './repository.js'
 export type PostWriteContext = {
   requestId?: string | null
   correlationId?: string | null
+  /** Trusted server-side association. Never populated from the generic post body. */
+  communityId?: string | null
 }
 
 export class PostWriteService {
@@ -47,19 +49,25 @@ export class PostWriteService {
         code: 'VALIDATION_FAILED',
       })
     }
-    const audience = input.audience ?? 'public'
+    const requestedAudience = input.audience ?? 'public'
     const feed = input.feed ?? 'following'
     const idempotencyKey = input.idempotencyKey ?? null
     if (idempotencyKey) {
       const existing = await this.db
         .selectFrom('posts')
-        .select('id')
+        .select(['id', 'community_id', 'text'])
         .where('author_actor_id', '=', actorId)
         .where('idempotency_key', '=', idempotencyKey)
         .where('deleted_at', 'is', null)
         .executeTakeFirst()
       if (existing) {
-        const post = await this.posts.getById(existing.id)
+        if ((existing.community_id ?? null) !== (context.communityId ?? null)) {
+          throw Object.assign(new Error('Idempotency key is already bound to another post context'), {code: 'CONFLICT'})
+        }
+        if ((existing.text ?? '') !== text) {
+          throw Object.assign(new Error('Idempotency key was reused with a different post payload'), {code: 'CONFLICT'})
+        }
+        const post = await this.posts.getById(existing.id, actorId)
         if (post) return post
       }
     }
@@ -71,6 +79,40 @@ export class PostWriteService {
     const kind = persistedMedia.length > 0 || contentInput.length > 0 ? 'media' : 'text'
     try {
       await this.db.transaction().execute(async trx => {
+        let audience = requestedAudience
+        let communityId: string | null = null
+        if (context.communityId) {
+          const association = await trx
+            .selectFrom('greenfield_communities as community')
+            .innerJoin('greenfield_community_settings as settings', 'settings.community_id', 'community.community_id')
+            .innerJoin('greenfield_community_memberships as membership', join => join
+              .onRef('membership.community_id', '=', 'community.community_id')
+              .on('membership.actor_id', '=', actorId))
+            .select([
+              'community.community_id', 'community.visibility', 'community.posting_policy',
+              'settings.allow_attachments', 'settings.blocked_words',
+              'membership.role', 'membership.status',
+            ])
+            .where('community.community_id', '=', context.communityId)
+            .where('community.deleted_at', 'is', null)
+            .forUpdate('community')
+            .executeTakeFirst()
+          if (!association) throw Object.assign(new Error('Community not found'), {code: 'NOT_FOUND'})
+          if (association.status !== 'active' || association.role === 'restricted') {
+            throw Object.assign(new Error('Active community membership is required'), {code: 'FORBIDDEN'})
+          }
+          if (association.posting_policy === 'moderators' && !['owner', 'admin', 'moderator'].includes(association.role)) {
+            throw Object.assign(new Error('Community posting is restricted to moderators'), {code: 'FORBIDDEN'})
+          }
+          if (!association.allow_attachments && (mediaInput.length > 0 || contentInput.length > 0)) {
+            throw Object.assign(new Error('Attachments are disabled for this community'), {code: 'VALIDATION_FAILED'})
+          }
+          if (containsBlockedCommunityWord(text, association.blocked_words)) {
+            throw Object.assign(new Error('Post text violates community content settings'), {code: 'VALIDATION_FAILED'})
+          }
+          audience = association.visibility === 'public' ? 'public' : 'private'
+          communityId = association.community_id
+        }
         const attachments = contentInput.length === 0 ? [] : await trx
           .selectFrom('attachments')
           .selectAll()
@@ -117,6 +159,9 @@ export class PostWriteService {
             quote_count: 0,
             reply_count: 0,
             repost_count: 0,
+            community_id: communityId,
+            community_moderation_state: communityId ? 'visible' : null,
+            community_featured_at: null,
             created_at: now,
             updated_at: now,
             deleted_at: null,
@@ -162,7 +207,7 @@ export class PostWriteService {
           aggregateId: id,
           payload: {postId: id},
         })
-        if (audience === 'public' && input.publishToAtproto) {
+        if (!communityId && audience === 'public' && input.publishToAtproto) {
           await outbox.enqueue(trx, {
             eventType: 'atproto.publish.create',
             aggregateType: 'post',
@@ -179,7 +224,7 @@ export class PostWriteService {
             },
           })
         }
-        await new AuditRepository(trx).append('post.created', {audience, feed, mediaCount: persistedMedia.length + contentInput.length}, {
+        await new AuditRepository(trx).append('post.created', {audience, feed, communityId, mediaCount: persistedMedia.length + contentInput.length}, {
           type: 'post',
           id,
           actorId,
@@ -210,9 +255,36 @@ export class PostWriteService {
           },
           occurredAt: now,
         })
+        if (communityId) {
+          await new GreenfieldEventBus(trx).publish({
+            eventType: 'community.post-created',
+            aggregateType: 'communityPost',
+            aggregateId: id,
+            aggregateVersion: 1,
+            accountId: actor?.account_id ?? null,
+            actorId,
+            requestId: context.requestId ?? null,
+            correlationId: context.correlationId ?? context.requestId ?? null,
+            idempotencyKey: idempotencyKey ? `community.post.create:${communityId}:${actorId}:${idempotencyKey}` : null,
+            visibility: audience === 'public' ? 'public' : 'internal',
+            classification: 'internal',
+            payload: {communityId, postId: id, actorId},
+            metadata: {source: 'greenfield.communities'},
+            occurredAt: now,
+          })
+        }
       })
     } catch (error) {
       await this.mediaStorage.removePersistedMedia(persistedMedia)
+      if (idempotencyKey && (error as {code?: string})?.code === '23505') {
+        const existing = await this.db.selectFrom('posts').select(['id', 'community_id', 'text'])
+          .where('author_actor_id', '=', actorId).where('idempotency_key', '=', idempotencyKey)
+          .where('deleted_at', 'is', null).executeTakeFirst()
+        if (existing && (existing.community_id ?? null) === (context.communityId ?? null) && (existing.text ?? '') === text) {
+          const post = await this.posts.getById(existing.id, actorId)
+          if (post) return post
+        }
+      }
       throw error
     }
     const created = await this.posts.getByIdForAuthor(id, actorId)
@@ -238,6 +310,21 @@ export class PostWriteService {
     if (row.version !== input.expectedVersion) {
       throw Object.assign(new Error('Version conflict'), {code: 'CONFLICT'})
     }
+    if (row.community_id) {
+      const community = await this.db
+        .selectFrom('greenfield_community_memberships as membership')
+        .innerJoin('greenfield_community_settings as settings', 'settings.community_id', 'membership.community_id')
+        .select(['membership.role', 'membership.status', 'settings.blocked_words'])
+        .where('membership.community_id', '=', row.community_id)
+        .where('membership.actor_id', '=', actorId)
+        .executeTakeFirst()
+      if (!community || community.status !== 'active' || community.role === 'restricted') {
+        throw Object.assign(new Error('Active community membership is required'), {code: 'FORBIDDEN'})
+      }
+      if (containsBlockedCommunityWord(text, community.blocked_words)) {
+        throw Object.assign(new Error('Post text violates community content settings'), {code: 'VALIDATION_FAILED'})
+      }
+    }
     const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
     const nextVersion = row.version + 1
     await this.db.transaction().execute(async trx => {
@@ -251,7 +338,7 @@ export class PostWriteService {
       if (Number(updated.numUpdatedRows ?? 0) === 0) {
         throw Object.assign(new Error('Version conflict'), {code: 'CONFLICT'})
       }
-      if (row.audience === 'public') {
+      if (!row.community_id && row.audience === 'public') {
         await new OutboxRepository(this.db).enqueue(trx, {
           eventType: 'atproto.publish.update',
           aggregateType: 'post',
@@ -319,7 +406,7 @@ export class PostWriteService {
         .set({deleted_at: now, updated_at: now, version: nextVersion})
         .where('id', '=', postId)
         .execute()
-      if (row.audience === 'public') {
+      if (!row.community_id && row.audience === 'public') {
         await new OutboxRepository(this.db).enqueue(trx, {
           eventType: 'atproto.publish.delete',
           aggregateType: 'post',
@@ -451,6 +538,14 @@ export class PostWriteService {
       }
     })
   }
+}
+
+function containsBlockedCommunityWord(text: string, blockedWords: string[]): boolean {
+  const normalized = text.normalize('NFKC').toLocaleLowerCase()
+  return blockedWords.some(value => {
+    const word = value.normalize('NFKC').trim().toLocaleLowerCase()
+    return word.length > 0 && normalized.includes(word)
+  })
 }
 
 function boundedCaption(value: unknown): string | null {
