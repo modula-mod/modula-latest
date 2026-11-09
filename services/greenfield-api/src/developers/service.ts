@@ -285,7 +285,8 @@ export class DeveloperService {
     forbidden('Product access denied')
   }
 
-  private async requirePublisherAccess(accountId: string, publisherId: string) {
+  /** Publisher authority: an owner account, or an ACTIVE org member with OWNER, ADMIN, DEVELOPER or RELEASE_MANAGER. Admin handles are not consulted. */
+  async requirePublisherAccess(accountId: string, publisherId: string) {
     const owners = await this.db.selectFrom('greenfield_publisher_owners').selectAll().where('publisher_id', '=', publisherId).execute()
     if (owners.some(owner => owner.account_id === accountId)) return
     for (const owner of owners) {
