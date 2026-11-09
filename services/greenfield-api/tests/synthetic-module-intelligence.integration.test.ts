@@ -102,6 +102,33 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     expect(detail.executions).toHaveLength(0)
     expect(detail.governorDecisions[0]?.authorization).toBe('blocked')
   })
+
+  it('revalidate requires the action to still be a declared AI-callable action', async () => {
+    const boundary = new IntelligenceActionBoundary(db, developmentTrust)
+    const declared = await boundary.revalidate(accountA, undefined, {
+      id: `syn-revalidate-declared-${suffix}`,
+      missionId: `syn-revalidate-mission-${suffix}`,
+      moduleId,
+      family: 'record.query',
+      capability: `records:module.${moduleId}.${collection}:read`,
+      actionId: queryActionId,
+      input: {collection, limit: 25, sort: 'updatedAt', direction: 'desc'},
+      requestedBy: 'gaia',
+    })
+    expect(declared).toMatchObject({registered: true, schemaValid: true, permissionGranted: true})
+
+    const undeclaredReadable = await boundary.revalidate(accountA, undefined, {
+      id: `syn-revalidate-undeclared-${suffix}`,
+      missionId: `syn-revalidate-mission-${suffix}`,
+      moduleId,
+      family: 'record.query',
+      capability: `records:module.${moduleId}.${undeclaredCollection}:read`,
+      input: {collection: undeclaredCollection, limit: 25, sort: 'updatedAt', direction: 'desc'},
+      requestedBy: 'gaia',
+    })
+    expect(undeclaredReadable.permissionGranted).toBe(true)
+    expect(undeclaredReadable).toMatchObject({registered: false, schemaValid: false})
+  })
 })
 
 async function seedRuntime(db: ModulaDb) {
