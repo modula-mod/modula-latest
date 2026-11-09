@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-08T17:33:22.052Z",
+  "capturedAt": "2026-11-09T16:29:40.381Z",
   "source": {
     "branch": "fix/gubic-socket-auth",
-    "headAtCapture": "6d6d4d56c83f1f8dbd855c6aea7edf5e8b7baaf4",
+    "headAtCapture": "7a8c48af1e1dcc108c73a93fb9d4842488d69b23",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "a151ef17e4496a533f1ed728372bf70b223008fa7724bdc1ce17db0c78f84d27"
   },
@@ -6087,6 +6087,256 @@
     },
     {
       "method": "GET",
+      "url": "/v1/premium/tiers",
+      "path": "/v1/premium/tiers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/premium/tiers",
+      "path": "/v1/premium/tiers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/membership",
+      "path": "/v1/me/membership",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/membership",
+      "path": "/v1/me/membership",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/entitlements",
+      "path": "/v1/me/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/entitlements",
+      "path": "/v1/me/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/entitlements/:capabilityId",
+      "path": "/v1/me/entitlements/:capabilityId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityId"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{2,79}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/entitlements/:capabilityId",
+      "path": "/v1/me/entitlements/:capabilityId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capabilityId"
+          ],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{2,79}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/me/membership/badge-visibility",
+      "path": "/v1/me/membership/badge-visibility",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/qa/premium/:handle",
+      "path": "/v1/admin/qa/premium/:handle",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "handle"
+          ],
+          "properties": {
+            "handle": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/verification",
+      "path": "/v1/me/verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/verification",
+      "path": "/v1/me/verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/verification/applications",
+      "path": "/v1/me/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/verification/applications/:applicationId/appeals",
+      "path": "/v1/me/verification/applications/:applicationId/appeals",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicationId"
+          ],
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/qa/verification/applications",
+      "path": "/v1/admin/qa/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/qa/verification/applications",
+      "path": "/v1/admin/qa/verification/applications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "path": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicationId"
+          ],
+          "properties": {
+            "applicationId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "path": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "appealId"
+          ],
+          "properties": {
+            "appealId": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/moliboo/catalogue/items",
       "path": "/v1/moliboo/catalogue/items",
       "prefix": "",
@@ -6647,6 +6897,303 @@
       "method": "POST",
       "url": "/v1/internal/build-service/builds/:buildId/result",
       "path": "/v1/internal/build-service/builds/:buildId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/capabilities",
+      "path": "/v1/gubic/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/capabilities",
+      "path": "/v1/gubic/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/library",
+      "path": "/v1/gubic/library",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/library",
+      "path": "/v1/gubic/library",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/gubic/library/:gameId",
+      "path": "/v1/gubic/library/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/gubic/library/:gameId",
+      "path": "/v1/gubic/library/:gameId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/games/:gameId/sessions",
+      "path": "/v1/gubic/games/:gameId/sessions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/sessions/:sessionId/heartbeat",
+      "path": "/v1/gubic/sessions/:sessionId/heartbeat",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/sessions/:sessionId/end",
+      "path": "/v1/gubic/sessions/:sessionId/end",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/sessions/:sessionId/achievements/:key",
+      "path": "/v1/gubic/sessions/:sessionId/achievements/:key",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId/achievements",
+      "path": "/v1/gubic/games/:gameId/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId/achievements",
+      "path": "/v1/gubic/games/:gameId/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/me/achievements",
+      "path": "/v1/gubic/me/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/me/achievements",
+      "path": "/v1/gubic/me/achievements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/games/:gameId/lobbies",
+      "path": "/v1/gubic/games/:gameId/lobbies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/games/:gameId/lobbies",
+      "path": "/v1/gubic/games/:gameId/lobbies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/games/:gameId/lobbies",
+      "path": "/v1/gubic/games/:gameId/lobbies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/join",
+      "path": "/v1/gubic/lobbies/join",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/lobbies/:lobbyId",
+      "path": "/v1/gubic/lobbies/:lobbyId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/lobbies/:lobbyId",
+      "path": "/v1/gubic/lobbies/:lobbyId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/join",
+      "path": "/v1/gubic/lobbies/:lobbyId/join",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/leave",
+      "path": "/v1/gubic/lobbies/:lobbyId/leave",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/ready",
+      "path": "/v1/gubic/lobbies/:lobbyId/ready",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/gubic/lobbies/:lobbyId/start",
+      "path": "/v1/gubic/lobbies/:lobbyId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gubic/lobbies/:lobbyId/socket",
+      "path": "/v1/gubic/lobbies/:lobbyId/socket",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gubic/lobbies/:lobbyId/socket",
+      "path": "/v1/gubic/lobbies/:lobbyId/socket",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/gubic/submissions",
+      "path": "/v1/developer/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/developer/gubic/submissions",
+      "path": "/v1/developer/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/developer/gubic/submissions",
+      "path": "/v1/developer/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/gubic/submissions/:submissionId/withdraw",
+      "path": "/v1/developer/gubic/submissions/:submissionId/withdraw",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/gubic/submissions",
+      "path": "/v1/admin/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/gubic/submissions",
+      "path": "/v1/admin/gubic/submissions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/gubic/submissions/:submissionId/decision",
+      "path": "/v1/admin/gubic/submissions/:submissionId/decision",
       "prefix": "",
       "schema": null,
       "config": null,

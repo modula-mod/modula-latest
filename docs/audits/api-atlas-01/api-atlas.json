@@ -10,19 +10,19 @@
       "kind": "local-candidate-runtime",
       "branch": "fix/gubic-socket-auth",
       "sourceSha256": "a151ef17e4496a533f1ed728372bf70b223008fa7724bdc1ce17db0c78f84d27",
-      "capturedAt": "2026-11-08T17:33:22.052Z",
-      "routeCount": 707
+      "capturedAt": "2026-11-09T16:29:40.381Z",
+      "routeCount": 758
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 707,
-    "applicationRuntimeRoutes": 499,
-    "mappedApplicationRoutes": 499,
+    "runtimeMethodRoutes": 758,
+    "applicationRuntimeRoutes": 535,
+    "mappedApplicationRoutes": 535,
     "runtimeOnlyRoutes": 0,
     "sourceRoutes": 535,
-    "sourceOnlyRoutes": 36,
-    "explicitlyExcludedFrameworkRoutes": 208,
+    "sourceOnlyRoutes": 0,
+    "explicitlyExcludedFrameworkRoutes": 223,
     "frameworkRoutes": [
       {
         "method": "OPTIONS",
@@ -941,6 +941,36 @@
       },
       {
         "method": "HEAD",
+        "path": "/v1/premium/tiers",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/membership",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/entitlements",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/entitlements/:capabilityId",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/verification",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/admin/qa/verification/applications",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
         "path": "/v1/moliboo/catalogue/items",
         "reason": "Fastify automatic HEAD companion for GET"
       },
@@ -982,6 +1012,51 @@
       {
         "method": "HEAD",
         "path": "/v1/developer/products/:productId",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/capabilities",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/library",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/games/:gameId/achievements",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/me/achievements",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/games/:gameId/lobbies",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/lobbies/:lobbyId",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/gubic/lobbies/:lobbyId/socket",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/developer/gubic/submissions",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/admin/gubic/submissions",
         "reason": "Fastify automatic HEAD companion for GET"
       },
       {
@@ -1066,7 +1141,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "707 = 499 application + 208 framework-derived"
+    "equation": "758 = 535 application + 223 framework-derived"
   },
   "routes": [
     {
@@ -6549,6 +6624,209 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/admin/gubic/submissions",
+      "domain": "Admin",
+      "method": "GET",
+      "effectiveRoute": "/v1/admin/gubic/submissions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/gubic/submissions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 121
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.reviewQueue"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_accounts",
+          "greenfield_gubic_submissions"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#requireAdmin",
+          "services/greenfield-api/src/gubic/play-service.ts#reviewQueue"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/admin/gubic/submissions/:submissionId/decision",
+      "domain": "Admin",
+      "method": "POST",
+      "effectiveRoute": "/v1/admin/gubic/submissions/:submissionId/decision",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/gubic/submissions/:submissionId/decision",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 122
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.decide"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_accounts",
+          "greenfield_gubic_submissions"
+        ],
+        "writes": [
+          "greenfield_gubic_achievements",
+          "greenfield_gubic_submissions"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#decide",
+          "services/greenfield-api/src/gubic/play-service.ts#requireAdmin",
+          "services/greenfield-api/src/gubic/play-service.ts#submission",
+          "services/greenfield-api/src/gubic/play-service.ts#submissionRow"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "GET /v1/admin/moderation/reports",
       "domain": "Admin",
       "method": "GET",
@@ -10125,6 +10403,459 @@
       "liveProbe": null,
       "status": "candidate-registered-not-production-probed",
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "PUT /v1/admin/qa/premium/:handle",
+      "domain": "Admin",
+      "method": "PUT",
+      "effectiveRoute": "/v1/admin/qa/premium/:handle",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/qa/premium/:handle",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 63
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "header.trim",
+        "premium.assignQaFixture"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [
+          "admin:ops"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{handle: string}).handle, (request.body ?? {}) as Record<string, unknown>, header.trim()), request.id)) }"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        400
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "greenfield_accounts",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_membership_events",
+          "greenfield_premium_memberships",
+          "greenfield_premium_preferences"
+        ],
+        "writes": [
+          "greenfield_premium_membership_events",
+          "greenfield_premium_memberships"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/premium/service.ts#activeCatalogueVersion",
+          "services/greenfield-api/src/premium/service.ts#assignQaFixture",
+          "services/greenfield-api/src/premium/service.ts#invalidateAccount",
+          "services/greenfield-api/src/premium/service.ts#membership",
+          "services/greenfield-api/src/premium/service.ts#membershipForAccount"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered."
+    },
+    {
+      "id": "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+      "domain": "Admin",
+      "method": "POST",
+      "effectiveRoute": "/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/qa/verification/appeals/:appealId/transitions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 114
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "verification.transitionAppeal"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [
+          "admin:moderation"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{appealId: string}).appealId, (request.body ?? {}) as Record<string, unknown>), request.id)) }"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "greenfield_verification_appeals",
+          "greenfield_verification_applications",
+          "greenfield_verification_statuses"
+        ],
+        "writes": [
+          "greenfield_verification_appeals",
+          "greenfield_verification_applications",
+          "greenfield_verification_events",
+          "greenfield_verification_statuses"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/premium/verification-service.ts#insertEvent",
+          "services/greenfield-api/src/premium/verification-service.ts#invalidateAccount",
+          "services/greenfield-api/src/premium/verification-service.ts#me",
+          "services/greenfield-api/src/premium/verification-service.ts#transitionAppeal"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered."
+    },
+    {
+      "id": "GET /v1/admin/qa/verification/applications",
+      "domain": "Admin",
+      "method": "GET",
+      "effectiveRoute": "/v1/admin/qa/verification/applications",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/qa/verification/applications",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 99
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "verification.listApplications"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [
+          "admin:moderation"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [
+          "{state?: string}).state), request.id)) }"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_accounts",
+          "greenfield_verification_applications"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/premium/verification-service.ts#listApplications"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+      "domain": "Admin",
+      "method": "POST",
+      "effectiveRoute": "/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/qa/verification/applications/:applicationId/transitions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 105
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "verification.transition"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [
+          "admin:moderation"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{applicationId: string}).applicationId, (request.body ?? {}) as Record<string, unknown>), request.id)) }"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "greenfield_verification_appeals",
+          "greenfield_verification_applications",
+          "greenfield_verification_statuses"
+        ],
+        "writes": [
+          "greenfield_verification_applications",
+          "greenfield_verification_events",
+          "greenfield_verification_statuses"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/premium/verification-service.ts#insertEvent",
+          "services/greenfield-api/src/premium/verification-service.ts#invalidateAccount",
+          "services/greenfield-api/src/premium/verification-service.ts#me",
+          "services/greenfield-api/src/premium/verification-service.ts#transition"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered."
     },
     {
       "id": "GET /v1/admin/registry/artifacts/orphans",
@@ -23869,6 +24600,320 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/developer/gubic/submissions",
+      "domain": "Developer",
+      "method": "GET",
+      "effectiveRoute": "/v1/developer/gubic/submissions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/developer/gubic/submissions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 119
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.listSubmissions"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_developer_organisation_memberships",
+          "greenfield_gubic_submissions",
+          "greenfield_publisher_owners"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#listSubmissions",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublisherAccess"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/developer/gubic/submissions",
+      "domain": "Developer",
+      "method": "POST",
+      "effectiveRoute": "/v1/developer/gubic/submissions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/developer/gubic/submissions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 118
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.submit"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        201
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_developer_organisation_memberships",
+          "greenfield_gubic_submissions",
+          "greenfield_premium_capabilities",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_memberships",
+          "greenfield_premium_tiers",
+          "greenfield_publisher_owners"
+        ],
+        "writes": [
+          "greenfield_game_catalogue_entries",
+          "greenfield_game_catalogue_events",
+          "greenfield_gubic_submissions"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#capabilities",
+          "services/greenfield-api/src/gubic/play-service.ts#capability",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublisherAccess",
+          "services/greenfield-api/src/gubic/play-service.ts#submission",
+          "services/greenfield-api/src/gubic/play-service.ts#submissionRow",
+          "services/greenfield-api/src/gubic/play-service.ts#submit"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/developer/gubic/submissions/:submissionId/withdraw",
+      "domain": "Developer",
+      "method": "POST",
+      "effectiveRoute": "/v1/developer/gubic/submissions/:submissionId/withdraw",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/developer/gubic/submissions/:submissionId/withdraw",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 120
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.withdraw"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_developer_organisation_memberships",
+          "greenfield_gubic_submissions",
+          "greenfield_publisher_owners"
+        ],
+        "writes": [
+          "greenfield_gubic_submissions"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublisherAccess",
+          "services/greenfield-api/src/gubic/play-service.ts#submission",
+          "services/greenfield-api/src/gubic/play-service.ts#submissionRow",
+          "services/greenfield-api/src/gubic/play-service.ts#withdraw"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "POST /v1/developer/organisations",
       "domain": "Developer",
       "method": "POST",
@@ -28876,6 +29921,106 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/gubic/capabilities",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/capabilities",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/capabilities",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 51
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.capabilities"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_premium_capabilities",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_memberships",
+          "greenfield_premium_tiers"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#capabilities"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "GET /v1/gubic/categories",
       "domain": "Platform",
       "method": "GET",
@@ -29289,6 +30434,105 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/gubic/games/:gameId/achievements",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/games/:gameId/achievements",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/games/:gameId/achievements",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 62
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.gameAchievements"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_achievement_unlocks",
+          "greenfield_gubic_achievements"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#gameAchievements",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "GET /v1/gubic/games/:gameId/eligibility",
       "domain": "Platform",
       "method": "GET",
@@ -29514,6 +30758,330 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/gubic/games/:gameId/lobbies",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/games/:gameId/lobbies",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/games/:gameId/lobbies",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 69
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.listLobbies"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#listLobbies",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/games/:gameId/lobbies",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/games/:gameId/lobbies",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/games/:gameId/lobbies",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 70
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.createLobby"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members",
+          "greenfield_premium_capabilities",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_memberships",
+          "greenfield_premium_tiers"
+        ],
+        "writes": [
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#capabilities",
+          "services/greenfield-api/src/gubic/play-service.ts#capability",
+          "services/greenfield-api/src/gubic/play-service.ts#createLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/games/:gameId/sessions",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/games/:gameId/sessions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/games/:gameId/sessions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 57
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.startSession"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_lobby_members",
+          "greenfield_gubic_play_sessions",
+          "the"
+        ],
+        "writes": [
+          "greenfield_gubic_library_items",
+          "greenfield_gubic_play_sessions"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#closeSession",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame",
+          "services/greenfield-api/src/gubic/play-service.ts#startSession"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "GET /v1/gubic/games/:gameId/versions",
       "domain": "Platform",
       "method": "GET",
@@ -29607,6 +31175,1155 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/gubic/library",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/library",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/library",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 53
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.library"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_achievement_unlocks",
+          "greenfield_gubic_library_items"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#library"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "DELETE /v1/gubic/library/:gameId",
+      "domain": "Platform",
+      "method": "DELETE",
+      "effectiveRoute": "/v1/gubic/library/:gameId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/library/:gameId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 55
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.removeLibraryItem"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_play_sessions"
+        ],
+        "writes": [
+          "greenfield_gubic_library_items"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#removeLibraryItem"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "PUT /v1/gubic/library/:gameId",
+      "domain": "Platform",
+      "method": "PUT",
+      "effectiveRoute": "/v1/gubic/library/:gameId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/library/:gameId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 54
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.upsertLibraryItem"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_achievement_unlocks",
+          "greenfield_gubic_library_items"
+        ],
+        "writes": [
+          "failed",
+          "greenfield_gubic_library_items"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#library",
+          "services/greenfield-api/src/gubic/play-service.ts#requirePublishedGame",
+          "services/greenfield-api/src/gubic/play-service.ts#upsertLibraryItem"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/gubic/lobbies/:lobbyId",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/lobbies/:lobbyId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/:lobbyId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 72
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.getLobby"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/join",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/lobbies/:lobbyId/join",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/:lobbyId/join",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 73
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.joinLobby"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "failed",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#bump",
+          "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#joinLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/leave",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/lobbies/:lobbyId/leave",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/:lobbyId/leave",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 74
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.leaveLobby"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#bump",
+          "services/greenfield-api/src/gubic/play-service.ts#leaveLobby"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/ready",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/lobbies/:lobbyId/ready",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/:lobbyId/ready",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 75
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.setReady"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#bump",
+          "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#setReady"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/gubic/lobbies/:lobbyId/socket",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/lobbies/:lobbyId/socket",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/:lobbyId/socket",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 84
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "hub.relay",
+        "hub.subscribe",
+        "play.isActiveMember",
+        "raw.toString",
+        "socket.close",
+        "socket.on",
+        "socket.send",
+        "socketAuth.get"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/lobby-hub.ts#relay",
+          "services/greenfield-api/src/gubic/lobby-hub.ts#subscribe",
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#isActiveMember"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/:lobbyId/start",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/lobbies/:lobbyId/start",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/:lobbyId/start",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 76
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.startLobby"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [
+          "greenfield_gubic_lobbies"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#startLobby"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/lobbies/join",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/lobbies/join",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/lobbies/join",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 71
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.joinLobby"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "code",
+          "failed",
+          "greenfield_accounts",
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "writes": [
+          "greenfield_gubic_lobbies",
+          "greenfield_gubic_lobby_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#activeMember",
+          "services/greenfield-api/src/gubic/play-service.ts#bump",
+          "services/greenfield-api/src/gubic/play-service.ts#getLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#joinLobby",
+          "services/greenfield-api/src/gubic/play-service.ts#presentLobby"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/gubic/me/achievements",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/gubic/me/achievements",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/me/achievements",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 67
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.myAchievements"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_achievement_unlocks",
+          "greenfield_gubic_achievements"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#myAchievements"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
         ]
       },
       "automatedTest": true,
@@ -29927,6 +32644,309 @@
         ]
       },
       "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/sessions/:sessionId/achievements/:key",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/sessions/:sessionId/achievements/:key",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/sessions/:sessionId/achievements/:key",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 60
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.unlockAchievement"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_achievement_unlocks",
+          "greenfield_gubic_achievements",
+          "greenfield_gubic_play_sessions"
+        ],
+        "writes": [
+          "greenfield_gubic_achievement_unlocks"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#ownedSession",
+          "services/greenfield-api/src/gubic/play-service.ts#unlockAchievement"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/sessions/:sessionId/end",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/sessions/:sessionId/end",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/sessions/:sessionId/end",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 59
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.endSession"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_play_sessions"
+        ],
+        "writes": [
+          "greenfield_gubic_library_items",
+          "greenfield_gubic_play_sessions"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#closeSession",
+          "services/greenfield-api/src/gubic/play-service.ts#endSession"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/gubic/sessions/:sessionId/heartbeat",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/gubic/sessions/:sessionId/heartbeat",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/gubic/sessions/:sessionId/heartbeat",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/gubic/routes.ts",
+        "line": 58
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "play.heartbeat"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_gubic_play_sessions"
+        ],
+        "writes": [
+          "greenfield_gubic_play_sessions"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/gubic/play-service.ts#heartbeat",
+          "services/greenfield-api/src/gubic/play-service.ts#ownedSession"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -32308,6 +35328,745 @@
       "liveProbe": null,
       "status": "candidate-registered-not-production-probed",
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/me/entitlements",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/entitlements",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/entitlements",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 38
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "premium.effectiveEntitlements"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_premium_capabilities",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_memberships",
+          "greenfield_premium_preferences",
+          "greenfield_premium_tiers"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/premium/service.ts#activeCatalogueVersion",
+          "services/greenfield-api/src/premium/service.ts#effectiveEntitlements",
+          "services/greenfield-api/src/premium/service.ts#membership"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/me/entitlements/:capabilityId",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/entitlements/:capabilityId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/entitlements/:capabilityId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 44
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "premium.feature"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{capabilityId: string}).capabilityId), request.id)) }"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_premium_capabilities",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_memberships",
+          "greenfield_premium_preferences",
+          "greenfield_premium_tiers"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/premium/service.ts#activeCatalogueVersion",
+          "services/greenfield-api/src/premium/service.ts#effectiveEntitlements",
+          "services/greenfield-api/src/premium/service.ts#feature",
+          "services/greenfield-api/src/premium/service.ts#membership"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered."
+    },
+    {
+      "id": "GET /v1/me/membership",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/membership",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/membership",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 32
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "premium.membership"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_premium_memberships",
+          "greenfield_premium_preferences"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/premium/service.ts#membership"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "PATCH /v1/me/membership/badge-visibility",
+      "domain": "Platform",
+      "method": "PATCH",
+      "effectiveRoute": "/v1/me/membership/badge-visibility",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/membership/badge-visibility",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 53
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "premium.setBadgeVisibility"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "{visible?: unknown} | undefined)?.visible"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "greenfield_premium_memberships",
+          "greenfield_premium_preferences"
+        ],
+        "writes": [
+          "badge",
+          "greenfield_premium_membership_events",
+          "greenfield_premium_preferences"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/premium/service.ts#invalidateAccount",
+          "services/greenfield-api/src/premium/service.ts#membership",
+          "services/greenfield-api/src/premium/service.ts#setBadgeVisibility"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "GET /v1/me/verification",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/verification",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/verification",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 77
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "verification.me"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_verification_appeals",
+          "greenfield_verification_applications",
+          "greenfield_verification_statuses"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/premium/verification-service.ts#me"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/me/verification/applications",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/me/verification/applications",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/verification/applications",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 83
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "verification.createApplication"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        201
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "greenfield_verification_appeals",
+          "greenfield_verification_applications",
+          "greenfield_verification_statuses"
+        ],
+        "writes": [
+          "greenfield_verification_applications",
+          "greenfield_verification_events",
+          "greenfield_verification_statuses"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/premium/verification-service.ts#createApplication",
+          "services/greenfield-api/src/premium/verification-service.ts#insertEvent",
+          "services/greenfield-api/src/premium/verification-service.ts#invalidateAccount",
+          "services/greenfield-api/src/premium/verification-service.ts#me"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/me/verification/applications/:applicationId/appeals",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/me/verification/applications/:applicationId/appeals",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/verification/applications/:applicationId/appeals",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 89
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "verification.createAppeal"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{applicationId: string}).applicationId, (request.body ?? {}) as Record<string, unknown>), request.id)) }"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        201
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_verification_appeals",
+          "greenfield_verification_applications",
+          "greenfield_verification_statuses"
+        ],
+        "writes": [
+          "greenfield_verification_appeals",
+          "greenfield_verification_events"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/premium/verification-service.ts#createAppeal",
+          "services/greenfield-api/src/premium/verification-service.ts#insertEvent",
+          "services/greenfield-api/src/premium/verification-service.ts#me"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered."
     },
     {
       "id": "GET /v1/media/:mediaFile",
@@ -49475,6 +53234,107 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     },
     {
+      "id": "GET /v1/premium/tiers",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/premium/tiers",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/premium/tiers",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/premium/routes.ts",
+        "line": 26
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "premium.catalogue"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "not evident in the route handler; inspect downstream service",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_premium_capabilities",
+          "greenfield_premium_catalogue_versions",
+          "greenfield_premium_tiers"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/premium/service.ts#activeCatalogueVersion",
+          "services/greenfield-api/src/premium/service.ts#catalogue"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/premium.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
       "id": "GET /v1/product-standard/products/:productId",
       "domain": "Modules",
       "method": "GET",
@@ -59510,188 +63370,7 @@
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
     }
   ],
-  "sourceOnly": [
-    {
-      "method": "GET",
-      "path": "/v1/gubic/capabilities",
-      "source": "services/greenfield-api/src/gubic/routes.ts:51"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/gubic/library",
-      "source": "services/greenfield-api/src/gubic/routes.ts:53"
-    },
-    {
-      "method": "PUT",
-      "path": "/v1/gubic/library/:gameId",
-      "source": "services/greenfield-api/src/gubic/routes.ts:54"
-    },
-    {
-      "method": "DELETE",
-      "path": "/v1/gubic/library/:gameId",
-      "source": "services/greenfield-api/src/gubic/routes.ts:55"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/games/:gameId/sessions",
-      "source": "services/greenfield-api/src/gubic/routes.ts:57"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/sessions/:sessionId/heartbeat",
-      "source": "services/greenfield-api/src/gubic/routes.ts:58"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/sessions/:sessionId/end",
-      "source": "services/greenfield-api/src/gubic/routes.ts:59"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/sessions/:sessionId/achievements/:key",
-      "source": "services/greenfield-api/src/gubic/routes.ts:60"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/gubic/games/:gameId/achievements",
-      "source": "services/greenfield-api/src/gubic/routes.ts:62"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/gubic/me/achievements",
-      "source": "services/greenfield-api/src/gubic/routes.ts:67"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/gubic/games/:gameId/lobbies",
-      "source": "services/greenfield-api/src/gubic/routes.ts:69"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/games/:gameId/lobbies",
-      "source": "services/greenfield-api/src/gubic/routes.ts:70"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/lobbies/join",
-      "source": "services/greenfield-api/src/gubic/routes.ts:71"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/gubic/lobbies/:lobbyId",
-      "source": "services/greenfield-api/src/gubic/routes.ts:72"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/lobbies/:lobbyId/join",
-      "source": "services/greenfield-api/src/gubic/routes.ts:73"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/lobbies/:lobbyId/leave",
-      "source": "services/greenfield-api/src/gubic/routes.ts:74"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/lobbies/:lobbyId/ready",
-      "source": "services/greenfield-api/src/gubic/routes.ts:75"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/gubic/lobbies/:lobbyId/start",
-      "source": "services/greenfield-api/src/gubic/routes.ts:76"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/gubic/lobbies/:lobbyId/socket",
-      "source": "services/greenfield-api/src/gubic/routes.ts:84"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/developer/gubic/submissions",
-      "source": "services/greenfield-api/src/gubic/routes.ts:118"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/developer/gubic/submissions",
-      "source": "services/greenfield-api/src/gubic/routes.ts:119"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/developer/gubic/submissions/:submissionId/withdraw",
-      "source": "services/greenfield-api/src/gubic/routes.ts:120"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/admin/gubic/submissions",
-      "source": "services/greenfield-api/src/gubic/routes.ts:121"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/admin/gubic/submissions/:submissionId/decision",
-      "source": "services/greenfield-api/src/gubic/routes.ts:122"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/premium/tiers",
-      "source": "services/greenfield-api/src/premium/routes.ts:26"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/me/membership",
-      "source": "services/greenfield-api/src/premium/routes.ts:32"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/me/entitlements",
-      "source": "services/greenfield-api/src/premium/routes.ts:38"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/me/entitlements/:capabilityId",
-      "source": "services/greenfield-api/src/premium/routes.ts:44"
-    },
-    {
-      "method": "PATCH",
-      "path": "/v1/me/membership/badge-visibility",
-      "source": "services/greenfield-api/src/premium/routes.ts:53"
-    },
-    {
-      "method": "PUT",
-      "path": "/v1/admin/qa/premium/:handle",
-      "source": "services/greenfield-api/src/premium/routes.ts:63"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/me/verification",
-      "source": "services/greenfield-api/src/premium/routes.ts:77"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/me/verification/applications",
-      "source": "services/greenfield-api/src/premium/routes.ts:83"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/me/verification/applications/:applicationId/appeals",
-      "source": "services/greenfield-api/src/premium/routes.ts:89"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/admin/qa/verification/applications",
-      "source": "services/greenfield-api/src/premium/routes.ts:99"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/admin/qa/verification/applications/:applicationId/transitions",
-      "source": "services/greenfield-api/src/premium/routes.ts:105"
-    },
-    {
-      "method": "POST",
-      "path": "/v1/admin/qa/verification/appeals/:appealId/transitions",
-      "source": "services/greenfield-api/src/premium/routes.ts:114"
-    }
-  ],
+  "sourceOnly": [],
   "runtimeOnly": [],
   "tables": [
     {
@@ -59927,11 +63606,16 @@
         "GET /v1/accounts/me/notification-preferences",
         "PATCH /v1/accounts/me/notification-preferences",
         "POST /v1/admin/ops/policy/evaluate",
+        "PUT /v1/admin/qa/premium/:handle",
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
         "POST /v1/ai/requests",
         "POST /v1/comments/:commentId/replies",
         "DELETE /v1/connections/:connectionId",
         "POST /v1/connections/:connectionId/refresh",
         "GET /v1/creator/insights",
+        "PATCH /v1/me/membership/badge-visibility",
+        "POST /v1/me/verification/applications",
         "POST /v1/modules/:moduleId/ai/requests",
         "POST /v1/posts",
         "DELETE /v1/posts/:postId",
@@ -65040,7 +68724,11 @@
         "POST /v1/admin/developer/namespaces/:namespace/verify",
         "PATCH /v1/admin/developer/programme/:accountId",
         "POST /v1/admin/gubic/games/:gameId/review",
+        "GET /v1/admin/gubic/submissions",
+        "POST /v1/admin/gubic/submissions/:submissionId/decision",
         "POST /v1/admin/product-standard/ingest",
+        "PUT /v1/admin/qa/premium/:handle",
+        "GET /v1/admin/qa/verification/applications",
         "GET /v1/admin/registry/artifacts/orphans",
         "POST /v1/admin/registry/modules/import",
         "POST /v1/admin/registry/publishers/:publisherId/signing-keys",
@@ -65052,6 +68740,13 @@
         "POST /v1/auth/totp/enroll",
         "GET /v1/backend/products/:productId/accounts/:accountId",
         "POST /v1/developer/organisations/:organisationId/members",
+        "GET /v1/gubic/games/:gameId/lobbies",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "GET /v1/gubic/lobbies/:lobbyId",
+        "POST /v1/gubic/lobbies/:lobbyId/join",
+        "POST /v1/gubic/lobbies/:lobbyId/ready",
+        "POST /v1/gubic/lobbies/:lobbyId/start",
+        "POST /v1/gubic/lobbies/join",
         "POST /v1/modules/:moduleId/records/:collection/:recordId/shares",
         "PATCH /v1/profiles/me",
         "POST /v1/sessions",
@@ -71772,6 +75467,9 @@
       "routeReads": [
         "GET /v1/developer/board",
         "PUT /v1/developer/gubic/games/:gameId",
+        "GET /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions/:submissionId/withdraw",
         "POST /v1/developer/organisations/:organisationId/members",
         "GET /v1/developer/products",
         "POST /v1/developer/products",
@@ -78674,7 +82372,8 @@
       ],
       "routeWrites": [
         "POST /v1/admin/gubic/games/:gameId/review",
-        "PUT /v1/developer/gubic/games/:gameId"
+        "PUT /v1/developer/gubic/games/:gameId",
+        "POST /v1/developer/gubic/submissions"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -78703,7 +82402,8 @@
       "routeReads": [],
       "routeWrites": [
         "POST /v1/admin/gubic/games/:gameId/review",
-        "PUT /v1/developer/gubic/games/:gameId"
+        "PUT /v1/developer/gubic/games/:gameId",
+        "POST /v1/developer/gubic/submissions"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": true,
@@ -78730,8 +82430,16 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "GET /v1/gubic/games/:gameId/achievements",
+        "GET /v1/gubic/library",
+        "PUT /v1/gubic/library/:gameId",
+        "GET /v1/gubic/me/achievements",
+        "POST /v1/gubic/sessions/:sessionId/achievements/:key"
+      ],
+      "routeWrites": [
+        "POST /v1/gubic/sessions/:sessionId/achievements/:key"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -78757,8 +82465,14 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "GET /v1/gubic/games/:gameId/achievements",
+        "GET /v1/gubic/me/achievements",
+        "POST /v1/gubic/sessions/:sessionId/achievements/:key"
+      ],
+      "routeWrites": [
+        "POST /v1/admin/gubic/submissions/:submissionId/decision"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -78784,8 +82498,16 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "GET /v1/gubic/library",
+        "PUT /v1/gubic/library/:gameId"
+      ],
+      "routeWrites": [
+        "POST /v1/gubic/games/:gameId/sessions",
+        "DELETE /v1/gubic/library/:gameId",
+        "PUT /v1/gubic/library/:gameId",
+        "POST /v1/gubic/sessions/:sessionId/end"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -78811,8 +82533,24 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "GET /v1/gubic/games/:gameId/lobbies",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "GET /v1/gubic/lobbies/:lobbyId",
+        "POST /v1/gubic/lobbies/:lobbyId/join",
+        "POST /v1/gubic/lobbies/:lobbyId/leave",
+        "POST /v1/gubic/lobbies/:lobbyId/ready",
+        "POST /v1/gubic/lobbies/:lobbyId/start",
+        "POST /v1/gubic/lobbies/join"
+      ],
+      "routeWrites": [
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "POST /v1/gubic/lobbies/:lobbyId/join",
+        "POST /v1/gubic/lobbies/:lobbyId/leave",
+        "POST /v1/gubic/lobbies/:lobbyId/ready",
+        "POST /v1/gubic/lobbies/:lobbyId/start",
+        "POST /v1/gubic/lobbies/join"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -78838,8 +82576,25 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "GET /v1/gubic/games/:gameId/lobbies",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "POST /v1/gubic/games/:gameId/sessions",
+        "GET /v1/gubic/lobbies/:lobbyId",
+        "POST /v1/gubic/lobbies/:lobbyId/join",
+        "POST /v1/gubic/lobbies/:lobbyId/leave",
+        "POST /v1/gubic/lobbies/:lobbyId/ready",
+        "GET /v1/gubic/lobbies/:lobbyId/socket",
+        "POST /v1/gubic/lobbies/:lobbyId/start",
+        "POST /v1/gubic/lobbies/join"
+      ],
+      "routeWrites": [
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "POST /v1/gubic/lobbies/:lobbyId/join",
+        "POST /v1/gubic/lobbies/:lobbyId/leave",
+        "POST /v1/gubic/lobbies/:lobbyId/ready",
+        "POST /v1/gubic/lobbies/join"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -78865,8 +82620,18 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "POST /v1/gubic/games/:gameId/sessions",
+        "DELETE /v1/gubic/library/:gameId",
+        "POST /v1/gubic/sessions/:sessionId/achievements/:key",
+        "POST /v1/gubic/sessions/:sessionId/end",
+        "POST /v1/gubic/sessions/:sessionId/heartbeat"
+      ],
+      "routeWrites": [
+        "POST /v1/gubic/games/:gameId/sessions",
+        "POST /v1/gubic/sessions/:sessionId/end",
+        "POST /v1/gubic/sessions/:sessionId/heartbeat"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -78892,8 +82657,18 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "GET /v1/admin/gubic/submissions",
+        "POST /v1/admin/gubic/submissions/:submissionId/decision",
+        "GET /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions/:submissionId/withdraw"
+      ],
+      "routeWrites": [
+        "POST /v1/admin/gubic/submissions/:submissionId/decision",
+        "POST /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions/:submissionId/withdraw"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -89799,7 +93574,14 @@
       "sourceWrites": [],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
+      "routeReads": [
+        "POST /v1/developer/gubic/submissions",
+        "GET /v1/gubic/capabilities",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "GET /v1/me/entitlements",
+        "GET /v1/me/entitlements/:capabilityId",
+        "GET /v1/premium/tiers"
+      ],
       "routeWrites": [],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -89825,7 +93607,15 @@
       "sourceWrites": [],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
+      "routeReads": [
+        "PUT /v1/admin/qa/premium/:handle",
+        "POST /v1/developer/gubic/submissions",
+        "GET /v1/gubic/capabilities",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "GET /v1/me/entitlements",
+        "GET /v1/me/entitlements/:capabilityId",
+        "GET /v1/premium/tiers"
+      ],
       "routeWrites": [],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -89852,8 +93642,13 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "PUT /v1/admin/qa/premium/:handle"
+      ],
+      "routeWrites": [
+        "PUT /v1/admin/qa/premium/:handle",
+        "PATCH /v1/me/membership/badge-visibility"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -89881,8 +93676,19 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "PUT /v1/admin/qa/premium/:handle",
+        "POST /v1/developer/gubic/submissions",
+        "GET /v1/gubic/capabilities",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "GET /v1/me/entitlements",
+        "GET /v1/me/entitlements/:capabilityId",
+        "GET /v1/me/membership",
+        "PATCH /v1/me/membership/badge-visibility"
+      ],
+      "routeWrites": [
+        "PUT /v1/admin/qa/premium/:handle"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -89909,8 +93715,16 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "PUT /v1/admin/qa/premium/:handle",
+        "GET /v1/me/entitlements",
+        "GET /v1/me/entitlements/:capabilityId",
+        "GET /v1/me/membership",
+        "PATCH /v1/me/membership/badge-visibility"
+      ],
+      "routeWrites": [
+        "PATCH /v1/me/membership/badge-visibility"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -89935,7 +93749,14 @@
       "sourceWrites": [],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
+      "routeReads": [
+        "POST /v1/developer/gubic/submissions",
+        "GET /v1/gubic/capabilities",
+        "POST /v1/gubic/games/:gameId/lobbies",
+        "GET /v1/me/entitlements",
+        "GET /v1/me/entitlements/:capabilityId",
+        "GET /v1/premium/tiers"
+      ],
       "routeWrites": [],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -90566,6 +94387,9 @@
       "jobWrites": [],
       "routeReads": [
         "PUT /v1/developer/gubic/games/:gameId",
+        "GET /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions",
+        "POST /v1/developer/gubic/submissions/:submissionId/withdraw",
         "POST /v1/developer/products",
         "POST /v1/developer/publishers/:publisherId/namespaces"
       ],
@@ -95045,8 +98869,17 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "GET /v1/me/verification",
+        "POST /v1/me/verification/applications",
+        "POST /v1/me/verification/applications/:applicationId/appeals"
+      ],
+      "routeWrites": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/me/verification/applications/:applicationId/appeals"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -95072,8 +98905,19 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "GET /v1/admin/qa/verification/applications",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "GET /v1/me/verification",
+        "POST /v1/me/verification/applications",
+        "POST /v1/me/verification/applications/:applicationId/appeals"
+      ],
+      "routeWrites": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "POST /v1/me/verification/applications"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -95098,7 +98942,12 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [],
-      "routeWrites": [],
+      "routeWrites": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "POST /v1/me/verification/applications",
+        "POST /v1/me/verification/applications/:applicationId/appeals"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": true,
       "readOnlyCandidate": false
@@ -95125,8 +98974,18 @@
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "GET /v1/me/verification",
+        "POST /v1/me/verification/applications",
+        "POST /v1/me/verification/applications/:applicationId/appeals"
+      ],
+      "routeWrites": [
+        "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "POST /v1/me/verification/applications"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false

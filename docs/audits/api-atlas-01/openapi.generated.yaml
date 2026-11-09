@@ -1195,6 +1195,51 @@
         ]
       }
     },
+    "/v1/admin/gubic/submissions": {
+      "get": {
+        "operationId": "get_v1_admin_gubic_submissions",
+        "summary": "Admin: GET /v1/admin/gubic/submissions",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:121",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/admin/gubic/submissions/{submissionId}/decision": {
+      "post": {
+        "operationId": "post_v1_admin_gubic_submissions_submissionId_decision",
+        "summary": "Admin: POST /v1/admin/gubic/submissions/:submissionId/decision",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "submissionId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:122",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
     "/v1/admin/moderation/reports": {
       "get": {
         "operationId": "get_v1_admin_moderation_reports",
@@ -2065,6 +2110,123 @@
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:304",
         "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/qa/premium/{handle}": {
+      "put": {
+        "operationId": "put_v1_admin_qa_premium_handle",
+        "summary": "Admin: PUT /v1/admin/qa/premium/:handle",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:63",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/qa/verification/appeals/{appealId}/transitions": {
+      "post": {
+        "operationId": "post_v1_admin_qa_verification_appeals_appealId_transitions",
+        "summary": "Admin: POST /v1/admin/qa/verification/appeals/:appealId/transitions",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "appealId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:114",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/qa/verification/applications": {
+      "get": {
+        "operationId": "get_v1_admin_qa_verification_applications",
+        "summary": "Admin: GET /v1/admin/qa/verification/applications",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:99",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/admin/qa/verification/applications/{applicationId}/transitions": {
+      "post": {
+        "operationId": "post_v1_admin_qa_verification_applications_applicationId_transitions",
+        "summary": "Admin: POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:105",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
         "security": [
@@ -5725,6 +5887,68 @@
         ]
       }
     },
+    "/v1/developer/gubic/submissions": {
+      "get": {
+        "operationId": "get_v1_developer_gubic_submissions",
+        "summary": "Developer: GET /v1/developer/gubic/submissions",
+        "tags": [
+          "Developer"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:119",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      },
+      "post": {
+        "operationId": "post_v1_developer_gubic_submissions",
+        "summary": "Developer: POST /v1/developer/gubic/submissions",
+        "tags": [
+          "Developer"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:118",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/developer/gubic/submissions/{submissionId}/withdraw": {
+      "post": {
+        "operationId": "post_v1_developer_gubic_submissions_submissionId_withdraw",
+        "summary": "Developer: POST /v1/developer/gubic/submissions/:submissionId/withdraw",
+        "tags": [
+          "Developer"
+        ],
+        "parameters": [
+          {
+            "name": "submissionId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:120",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
     "/v1/developer/organisations": {
       "post": {
         "operationId": "post_v1_developer_organisations",
@@ -7036,6 +7260,25 @@
         ]
       }
     },
+    "/v1/gubic/capabilities": {
+      "get": {
+        "operationId": "get_v1_gubic_capabilities",
+        "summary": "Platform: GET /v1/gubic/capabilities",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:51",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
     "/v1/gubic/categories": {
       "get": {
         "operationId": "get_v1_gubic_categories",
@@ -7119,6 +7362,32 @@
         "x-contract-completeness": "schema-missing"
       }
     },
+    "/v1/gubic/games/{gameId}/achievements": {
+      "get": {
+        "operationId": "get_v1_gubic_games_gameId_achievements",
+        "summary": "Platform: GET /v1/gubic/games/:gameId/achievements",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:62",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
     "/v1/gubic/games/{gameId}/eligibility": {
       "get": {
         "operationId": "get_v1_gubic_games_gameId_eligibility",
@@ -7176,6 +7445,82 @@
         ]
       }
     },
+    "/v1/gubic/games/{gameId}/lobbies": {
+      "get": {
+        "operationId": "get_v1_gubic_games_gameId_lobbies",
+        "summary": "Platform: GET /v1/gubic/games/:gameId/lobbies",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:69",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      },
+      "post": {
+        "operationId": "post_v1_gubic_games_gameId_lobbies",
+        "summary": "Platform: POST /v1/gubic/games/:gameId/lobbies",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:70",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/games/{gameId}/sessions": {
+      "post": {
+        "operationId": "post_v1_gubic_games_gameId_sessions",
+        "summary": "Platform: POST /v1/gubic/games/:gameId/sessions",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:57",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
     "/v1/gubic/games/{gameId}/versions": {
       "get": {
         "operationId": "get_v1_gubic_games_gameId_versions",
@@ -7197,6 +7542,269 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:201",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/library": {
+      "get": {
+        "operationId": "get_v1_gubic_library",
+        "summary": "Platform: GET /v1/gubic/library",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:53",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/library/{gameId}": {
+      "delete": {
+        "operationId": "delete_v1_gubic_library_gameId",
+        "summary": "Platform: DELETE /v1/gubic/library/:gameId",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:55",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      },
+      "put": {
+        "operationId": "put_v1_gubic_library_gameId",
+        "summary": "Platform: PUT /v1/gubic/library/:gameId",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:54",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/{lobbyId}": {
+      "get": {
+        "operationId": "get_v1_gubic_lobbies_lobbyId",
+        "summary": "Platform: GET /v1/gubic/lobbies/:lobbyId",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "lobbyId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:72",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/{lobbyId}/join": {
+      "post": {
+        "operationId": "post_v1_gubic_lobbies_lobbyId_join",
+        "summary": "Platform: POST /v1/gubic/lobbies/:lobbyId/join",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "lobbyId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:73",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/{lobbyId}/leave": {
+      "post": {
+        "operationId": "post_v1_gubic_lobbies_lobbyId_leave",
+        "summary": "Platform: POST /v1/gubic/lobbies/:lobbyId/leave",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "lobbyId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:74",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/{lobbyId}/ready": {
+      "post": {
+        "operationId": "post_v1_gubic_lobbies_lobbyId_ready",
+        "summary": "Platform: POST /v1/gubic/lobbies/:lobbyId/ready",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "lobbyId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:75",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/{lobbyId}/socket": {
+      "get": {
+        "operationId": "get_v1_gubic_lobbies_lobbyId_socket",
+        "summary": "Platform: GET /v1/gubic/lobbies/:lobbyId/socket",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "lobbyId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:84",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/{lobbyId}/start": {
+      "post": {
+        "operationId": "post_v1_gubic_lobbies_lobbyId_start",
+        "summary": "Platform: POST /v1/gubic/lobbies/:lobbyId/start",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "lobbyId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:76",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/lobbies/join": {
+      "post": {
+        "operationId": "post_v1_gubic_lobbies_join",
+        "summary": "Platform: POST /v1/gubic/lobbies/join",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:71",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/me/achievements": {
+      "get": {
+        "operationId": "get_v1_gubic_me_achievements",
+        "summary": "Platform: GET /v1/gubic/me/achievements",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:67",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
@@ -7266,6 +7874,90 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/modules/routes/index.ts:183",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/sessions/{sessionId}/achievements/{key}": {
+      "post": {
+        "operationId": "post_v1_gubic_sessions_sessionId_achievements_key",
+        "summary": "Platform: POST /v1/gubic/sessions/:sessionId/achievements/:key",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:60",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/sessions/{sessionId}/end": {
+      "post": {
+        "operationId": "post_v1_gubic_sessions_sessionId_end",
+        "summary": "Platform: POST /v1/gubic/sessions/:sessionId/end",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:59",
+        "x-modula-auth": "none",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing"
+      }
+    },
+    "/v1/gubic/sessions/{sessionId}/heartbeat": {
+      "post": {
+        "operationId": "post_v1_gubic_sessions_sessionId_heartbeat",
+        "summary": "Platform: POST /v1/gubic/sessions/:sessionId/heartbeat",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:58",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
@@ -7896,6 +8588,188 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-composer-routes.ts:58",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/entitlements": {
+      "get": {
+        "operationId": "get_v1_me_entitlements",
+        "summary": "Platform: GET /v1/me/entitlements",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:38",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/entitlements/{capabilityId}": {
+      "get": {
+        "operationId": "get_v1_me_entitlements_capabilityId",
+        "summary": "Platform: GET /v1/me/entitlements/:capabilityId",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "capabilityId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:44",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/membership": {
+      "get": {
+        "operationId": "get_v1_me_membership",
+        "summary": "Platform: GET /v1/me/membership",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:32",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/membership/badge-visibility": {
+      "patch": {
+        "operationId": "patch_v1_me_membership_badge_visibility",
+        "summary": "Platform: PATCH /v1/me/membership/badge-visibility",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:53",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/verification": {
+      "get": {
+        "operationId": "get_v1_me_verification",
+        "summary": "Platform: GET /v1/me/verification",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:77",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/verification/applications": {
+      "post": {
+        "operationId": "post_v1_me_verification_applications",
+        "summary": "Platform: POST /v1/me/verification/applications",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:83",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/me/verification/applications/{applicationId}/appeals": {
+      "post": {
+        "operationId": "post_v1_me_verification_applications_applicationId_appeals",
+        "summary": "Platform: POST /v1/me/verification/applications/:applicationId/appeals",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:89",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -11833,6 +12707,30 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1630",
+        "x-modula-auth": "legacy or bridged bearer session",
+        "x-modula-rate-limit": null,
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/premium/tiers": {
+      "get": {
+        "operationId": "get_v1_premium_tiers",
+        "summary": "Platform: GET /v1/premium/tiers",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/premium/routes.ts:26",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",

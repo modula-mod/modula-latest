@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-08T17:33:22.052Z for branch `fix/gubic-socket-auth`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T16:29:40.381Z for branch `fix/gubic-socket-auth`; this does not claim deployment.
 
-- Runtime method routes: 707
-- Application routes: 499
-- Automatically generated HEAD routes: 207
+- Runtime method routes: 758
+- Application routes: 535
+- Automatically generated HEAD routes: 222
 - Framework CORS routes: 1
-- Source-only: 36
+- Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `707 = 499 application + 208 framework-derived`
+- Reconciliation: `758 = 535 application + 223 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,10 +17,10 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 499 |
-| yes | no | no | source-only | 36 |
+| yes | yes | not yet | candidate-registered | 535 |
+| yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 208 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 223 |
 
 ## Error contract
 
@@ -83,6 +83,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | POST | `/v1/admin/developer/namespaces/:namespace/verify` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:48` | candidate-registered-not-production-probed |
 | Admin | PATCH | `/v1/admin/developer/programme/:accountId` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:47` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/gubic/games/:gameId/review` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:51` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/gubic/submissions` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:121` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/gubic/submissions/:submissionId/decision` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:122` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/moderation/reports` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1945` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/moderation/reports/:reportId` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1963` | candidate-registered-not-production-probed |
 | Admin | PATCH | `/v1/admin/moderation/reports/:reportId` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1974` | candidate-registered-not-production-probed |
@@ -117,6 +119,10 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | GET | `/v1/admin/ops/search/projections` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2513` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2533` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:304` | candidate-registered-not-production-probed |
+| Admin | PUT | `/v1/admin/qa/premium/:handle` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:63` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/qa/verification/appeals/:appealId/transitions` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:114` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/qa/verification/applications` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:99` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/qa/verification/applications/:applicationId/transitions` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:105` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/registry/artifacts/orphans` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:339` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1683` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1783` | candidate-registered-not-production-probed |
@@ -241,6 +247,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | GET | `/v1/developer/board` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:38` | candidate-registered-not-production-probed |
 | Developer | PUT | `/v1/developer/gubic/games/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:50` | candidate-registered-not-production-probed |
+| Developer | GET | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:119` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:118` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:120` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:40` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/invitations/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:42` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/members` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:41` | candidate-registered-not-production-probed |
@@ -287,16 +296,35 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/gifs/search` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:36` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/status` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:21` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/trending` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:26` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/capabilities` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:51` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/categories` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:174` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/featured` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:156` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:147` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:192` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games/:gameId/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:62` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId/eligibility` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:210` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/games/:gameId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:223` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games/:gameId/lobbies` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:69` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/games/:gameId/lobbies` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:70` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/games/:gameId/sessions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:57` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:201` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/library` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:53` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/gubic/library/:gameId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:55` | candidate-registered-not-production-probed |
+| Platform | PUT | `/v1/gubic/library/:gameId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:54` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/lobbies/:lobbyId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:72` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:73` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/leave` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:74` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/ready` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:75` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:84` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/start` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:76` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:71` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/me/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:67` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/my-games` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:242` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/new-releases` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:165` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:183` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/sessions/:sessionId/achievements/:key` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:60` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/sessions/:sessionId/end` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:59` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/sessions/:sessionId/heartbeat` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:58` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:72` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/live` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:264` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/ready` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:268` | candidate-registered-not-production-probed |
@@ -320,6 +348,13 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2681` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/link-previews` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:46` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/link-safety` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:58` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/entitlements` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:38` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/entitlements/:capabilityId` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:44` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/membership` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:32` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/me/membership/badge-visibility` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:53` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/verification` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:77` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/me/verification/applications` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:83` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/me/verification/applications/:applicationId/appeals` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:89` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2157` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:137` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:214` | candidate-registered-not-production-probed |
@@ -444,6 +479,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Posts | DELETE | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1593` | candidate-registered-not-production-probed |
 | Posts | POST | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1593` | candidate-registered-not-production-probed |
 | Sharing | POST | `/v1/posts/:postId/share` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1630` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/premium/tiers` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:26` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:280` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:292` | candidate-registered-not-production-probed |
 | Profile | GET | `/v1/profiles/:handle` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1649` | candidate-registered-not-production-probed |
@@ -2448,6 +2484,84 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/admin/gubic/submissions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: GET
+- Effective route: `/v1/admin/gubic/submissions`
+- Public URL: `https://api.modula.digital/v1/admin/gubic/submissions`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:121`
+- Handler: inline
+- Controller/service calls: `play.reviewQueue`
+- Authentication: none
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `403`, `404`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_gubic_submissions`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/admin/gubic/submissions/:submissionId/decision</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: POST
+- Effective route: `/v1/admin/gubic/submissions/:submissionId/decision`
+- Public URL: `https://api.modula.digital/v1/admin/gubic/submissions/:submissionId/decision`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:122`
+- Handler: inline
+- Controller/service calls: `play.decide`
+- Authentication: none
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_gubic_submissions`
+- Database writes: `greenfield_gubic_achievements`, `greenfield_gubic_submissions`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/admin/moderation/reports</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Admin
@@ -3770,6 +3884,162 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>PUT /v1/admin/qa/premium/:handle</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: PUT
+- Effective route: `/v1/admin/qa/premium/:handle`
+- Public URL: `https://api.modula.digital/v1/admin/qa/premium/:handle`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:63`
+- Handler: inline
+- Controller/service calls: `header.trim`, `premium.assignQaFixture`
+- Authentication: legacy or bridged bearer session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: `admin:ops`
+- Rate limit: none registered
+- Request params: `{handle: string}).handle, (request.body ?? {}) as Record<string, unknown>, header.trim()), request.id)) }`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `400`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `actors`, `greenfield_accounts`, `greenfield_premium_catalogue_versions`, `greenfield_premium_membership_events`, `greenfield_premium_memberships`, `greenfield_premium_preferences`
+- Database writes: `greenfield_premium_membership_events`, `greenfield_premium_memberships`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/admin/qa/verification/appeals/:appealId/transitions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: POST
+- Effective route: `/v1/admin/qa/verification/appeals/:appealId/transitions`
+- Public URL: `https://api.modula.digital/v1/admin/qa/verification/appeals/:appealId/transitions`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:114`
+- Handler: inline
+- Controller/service calls: `verification.transitionAppeal`
+- Authentication: legacy or bridged bearer session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: `admin:moderation`
+- Rate limit: none registered
+- Request params: `{appealId: string}).appealId, (request.body ?? {}) as Record<string, unknown>), request.id)) }`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `actors`, `greenfield_verification_appeals`, `greenfield_verification_applications`, `greenfield_verification_statuses`
+- Database writes: `greenfield_verification_appeals`, `greenfield_verification_applications`, `greenfield_verification_events`, `greenfield_verification_statuses`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/admin/qa/verification/applications</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: GET
+- Effective route: `/v1/admin/qa/verification/applications`
+- Public URL: `https://api.modula.digital/v1/admin/qa/verification/applications`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:99`
+- Handler: inline
+- Controller/service calls: `verification.listApplications`
+- Authentication: legacy or bridged bearer session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: `admin:moderation`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: `{state?: string}).state), request.id)) }`
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_verification_applications`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/admin/qa/verification/applications/:applicationId/transitions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: POST
+- Effective route: `/v1/admin/qa/verification/applications/:applicationId/transitions`
+- Public URL: `https://api.modula.digital/v1/admin/qa/verification/applications/:applicationId/transitions`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:105`
+- Handler: inline
+- Controller/service calls: `verification.transition`
+- Authentication: legacy or bridged bearer session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: `admin:moderation`
+- Rate limit: none registered
+- Request params: `{applicationId: string}).applicationId, (request.body ?? {}) as Record<string, unknown>), request.id)) }`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `actors`, `greenfield_verification_appeals`, `greenfield_verification_applications`, `greenfield_verification_statuses`
+- Database writes: `greenfield_verification_applications`, `greenfield_verification_events`, `greenfield_verification_statuses`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
 
@@ -8610,6 +8880,123 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/developer/gubic/submissions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Developer
+- Method: GET
+- Effective route: `/v1/developer/gubic/submissions`
+- Public URL: `https://api.modula.digital/v1/developer/gubic/submissions`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:119`
+- Handler: inline
+- Controller/service calls: `play.listSubmissions`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_organisation_memberships`, `greenfield_gubic_submissions`, `greenfield_publisher_owners`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/developer/gubic/submissions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Developer
+- Method: POST
+- Effective route: `/v1/developer/gubic/submissions`
+- Public URL: `https://api.modula.digital/v1/developer/gubic/submissions`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:118`
+- Handler: inline
+- Controller/service calls: `play.submit`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `201`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_developer_organisation_memberships`, `greenfield_gubic_submissions`, `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_tiers`, `greenfield_publisher_owners`
+- Database writes: `greenfield_game_catalogue_entries`, `greenfield_game_catalogue_events`, `greenfield_gubic_submissions`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/developer/gubic/submissions/:submissionId/withdraw</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Developer
+- Method: POST
+- Effective route: `/v1/developer/gubic/submissions/:submissionId/withdraw`
+- Public URL: `https://api.modula.digital/v1/developer/gubic/submissions/:submissionId/withdraw`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:120`
+- Handler: inline
+- Controller/service calls: `play.withdraw`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_developer_organisation_memberships`, `greenfield_gubic_submissions`, `greenfield_publisher_owners`
+- Database writes: `greenfield_gubic_submissions`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>POST /v1/developer/organisations</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Developer
@@ -10404,6 +10791,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/gubic/capabilities</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/capabilities`
+- Public URL: `https://api.modula.digital/v1/gubic/capabilities`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:51`
+- Handler: inline
+- Controller/service calls: `play.capabilities`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_tiers`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/gubic/categories</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -10560,6 +10986,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/gubic/games/:gameId/achievements</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/games/:gameId/achievements`
+- Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/achievements`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:62`
+- Handler: inline
+- Controller/service calls: `play.gameAchievements`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_achievements`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/gubic/games/:gameId/eligibility</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -10638,6 +11103,123 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/gubic/games/:gameId/lobbies</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/games/:gameId/lobbies`
+- Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/lobbies`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:69`
+- Handler: inline
+- Controller/service calls: `play.listLobbies`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/games/:gameId/lobbies</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/games/:gameId/lobbies`
+- Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/lobbies`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:70`
+- Handler: inline
+- Controller/service calls: `play.createLobby`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`, `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_tiers`
+- Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/games/:gameId/sessions</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/games/:gameId/sessions`
+- Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/sessions`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:57`
+- Handler: inline
+- Controller/service calls: `play.startSession`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_lobby_members`, `greenfield_gubic_play_sessions`, `the`
+- Database writes: `greenfield_gubic_library_items`, `greenfield_gubic_play_sessions`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/gubic/games/:gameId/versions</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -10669,6 +11251,435 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - External integrations: none observed
 - Known clients: none observed
 - Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/gubic/library</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/library`
+- Public URL: `https://api.modula.digital/v1/gubic/library`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:53`
+- Handler: inline
+- Controller/service calls: `play.library`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_library_items`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>DELETE /v1/gubic/library/:gameId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/gubic/library/:gameId`
+- Public URL: `https://api.modula.digital/v1/gubic/library/:gameId`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:55`
+- Handler: inline
+- Controller/service calls: `play.removeLibraryItem`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_play_sessions`
+- Database writes: `greenfield_gubic_library_items`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>PUT /v1/gubic/library/:gameId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PUT
+- Effective route: `/v1/gubic/library/:gameId`
+- Public URL: `https://api.modula.digital/v1/gubic/library/:gameId`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:54`
+- Handler: inline
+- Controller/service calls: `play.upsertLibraryItem`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_library_items`
+- Database writes: `failed`, `greenfield_gubic_library_items`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/gubic/lobbies/:lobbyId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/lobbies/:lobbyId`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:72`
+- Handler: inline
+- Controller/service calls: `play.getLobby`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/lobbies/:lobbyId/join</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/lobbies/:lobbyId/join`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/join`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:73`
+- Handler: inline
+- Controller/service calls: `play.joinLobby`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `code`, `failed`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/lobbies/:lobbyId/leave</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/lobbies/:lobbyId/leave`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/leave`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:74`
+- Handler: inline
+- Controller/service calls: `play.leaveLobby`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/lobbies/:lobbyId/ready</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/lobbies/:lobbyId/ready`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/ready`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:75`
+- Handler: inline
+- Controller/service calls: `play.setReady`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/gubic/lobbies/:lobbyId/socket</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/lobbies/:lobbyId/socket`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/socket`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:84`
+- Handler: inline
+- Controller/service calls: `hub.relay`, `hub.subscribe`, `play.isActiveMember`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`, `socketAuth.get`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_gubic_lobby_members`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/lobbies/:lobbyId/start</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/lobbies/:lobbyId/start`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/start`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:76`
+- Handler: inline
+- Controller/service calls: `play.startLobby`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: `greenfield_gubic_lobbies`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/lobbies/join</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/lobbies/join`
+- Public URL: `https://api.modula.digital/v1/gubic/lobbies/join`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:71`
+- Handler: inline
+- Controller/service calls: `play.joinLobby`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `code`, `failed`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/gubic/me/achievements</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/gubic/me/achievements`
+- Public URL: `https://api.modula.digital/v1/gubic/me/achievements`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:67`
+- Handler: inline
+- Controller/service calls: `play.myAchievements`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_achievements`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -10786,6 +11797,123 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - External integrations: none observed
 - Known clients: none observed
 - Tests: `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/sessions/:sessionId/achievements/:key</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/sessions/:sessionId/achievements/:key`
+- Public URL: `https://api.modula.digital/v1/gubic/sessions/:sessionId/achievements/:key`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:60`
+- Handler: inline
+- Controller/service calls: `play.unlockAchievement`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_achievements`, `greenfield_gubic_play_sessions`
+- Database writes: `greenfield_gubic_achievement_unlocks`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/sessions/:sessionId/end</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/sessions/:sessionId/end`
+- Public URL: `https://api.modula.digital/v1/gubic/sessions/:sessionId/end`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:59`
+- Handler: inline
+- Controller/service calls: `play.endSession`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_play_sessions`
+- Database writes: `greenfield_gubic_library_items`, `greenfield_gubic_play_sessions`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/gubic/sessions/:sessionId/heartbeat</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/gubic/sessions/:sessionId/heartbeat`
+- Public URL: `https://api.modula.digital/v1/gubic/sessions/:sessionId/heartbeat`
+- API version: v1
+- Source file: `services/greenfield-api/src/gubic/routes.ts:58`
+- Handler: inline
+- Controller/service calls: `play.heartbeat`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_gubic_play_sessions`
+- Database writes: `greenfield_gubic_play_sessions`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11687,6 +12815,279 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/me/entitlements</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/me/entitlements`
+- Public URL: `https://api.modula.digital/v1/me/entitlements`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:38`
+- Handler: inline
+- Controller/service calls: `premium.effectiveEntitlements`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_preferences`, `greenfield_premium_tiers`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/me/entitlements/:capabilityId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/me/entitlements/:capabilityId`
+- Public URL: `https://api.modula.digital/v1/me/entitlements/:capabilityId`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:44`
+- Handler: inline
+- Controller/service calls: `premium.feature`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{capabilityId: string}).capabilityId), request.id)) }`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_preferences`, `greenfield_premium_tiers`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/me/membership</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/me/membership`
+- Public URL: `https://api.modula.digital/v1/me/membership`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:32`
+- Handler: inline
+- Controller/service calls: `premium.membership`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_premium_memberships`, `greenfield_premium_preferences`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>PATCH /v1/me/membership/badge-visibility</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PATCH
+- Effective route: `/v1/me/membership/badge-visibility`
+- Public URL: `https://api.modula.digital/v1/me/membership/badge-visibility`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:53`
+- Handler: inline
+- Controller/service calls: `premium.setBadgeVisibility`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: `{visible?: unknown} | undefined)?.visible`
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `actors`, `greenfield_premium_memberships`, `greenfield_premium_preferences`
+- Database writes: `badge`, `greenfield_premium_membership_events`, `greenfield_premium_preferences`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/me/verification</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/me/verification`
+- Public URL: `https://api.modula.digital/v1/me/verification`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:77`
+- Handler: inline
+- Controller/service calls: `verification.me`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_verification_appeals`, `greenfield_verification_applications`, `greenfield_verification_statuses`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/me/verification/applications</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/me/verification/applications`
+- Public URL: `https://api.modula.digital/v1/me/verification/applications`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:83`
+- Handler: inline
+- Controller/service calls: `verification.createApplication`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `201`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `actors`, `greenfield_verification_appeals`, `greenfield_verification_applications`, `greenfield_verification_statuses`
+- Database writes: `greenfield_verification_applications`, `greenfield_verification_events`, `greenfield_verification_statuses`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/me/verification/applications/:applicationId/appeals</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/me/verification/applications/:applicationId/appeals`
+- Public URL: `https://api.modula.digital/v1/me/verification/applications/:applicationId/appeals`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:89`
+- Handler: inline
+- Controller/service calls: `verification.createAppeal`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{applicationId: string}).applicationId, (request.body ?? {}) as Record<string, unknown>), request.id)) }`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `201`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: `greenfield_verification_appeals`, `greenfield_verification_applications`, `greenfield_verification_statuses`
+- Database writes: `greenfield_verification_appeals`, `greenfield_verification_events`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
 
@@ -16519,6 +17920,45 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - External integrations: none observed
 - Known clients: `src/api/local/routes/commentRoutes.ts`, `src/api/local/routes/postRoutes.ts`, `src/data/repositories/api/ApiPostRepository.ts`, `src/features/composer/screens/ComposerScreen.tsx`, `src/features/social/data/useCommentsQuery.ts`, `src/features/social/data/useReactionMutation.ts`
 - Tests: `scripts/verify-greenfield-backend-v1-social.mjs`, `scripts/verify-phase6-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7m-b7.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/premium/tiers</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/premium/tiers`
+- Public URL: `https://api.modula.digital/v1/premium/tiers`
+- API version: v1
+- Source file: `services/greenfield-api/src/premium/routes.ts:26`
+- Handler: inline
+- Controller/service calls: `premium.catalogue`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: not evident in the route handler; inspect downstream service
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `404`, `500`
+- Database reads: `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_tiers`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/premium.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
