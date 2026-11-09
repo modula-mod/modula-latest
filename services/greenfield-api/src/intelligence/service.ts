@@ -91,11 +91,14 @@ export class GovernedIntelligenceService {
   }
 
   async execute(accountId: string, missionId: string, proposalId: string) {
-    const existing = await this.repository.getExecution(proposalId)
-    if (existing?.status === 'completed') return {idempotent: true, executionId: existing.execution_id, result: existing.result}
     const mission = await this.repository.ownedMission(accountId, missionId)
+    await this.repository.proposal(missionId, proposalId)
     if (mission.status === 'cancelled') {
       throw new IntelligenceError('INVALID_MISSION_STATE', 'Mission cannot execute from cancelled')
+    }
+    const existing = await this.repository.getExecution(proposalId)
+    if (existing?.status === 'completed' && existing.mission_id === missionId) {
+      return {idempotent: true, executionId: existing.execution_id, result: existing.result}
     }
     try {
       await this.runtime.execute(this.principal(accountId, mission), missionId, proposalId)
@@ -104,8 +107,10 @@ export class GovernedIntelligenceService {
       throw new IntelligenceError('EXECUTION_FAILED', 'Governed runtime execution failed', {causeCode: intelligenceCode(error)})
     }
     const row = await this.repository.getExecution(proposalId)
-    if (row?.status === 'completed') return {idempotent: false, executionId: row.execution_id, result: row.result}
-    if (row?.status === 'failed') {
+    if (row?.status === 'completed' && row.mission_id === missionId) {
+      return {idempotent: false, executionId: row.execution_id, result: row.result}
+    }
+    if (row?.status === 'failed' && row.mission_id === missionId) {
       throw new IntelligenceError('EXECUTION_FAILED', 'Governed runtime execution failed', {causeCode: row.error_code ?? 'EXECUTION_FAILED'})
     }
     throw new IntelligenceError('EXECUTION_FAILED', 'Governed runtime execution failed')
