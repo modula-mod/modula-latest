@@ -195,7 +195,7 @@ GRANT SELECT ON greenfield_release_artifact_signatures,
   greenfield_stickers TO modula_worker, modula_backup;
 GRANT SELECT, INSERT ON greenfield_release_artifact_signatures TO modula_api;
 GRANT SELECT, INSERT, UPDATE ON greenfield_moliboo_characters,
-  greenfield_moliboo_pack_releases, greenfield_moliboo_items,
+  greenfield_moliboo_pack_releases,
   greenfield_moliboo_inventory, greenfield_moliboo_equipped,
   greenfield_sticker_pack_releases,
   greenfield_stickers TO modula_api;
