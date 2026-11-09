@@ -1,6 +1,8 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import Fastify, {type FastifyInstance} from 'fastify'
 import {sql} from 'kysely'
+import {IntelligenceError} from '@modula/intelligence-contracts'
 import {
   DETERMINISTIC_TEST_PROVIDER_ID,
 } from '@modula/intelligence-core'
@@ -8,6 +10,13 @@ import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {IntelligenceActionBoundary} from '../src/intelligence/action-boundary.js'
 import {GovernedIntelligenceService} from '../src/intelligence/service.js'
+import {registerIntelligenceRoutes} from '../src/intelligence/routes.js'
+import {createGreenfieldCancelRuntime, sessionPrincipal} from '../src/intelligence/mission-cancel.js'
+import {
+  getGreenfieldMissionRuntimeTrace,
+  installGreenfieldMissionRuntimeTestHooks,
+  resetGreenfieldMissionRuntimeTrace,
+} from '../src/intelligence/mission-runtime-binding.js'
 import {
   DETERMINISTIC_TEST_ADAPTER_LIMITATION,
   DETERMINISTIC_TEST_ADAPTER_STATUS,
@@ -33,15 +42,25 @@ const developmentTrust = {environment: 'development' as const, moduleAllowUntrus
 describeIfDb('synthetic authorized module intelligence path', () => {
   let db: ModulaDb
   let service: GovernedIntelligenceService
+  let app: FastifyInstance
 
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
     db = createDb(databaseUrl!)
     service = new GovernedIntelligenceService(db, developmentTrust)
     await seedRuntime(db)
+    app = Fastify()
+    await registerIntelligenceRoutes(app, db, {
+      resolveAccess: async (token: string) => token === 'token-a' ? {accountId: accountA} : null,
+    } as any, {profileConfig: {}, writeConfig: {}}, developmentTrust)
+    await app.ready()
   })
 
-  afterAll(async () => { await db?.destroy() })
+  afterAll(async () => {
+    installGreenfieldMissionRuntimeTestHooks(db)
+    await app?.close()
+    await db?.destroy()
+  })
 
   it('plans and executes an owner-scoped record.query discovered from the synthetic module', async () => {
     const mission = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-query-${suffix}`})
@@ -129,6 +148,83 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     expect(undeclaredReadable.permissionGranted).toBe(true)
     expect(undeclaredReadable).toMatchObject({registered: false, schemaValid: false})
   })
+
+  it('runs start, plan, verify, and execute to completion through MissionRuntime', async () => {
+    resetGreenfieldMissionRuntimeTrace(db)
+    const mission = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-runtime-${suffix}`})
+    const detail = await service.start(accountA, mission.id)
+    expect(detail.mission.status).toBe('completed')
+    expect(detail.executions).toHaveLength(1)
+    expect(detail.executions[0]).toMatchObject({status: 'completed', missionId: mission.id})
+    expect((detail.executions[0]?.result as {items?: unknown[]}).items).toHaveLength(5)
+    const events = await service.ledger(accountA, mission.id)
+    const planning = events.find(event => event.type === 'mission.planning_started')
+    expect(planning?.payload).toMatchObject({
+      planner: 'deterministic-test-v0',
+      missionRuntime: 'injected',
+      router: 'selection-only',
+      selectedProviderId: DETERMINISTIC_TEST_PROVIDER_ID,
+      modelProviderStatus: DETERMINISTIC_TEST_ADAPTER_STATUS,
+    })
+    expect(events.some(event => event.type === 'plan.created')).toBe(true)
+    expect(events.some(event => event.type === 'aki.decision_created')).toBe(true)
+    expect(events.some(event => event.type === 'governor.authorization_created')).toBe(true)
+    expect(events.some(event => event.type === 'execution.completed')).toBe(true)
+    expect(events.some(event => event.type === 'mission.completed')).toBe(true)
+    const trace = getGreenfieldMissionRuntimeTrace(db)
+    expect(trace).toMatchObject({planner: 1, decisions: 1, governor: 1, execute: 1})
+    expect((trace?.revalidate ?? 0) >= 1).toBe(true)
+  })
+
+  it('cancels a mid-run mission through the existing MissionRuntime cancel route', async () => {
+    resetGreenfieldMissionRuntimeTrace(db)
+    let release!: () => void
+    const entered = new Promise<void>(resolve => {
+      installGreenfieldMissionRuntimeTestHooks(db, {
+        beforeExecute: async () => {
+          resolve()
+          await new Promise<void>(inner => { release = inner })
+        },
+      })
+    })
+    const mission = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-cancel-${suffix}`})
+    const started = service.start(accountA, mission.id)
+    await entered
+    const cancelled = await app.inject({
+      method: 'POST',
+      url: `/v1/intelligence/missions/${mission.id}/cancel`,
+      headers: {authorization: 'Bearer token-a'},
+    })
+    expect(cancelled.statusCode).toBe(200)
+    expect(cancelled.json().data.status).toBe('cancelled')
+    const again = await createGreenfieldCancelRuntime(db).cancel(sessionPrincipal(accountA), mission.id)
+    expect(again.status).toBe('cancelled')
+    release()
+    const detail = await started
+    expect(detail.mission.status).toBe('cancelled')
+    expect(detail.executions.some(execution => execution.status === 'completed')).toBe(false)
+    const events = await service.ledger(accountA, mission.id)
+    expect(events.some(event => event.type === 'mission.cancelled')).toBe(true)
+    installGreenfieldMissionRuntimeTestHooks(db)
+  })
+
+  it('returns a structured authorization error for a write-only grant without throwing a raw error', async () => {
+    const deniedAccount = `syn-denied-struct-${suffix}`
+    const now = new Date()
+    await db.insertInto('greenfield_accounts').values({account_id: deniedAccount, primary_handle: `synds${suffix}`, status: 'active', created_at: now, updated_at: now}).execute()
+    await seedDeniedReadInstallation(db, deniedAccount, `struct-${suffix}`)
+    const mission = await service.createMission(deniedAccount, {objective: genericQueryObjective, correlationId: `syn-denied-struct-${suffix}`})
+    const detail = await service.start(deniedAccount, mission.id)
+    expect(detail.mission.status).toBe('blocked')
+    expect(detail.executions).toHaveLength(0)
+    const blocked = (await service.ledger(deniedAccount, mission.id)).find(event => event.type === 'mission.blocked')
+    expect(blocked?.payload).toEqual(expect.objectContaining({
+      reasonCode: expect.stringMatching(/^(AKI_DENIED|GOVERNOR_BLOCKED|PERMISSION_DENIED|CAPABILITY_UNKNOWN|CAPABILITY_DENIED)$/),
+    }))
+    expect(typeof blocked?.payload.reasonCode).toBe('string')
+    const structured = new IntelligenceError(String(blocked?.payload.reasonCode), 'Authorization refused the proposal')
+    expect(structured).toMatchObject({name: IntelligenceError.name, code: String(blocked?.payload.reasonCode)})
+  })
 })
 
 async function seedRuntime(db: ModulaDb) {
@@ -171,24 +267,24 @@ async function seedRuntime(db: ModulaDb) {
   }
 }
 
-async function seedDeniedReadInstallation(db: ModulaDb, accountId: string) {
+async function seedDeniedReadInstallation(db: ModulaDb, accountId: string, seedKey = suffix) {
   const now = new Date()
-  const publisherId = `syn-denied-publisher-${suffix}`
-  const extensionId = `syn-denied-extension-${suffix}`
-  const extensionVersionId = `syn-denied-extension-version-${suffix}`
-  const moduleVersionId = `syn-denied-module-version-${suffix}`
+  const publisherId = `syn-denied-publisher-${seedKey}`
+  const extensionId = `syn-denied-extension-${seedKey}`
+  const extensionVersionId = `syn-denied-extension-version-${seedKey}`
+  const moduleVersionId = `syn-denied-module-version-${seedKey}`
   const version = `0.0.${Date.now()}`
   const read = `records:module.${moduleId}.${collection}:read`
   const write = `records:module.${moduleId}.${collection}:write`
   const manifest = syntheticAiManifest([{permission: write, reason: 'write only', risk: 'medium'}, {permission: read, reason: 'read declared but denied', risk: 'low'}])
   await db.insertInto('greenfield_publishers').values({publisher_id: publisherId, display_name: 'Synthetic Denied Read', website: null, status: 'verified', trust_level: 'firstParty', created_at: now, updated_at: now, verified_at: now, suspended_at: null, revoked_at: null}).execute()
-  await db.insertInto('greenfield_extensions').values({extension_id: extensionId, slug: `syn-denied-${suffix}`, publisher_account_id: null, status: 'published', created_at: now, updated_at: now}).execute()
+  await db.insertInto('greenfield_extensions').values({extension_id: extensionId, slug: `syn-denied-${seedKey}`, publisher_account_id: null, status: 'published', created_at: now, updated_at: now}).execute()
   await db.insertInto('greenfield_extension_versions').values({extension_version_id: extensionVersionId, extension_id: extensionId, version, manifest, status: 'published', created_at: now}).execute()
   await db.insertInto('greenfield_module_versions').values({module_version_id: moduleVersionId, extension_version_id: extensionVersionId, module_id: moduleId, version, publisher_id: publisherId, manifest, status: 'published', created_at: now, updated_at: now}).execute()
-  await db.insertInto('greenfield_module_releases').values({release_id: deniedReleaseId, module_version_id: moduleVersionId, extension_id: extensionId, extension_version_id: extensionVersionId, module_id: moduleId, version, publisher_id: publisherId, release_state: 'published', source_repository: 'modula-mod/modula-synthetic-records', source_commit: 'd'.repeat(40), manifest_path: 'module.manifest.json', manifest_sha256: 'e'.repeat(64), release_sha256: 'f'.repeat(64), signature_key_id: null, signature: null, compatibility: {}, license_status: 'firstParty', trust_level: 'firstParty', product_kind: 'module', extension_product: {}, published_at: now, quarantined_at: null, revoked_at: null, superseded_at: null, created_at: now, updated_at: now}).execute()
-  await db.insertInto('greenfield_extension_installations').values({installation_id: deniedInstallationId, extension_version_id: extensionVersionId, account_id: accountId, status: 'enabled', config: {}, created_at: now, updated_at: now}).execute()
-  await db.insertInto('greenfield_module_permission_reviews').values({review_id: `syn-denied-review-${suffix}`, installation_id: deniedInstallationId, release_id: deniedReleaseId, account_id: accountId, granted_permissions: jsonb([write]), denied_permissions: jsonb([read]), high_risk_increase: false, idempotency_key: `syn-denied-review-${suffix}`, reviewed_at: now}).execute()
-  await db.insertInto('greenfield_module_record_collections').values({collection_id: `syn-denied-collection-${suffix}`, release_id: deniedReleaseId, module_id: moduleId, collection, schema_ref: 'schemas/item.json', default_visibility: 'private', fields: jsonb([{fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true}, {fieldId: 'body', name: 'body', type: 'text', label: 'Body', required: true}]), searchable_fields: jsonb(['title']), filterable_fields: jsonb([]), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now}).execute()
+  await db.insertInto('greenfield_module_releases').values({release_id: (seedKey === suffix ? deniedReleaseId : `syn-denied-release-${seedKey}`), module_version_id: moduleVersionId, extension_id: extensionId, extension_version_id: extensionVersionId, module_id: moduleId, version, publisher_id: publisherId, release_state: 'published', source_repository: 'modula-mod/modula-synthetic-records', source_commit: 'd'.repeat(40), manifest_path: 'module.manifest.json', manifest_sha256: 'e'.repeat(64), release_sha256: 'f'.repeat(64), signature_key_id: null, signature: null, compatibility: {}, license_status: 'firstParty', trust_level: 'firstParty', product_kind: 'module', extension_product: {}, published_at: now, quarantined_at: null, revoked_at: null, superseded_at: null, created_at: now, updated_at: now}).execute()
+  await db.insertInto('greenfield_extension_installations').values({installation_id: (seedKey === suffix ? deniedInstallationId : `syn-denied-installation-${seedKey}`), extension_version_id: extensionVersionId, account_id: accountId, status: 'enabled', config: {}, created_at: now, updated_at: now}).execute()
+  await db.insertInto('greenfield_module_permission_reviews').values({review_id: `syn-denied-review-${seedKey}`, installation_id: (seedKey === suffix ? deniedInstallationId : `syn-denied-installation-${seedKey}`), release_id: (seedKey === suffix ? deniedReleaseId : `syn-denied-release-${seedKey}`), account_id: accountId, granted_permissions: jsonb([write]), denied_permissions: jsonb([read]), high_risk_increase: false, idempotency_key: `syn-denied-review-${seedKey}`, reviewed_at: now}).execute()
+  await db.insertInto('greenfield_module_record_collections').values({collection_id: `syn-denied-collection-${seedKey}`, release_id: (seedKey === suffix ? deniedReleaseId : `syn-denied-release-${seedKey}`), module_id: moduleId, collection, schema_ref: 'schemas/item.json', default_visibility: 'private', fields: jsonb([{fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true}, {fieldId: 'body', name: 'body', type: 'text', label: 'Body', required: true}]), searchable_fields: jsonb(['title']), filterable_fields: jsonb([]), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now}).execute()
 }
 
 function jsonb(value: unknown) {

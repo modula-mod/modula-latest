@@ -123,6 +123,14 @@ describe('generic GAIA discovery from authorized module actions', () => {
     expect(new GovernorV0().decide({id: 'gov', proposal, aki: decision}).authorization).toBe('blocked')
   })
 
+  it('keeps module.absent when the catalog only lists the supported absent action', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: genericQueryObjective},
+      availableActions: [{family: 'module.absent', capability: 'module.absent'}],
+    })
+    expect(plan.steps[0]?.actionProposal).toMatchObject({family: 'module.absent', capability: 'module.absent', input: {}})
+  })
+
   it('refuses authorization when the discovered action is no longer permitted', async () => {
     const plan = await planner().plan({
       mission: {...mission, objective: genericQueryObjective},
