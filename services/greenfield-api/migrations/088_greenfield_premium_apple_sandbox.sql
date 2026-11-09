@@ -1,3 +1,8 @@
+-- Numbered 088 to follow #151 collections and drafts (087) and #150
+-- communities (086). 084 is #147/#160 moliboo signed packs and 085 is Gate 01
+-- publisher release console; those branches are not on main yet, so this tree
+-- still goes 083 then 088.
+
 -- GREENFIELD-FEATURE-REALITY-01 / PR-07: verified Apple sandbox Premium state.
 -- This migration does not enable production billing and deliberately seeds no
 -- App Store product identifiers. QA operators must configure identifiers that
@@ -130,5 +135,5 @@ GRANT SELECT ON
 TO modula_worker, modula_backup;
 
 INSERT INTO schema_metadata (key, value)
-VALUES ('schema_version', '087')
+VALUES ('schema_version', '088')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
