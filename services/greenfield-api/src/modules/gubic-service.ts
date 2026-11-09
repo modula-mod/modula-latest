@@ -225,7 +225,7 @@ export class GreenfieldGubicService {
       return {gameId: game.gameId, eligible: false, reasonCode: 'ENTITLEMENT_REQUIRED', reason: 'An active game entitlement is required', entitlement, packagePlan: null}
     }
     try {
-      const packagePlan = await this.distribution.packageInstallPlan(game.gameId, null, context, [])
+      const packagePlan = await this.distribution.packageInstallPlan(accountId, game.gameId, null, context, [])
       return {gameId: game.gameId, eligible: true, reasonCode: 'ELIGIBLE', reason: 'Game is eligible for installation', entitlement, packagePlan}
     } catch (error) {
       const code = String((error as {code?: unknown})?.code ?? 'INSTALLATION_UNAVAILABLE')
@@ -236,7 +236,7 @@ export class GreenfieldGubicService {
   async packageInstallPlan(accountId: string, gameId: string, context: DistributionHostContext, cachedPublicDigests: string[]) {
     const eligibility = await this.eligibility(accountId, gameId, context)
     if (!eligibility.eligible) throw moduleError(eligibility.reasonCode === 'ENTITLEMENT_REQUIRED' ? 'FORBIDDEN' : 'CONFLICT', eligibility.reason)
-    return this.distribution.packageInstallPlan(gameId, null, context, cachedPublicDigests)
+    return this.distribution.packageInstallPlan(accountId, gameId, null, context, cachedPublicDigests)
   }
 
   async myGames(accountId: string, context: DistributionHostContext = {}) {

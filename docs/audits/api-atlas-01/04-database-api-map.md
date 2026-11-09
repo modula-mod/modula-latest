@@ -2031,9 +2031,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `started_at`, `expires_at`, `created_at`, `updated_at`
 - Migration introduced: `049_greenfield_backend_v1_entitlements_usage.sql`
-- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/commerce/entitlements`, `POST /v1/admin/commerce/entitlements/:entitlementId/transitions`, `GET /v1/backend/products/:productId/accounts/:accountId/entitlements`, `POST /v1/backend/products/:productId/entitlements/check`, `POST /v1/backend/products/:productId/usage`, `GET /v1/commerce/entitlements`, `POST /v1/commerce/entitlements/check`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`
+- Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/commerce/entitlements`, `POST /v1/admin/commerce/entitlements/:entitlementId/transitions`, `GET /v1/backend/products/:productId/accounts/:accountId/entitlements`, `POST /v1/backend/products/:productId/entitlements/check`, `POST /v1/backend/products/:productId/usage`, `GET /v1/commerce/entitlements`, `POST /v1/commerce/entitlements/check`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/update`
 - Routes writing: `POST /v1/admin/commerce/entitlements`, `POST /v1/admin/commerce/entitlements/:entitlementId/transitions`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - API/worker source writes: `services/greenfield-api/src/entitlements/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4054,9 +4054,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `049_greenfield_backend_v1_entitlements_usage.sql`
-- Routes reading: `POST /v1/admin/commerce/entitlements`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`
+- Routes reading: `POST /v1/admin/commerce/entitlements`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/my-games`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/update`
 - Routes writing: `PUT /v1/admin/commerce/offers/:offerId`
-- API/worker source reads: `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
+- API/worker source reads: `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`
 - API/worker source writes: `services/greenfield-api/src/entitlements/service.ts`
 - Disposition: active read/write or ledger/schema table
 
