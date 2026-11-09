@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {sql} from 'kysely'
 import {badgesForActors, NO_BADGES, type PublicBadgeFields} from '../../premium/badges.js'
 
 import type {ModulaDb} from '../../database/client.js'
@@ -15,6 +16,7 @@ export type ConversationDto = {
   muted?: boolean
   archived?: boolean
 }
+export type StartConversationResult = {conversation: ConversationDto; created: boolean}
 export type MessageDto = {
   id: string
   conversationId: string
@@ -132,12 +134,17 @@ export class MessagingService {
   private async resolveHandle(raw: unknown): Promise<string> {
     const handle = cleanText(raw, 80, 'Recipient').replace(/^@/, '').toLowerCase()
     const row = await this.db
-      .selectFrom('profiles')
-      .select('actor_id')
-      .where('handle', '=', handle)
+      .selectFrom('profiles as p')
+      .innerJoin('actors as a', 'a.id', 'p.actor_id')
+      .innerJoin('greenfield_accounts as ga', 'ga.account_id', 'a.account_id')
+      .select('p.actor_id')
+      .where('p.handle', '=', handle)
+      .where('p.deleted_at', 'is', null)
+      .where('a.deleted_at', 'is', null)
+      .where('ga.status', '=', 'active')
       .executeTakeFirst()
     if (!row) fail('NOT_FOUND', 'Recipient not found')
-    return row!.actor_id
+    return row.actor_id
   }
 
   private async isBlockedEitherWay(a: string, b: string): Promise<boolean> {
@@ -151,17 +158,6 @@ export class MessagingService {
           eb.and([eb('blocker_actor_id', '=', b), eb('blocked_actor_id', '=', a)]),
         ]),
       )
-      .executeTakeFirst()
-    return Boolean(row)
-  }
-
-  private async follows(follower: string, followed: string): Promise<boolean> {
-    const row = await this.db
-      .selectFrom('follows')
-      .select('id')
-      .where('follower_actor_id', '=', follower)
-      .where('followed_actor_id', '=', followed)
-      .where('deleted_at', 'is', null)
       .executeTakeFirst()
     return Boolean(row)
   }
@@ -324,53 +320,99 @@ export class MessagingService {
     return {unreadCount: total}
   }
 
-  /** Start (or reuse) a direct conversation. New contacts who don't follow the sender get a request. */
-  async startConversation(viewer: string, input: {handle?: unknown; text?: unknown}): Promise<ConversationDto> {
+  /** Resolve a public handle, then atomically create or reuse its direct conversation. */
+  async startConversation(viewer: string, input: {handle?: unknown; text?: unknown}): Promise<StartConversationResult> {
     const recipient = await this.resolveHandle(input.handle)
+    return this.startDirectConversation(viewer, recipient, input.text)
+  }
+
+  /**
+   * Server-side direct-conversation primitive for trusted domain integrations.
+   * The optional text is an initial message: it is written only by the request
+   * that creates the conversation, making retries safe after a lost response.
+   */
+  async startDirectConversation(viewer: string, recipient: string, initialText?: unknown): Promise<StartConversationResult> {
     if (recipient === viewer) fail('VALIDATION_FAILED', 'You cannot message yourself')
-    if (await this.isBlockedEitherWay(viewer, recipient)) fail('FORBIDDEN', 'You cannot message this account')
-    const text = input.text === undefined || input.text === '' ? null : cleanText(input.text, MESSAGE_MAX, 'Message')
+    const text = initialText === undefined || initialText === '' ? null : cleanText(initialText, MESSAGE_MAX, 'Message')
     const directKey = [viewer, recipient].sort().join(':')
-    let conversation = await this.db
-      .selectFrom('greenfield_conversations')
-      .select('conversation_id')
-      .where('direct_key', '=', directKey)
-      .executeTakeFirst()
-    if (!conversation) {
+    const result = await this.db.transaction().execute(async trx => {
+      // Moderation block creation uses this same actor-pair lock. Whichever
+      // transaction commits first becomes authoritative for this creation.
+      await sql`SELECT pg_advisory_xact_lock(hashtextextended(${directKey}, 0))`.execute(trx)
+      const activeRecipient = await trx
+        .selectFrom('actors as a')
+        .innerJoin('greenfield_accounts as ga', 'ga.account_id', 'a.account_id')
+        .select('a.id')
+        .where('a.id', '=', recipient)
+        .where('a.deleted_at', 'is', null)
+        .where('ga.status', '=', 'active')
+        .executeTakeFirst()
+      if (!activeRecipient) fail('NOT_FOUND', 'Recipient not found')
+      const blocked = await trx
+        .selectFrom('blocks')
+        .select('id')
+        .where('deleted_at', 'is', null)
+        .where(eb =>
+          eb.or([
+            eb.and([eb('blocker_actor_id', '=', viewer), eb('blocked_actor_id', '=', recipient)]),
+            eb.and([eb('blocker_actor_id', '=', recipient), eb('blocked_actor_id', '=', viewer)]),
+          ]),
+        )
+        .executeTakeFirst()
+      if (blocked) fail('FORBIDDEN', 'You cannot message this account')
+      const recipientFollowsViewer = await trx
+        .selectFrom('follows')
+        .select('id')
+        .where('follower_actor_id', '=', recipient)
+        .where('followed_actor_id', '=', viewer)
+        .where('deleted_at', 'is', null)
+        .executeTakeFirst()
+      const recipientState = recipientFollowsViewer ? 'active' : 'pending'
+
       const conversationId = randomUUID()
-      const recipientState = (await this.follows(recipient, viewer)) ? 'active' : 'pending'
       const now = new Date()
-      await this.db.transaction().execute(async trx => {
-        await trx
-          .insertInto('greenfield_conversations')
-          .values({conversation_id: conversationId, kind: 'direct', subject: null, direct_key: directKey, created_by_actor_id: viewer, created_at: now, updated_at: now, last_message_at: now})
-          .onConflict(oc => oc.column('direct_key').doNothing())
-          .execute()
+      const inserted = await trx
+        .insertInto('greenfield_conversations')
+        .values({conversation_id: conversationId, kind: 'direct', subject: null, direct_key: directKey, created_by_actor_id: viewer, created_at: now, updated_at: now, last_message_at: now})
+        .onConflict(oc => oc.column('direct_key').doNothing())
+        .returning('conversation_id')
+        .executeTakeFirst()
+
+      if (inserted) {
         await trx
           .insertInto('greenfield_conversation_members')
           .values([
             {conversation_id: conversationId, actor_id: viewer, state: 'active', last_read_at: now, joined_at: now, updated_at: now},
             {conversation_id: conversationId, actor_id: recipient, state: recipientState, last_read_at: null, joined_at: now, updated_at: now},
           ])
-          .onConflict(oc => oc.columns(['conversation_id', 'actor_id']).doNothing())
           .execute()
-      })
-      conversation = await this.db
+
+        if (text) {
+          await trx
+            .insertInto('greenfield_conversation_messages')
+            .values({message_id: randomUUID(), conversation_id: conversationId, sender_actor_id: viewer, subject: null, body: text, created_at: now})
+            .execute()
+        }
+        return {conversationId, created: true}
+      }
+
+      // The actor-pair lock makes this existing-row lookup deterministic and
+      // the unique direct_key remains the final database invariant.
+      const existing = await trx
         .selectFrom('greenfield_conversations')
         .select('conversation_id')
         .where('direct_key', '=', directKey)
         .executeTakeFirstOrThrow()
-    } else {
       // Re-opening by the viewer reactivates their side if they had declined.
-      await this.db
+      await trx
         .updateTable('greenfield_conversation_members')
         .set({state: 'active', updated_at: new Date()})
-        .where('conversation_id', '=', conversation.conversation_id)
+        .where('conversation_id', '=', existing.conversation_id)
         .where('actor_id', '=', viewer)
         .execute()
-    }
-    if (text) await this.send(viewer, conversation.conversation_id, {text})
-    return this.conversationFor(viewer, conversation.conversation_id)
+      return {conversationId: existing.conversation_id, created: false}
+    })
+    return {conversation: await this.conversationFor(viewer, result.conversationId), created: result.created}
   }
 
   async conversationFor(viewer: string, conversationId: string): Promise<ConversationDto> {

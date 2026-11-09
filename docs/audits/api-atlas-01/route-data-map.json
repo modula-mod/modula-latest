@@ -3228,12 +3228,13 @@
   },
   "POST /v1/conversations": {
     "reads": [
+      "actors",
       "blocks",
       "follows",
+      "greenfield_accounts",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
-      "greenfield_message_reactions",
       "profiles"
     ],
     "writes": [
@@ -3246,18 +3247,13 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
-      "services/greenfield-api/src/domains/messaging/service.ts#follows",
-      "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
-      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
-      "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
-      "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
       "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
-      "services/greenfield-api/src/domains/messaging/service.ts#send",
       "services/greenfield-api/src/domains/messaging/service.ts#startConversation",
+      "services/greenfield-api/src/domains/messaging/service.ts#startDirectConversation",
       "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts"
     ]
   },
@@ -4965,7 +4961,9 @@
   },
   "POST /v1/in-mail": {
     "reads": [
+      "actors",
       "blocks",
+      "greenfield_accounts",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",

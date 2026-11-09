@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T22:02:27.020Z",
+  "capturedAt": "2026-11-09T22:40:55.671Z",
   "source": {
-    "branch": "mosaic/pr160-084-privileges",
-    "headAtCapture": "baed7f22ec47573c230f3a99ee959ba14e35122d",
+    "branch": "mosaic/pr148-update",
+    "headAtCapture": "883211197116b8a0469c06783b55d4b31f2e8de3",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "ae54a8e50b3c47d850ae78cdf7b20733a5e297897aabe03ff0a9945356392257"
+    "apiSourceSha256": "963cdc92c2b1cd38ae637602c7046ef1fcf54c2de68c8a8f535d22c36886e981"
   },
   "runtimeRoutes": [
     {
@@ -5505,7 +5505,26 @@
       "url": "/v1/conversations",
       "path": "/v1/conversations",
       "prefix": "",
-      "schema": null,
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "handle"
+          ],
+          "properties": {
+            "handle": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 5000
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },
