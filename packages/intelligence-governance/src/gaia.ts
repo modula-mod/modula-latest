@@ -94,7 +94,7 @@ function genericAuthorizedQuery(
 ): ModulaActionProposal {
   const action = availableActions.find(candidate => candidate.family === 'record.query' && candidate.collection)
   if (!action?.collection) {
-    const absent = availableActions.length === 0
+    const absent = isModuleAbsentCatalog(availableActions)
     return {
       ...common,
       family: absent ? 'module.absent' : 'capability.unavailable',
@@ -110,6 +110,10 @@ function genericAuthorizedQuery(
     actionId: action.actionId,
     input: {collection: action.collection, limit: queryLimit(action), sort: 'updatedAt', direction: 'desc'},
   }
+}
+
+function isModuleAbsentCatalog(actions: GaiaAvailableAction[]): boolean {
+  return actions.length === 0 || actions.every(action => action.family === 'module.absent' && action.capability === 'module.absent' && !action.moduleId)
 }
 
 function queryLimit(action: GaiaAvailableAction): number {
