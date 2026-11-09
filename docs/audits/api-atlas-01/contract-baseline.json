@@ -5134,6 +5134,65 @@
       "sourceContractSha256": "e5ee5b67a186d5807366dfe178e1c3ac43537528faae2bfd4f158bb7877fab93"
     },
     {
+      "id": "PUT /v1/admin/qa/premium/apple-products/:productId",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [
+          "admin:ops"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{productId: string}).productId"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "836a295265c7af374934a8600e6fb63a47165ce438337f47b28ba301965e6ebc"
+    },
+    {
       "id": "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
       "authorization": {
         "visibility": "ADMIN",
@@ -18165,7 +18224,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "a620434486dab506d25f02627f5297957c9560d13f01f9e22d803f70c5da3476"
+      "sourceContractSha256": "0361936d39d8ff4601a43acbf3e3e48b49e4cb66dde0197eea51075bc289e8d8"
     },
     {
       "id": "GET /v1/me/entitlements/:capabilityId",
@@ -18222,7 +18281,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "b2f605039156d6fe1230181db52fe61a4ed379c43aff524e5f11867c673916c9"
+      "sourceContractSha256": "9eb9e4713d485763a29970c2dbc33df801239b625ed907e091f5d5f73a75c763"
     },
     {
       "id": "GET /v1/me/membership",
@@ -18277,7 +18336,62 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "048e7175b397de9be631b8ef0bb04ae5673dba2b2b1df527595a27f53ac56eb0"
+      "sourceContractSha256": "0d1270478162e7bec81eafd820c4b9a3f8197b9a2faa4cbda54b0d7765816eef"
+    },
+    {
+      "id": "POST /v1/me/membership/apple-purchase-context",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "42d751a9f91ea68ce1434f0973c4ac1bf6500832fcb0c67dfd0ca89e0775e03d"
     },
     {
       "id": "PATCH /v1/me/membership/badge-visibility",
@@ -18317,7 +18431,7 @@
         "body": [
           "{visible?: unknown} | undefined)?.visible"
         ],
-        "explicitFastifySchema": false,
+        "explicitFastifySchema": true,
         "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
@@ -18334,7 +18448,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "c11eaa593a6344b8061df0a1356ed90477abe3c9e6067e6adffd6cacbbf9a306"
+      "sourceContractSha256": "6c11a090cc659c5808cfb302a452997b8526b5b9a6bfda51d17622ef5d21ebdc"
     },
     {
       "id": "GET /v1/me/moliboos/outfit",
@@ -26351,6 +26465,120 @@
       "sourceContractSha256": "49353552074bf3e94542a18d8688c510b134fadec8be6094d76b43e19b822cd3"
     },
     {
+      "id": "POST /v1/premium/apple/notifications",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "{signedPayload: string}).signedPayload"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "0d6ea0e61425858929b5dd5648f88aba5ecebe4ad8fd1c3626c12ed101366369"
+    },
+    {
+      "id": "POST /v1/premium/apple/transactions",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "{signedTransaction: string}).signedTransaction"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "e827cf832815a621d66da34cc4a3fff9ee7270790e8db51c3e2036fce7d01607"
+    },
+    {
       "id": "GET /v1/premium/tiers",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -26403,7 +26631,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "eece69cd271364cbfc6c88aaa7974a337f780e03c9641018bbdc2ed512baa99d"
+      "sourceContractSha256": "b0c049ccd4c9863b62773327ce0c166f7e68860a1014fa485b1a3444d8013d4d"
     },
     {
       "id": "GET /v1/product-standard/products/:productId",
