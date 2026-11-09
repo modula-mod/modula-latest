@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T16:29:40.381Z for branch `fix/gubic-socket-auth`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T20:13:12.458Z for branch `rebase-check/mar-fast-01-on-9f2ab96`; this does not claim deployment.
 
-- Runtime method routes: 758
-- Application routes: 535
+- Runtime method routes: 759
+- Application routes: 536
 - Automatically generated HEAD routes: 222
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `758 = 535 application + 223 framework-derived`
+- Reconciliation: `759 = 536 application + 223 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,7 +17,7 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 535 |
+| yes | yes | not yet | candidate-registered | 536 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
 | framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 223 |
@@ -332,17 +332,18 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:259` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:271` | candidate-registered-not-production-probed |
 | Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:282` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:23` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:14` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:29` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/approvals` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:57` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/approve` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:71` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/reject` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:78` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/decisions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:50` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/evidence` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:64` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/missions/:missionId/ledger` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:43` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:85` | candidate-registered-not-production-probed |
-| Intelligence | POST | `/v1/intelligence/missions/:missionId/start` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:36` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:25` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:16` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:31` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/approvals` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:66` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/approve` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:80` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/approvals/:approvalId/reject` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:87` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:45` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/decisions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:59` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/evidence` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:73` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/missions/:missionId/ledger` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:52` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:94` | candidate-registered-not-production-probed |
+| Intelligence | POST | `/v1/intelligence/missions/:missionId/start` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:38` | candidate-registered-not-production-probed |
 | Internal | POST | `/v1/internal/build-service/builds/:buildId/result` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/developers/routes.ts:76` | candidate-registered-not-production-probed |
 | Internal | POST | `/v1/internal/build-service/claims` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/developers/routes.ts:75` | candidate-registered-not-production-probed |
 | Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2681` | candidate-registered-not-production-probed |
@@ -12202,7 +12203,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:23`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:25`
 - Handler: inline
 - Controller/service calls: `intelligence.listMissions`
 - Authentication: greenfield bearer access session
@@ -12225,7 +12226,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (401)
 - Status: candidate-registered-not-production-probed
@@ -12241,7 +12242,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:14`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:16`
 - Handler: inline
 - Controller/service calls: `intelligence.createMission`
 - Authentication: greenfield bearer access session
@@ -12264,7 +12265,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12280,7 +12281,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:29`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:31`
 - Handler: inline
 - Controller/service calls: `intelligence.detail`
 - Authentication: greenfield bearer access session
@@ -12303,7 +12304,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12319,7 +12320,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/approvals`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/approvals`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:57`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:66`
 - Handler: inline
 - Controller/service calls: `intelligence.approvals`
 - Authentication: greenfield bearer access session
@@ -12342,7 +12343,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12358,7 +12359,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/approvals/:approvalId/approve`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/approvals/:approvalId/approve`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:71`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:80`
 - Handler: inline
 - Controller/service calls: `intelligence.approve`
 - Authentication: greenfield bearer access session
@@ -12381,7 +12382,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12397,7 +12398,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/approvals/:approvalId/reject`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/approvals/:approvalId/reject`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:78`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:87`
 - Handler: inline
 - Controller/service calls: `intelligence.reject`
 - Authentication: greenfield bearer access session
@@ -12420,7 +12421,46 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/intelligence/missions/:missionId/cancel</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Intelligence
+- Method: POST
+- Effective route: `/v1/intelligence/missions/:missionId/cancel`
+- Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/cancel`
+- API version: v1
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:45`
+- Handler: inline
+- Controller/service calls: `cancelRuntime.cancel`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12436,7 +12476,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/decisions`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/decisions`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:50`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:59`
 - Handler: inline
 - Controller/service calls: `intelligence.decisions`
 - Authentication: greenfield bearer access session
@@ -12459,7 +12499,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12475,7 +12515,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/evidence`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/evidence`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:64`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:73`
 - Handler: inline
 - Controller/service calls: `intelligence.evidence`
 - Authentication: greenfield bearer access session
@@ -12498,7 +12538,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12514,7 +12554,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/ledger`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/ledger`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:43`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:52`
 - Handler: inline
 - Controller/service calls: `intelligence.ledger`
 - Authentication: greenfield bearer access session
@@ -12537,7 +12577,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12553,7 +12593,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/proposals/:proposalId/execute`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:85`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:94`
 - Handler: inline
 - Controller/service calls: `intelligence.execute`
 - Authentication: greenfield bearer access session
@@ -12576,7 +12616,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12592,7 +12632,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/missions/:missionId/start`
 - Public URL: `https://api.modula.digital/v1/intelligence/missions/:missionId/start`
 - API version: v1
-- Source file: `services/greenfield-api/src/intelligence/routes.ts:36`
+- Source file: `services/greenfield-api/src/intelligence/routes.ts:38`
 - Handler: inline
 - Controller/service calls: `intelligence.start`
 - Authentication: greenfield bearer access session
@@ -12615,7 +12655,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
+- Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`, `services/greenfield-api/tests/intelligence-cancel.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
