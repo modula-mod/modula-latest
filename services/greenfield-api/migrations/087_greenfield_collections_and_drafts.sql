@@ -1,3 +1,7 @@
+-- Numbered 087 to follow #150 communities (086). 084 is #147/#160 moliboo
+-- signed packs and 085 is Gate 01 publisher release console; those branches
+-- are not on main yet, so this tree still goes 083, then 086, then 087.
+
 -- GREENFIELD-FEATURE-REALITY-01 PR-05: server-backed named Saved collections and post drafts.
 
 CREATE TABLE greenfield_saved_collections (
@@ -87,5 +91,5 @@ GRANT SELECT ON
   greenfield_post_draft_content
 TO modula_worker, modula_backup;
 
-INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '086')
+INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '087')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();
