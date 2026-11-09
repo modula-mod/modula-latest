@@ -8,21 +8,21 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/pr150-update",
-      "sourceSha256": "8fe6baa6796ec6886fee33228a78d32866f1289da4eaecab2fe4137301093b18",
-      "capturedAt": "2026-11-09T21:49:12.580Z",
-      "routeCount": 789
+      "branch": "mosaic/pr151-update",
+      "sourceSha256": "8a9b09e22fd5925045070c32d7194fa657ccec4e03329849189026a08c521b8c",
+      "capturedAt": "2026-11-09T21:56:54.572Z",
+      "routeCount": 808
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 789,
-    "applicationRuntimeRoutes": 557,
-    "mappedApplicationRoutes": 557,
+    "runtimeMethodRoutes": 808,
+    "applicationRuntimeRoutes": 571,
+    "mappedApplicationRoutes": 571,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 557,
+    "sourceRoutes": 571,
     "sourceOnlyRoutes": 0,
-    "explicitlyExcludedFrameworkRoutes": 232,
+    "explicitlyExcludedFrameworkRoutes": 237,
     "frameworkRoutes": [
       {
         "method": "OPTIONS",
@@ -117,6 +117,31 @@
       {
         "method": "HEAD",
         "path": "/v1/communities/:communityId/polls/:pollId",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/collections",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/collections/:collectionId",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/collections/:collectionId/items",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/drafts",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/me/drafts/:draftId",
         "reason": "Fastify automatic HEAD companion for GET"
       },
       {
@@ -1186,7 +1211,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "789 = 557 application + 232 framework-derived"
+    "equation": "808 = 571 application + 237 framework-derived"
   },
   "routes": [
     {
@@ -1199,7 +1224,7 @@
       "apiVersion": "versionless",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 339
+        "line": 341
       },
       "handler": "inline",
       "controllerServices": [
@@ -1300,7 +1325,7 @@
       "apiVersion": "versionless",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 335
+        "line": 337
       },
       "handler": "inline",
       "controllerServices": [
@@ -2192,7 +2217,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 610
+        "line": 612
       },
       "handler": "inline",
       "controllerServices": [
@@ -2292,6 +2317,7 @@
           "scripts/verify-phase7e-real-auth.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -2339,7 +2365,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 499
+        "line": 501
       },
       "handler": "inline",
       "controllerServices": [
@@ -2454,7 +2480,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 515
+        "line": 517
       },
       "handler": "inline",
       "controllerServices": [
@@ -2556,7 +2582,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 519
+        "line": 521
       },
       "handler": "inline",
       "controllerServices": [
@@ -2659,7 +2685,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 527
+        "line": 529
       },
       "handler": "inline",
       "controllerServices": [
@@ -2754,6 +2780,7 @@
           "scripts/verify-phase7c-social-core.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
@@ -2802,7 +2829,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 573
+        "line": 575
       },
       "handler": "inline",
       "controllerServices": [
@@ -2904,6 +2931,7 @@
           "scripts/verify-phase7c-social-core.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
@@ -3175,7 +3203,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 263
+        "line": 270
       },
       "handler": "inline",
       "controllerServices": [
@@ -3282,7 +3310,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 268
+        "line": 275
       },
       "handler": "inline",
       "controllerServices": [
@@ -3511,7 +3539,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 582
+        "line": 584
       },
       "handler": "inline",
       "controllerServices": [
@@ -3621,7 +3649,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 532
+        "line": 534
       },
       "handler": "inline",
       "controllerServices": [
@@ -3727,7 +3755,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 547
+        "line": 549
       },
       "handler": "inline",
       "controllerServices": [
@@ -3845,7 +3873,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 537
+        "line": 539
       },
       "handler": "inline",
       "controllerServices": [
@@ -4074,7 +4102,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2043
+        "line": 2045
       },
       "handler": "inline",
       "controllerServices": [
@@ -4184,7 +4212,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2053
+        "line": 2055
       },
       "handler": "inline",
       "controllerServices": [
@@ -4300,7 +4328,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 593
+        "line": 595
       },
       "handler": "inline",
       "controllerServices": [
@@ -4416,7 +4444,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 624
+        "line": 626
       },
       "handler": "inline",
       "controllerServices": [
@@ -4526,7 +4554,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 619
+        "line": 621
       },
       "handler": "inline",
       "controllerServices": [
@@ -4628,7 +4656,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 289
+        "line": 296
       },
       "handler": "inline",
       "controllerServices": [
@@ -4737,7 +4765,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 281
+        "line": 288
       },
       "handler": "inline",
       "controllerServices": [
@@ -4849,7 +4877,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 448
+        "line": 450
       },
       "handler": "inline",
       "controllerServices": [
@@ -4944,6 +4972,7 @@
           "scripts/verify-phase6-greenfield-frontend.mjs",
           "scripts/verify-phase7c-api-parity.mjs",
           "scripts/verify-phase7e-real-auth.mjs",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -5003,7 +5032,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 484
+        "line": 486
       },
       "handler": "inline",
       "controllerServices": [
@@ -5113,7 +5142,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 506
+        "line": 508
       },
       "handler": "inline",
       "controllerServices": [
@@ -5229,7 +5258,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 470
+        "line": 472
       },
       "handler": "inline",
       "controllerServices": [
@@ -5331,6 +5360,7 @@
           "scripts/verify-phase6-greenfield-frontend.mjs",
           "scripts/verify-phase7c-api-parity.mjs",
           "scripts/verify-phase7e-real-auth.mjs",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -5376,7 +5406,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2191
+        "line": 2193
       },
       "handler": "inline",
       "controllerServices": [
@@ -6942,7 +6972,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1947
+        "line": 1949
       },
       "handler": "inline",
       "controllerServices": [
@@ -7046,7 +7076,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1965
+        "line": 1967
       },
       "handler": "inline",
       "controllerServices": [
@@ -7150,7 +7180,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1976
+        "line": 1978
       },
       "handler": "inline",
       "controllerServices": [
@@ -7260,7 +7290,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1994
+        "line": 1996
       },
       "handler": "inline",
       "controllerServices": [
@@ -8196,7 +8226,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2354
+        "line": 2356
       },
       "handler": "inline",
       "controllerServices": [
@@ -8305,7 +8335,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2346
+        "line": 2348
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8405,7 +8435,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2648
+        "line": 2650
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8507,7 +8537,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2338
+        "line": 2340
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8607,7 +8637,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2492
+        "line": 2494
       },
       "handler": "inline",
       "controllerServices": [
@@ -8715,7 +8745,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2502
+        "line": 2504
       },
       "handler": "inline",
       "controllerServices": [
@@ -8826,7 +8856,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2615
+        "line": 2617
       },
       "handler": "inline",
       "controllerServices": [
@@ -8939,7 +8969,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2590
+        "line": 2592
       },
       "handler": "inline",
       "controllerServices": [
@@ -9051,7 +9081,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2635
+        "line": 2637
       },
       "handler": "inline",
       "controllerServices": [
@@ -9160,7 +9190,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2471
+        "line": 2473
       },
       "handler": "inline",
       "controllerServices": [
@@ -9265,7 +9295,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2409
+        "line": 2411
       },
       "handler": "inline",
       "controllerServices": [],
@@ -9365,7 +9395,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2380
+        "line": 2382
       },
       "handler": "inline",
       "controllerServices": [
@@ -9477,7 +9507,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2374
+        "line": 2376
       },
       "handler": "inline",
       "controllerServices": [
@@ -9579,7 +9609,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2560
+        "line": 2562
       },
       "handler": "inline",
       "controllerServices": [
@@ -9718,7 +9748,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2425
+        "line": 2427
       },
       "handler": "inline",
       "controllerServices": [
@@ -9827,7 +9857,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2366
+        "line": 2368
       },
       "handler": "inline",
       "controllerServices": [],
@@ -9925,7 +9955,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2525
+        "line": 2527
       },
       "handler": "inline",
       "controllerServices": [
@@ -10025,7 +10055,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2547
+        "line": 2549
       },
       "handler": "inline",
       "controllerServices": [
@@ -10129,7 +10159,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2482
+        "line": 2484
       },
       "handler": "inline",
       "controllerServices": [
@@ -10229,7 +10259,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2515
+        "line": 2517
       },
       "handler": "inline",
       "controllerServices": [
@@ -10329,7 +10359,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2535
+        "line": 2537
       },
       "handler": "inline",
       "controllerServices": [
@@ -13526,7 +13556,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2201
+        "line": 2203
       },
       "handler": "inline",
       "controllerServices": [
@@ -13633,7 +13663,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2266
+        "line": 2268
       },
       "handler": "inline",
       "controllerServices": [
@@ -13748,7 +13778,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2278
+        "line": 2280
       },
       "handler": "inline",
       "controllerServices": [
@@ -13859,7 +13889,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2290
+        "line": 2292
       },
       "handler": "inline",
       "controllerServices": [
@@ -13968,7 +13998,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2313
+        "line": 2315
       },
       "handler": "inline",
       "controllerServices": [
@@ -14073,7 +14103,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2233
+        "line": 2235
       },
       "handler": "inline",
       "controllerServices": [
@@ -14196,7 +14226,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2208
+        "line": 2210
       },
       "handler": "inline",
       "controllerServices": [
@@ -14309,7 +14339,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2299
+        "line": 2301
       },
       "handler": "inline",
       "controllerServices": [
@@ -14414,7 +14444,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2306
+        "line": 2308
       },
       "handler": "inline",
       "controllerServices": [
@@ -14593,7 +14623,9 @@
       ],
       "data": {
         "reads": [
-          "attachments"
+          "attachments",
+          "greenfield_post_draft_content",
+          "the"
         ],
         "writes": [
           "attachments"
@@ -14620,6 +14652,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
@@ -14736,6 +14769,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
@@ -14892,6 +14926,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
@@ -15005,6 +15040,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
@@ -15129,6 +15165,7 @@
         ],
         "tests": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
@@ -15154,7 +15191,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 737
+        "line": 739
       },
       "handler": "inline",
       "controllerServices": [
@@ -15261,7 +15298,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 727
+        "line": 729
       },
       "handler": "inline",
       "controllerServices": [
@@ -15363,7 +15400,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 724
+        "line": 726
       },
       "handler": "inline",
       "controllerServices": [
@@ -15459,7 +15496,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 718
+        "line": 720
       },
       "handler": "inline",
       "controllerServices": [
@@ -15559,7 +15596,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 803
+        "line": 805
       },
       "handler": "inline",
       "controllerServices": [
@@ -15674,7 +15711,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 760
+        "line": 762
       },
       "handler": "inline",
       "controllerServices": [
@@ -15780,7 +15817,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 775
+        "line": 777
       },
       "handler": "inline",
       "controllerServices": [
@@ -15896,7 +15933,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 343
+        "line": 345
       },
       "handler": "inline",
       "controllerServices": [
@@ -16013,7 +16050,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 824
+        "line": 826
       },
       "handler": "inline",
       "controllerServices": [
@@ -16116,7 +16153,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 829
+        "line": 831
       },
       "handler": "inline",
       "controllerServices": [
@@ -16341,7 +16378,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 698
+        "line": 700
       },
       "handler": "inline",
       "controllerServices": [
@@ -16451,7 +16488,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 673
+        "line": 675
       },
       "handler": "inline",
       "controllerServices": [
@@ -16564,7 +16601,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 632
+        "line": 634
       },
       "handler": "inline",
       "controllerServices": [
@@ -16672,7 +16709,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 647
+        "line": 649
       },
       "handler": "inline",
       "controllerServices": [
@@ -19959,7 +19996,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1075
+        "line": 1077
       },
       "handler": "inline",
       "controllerServices": [
@@ -20066,7 +20103,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1085
+        "line": 1087
       },
       "handler": "inline",
       "controllerServices": [
@@ -20179,7 +20216,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 172
+        "line": 173
       },
       "handler": "inline",
       "controllerServices": [
@@ -20296,7 +20333,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 154
+        "line": 155
       },
       "handler": "inline",
       "controllerServices": [
@@ -20415,7 +20452,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 198
+        "line": 199
       },
       "handler": "inline",
       "controllerServices": [
@@ -20536,7 +20573,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 198
+        "line": 199
       },
       "handler": "inline",
       "controllerServices": [
@@ -20657,7 +20694,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 184
+        "line": 185
       },
       "handler": "inline",
       "controllerServices": [
@@ -20779,7 +20816,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 223
+        "line": 224
       },
       "handler": "inline",
       "controllerServices": [
@@ -20896,7 +20933,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 210
+        "line": 211
       },
       "handler": "inline",
       "controllerServices": [
@@ -21015,7 +21052,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 131
+        "line": 132
       },
       "handler": "inline",
       "controllerServices": [
@@ -21130,7 +21167,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 140
+        "line": 141
       },
       "handler": "inline",
       "controllerServices": [
@@ -25337,7 +25374,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1343
+        "line": 1345
       },
       "handler": "inline",
       "controllerServices": [
@@ -25437,7 +25474,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1427
+        "line": 1429
       },
       "handler": "inline",
       "controllerServices": [
@@ -25580,7 +25617,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1352
+        "line": 1354
       },
       "handler": "inline",
       "controllerServices": [
@@ -25682,7 +25719,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1370
+        "line": 1372
       },
       "handler": "inline",
       "controllerServices": [
@@ -25786,7 +25823,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1361
+        "line": 1363
       },
       "handler": "inline",
       "controllerServices": [
@@ -25890,7 +25927,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1379
+        "line": 1381
       },
       "handler": "inline",
       "controllerServices": [
@@ -26044,7 +26081,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1296
+        "line": 1298
       },
       "handler": "inline",
       "controllerServices": [
@@ -26149,7 +26186,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1299
+        "line": 1301
       },
       "handler": "inline",
       "controllerServices": [
@@ -26256,7 +26293,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1304
+        "line": 1306
       },
       "handler": "inline",
       "controllerServices": [
@@ -30697,7 +30734,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2186
+        "line": 2188
       },
       "handler": "inline",
       "controllerServices": [
@@ -30810,7 +30847,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1205
+        "line": 1207
       },
       "handler": "inline",
       "controllerServices": [
@@ -30918,7 +30955,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1213
+        "line": 1215
       },
       "handler": "inline",
       "controllerServices": [
@@ -31029,7 +31066,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 320
+        "line": 327
       },
       "handler": "inline",
       "controllerServices": [
@@ -31149,7 +31186,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 310
+        "line": 317
       },
       "handler": "inline",
       "controllerServices": [
@@ -31272,7 +31309,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 300
+        "line": 307
       },
       "handler": "inline",
       "controllerServices": [
@@ -31395,7 +31432,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1237
+        "line": 1239
       },
       "handler": "inline",
       "controllerServices": [
@@ -31511,7 +31548,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1225
+        "line": 1227
       },
       "handler": "inline",
       "controllerServices": [
@@ -31627,7 +31664,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1247
+        "line": 1249
       },
       "handler": "inline",
       "controllerServices": [
@@ -32470,7 +32507,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1208
+        "line": 1210
       },
       "handler": "inline",
       "controllerServices": [
@@ -32573,7 +32610,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1220
+        "line": 1222
       },
       "handler": "inline",
       "controllerServices": [
@@ -32677,7 +32714,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1475
+        "line": 1477
       },
       "handler": "inline",
       "controllerServices": [
@@ -32806,7 +32843,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1506
+        "line": 1508
       },
       "handler": "inline",
       "controllerServices": [
@@ -32918,7 +32955,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1791
+        "line": 1793
       },
       "handler": "inline",
       "controllerServices": [
@@ -33026,7 +33063,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1767
+        "line": 1769
       },
       "handler": "inline",
       "controllerServices": [
@@ -33135,7 +33172,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1779
+        "line": 1781
       },
       "handler": "inline",
       "controllerServices": [
@@ -33243,7 +33280,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 337
+        "line": 344
       },
       "handler": "inline",
       "controllerServices": [
@@ -33344,7 +33381,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 347
+        "line": 354
       },
       "handler": "inline",
       "controllerServices": [
@@ -33450,7 +33487,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1273
+        "line": 1275
       },
       "handler": "inline",
       "controllerServices": [
@@ -33557,7 +33594,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1278
+        "line": 1280
       },
       "handler": "inline",
       "controllerServices": [
@@ -33669,7 +33706,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 359
+        "line": 366
       },
       "handler": "inline",
       "controllerServices": [
@@ -37231,7 +37268,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 266
+        "line": 268
       },
       "handler": "inline",
       "controllerServices": [],
@@ -37343,7 +37380,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 270
+        "line": 272
       },
       "handler": "inline",
       "controllerServices": [],
@@ -39250,7 +39287,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2683
+        "line": 2685
       },
       "handler": "inline",
       "controllerServices": [],
@@ -39525,6 +39562,2394 @@
       "status": "candidate-registered-not-production-probed",
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
       "contract": null
+    },
+    {
+      "id": "GET /v1/me/collections",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/collections",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 77
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.list"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#list"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "List the authenticated actor's named Saved collections and authoritative active item counts.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Collection owner is resolved from the authenticated actor; another actor's collections are never returned.",
+        "request": {
+          "params": {},
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional updated-at/collection-id cursor"
+          },
+          "body": {},
+          "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data CursorPage<SavedCollectionDto>."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "updated_at descending then collection_id descending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only; itemCount is derived from active collection-item rows.",
+        "versioningCompatibility": "HTTP v1 additive route. This is named organization over existing Saved rows, not a replacement bookmarking system."
+      }
+    },
+    {
+      "id": "POST /v1/me/collections",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/me/collections",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 88
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.create"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "{name: string}).name, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        201
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [
+          "greenfield_saved_collections"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#create"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Create an authenticated actor-owned named Saved collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Owner identity is server-derived; client owner fields are rejected.",
+        "request": {
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "required trimmed name, 1-120 characters"
+          },
+          "validation": "Unknown fields and blank names are rejected; active names are case-insensitively unique per owner."
+        },
+        "success": {
+          "status": "201",
+          "body": "Envelope data {collection:SavedCollectionDto} with itemCount=0 and version=1."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "A partial unique index on owner and normalized active name prevents concurrent duplicates; state and audit commit together.",
+        "versioningCompatibility": "HTTP v1 new route. Collection IDs are immutable UUIDs and version starts at 1."
+      }
+    },
+    {
+      "id": "DELETE /v1/me/collections/:collectionId",
+      "domain": "Platform",
+      "method": "DELETE",
+      "effectiveRoute": "/v1/me/collections/:collectionId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections/:collectionId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 129
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.remove"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [
+          "{expectedVersion: number}).expectedVersion)"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [
+          "greenfield_saved_collections"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#remove"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Soft-delete an authenticated actor-owned collection without deleting source posts or Saved rows.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Only the owner may delete; cross-user IDs return NOT_FOUND.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {
+            "expectedVersion": "required positive integer"
+          },
+          "body": {},
+          "validation": "Unknown query fields and stale revisions are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {deleted:true}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Soft delete is version-guarded and auditable. Collection-item rows may cascade only during physical recovery cleanup; posts and post_saves are never cascaded.",
+        "versioningCompatibility": "HTTP v1 new route. Deletion does not unsave or delete underlying content."
+      }
+    },
+    {
+      "id": "GET /v1/me/collections/:collectionId",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/collections/:collectionId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections/:collectionId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 102
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.get"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#get",
+          "services/greenfield-api/src/domains/collections/service.ts#ownedCollection"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Load one authenticated actor-owned named Saved collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Cross-user and deleted collection IDs return NOT_FOUND without ownership disclosure.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {},
+          "body": {},
+          "validation": "collectionId is schema-validated."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {collection:SavedCollectionDto}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Read-only; item count is server-derived.",
+        "versioningCompatibility": "HTTP v1 new route."
+      }
+    },
+    {
+      "id": "PATCH /v1/me/collections/:collectionId",
+      "domain": "Platform",
+      "method": "PATCH",
+      "effectiveRoute": "/v1/me/collections/:collectionId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections/:collectionId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 111
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.update"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{name: string"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections"
+        ],
+        "writes": [
+          "collection",
+          "greenfield_saved_collections"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#get",
+          "services/greenfield-api/src/domains/collections/service.ts#ownedCollection",
+          "services/greenfield-api/src/domains/collections/service.ts#update"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Optimistically rename an authenticated actor-owned Saved collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Only the owner may rename; owner identity and version are not inferred from client object state.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {},
+          "body": {
+            "name": "required 1-120 characters",
+            "expectedVersion": "required positive integer"
+          },
+          "validation": "Unknown fields, blank names and duplicate active owner/name pairs are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {collection:SavedCollectionDto} with incremented version."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "UPDATE is guarded by owner and expectedVersion; stale or competing renames return CONFLICT.",
+        "versioningCompatibility": "HTTP v1 new route with optimistic revision semantics."
+      }
+    },
+    {
+      "id": "GET /v1/me/collections/:collectionId/items",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/collections/:collectionId/items",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections/:collectionId/items",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 143
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.listItems"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections",
+          "post_saves"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#listItems",
+          "services/greenfield-api/src/domains/collections/service.ts#ownedCollection"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "List stable ordered items in one actor-owned collection while retaining unavailable source references safely.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Collection ownership is required. Post hydration applies existing post visibility policy.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional position/item-id cursor"
+          },
+          "body": {},
+          "validation": "Malformed UUID, cursor and limit values are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data CursorPage<SavedCollectionItemDto>; unavailable or unsaved sources return available=false and post=null."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "position ascending then item_id ascending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only; positions are uniquely constrained among active rows per collection.",
+        "versioningCompatibility": "HTTP v1 new route. Unavailable items remain identifiable for explicit removal and can become available after re-save."
+      }
+    },
+    {
+      "id": "POST /v1/me/collections/:collectionId/items",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/me/collections/:collectionId/items",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections/:collectionId/items",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 157
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.addItem"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{collectionId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{postId: string}).postId, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections",
+          "post_saves"
+        ],
+        "writes": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#addItem"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Add an already-Saved post to an actor-owned named collection.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "The collection and active post_saves row must both belong to the authenticated actor.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID"
+          },
+          "query": {},
+          "body": {
+            "postId": "required UUID of an existing currently Saved post"
+          },
+          "validation": "Unknown fields, cross-user collections and posts not present in the caller's active Saved rows are rejected."
+        },
+        "success": {
+          "status": "201 when added; 200 for an existing active membership",
+          "body": "Envelope data {item:SavedCollectionItemDto}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The collection row serializes position allocation and UNIQUE(collection_id,save_id) prevents duplicate membership. Concurrent identical requests converge on one item ID.",
+        "versioningCompatibility": "HTTP v1 new route. postId references the canonical existing Saved system."
+      }
+    },
+    {
+      "id": "DELETE /v1/me/collections/:collectionId/items/:itemId",
+      "domain": "Platform",
+      "method": "DELETE",
+      "effectiveRoute": "/v1/me/collections/:collectionId/items/:itemId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/collections/:collectionId/items/:itemId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 173
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "collections.removeItem"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "saved:manage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{collectionId: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_saved_collections"
+        ],
+        "writes": [
+          "greenfield_saved_collection_items",
+          "greenfield_saved_collections"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/collections/service.ts#removeItem"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Remove one item membership from an actor-owned collection without unsaving or deleting its source post.",
+        "owningDomain": "Saved collections",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Both collection ownership and item-to-collection association are enforced.",
+        "request": {
+          "params": {
+            "collectionId": "required collection UUID",
+            "itemId": "required collection item UUID"
+          },
+          "query": {},
+          "body": {},
+          "validation": "Both UUIDs are schema-validated and cross-associated server-side."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {deleted:true}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The item is soft-deleted under a collection lock; a missing/already-removed item returns NOT_FOUND and no source rows are changed.",
+        "versioningCompatibility": "HTTP v1 new route."
+      }
+    },
+    {
+      "id": "GET /v1/me/drafts",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/drafts",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/drafts",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 186
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "drafts.list"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_post_drafts"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/drafts/service.ts#list",
+          "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "List the authenticated actor's editable post drafts for multi-device reconciliation.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Only owner_actor_id matching the authenticated actor is queried.",
+        "request": {
+          "params": {},
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional updated-at/draft-id cursor"
+          },
+          "body": {},
+          "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data CursorPage<PostDraftDto>; each draft includes version and updatedAt for reconciliation."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "updated_at descending then draft_id descending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only; only editing drafts are listed. Published drafts remain addressable by ID for retry confirmation.",
+        "versioningCompatibility": "HTTP v1 additive route. Initial server contract is post drafts only; Story and In-Mail drafts remain separate Native gaps."
+      }
+    },
+    {
+      "id": "POST /v1/me/drafts",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/me/drafts",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/drafts",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 197
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "drafts.create"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "CreatePostDraftInput, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_post_drafts"
+        ],
+        "writes": [
+          "greenfield_post_drafts"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/drafts/service.ts#assertIdempotentPayload",
+          "services/greenfield-api/src/domains/drafts/service.ts#create",
+          "services/greenfield-api/src/domains/drafts/service.ts#get",
+          "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+          "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Persist a post-composer draft and reserve its uploaded attachment references for the authenticated actor.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Owner is server-derived. Every attachment must be ready, unattached and owned by the authenticated account.",
+        "request": {
+          "params": {},
+          "query": {},
+          "body": {
+            "idempotencyKey": "optional 1-200 character retry identity",
+            "text": "required string up to 5000 characters; may be empty when content is present",
+            "feed": "optional following, forYou or modules",
+            "audience": "optional public, followers or private",
+            "replyPermission": "optional everyone, followers, mentioned or none",
+            "content": "optional array of at most 10 typed uploaded attachment references with captions up to 1000 characters",
+            "publishToAtproto": "optional boolean; attachments are not supported when true"
+          },
+          "validation": "Unknown/privileged fields, empty text+content, duplicate/cross-account/unready/reserved attachments and legacy base64 media are rejected."
+        },
+        "success": {
+          "status": "201 when created; 200 for an identical idempotent retry",
+          "body": "Envelope data {draft:PostDraftDto} with state=editing and version=1."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "An optional owner/idempotency-key unique index converges retries; key reuse with a different normalized payload returns CONFLICT. Draft and attachment references commit together.",
+        "versioningCompatibility": "HTTP v1 new route. Uses the canonical CreatePost content/feed/audience/reply contract; clients must upload local media before syncing."
+      }
+    },
+    {
+      "id": "DELETE /v1/me/drafts/:draftId",
+      "domain": "Platform",
+      "method": "DELETE",
+      "effectiveRoute": "/v1/me/drafts/:draftId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/drafts/:draftId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 238
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "drafts.remove"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [
+          "{expectedVersion: number}).expectedVersion), contextFor(request))"
+        ],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_post_drafts"
+        ],
+        "writes": [
+          "greenfield_post_draft_content",
+          "greenfield_post_drafts"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/drafts/service.ts#remove"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Soft-delete an owned draft and release any unpublished attachment reservations.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Only the authenticated owner may delete; cross-user IDs return NOT_FOUND.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {
+            "expectedVersion": "required positive integer"
+          },
+          "body": {},
+          "validation": "Unknown query fields and stale revisions are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {deleted:true}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Draft deletion is row-locked and revision-guarded. It never deletes a published post or attachment bytes.",
+        "versioningCompatibility": "HTTP v1 new route. A draft is never deleted automatically before post publication is confirmed."
+      }
+    },
+    {
+      "id": "GET /v1/me/drafts/:draftId",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/me/drafts/:draftId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/drafts/:draftId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 212
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "drafts.get"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_post_drafts"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/drafts/service.ts#get",
+          "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+          "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Load one owned editing or published post draft for synchronization or publish retry recovery.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Cross-user and deleted draft IDs return NOT_FOUND.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {},
+          "body": {},
+          "validation": "draftId is schema-validated."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {draft:PostDraftDto}, including state, publishedPostId, version and updatedAt."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "Read-only. Published state is retained so a lost publish response can be reconciled safely.",
+        "versioningCompatibility": "HTTP v1 new route."
+      }
+    },
+    {
+      "id": "PATCH /v1/me/drafts/:draftId",
+      "domain": "Platform",
+      "method": "PATCH",
+      "effectiveRoute": "/v1/me/drafts/:draftId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/drafts/:draftId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 221
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "drafts.update"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [
+          "UpdatePostDraftInput, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_post_drafts"
+        ],
+        "writes": [
+          "draft",
+          "greenfield_post_drafts"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/drafts/service.ts#get",
+          "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+          "services/greenfield-api/src/domains/drafts/service.ts#toDto",
+          "services/greenfield-api/src/domains/drafts/service.ts#update"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Optimistically synchronize changes to an owned editable post draft.",
+        "owningDomain": "Post drafts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Only the authenticated owner may edit; published drafts reject edits.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {},
+          "body": {
+            "expectedVersion": "required positive integer",
+            "text": "optional string up to 5000 characters",
+            "feed": "optional following, forYou or modules",
+            "audience": "optional public, followers or private",
+            "replyPermission": "optional everyone, followers, mentioned or none",
+            "content": "optional complete replacement array of up to 10 uploaded attachment references",
+            "publishToAtproto": "optional boolean"
+          },
+          "validation": "At least one change is required. Unknown fields, stale revisions and invalid/cross-account/unready/reserved attachments are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {draft:PostDraftDto} with incremented version and updatedAt."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The draft row is locked and expectedVersion must match. Stale two-device edits return CONFLICT; no newer server revision is overwritten silently.",
+        "versioningCompatibility": "HTTP v1 new route. Clients should surface conflicts for user resolution and reload the latest draft."
+      }
+    },
+    {
+      "id": "POST /v1/me/drafts/:draftId/publish",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/me/drafts/:draftId/publish",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/me/drafts/:draftId/publish",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "line": 251
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "drafts.publish"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:create"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{draftId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{expectedVersion: number}).expectedVersion, contextFor(request))"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_post_drafts"
+        ],
+        "writes": [
+          "greenfield_post_drafts"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/drafts/service.ts#get",
+          "services/greenfield-api/src/domains/drafts/service.ts#ownedDraft",
+          "services/greenfield-api/src/domains/drafts/service.ts#publish",
+          "services/greenfield-api/src/domains/drafts/service.ts#toDto"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "Validate and publish an owned post draft exactly once through the canonical post creation pipeline.",
+        "owningDomain": "Post drafts integrated with canonical posts",
+        "authentication": "Bearer session with post:create capability required.",
+        "authorization": "Draft owner and attachment ownership are resolved server-side; another actor cannot redirect or publish the draft.",
+        "request": {
+          "params": {
+            "draftId": "required draft UUID"
+          },
+          "query": {},
+          "body": {
+            "expectedVersion": "required current positive draft version"
+          },
+          "validation": "Unknown fields, stale revisions, invalid composer state and unavailable attachments are rejected before commit."
+        },
+        "success": {
+          "status": "201 for the committing publication; 200 for an already-published or concurrent retry",
+          "body": "Envelope data {draft:PostDraftDto,postId:string,created:boolean}."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 403,
+            "codes": [
+              "FORBIDDEN"
+            ]
+          },
+          {
+            "status": 404,
+            "codes": [
+              "NOT_FOUND"
+            ]
+          },
+          {
+            "status": 409,
+            "codes": [
+              "CONFLICT"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "none",
+          "filtering": "none"
+        },
+        "idempotencyConcurrency": "The server derives idempotency key draft-publish:<draftId>. The existing unique post author/key invariant converges concurrent retries, and post creation, attachment activation, outbox/events/audit and draft state/publishedPostId update commit in one database transaction. A stale finalizer rolls back the post; failed publication leaves state=editing.",
+        "versioningCompatibility": "HTTP v1 new route. The created post is a normal SocialPostDto record consumable without a fake draft post type."
+      }
     },
     {
       "id": "GET /v1/me/entitlements",
@@ -40282,7 +42707,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2159
+        "line": 2161
       },
       "handler": "inline",
       "controllerServices": [
@@ -40849,7 +43274,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 282
+        "line": 284
       },
       "handler": "inline",
       "controllerServices": [
@@ -41221,7 +43646,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1446
+        "line": 1448
       },
       "handler": "inline",
       "controllerServices": [
@@ -54812,7 +57237,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2012
+        "line": 2014
       },
       "handler": "inline",
       "controllerServices": [
@@ -54924,7 +57349,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2027
+        "line": 2029
       },
       "handler": "inline",
       "controllerServices": [
@@ -55035,7 +57460,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2036
+        "line": 2038
       },
       "handler": "inline",
       "controllerServices": [
@@ -55141,7 +57566,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1293
+        "line": 1295
       },
       "handler": "inline",
       "controllerServices": [
@@ -55239,7 +57664,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1535
+        "line": 1537
       },
       "handler": "inline",
       "controllerServices": [
@@ -55311,6 +57736,7 @@
           "greenfield_communities",
           "greenfield_community_memberships",
           "greenfield_community_settings",
+          "greenfield_post_draft_content",
           "posts"
         ],
         "writes": [
@@ -55350,6 +57776,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -55377,7 +57804,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1571
+        "line": 1573
       },
       "handler": "inline",
       "controllerServices": [
@@ -55481,6 +57908,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -55508,7 +57936,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1528
+        "line": 1530
       },
       "handler": "inline",
       "controllerServices": [
@@ -55611,6 +58039,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -55638,7 +58067,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1554
+        "line": 1556
       },
       "handler": "inline",
       "controllerServices": [
@@ -55747,6 +58176,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -55774,7 +58204,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 108
+        "line": 109
       },
       "handler": "inline",
       "controllerServices": [
@@ -55876,6 +58306,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -55903,7 +58334,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 117
+        "line": 118
       },
       "handler": "inline",
       "controllerServices": [
@@ -56028,6 +58459,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56055,7 +58487,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1595
+        "line": 1597
       },
       "handler": "inline",
       "controllerServices": [
@@ -56174,6 +58606,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56201,7 +58634,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1595
+        "line": 1597
       },
       "handler": "inline",
       "controllerServices": [
@@ -56320,6 +58753,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56347,7 +58781,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 237
+        "line": 238
       },
       "handler": "inline",
       "controllerServices": [
@@ -56461,6 +58895,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56488,7 +58923,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 85
+        "line": 86
       },
       "handler": "inline",
       "controllerServices": [
@@ -56595,6 +59030,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56622,7 +59058,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 72
+        "line": 73
       },
       "handler": "inline",
       "controllerServices": [
@@ -56731,6 +59167,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56758,7 +59195,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 96
+        "line": 97
       },
       "handler": "inline",
       "controllerServices": [
@@ -56855,6 +59292,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -56882,7 +59320,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1595
+        "line": 1597
       },
       "handler": "inline",
       "controllerServices": [
@@ -57001,6 +59439,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -57028,7 +59467,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1595
+        "line": 1597
       },
       "handler": "inline",
       "controllerServices": [
@@ -57147,6 +59586,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -57174,7 +59614,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1595
+        "line": 1597
       },
       "handler": "inline",
       "controllerServices": [
@@ -57293,6 +59733,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -57320,7 +59761,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1595
+        "line": 1597
       },
       "handler": "inline",
       "controllerServices": [
@@ -57439,6 +59880,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -57466,7 +59908,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1632
+        "line": 1634
       },
       "handler": "inline",
       "controllerServices": [
@@ -57570,6 +60012,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
           "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/phase6.security.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -57914,7 +60357,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1651
+        "line": 1653
       },
       "handler": "inline",
       "controllerServices": [
@@ -58060,7 +60503,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1675
+        "line": 1677
       },
       "handler": "inline",
       "controllerServices": [
@@ -58196,7 +60639,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1691
+        "line": 1693
       },
       "handler": "inline",
       "controllerServices": [
@@ -58332,7 +60775,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1659
+        "line": 1661
       },
       "handler": "inline",
       "controllerServices": [
@@ -58467,7 +60910,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1878
+        "line": 1880
       },
       "handler": "inline",
       "controllerServices": [
@@ -58601,7 +61044,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1863
+        "line": 1865
       },
       "handler": "inline",
       "controllerServices": [
@@ -58738,7 +61181,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1730
+        "line": 1732
       },
       "handler": "inline",
       "controllerServices": [
@@ -58881,7 +61324,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1707
+        "line": 1709
       },
       "handler": "inline",
       "controllerServices": [
@@ -59024,7 +61467,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1908
+        "line": 1910
       },
       "handler": "inline",
       "controllerServices": [
@@ -59158,7 +61601,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1893
+        "line": 1895
       },
       "handler": "inline",
       "controllerServices": [
@@ -59293,7 +61736,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1803
+        "line": 1805
       },
       "handler": "inline",
       "controllerServices": [
@@ -59432,7 +61875,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1848
+        "line": 1850
       },
       "handler": "inline",
       "controllerServices": [
@@ -59545,7 +61988,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1831
+        "line": 1833
       },
       "handler": "inline",
       "controllerServices": [
@@ -59661,7 +62104,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1848
+        "line": 1850
       },
       "handler": "inline",
       "controllerServices": [
@@ -59773,7 +62216,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1831
+        "line": 1833
       },
       "handler": "inline",
       "controllerServices": [
@@ -59888,7 +62331,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1753
+        "line": 1755
       },
       "handler": "inline",
       "controllerServices": [
@@ -60843,7 +63286,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2196
+        "line": 2198
       },
       "handler": "inline",
       "controllerServices": [
@@ -62601,7 +65044,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1923
+        "line": 1925
       },
       "handler": "inline",
       "controllerServices": [
@@ -62722,7 +65165,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1936
+        "line": 1938
       },
       "handler": "inline",
       "controllerServices": [
@@ -62826,7 +65269,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1096
+        "line": 1098
       },
       "handler": "inline",
       "controllerServices": [
@@ -62931,7 +65374,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1185
+        "line": 1187
       },
       "handler": "inline",
       "controllerServices": [
@@ -63037,7 +65480,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1194
+        "line": 1196
       },
       "handler": "inline",
       "controllerServices": [
@@ -63140,7 +65583,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1105
+        "line": 1107
       },
       "handler": "inline",
       "controllerServices": [
@@ -63243,7 +65686,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1119
+        "line": 1121
       },
       "handler": "inline",
       "controllerServices": [
@@ -63353,7 +65796,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1162
+        "line": 1164
       },
       "handler": "inline",
       "controllerServices": [
@@ -63467,7 +65910,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1111
+        "line": 1113
       },
       "handler": "inline",
       "controllerServices": [
@@ -63570,7 +66013,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1138
+        "line": 1140
       },
       "handler": "inline",
       "controllerServices": [
@@ -63685,7 +66128,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 251
+        "line": 252
       },
       "handler": "inline",
       "controllerServices": [
@@ -63721,15 +66164,15 @@
         "params": [],
         "query": [],
         "body": [],
-        "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
         "pagination": {
-          "style": "none observed",
-          "defaultPageSize": null,
-          "maximumPageSize": null,
-          "nextCursor": false,
+          "style": "cursor",
+          "defaultPageSize": 20,
+          "maximumPageSize": 50,
+          "nextCursor": true,
           "previousCursor": false,
-          "stability": "not a list or unpaginated"
+          "stability": "route-specific stable ordering; inspect repository order fields"
         }
       },
       "response": {
@@ -63769,6 +66212,7 @@
           "scripts/verify-phase6s-social-backend.mjs",
           "scripts/verify-phase7c-api-parity.mjs",
           "scripts/verify-phase7c-social-core.mjs",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts"
         ]
       },
@@ -63779,8 +66223,61 @@
       "featureState": "enabled",
       "liveProbe": null,
       "status": "candidate-registered-not-production-probed",
-      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
-      "contract": null
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": {
+        "purpose": "List the authenticated actor's existing Saved posts with bounded stable pagination.",
+        "owningDomain": "Saved posts",
+        "authentication": "Bearer session with saved:manage capability required.",
+        "authorization": "Only the authenticated actor's private post_saves rows are queried; inaccessible or deleted source posts are omitted.",
+        "request": {
+          "params": {},
+          "query": {
+            "limit": "optional integer 1-50, default 20",
+            "cursor": "optional opaque created-at/save-id cursor"
+          },
+          "body": {},
+          "validation": "Unknown query fields, malformed cursors and invalid limits are rejected."
+        },
+        "success": {
+          "status": "200",
+          "body": "Envelope data {items:SocialPostDto[],nextCursor:string|null,hasMore:boolean}; the existing items field is preserved for older clients."
+        },
+        "errors": [
+          {
+            "status": 400,
+            "codes": [
+              "VALIDATION_FAILED"
+            ]
+          },
+          {
+            "status": 401,
+            "codes": [
+              "UNAUTHENTICATED",
+              "SESSION_EXPIRED"
+            ]
+          },
+          {
+            "status": 429,
+            "codes": [
+              "RATE_LIMITED"
+            ]
+          },
+          {
+            "status": 500,
+            "codes": [
+              "SERVER_ERROR"
+            ]
+          }
+        ],
+        "pagination": {
+          "style": "cursor",
+          "ordering": "post_saves.created_at descending then save id descending",
+          "defaultLimit": 20,
+          "maximumLimit": 50
+        },
+        "idempotencyConcurrency": "Read-only. Cursor identity is based on immutable save creation time and save ID; saving/unsaving continues through the existing post engagement routes.",
+        "versioningCompatibility": "HTTP v1 additive pagination metadata. Existing consumers that read data.items remain compatible."
+      }
     },
     {
       "id": "GET /v1/search",
@@ -63792,7 +66289,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2069
+        "line": 2071
       },
       "handler": "inline",
       "controllerServices": [
@@ -63902,7 +66399,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2106
+        "line": 2108
       },
       "handler": "inline",
       "controllerServices": [
@@ -64007,7 +66504,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2086
+        "line": 2088
       },
       "handler": "inline",
       "controllerServices": [
@@ -64108,7 +66605,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2096
+        "line": 2098
       },
       "handler": "inline",
       "controllerServices": [
@@ -64211,7 +66708,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2117
+        "line": 2119
       },
       "handler": "inline",
       "controllerServices": [
@@ -64311,7 +66808,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2127
+        "line": 2129
       },
       "handler": "inline",
       "controllerServices": [
@@ -64415,7 +66912,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2148
+        "line": 2150
       },
       "handler": "inline",
       "controllerServices": [
@@ -64519,7 +67016,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2137
+        "line": 2139
       },
       "handler": "inline",
       "controllerServices": [
@@ -64627,7 +67124,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2078
+        "line": 2080
       },
       "handler": "inline",
       "controllerServices": [
@@ -64725,7 +67222,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 845
+        "line": 847
       },
       "handler": "inline",
       "controllerServices": [
@@ -64823,6 +67320,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7l-b-session.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
@@ -64871,7 +67369,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1067
+        "line": 1069
       },
       "handler": "inline",
       "controllerServices": [
@@ -64972,6 +67470,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7l-b-session.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
@@ -65020,7 +67519,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1006
+        "line": 1008
       },
       "handler": "inline",
       "controllerServices": [
@@ -65136,7 +67635,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 994
+        "line": 996
       },
       "handler": "inline",
       "controllerServices": [
@@ -65238,7 +67737,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1061
+        "line": 1063
       },
       "handler": "inline",
       "controllerServices": [
@@ -65352,7 +67851,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 882
+        "line": 884
       },
       "handler": "inline",
       "controllerServices": [
@@ -65461,7 +67960,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 867
+        "line": 869
       },
       "handler": "inline",
       "controllerServices": [
@@ -65568,7 +68067,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1468
+        "line": 1470
       },
       "handler": "inline",
       "controllerServices": [
@@ -65671,7 +68170,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1462
+        "line": 1464
       },
       "handler": "inline",
       "controllerServices": [],
@@ -65766,7 +68265,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 953
+        "line": 955
       },
       "handler": "inline",
       "controllerServices": [
@@ -65888,7 +68387,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 938
+        "line": 940
       },
       "handler": "inline",
       "controllerServices": [
@@ -65995,7 +68494,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 910
+        "line": 912
       },
       "handler": "inline",
       "controllerServices": [
@@ -66103,7 +68602,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1042
+        "line": 1044
       },
       "handler": "inline",
       "controllerServices": [
@@ -67525,7 +70024,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1259
+        "line": 1261
       },
       "handler": "inline",
       "controllerServices": [
@@ -67628,7 +70127,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1263
+        "line": 1265
       },
       "handler": "inline",
       "controllerServices": [
@@ -67733,7 +70232,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 262
+        "line": 264
       },
       "handler": "inline",
       "controllerServices": [],
@@ -67829,7 +70328,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1443
+        "line": 1445
       },
       "handler": "inline",
       "controllerServices": [
@@ -67925,7 +70424,7 @@
       "apiVersion": "versionless",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 258
+        "line": 260
       },
       "handler": "inline",
       "controllerServices": [],
@@ -68233,6 +70732,7 @@
         "services/greenfield-api/src/ai/provider-runtime-service.ts",
         "services/greenfield-api/src/app/register-routes.ts",
         "services/greenfield-api/src/domains/communities/service.ts",
+        "services/greenfield-api/src/domains/drafts/service.ts",
         "services/greenfield-api/src/domains/mentions/service.ts",
         "services/greenfield-api/src/domains/messaging/service.ts",
         "services/greenfield-api/src/domains/notifications/preferences.ts",
@@ -71479,6 +73979,7 @@
         "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/communities/service.ts",
         "services/greenfield-api/src/domains/discovery/repository.ts",
+        "services/greenfield-api/src/domains/drafts/service.ts",
         "services/greenfield-api/src/domains/posts/repository.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
@@ -98489,6 +100990,79 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_post_draft_content",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield post draft content",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "087_greenfield_collections_and_drafts.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/attachments/service.ts",
+        "services/greenfield-api/src/domains/drafts/service.ts",
+        "services/greenfield-api/src/domains/posts/writes.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/drafts/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "DELETE /v1/attachments/:attachmentId",
+        "POST /v1/posts"
+      ],
+      "routeWrites": [
+        "DELETE /v1/me/drafts/:draftId"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_post_drafts",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield post drafts",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "087_greenfield_collections_and_drafts.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/drafts/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/drafts/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/me/drafts",
+        "POST /v1/me/drafts",
+        "DELETE /v1/me/drafts/:draftId",
+        "GET /v1/me/drafts/:draftId",
+        "PATCH /v1/me/drafts/:draftId",
+        "POST /v1/me/drafts/:draftId/publish"
+      ],
+      "routeWrites": [
+        "POST /v1/me/drafts",
+        "DELETE /v1/me/drafts/:draftId",
+        "PATCH /v1/me/drafts/:draftId",
+        "POST /v1/me/drafts/:draftId/publish"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_post_shares",
       "columns": [
         {
@@ -102239,6 +104813,82 @@
       "jobWrites": [],
       "routeReads": [],
       "routeWrites": [],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_saved_collection_items",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield saved collection items",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "087_greenfield_collections_and_drafts.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/collections/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/collections/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/me/collections",
+        "GET /v1/me/collections/:collectionId",
+        "PATCH /v1/me/collections/:collectionId",
+        "GET /v1/me/collections/:collectionId/items",
+        "POST /v1/me/collections/:collectionId/items"
+      ],
+      "routeWrites": [
+        "POST /v1/me/collections/:collectionId/items",
+        "DELETE /v1/me/collections/:collectionId/items/:itemId"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_saved_collections",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield saved collections",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "087_greenfield_collections_and_drafts.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/collections/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/collections/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/me/collections",
+        "GET /v1/me/collections/:collectionId",
+        "PATCH /v1/me/collections/:collectionId",
+        "GET /v1/me/collections/:collectionId/items",
+        "POST /v1/me/collections/:collectionId/items",
+        "DELETE /v1/me/collections/:collectionId/items/:itemId"
+      ],
+      "routeWrites": [
+        "POST /v1/me/collections",
+        "DELETE /v1/me/collections/:collectionId",
+        "PATCH /v1/me/collections/:collectionId",
+        "POST /v1/me/collections/:collectionId/items",
+        "DELETE /v1/me/collections/:collectionId/items/:itemId"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
@@ -108850,6 +111500,7 @@
       ],
       "migrationIntroduced": "001_init_schema.sql",
       "sourceReads": [
+        "services/greenfield-api/src/domains/collections/service.ts",
         "services/greenfield-api/src/domains/posts/repository.ts",
         "services/greenfield-api/src/domains/saves/service.ts",
         "services/greenfield-api/src/settings-v2/service.ts"
@@ -108864,6 +111515,8 @@
         "GET /v1/creator/insights",
         "GET /v1/feed/home",
         "GET /v1/feed/profile/:profileId",
+        "GET /v1/me/collections/:collectionId/items",
+        "POST /v1/me/collections/:collectionId/items",
         "GET /v1/media/:mediaFile",
         "GET /v1/posts/:postId",
         "DELETE /v1/posts/:postId/like",
