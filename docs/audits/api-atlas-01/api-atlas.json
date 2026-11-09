@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "integration/gate-01",
       "sourceSha256": "8bd6877890f55c6d72316fbe0ba1dcaaa6525f3225fe1b27c2797c3f4dc29695",
-      "capturedAt": "2026-11-09T20:39:41.475Z",
+      "capturedAt": "2026-11-09T20:41:12.811Z",
       "routeCount": 793
     },
     "status": "PASS"

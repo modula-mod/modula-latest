@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T20:39:41.475Z for branch `integration/gate-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T20:41:12.811Z for branch `integration/gate-01`; this does not claim deployment.
 
 - Runtime method routes: 793
 - Application routes: 557
