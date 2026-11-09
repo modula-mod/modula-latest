@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import Fastify, {type FastifyInstance} from 'fastify'
 import {sql} from 'kysely'
-import {IntelligenceError} from '@modula/intelligence-contracts'
+import {IntelligenceError, type GaiaPlan, type IntelligenceLedgerEvent, type ModulaActionProposal} from '@modula/intelligence-contracts'
 import {
   DETERMINISTIC_TEST_PROVIDER_ID,
 } from '@modula/intelligence-core'
@@ -17,6 +17,7 @@ import {
   installGreenfieldMissionRuntimeTestHooks,
   resetGreenfieldMissionRuntimeTrace,
 } from '../src/intelligence/mission-runtime-binding.js'
+import {GreenfieldMissionRuntimeStore} from '../src/intelligence/mission-runtime-store.js'
 import {
   DETERMINISTIC_TEST_ADAPTER_LIMITATION,
   DETERMINISTIC_TEST_ADAPTER_STATUS,
@@ -174,6 +175,11 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     const trace = getGreenfieldMissionRuntimeTrace(db)
     expect(trace).toMatchObject({planner: 1, decisions: 1, governor: 1, execute: 1})
     expect((trace?.revalidate ?? 0) >= 1).toBe(true)
+    assertStrictlyMonotonicLedger(events)
+    const proposalIndex = events.findIndex(event => event.type === 'proposal.created')
+    const planIndex = events.findIndex(event => event.type === 'plan.created')
+    expect(proposalIndex).toBeGreaterThanOrEqual(0)
+    expect(planIndex).toBeGreaterThan(proposalIndex)
   })
 
   it('cancels a mid-run mission through the existing MissionRuntime cancel route', async () => {
@@ -225,9 +231,138 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     const structured = new IntelligenceError(String(blocked?.payload.reasonCode), 'Authorization refused the proposal')
     expect(structured).toMatchObject({name: IntelligenceError.name, code: String(blocked?.payload.reasonCode)})
   })
+  it('discards buffered proposal and ledger writes when the parent plan insert fails', async () => {
+    const store = new GreenfieldMissionRuntimeStore(db)
+    const now = new Date()
+    const accountId = `syn-atom-account-${suffix}`
+    const failedMissionId = `syn-atom-fail-${suffix}`
+    const retryMissionId = `syn-atom-retry-${suffix}`
+    const nextMissionId = `syn-atom-next-${suffix}`
+    await db.insertInto('greenfield_accounts').values({account_id: accountId, primary_handle: `synatom${suffix}`, status: 'active', created_at: now, updated_at: now}).execute()
+    for (const missionId of [failedMissionId, retryMissionId, nextMissionId]) {
+      await store.insertMission({
+        id: missionId,
+        userId: accountId,
+        objective: genericQueryObjective,
+        status: 'planning',
+        correlationId: `${missionId}-corr`,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      })
+    }
+    // Occupy version 1 so the parent plan insert fails the unique (mission_id, version) constraint.
+    await db.insertInto('intelligence_plans').values({
+      plan_id: `syn-atom-blocker-${suffix}`,
+      mission_id: failedMissionId,
+      version: 1,
+      summary: 'blocking parent row',
+      created_at: now,
+    }).execute()
+
+    const failedProposal = storeProposal(failedMissionId, `syn-atom-fail-proposal-${suffix}`)
+    await store.writeProposal(failedProposal)
+    await store.appendEvent(storeEvent(failedMissionId, failedProposal, 'proposal.created', 1, accountId))
+    expect(store.bufferedState(failedMissionId).proposalIds).toEqual([failedProposal.id])
+    expect(store.bufferedState(failedMissionId).eventIds).toHaveLength(1)
+
+    await expect(store.writePlan(storePlan(failedMissionId, failedProposal, 1, `syn-atom-fail-plan-${suffix}`))).rejects.toThrow(/unique|duplicate|constraint/i)
+
+    expect(await db.selectFrom('intelligence_proposals').select('proposal_id').where('mission_id', '=', failedMissionId).execute()).toEqual([])
+    expect(await db.selectFrom('intelligence_ledger_events').select('event_id').where('mission_id', '=', failedMissionId).execute()).toEqual([])
+    expect(await db.selectFrom('intelligence_plans').select('plan_id').where('mission_id', '=', failedMissionId).execute()).toEqual([
+      expect.objectContaining({plan_id: `syn-atom-blocker-${suffix}`}),
+    ])
+    expect(store.bufferedState(failedMissionId)).toEqual({proposalIds: [], eventIds: []})
+
+    // Retry on a fresh mission after clearing the buffer must not double-write.
+    const retryProposal = storeProposal(retryMissionId, `syn-atom-retry-proposal-${suffix}`)
+    await store.writeProposal(retryProposal)
+    await store.appendEvent(storeEvent(retryMissionId, retryProposal, 'proposal.created', 1, accountId))
+    await store.writePlan(storePlan(retryMissionId, retryProposal, 1, `syn-atom-retry-plan-${suffix}`))
+    await store.appendEvent(storeEvent(retryMissionId, retryProposal, 'plan.created', 2, accountId))
+    const retryProposals = await db.selectFrom('intelligence_proposals').select('proposal_id').where('mission_id', '=', retryMissionId).execute()
+    const retryEvents = await store.listEvents(retryMissionId)
+    expect(retryProposals).toEqual([{proposal_id: retryProposal.id}])
+    expect(retryEvents.map(event => event.type)).toEqual(['proposal.created', 'plan.created'])
+    expect(store.bufferedState(retryMissionId)).toEqual({proposalIds: [], eventIds: []})
+    assertStrictlyMonotonicLedger(retryEvents)
+
+    const nextProposal = storeProposal(nextMissionId, `syn-atom-next-proposal-${suffix}`)
+    await store.writeProposal(nextProposal)
+    await store.appendEvent(storeEvent(nextMissionId, nextProposal, 'proposal.created', 1, accountId))
+    await store.writePlan(storePlan(nextMissionId, nextProposal, 1, `syn-atom-next-plan-${suffix}`))
+    await store.appendEvent(storeEvent(nextMissionId, nextProposal, 'plan.created', 2, accountId))
+    const nextEvents = await store.listEvents(nextMissionId)
+    expect(nextEvents.map(event => event.type)).toEqual(['proposal.created', 'plan.created'])
+    assertStrictlyMonotonicLedger(nextEvents)
+    expect(nextEvents.map(event => event.payload.sequence)).toEqual([1, 2])
+  })
 })
 
+function assertStrictlyMonotonicLedger(events: readonly {type: string; payload: Record<string, unknown>}[]) {
+  const sequences = events
+    .map(event => event.payload.sequence)
+    .filter((value): value is number => typeof value === 'number')
+  for (let index = 1; index < sequences.length; index += 1) {
+    expect(sequences[index]).toBeGreaterThan(sequences[index - 1])
+    expect(sequences[index]).toBe(sequences[index - 1] + 1)
+  }
+}
+
+function storeProposal(missionId: string, proposalId: string): ModulaActionProposal {
+  return {
+    id: proposalId,
+    missionId,
+    family: 'record.query',
+    capability: `records:module.${moduleId}.${collection}:read`,
+    actionId: queryActionId,
+    input: {collection, limit: 25, sort: 'updatedAt', direction: 'desc'},
+    requestedBy: 'gaia',
+  }
+}
+
+function storePlan(missionId: string, proposal: ModulaActionProposal, version: number, planId: string): GaiaPlan {
+  return {
+    id: planId,
+    missionId,
+    version,
+    summary: 'atomic store fixture',
+    createdAt: new Date().toISOString(),
+    steps: [{
+      id: `${planId}-step`,
+      order: 1,
+      description: 'Query the synthetic collection',
+      capability: proposal.capability,
+      actionProposal: proposal,
+      dependencies: [],
+      state: 'pending',
+    }],
+  }
+}
+
+function storeEvent(
+  missionId: string,
+  proposal: ModulaActionProposal,
+  type: 'proposal.created' | 'plan.created',
+  sequence: number,
+  accountId: string,
+): IntelligenceLedgerEvent {
+  return {
+    id: `${missionId}-${type}-${sequence}`,
+    schemaVersion: '1.0.0',
+    type,
+    timestamp: new Date(Date.now() + sequence).toISOString(),
+    actor: {type: 'gaia'},
+    missionId,
+    correlationId: `${missionId}-corr`,
+    userId: accountId,
+    proposalId: type === 'proposal.created' ? proposal.id : undefined,
+    payload: {sequence, family: proposal.family, capability: proposal.capability},
+  }
+}
+
 async function seedRuntime(db: ModulaDb) {
+
   const now = new Date()
   for (const [accountId, handle] of [[accountA, `syna${suffix}`], [accountB, `synb${suffix}`]] as const) {
     await db.insertInto('greenfield_accounts').values({account_id: accountId, primary_handle: handle, status: 'active', created_at: now, updated_at: now}).execute()
