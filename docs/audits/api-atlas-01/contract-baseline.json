@@ -11383,8 +11383,8 @@
         "params": [],
         "query": [],
         "body": [],
-        "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -11400,7 +11400,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "abc8b2c3b28c98139da8b19446f6f8b186efa459fb35f5b438f44ec0ab256b0f"
+      "sourceContractSha256": "0a080357455119564dfcb96c5e52ba263204a7001a81ffbbf54d340c7bd902e5"
     },
     {
       "id": "POST /v1/conversations/:id/archive",
