@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-02T10:09:01.508Z for branch `test/qa-vault-package-install-plan`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T16:29:40.381Z for branch `fix/gubic-socket-auth`; this does not claim deployment.
 
 - Runtime method routes: 758
 - Application routes: 535
@@ -83,8 +83,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | POST | `/v1/admin/developer/namespaces/:namespace/verify` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:48` | candidate-registered-not-production-probed |
 | Admin | PATCH | `/v1/admin/developer/programme/:accountId` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:47` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/gubic/games/:gameId/review` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:51` | candidate-registered-not-production-probed |
-| Admin | GET | `/v1/admin/gubic/submissions` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:107` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/gubic/submissions/:submissionId/decision` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:108` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/gubic/submissions` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:121` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/gubic/submissions/:submissionId/decision` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:122` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/moderation/reports` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1945` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/moderation/reports/:reportId` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1963` | candidate-registered-not-production-probed |
 | Admin | PATCH | `/v1/admin/moderation/reports/:reportId` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1974` | candidate-registered-not-production-probed |
@@ -118,25 +118,25 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | GET | `/v1/admin/ops/search/health` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2480` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/ops/search/projections` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2513` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2533` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:347` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:304` | candidate-registered-not-production-probed |
 | Admin | PUT | `/v1/admin/qa/premium/:handle` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:63` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/qa/verification/appeals/:appealId/transitions` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:114` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/qa/verification/applications` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:99` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/qa/verification/applications/:applicationId/transitions` | ADMIN | none | `services/greenfield-api/src/premium/routes.ts:105` | candidate-registered-not-production-probed |
-| Admin | GET | `/v1/admin/registry/artifacts/orphans` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:382` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1726` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1826` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1831` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1842` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/suspend` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1823` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1820` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/publish` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1810` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/quarantine` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1813` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1816` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/signature` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1773` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1770` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/sync` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1739` | candidate-registered-not-production-probed |
-| Admin | GET | `/v1/admin/registry/sync-runs` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1759` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/registry/artifacts/orphans` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:339` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1683` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1783` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1788` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1799` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/suspend` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1780` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1777` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/publish` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1767` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/quarantine` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1770` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1773` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/signature` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1730` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1727` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/sync` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1696` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/registry/sync-runs` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1716` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/ai/executions/:executionId` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:119` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/ai/executions/:executionId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:155` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/ai/executions/:executionId/stream` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:130` | candidate-registered-not-production-probed |
@@ -247,9 +247,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | GET | `/v1/developer/board` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:38` | candidate-registered-not-production-probed |
 | Developer | PUT | `/v1/developer/gubic/games/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:50` | candidate-registered-not-production-probed |
-| Developer | GET | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:105` | candidate-registered-not-production-probed |
-| Developer | POST | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:104` | candidate-registered-not-production-probed |
-| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:106` | candidate-registered-not-production-probed |
+| Developer | GET | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:119` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:118` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:120` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:40` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/invitations/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:42` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/members` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:41` | candidate-registered-not-production-probed |
@@ -275,12 +275,12 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Modules | DELETE | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1235` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1223` | candidate-registered-not-production-probed |
 | Modules | PATCH | `/v1/extensions/:extensionId/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1245` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/extensions/:extensionProductId/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:531` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/capabilities/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:541` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/fail` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:607` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:553` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/extensions/:extensionProductId/inspector` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:644` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionProductId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:624` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/extensions/:extensionProductId/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:488` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/capabilities/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:498` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/fail` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:564` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:510` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/extensions/:extensionProductId/inspector` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:601` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionProductId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:581` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions/catalogue` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1206` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions/installed` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1218` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/feed/home` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1473` | candidate-registered-not-production-probed |
@@ -297,17 +297,17 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/gifs/status` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:21` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/trending` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:26` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/capabilities` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:51` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/categories` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:217` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/featured` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:199` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/games` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:190` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/games/:gameId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:235` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/categories` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:174` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/featured` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:156` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:147` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games/:gameId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:192` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:62` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/games/:gameId/eligibility` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:253` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/games/:gameId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:266` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games/:gameId/eligibility` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:210` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/games/:gameId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:223` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId/lobbies` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:69` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/games/:gameId/lobbies` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:70` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/games/:gameId/sessions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:57` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/games/:gameId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:244` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games/:gameId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:201` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/library` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:53` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/gubic/library/:gameId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:55` | candidate-registered-not-production-probed |
 | Platform | PUT | `/v1/gubic/library/:gameId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:54` | candidate-registered-not-production-probed |
@@ -315,13 +315,13 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:73` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/leave` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:74` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/ready` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:75` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:80` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:84` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/start` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:76` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:71` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/me/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:67` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/my-games` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:285` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/new-releases` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:208` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:226` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/my-games` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:242` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/new-releases` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:165` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:183` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/sessions/:sessionId/achievements/:key` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:60` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/sessions/:sessionId/end` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:59` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/sessions/:sessionId/heartbeat` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:58` | candidate-registered-not-production-probed |
@@ -361,89 +361,89 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:224` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:236` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/meta` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:280` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:516` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1626` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:473` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1583` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/modules` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1444` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/actions/:actionId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1500` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/actions/:actionId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1457` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/modules/:moduleId/ai/actions/:actionId/executions` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:62` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/modules/:moduleId/ai/executions/:executionId/apply` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:78` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/modules/:moduleId/ai/requests` | AUTHENTICATED | none | `services/greenfield-api/src/ai/routes.ts:94` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/backend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1664` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1697` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/discover` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1675` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/events` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1708` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1686` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/backend/webhooks/modula` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1717` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:665` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:680` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/data-resources/:resourceId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:695` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/migrations` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:709` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/schemas` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:725` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:905` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:895` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/export` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1643` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/frontend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1136` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/functions/:functionId/:version/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1521` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1654` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/host-function-executors` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1540` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/host-function-executors/:executorId/requests` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1553` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/host-function-requests/:requestId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1564` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1588` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/complete` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1575` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1068` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:809` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/install-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:856` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:774` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/install-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:762` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/installation-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:867` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/package-install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:792` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/permissions/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1044` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1223` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1178` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1212` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId/record` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1201` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1189` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1249` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1260` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1451` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1278` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1432` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1300` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1311` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1344` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1333` | candidate-registered-not-production-probed |
-| Modules | PUT | `/v1/modules/:moduleId/records/:collection/:recordId/media/order` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1322` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/permanent` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1489` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1397` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/restore` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1470` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/reverse-references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1415` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1355` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1380` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/current` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1369` | candidate-registered-not-production-probed |
-| Sharing | POST | `/v1/modules/:moduleId/records/:collection/:recordId/shares` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1289` | candidate-registered-not-production-probed |
-| Sharing | GET | `/v1/modules/:moduleId/records/shares/owned` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1167` | candidate-registered-not-production-probed |
-| Sharing | GET | `/v1/modules/:moduleId/records/shares/received` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1157` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/records/sync` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1234` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/rollback` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1016` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/runtime` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:655` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/runtime-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1599` | candidate-registered-not-production-probed |
-| Modules | DELETE | `/v1/modules/:moduleId/runtime-credentials/:credentialId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1613` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/services/:serviceId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:741` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1100` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1110` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/settings-schema` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1090` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/uninstall-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1058` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/update` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:978` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/update-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:943` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/modules/:moduleId/version-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:929` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/versions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:917` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/views` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1126` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/:moduleId/views/:viewId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1146` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/contributions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1120` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/modules/installations/:installationId/update-policy` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:960` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/installed` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:502` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/installed/:moduleId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:508` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/modules/updates` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:881` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/backend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1621` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1654` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/discover` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1632` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/events` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1665` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1643` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/backend/webhooks/modula` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1674` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:622` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/data-resources` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:637` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/data-resources/:resourceId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:652` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/migrations` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:666` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/data-resources/:resourceId/schemas` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:682` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:862` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:852` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/export` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1600` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/frontend` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1093` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/functions/:functionId/:version/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1478` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/health` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1611` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/host-function-executors` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1497` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/host-function-executors/:executorId/requests` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1510` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/host-function-requests/:requestId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1521` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1545` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/host-function-requests/:requestId/complete` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1532` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1025` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/install` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:766` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/install-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:813` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:731` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/install-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:719` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/installation-descriptor` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:824` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/package-install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:749` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/permissions/review` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1001` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1180` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1135` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1169` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/record-shares/:shareId/record` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1158` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/record-shares/:shareId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1146` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1206` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/records/:collection` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1217` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1408` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1235` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1389` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1257` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/media` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1268` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1301` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1290` | candidate-registered-not-production-probed |
+| Modules | PUT | `/v1/modules/:moduleId/records/:collection/:recordId/media/order` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1279` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/records/:collection/:recordId/permanent` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1446` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1354` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/records/:collection/:recordId/restore` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1427` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/reverse-references` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1372` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1312` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1337` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/:collection/:recordId/revisions/current` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1326` | candidate-registered-not-production-probed |
+| Sharing | POST | `/v1/modules/:moduleId/records/:collection/:recordId/shares` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1246` | candidate-registered-not-production-probed |
+| Sharing | GET | `/v1/modules/:moduleId/records/shares/owned` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1124` | candidate-registered-not-production-probed |
+| Sharing | GET | `/v1/modules/:moduleId/records/shares/received` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1114` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/records/sync` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1191` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/rollback` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:973` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/runtime` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:612` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/runtime-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1556` | candidate-registered-not-production-probed |
+| Modules | DELETE | `/v1/modules/:moduleId/runtime-credentials/:credentialId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1570` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/services/:serviceId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:698` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1057` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/:moduleId/settings` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1067` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/settings-schema` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1047` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/uninstall-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1015` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/update` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:935` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/update-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:900` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/modules/:moduleId/version-preview` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:886` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/versions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:874` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/views` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1083` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/:moduleId/views/:viewId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1103` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/contributions` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:1077` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/modules/installations/:installationId/update-policy` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:917` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/installed` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:459` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/installed/:moduleId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:465` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/modules/updates` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:838` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/moliboo/activities/complete` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:64` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/moliboo/catalogue/items` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:50` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/moliboo/catalogue/outfits` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:51` | candidate-registered-not-production-probed |
@@ -480,8 +480,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Posts | POST | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1593` | candidate-registered-not-production-probed |
 | Sharing | POST | `/v1/posts/:postId/share` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1630` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/premium/tiers` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:26` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:323` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:335` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:280` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:292` | candidate-registered-not-production-probed |
 | Profile | GET | `/v1/profiles/:handle` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1649` | candidate-registered-not-production-probed |
 | Social | GET | `/v1/profiles/:handle/followers` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1673` | candidate-registered-not-production-probed |
 | Social | GET | `/v1/profiles/:handle/following` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1689` | candidate-registered-not-production-probed |
@@ -507,20 +507,20 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/push/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:84` | candidate-registered-not-production-probed |
 | Platform | PATCH | `/v1/push/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:94` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/reels` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2194` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/artifacts/:sha256` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:448` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:172` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:296` | candidate-registered-not-production-probed |
-| Modules | PUT | `/v1/registry/modules/:moduleId/rating` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:483` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:393` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/modules/:moduleId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:402` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/products` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:181` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:305` | candidate-registered-not-production-probed |
-| Social | GET | `/v1/registry/products/:productId/relationships` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:314` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:495` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/publishers/:publisherId/signing-keys` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:412` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/releases/:releaseId/artifact` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:422` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/releases/:releaseId/assets/:assetId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:461` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/registry/releases/:releaseId/descriptor` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:436` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/artifacts/:sha256` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:405` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:129` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:253` | candidate-registered-not-production-probed |
+| Modules | PUT | `/v1/registry/modules/:moduleId/rating` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:440` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:350` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/modules/:moduleId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:359` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/products` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:138` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:262` | candidate-registered-not-production-probed |
+| Social | GET | `/v1/registry/products/:productId/relationships` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:271` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:452` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/publishers/:publisherId/signing-keys` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:369` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/releases/:releaseId/artifact` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:379` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/releases/:releaseId/assets/:assetId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:418` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/registry/releases/:releaseId/descriptor` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:393` | candidate-registered-not-production-probed |
 | Moderation | POST | `/v1/reports` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1921` | candidate-registered-not-production-probed |
 | Moderation | GET | `/v1/reports/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1934` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/repositories/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1094` | candidate-registered-not-production-probed |
@@ -2491,7 +2491,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/gubic/submissions`
 - Public URL: `https://api.modula.digital/v1/admin/gubic/submissions`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:107`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:121`
 - Handler: inline
 - Controller/service calls: `play.reviewQueue`
 - Authentication: none
@@ -2530,7 +2530,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/gubic/submissions/:submissionId/decision`
 - Public URL: `https://api.modula.digital/v1/admin/gubic/submissions/:submissionId/decision`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:108`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:122`
 - Handler: inline
 - Controller/service calls: `play.decide`
 - Authentication: none
@@ -3856,7 +3856,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/product-standard/ingest`
 - Public URL: `https://api.modula.digital/v1/admin/product-standard/ingest`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:347`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:304`
 - Handler: inline
 - Controller/service calls: `filename.trim`, `mpsIngest.ingest`, `publishers.requireAdminAccount`, `releaseId.trim`
 - Authentication: greenfield bearer access session
@@ -4051,7 +4051,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/artifacts/orphans`
 - Public URL: `https://api.modula.digital/v1/admin/registry/artifacts/orphans`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:382`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:339`
 - Handler: inline
 - Controller/service calls: `distribution.orphanArtifactReport`, `publishers.requireAdminAccount`
 - Authentication: greenfield bearer access session
@@ -4090,7 +4090,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/modules/import`
 - Public URL: `https://api.modula.digital/v1/admin/registry/modules/import`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1726`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1683`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `releases.importPendingReview`
 - Authentication: greenfield bearer access session
@@ -4129,7 +4129,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1826`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1783`
 - Handler: inline
 - Controller/service calls: `publishers.revokePublisher`
 - Authentication: greenfield bearer access session
@@ -4168,7 +4168,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/signing-keys`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/signing-keys`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1831`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1788`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.register`
 - Authentication: greenfield bearer access session
@@ -4207,7 +4207,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1842`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1799`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.revoke`
 - Authentication: greenfield bearer access session
@@ -4246,7 +4246,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/suspend`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/suspend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1823`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1780`
 - Handler: inline
 - Controller/service calls: `publishers.suspendPublisher`
 - Authentication: greenfield bearer access session
@@ -4285,7 +4285,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/verify`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1820`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1777`
 - Handler: inline
 - Controller/service calls: `publishers.verifyPublisher`
 - Authentication: greenfield bearer access session
@@ -4324,7 +4324,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/publish`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/publish`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1810`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1767`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: greenfield bearer access session
@@ -4363,7 +4363,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/quarantine`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/quarantine`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1813`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1770`
 - Handler: inline
 - Controller/service calls: `releases.quarantineRelease`
 - Authentication: greenfield bearer access session
@@ -4402,7 +4402,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1816`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1773`
 - Handler: inline
 - Controller/service calls: `releases.revokeRelease`
 - Authentication: greenfield bearer access session
@@ -4441,7 +4441,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/signature`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/signature`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1773`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1730`
 - Handler: inline
 - Controller/service calls: `githubSync.fetchVerified`, `publishers.requireAdminAccount`, `releases.attachPublishedSignature`, `releases.getReleaseById`
 - Authentication: greenfield bearer access session
@@ -4480,7 +4480,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/verify`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1770`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1727`
 - Handler: inline
 - Controller/service calls: `releases.verifyReleaseFromId`
 - Authentication: greenfield bearer access session
@@ -4519,7 +4519,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/sync`
 - Public URL: `https://api.modula.digital/v1/admin/registry/sync`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1739`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1696`
 - Handler: inline
 - Controller/service calls: `githubSync.sync`, `publishers.requireAdminAccount`
 - Authentication: greenfield bearer access session
@@ -4558,7 +4558,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/sync-runs`
 - Public URL: `https://api.modula.digital/v1/admin/registry/sync-runs`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1759`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1716`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`, `publishers.requireAdminAccount`
 - Authentication: greenfield bearer access session
@@ -8887,7 +8887,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/developer/gubic/submissions`
 - Public URL: `https://api.modula.digital/v1/developer/gubic/submissions`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:105`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:119`
 - Handler: inline
 - Controller/service calls: `play.listSubmissions`
 - Authentication: none
@@ -8926,7 +8926,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/developer/gubic/submissions`
 - Public URL: `https://api.modula.digital/v1/developer/gubic/submissions`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:104`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:118`
 - Handler: inline
 - Controller/service calls: `play.submit`
 - Authentication: none
@@ -8965,7 +8965,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/developer/gubic/submissions/:submissionId/withdraw`
 - Public URL: `https://api.modula.digital/v1/developer/gubic/submissions/:submissionId/withdraw`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:106`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:120`
 - Handler: inline
 - Controller/service calls: `play.withdraw`
 - Authentication: none
@@ -9979,7 +9979,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/capabilities`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/capabilities`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:531`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:488`
 - Handler: inline
 - Controller/service calls: `extensionFabric.declaredCapabilities`
 - Authentication: greenfield bearer access session
@@ -10018,7 +10018,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/capabilities/review`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/capabilities/review`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:541`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:498`
 - Handler: inline
 - Controller/service calls: `approvedCapabilities.filter`, `extensionFabric.reviewCapabilities`
 - Authentication: greenfield bearer access session
@@ -10057,7 +10057,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/contributions/:contributionId/fail`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/contributions/:contributionId/fail`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:607`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:564`
 - Handler: inline
 - Controller/service calls: `extensionFabric.failContribution`
 - Authentication: greenfield bearer access session
@@ -10096,7 +10096,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/contributions/:contributionId/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:553`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:510`
 - Handler: inline
 - Controller/service calls: `backendGateway.canHandle`, `backendGateway.executeAction`, `extensionAi.canHandle`, `extensionAi.execute`, `extensionFabric.assertInvocation`, `requiredCapabilities.filter`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -10135,7 +10135,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/inspector`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/inspector`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:644`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:601`
 - Handler: inline
 - Controller/service calls: `extensionFabric.developerInspector`
 - Authentication: greenfield bearer access session
@@ -10174,7 +10174,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionProductId/jobs`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:624`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:581`
 - Handler: inline
 - Controller/service calls: `extensionFabric.enqueueJob`
 - Authentication: greenfield bearer access session
@@ -10837,7 +10837,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/categories`
 - Public URL: `https://api.modula.digital/v1/gubic/categories`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:217`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:174`
 - Handler: inline
 - Controller/service calls: `gubic.categories`
 - Authentication: none
@@ -10876,7 +10876,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/featured`
 - Public URL: `https://api.modula.digital/v1/gubic/featured`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:199`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:156`
 - Handler: inline
 - Controller/service calls: `gubic.featuredGames`
 - Authentication: none
@@ -10915,7 +10915,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/games`
 - Public URL: `https://api.modula.digital/v1/gubic/games`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:190`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:147`
 - Handler: inline
 - Controller/service calls: `gubic.listGames`
 - Authentication: none
@@ -10954,7 +10954,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/games/:gameId`
 - Public URL: `https://api.modula.digital/v1/gubic/games/:gameId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:235`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:192`
 - Handler: inline
 - Controller/service calls: `gubic.getGame`
 - Authentication: none
@@ -11032,7 +11032,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/games/:gameId/eligibility`
 - Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/eligibility`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:253`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:210`
 - Handler: inline
 - Controller/service calls: `gubic.eligibility`
 - Authentication: none
@@ -11071,7 +11071,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/games/:gameId/install-plan`
 - Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/install-plan`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:266`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:223`
 - Handler: inline
 - Controller/service calls: `cached.some`, `gubic.packageInstallPlan`
 - Authentication: greenfield bearer access session
@@ -11227,7 +11227,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/games/:gameId/versions`
 - Public URL: `https://api.modula.digital/v1/gubic/games/:gameId/versions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:244`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:201`
 - Handler: inline
 - Controller/service calls: `gubic.versions`
 - Authentication: none
@@ -11406,7 +11406,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11445,7 +11445,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11484,7 +11484,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11523,7 +11523,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11539,9 +11539,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/lobbies/:lobbyId/socket`
 - Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/socket`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:80`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:84`
 - Handler: inline
-- Controller/service calls: `hub.relay`, `hub.subscribe`, `play.isActiveMember`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`
+- Controller/service calls: `hub.relay`, `hub.subscribe`, `play.isActiveMember`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`, `socketAuth.get`
 - Authentication: none
 - Authorization: PUBLIC
 - Ownership rule: authenticated account id is passed into the service/repository scope
@@ -11562,7 +11562,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11601,7 +11601,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11695,7 +11695,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/my-games`
 - Public URL: `https://api.modula.digital/v1/gubic/my-games`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:285`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:242`
 - Handler: inline
 - Controller/service calls: `gubic.myGames`
 - Authentication: greenfield bearer access session
@@ -11734,7 +11734,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/new-releases`
 - Public URL: `https://api.modula.digital/v1/gubic/new-releases`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:208`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:165`
 - Handler: inline
 - Controller/service calls: `gubic.newReleases`
 - Authentication: none
@@ -11773,7 +11773,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/publishers/:publisherId`
 - Public URL: `https://api.modula.digital/v1/gubic/publishers/:publisherId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:226`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:183`
 - Handler: inline
 - Controller/service calls: `gubic.publisherDetail`
 - Authentication: none
@@ -13333,7 +13333,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/module-host/:targetProductId/composition`
 - Public URL: `https://api.modula.digital/v1/module-host/:targetProductId/composition`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:516`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:473`
 - Handler: inline
 - Controller/service calls: `extensionFabric.composeHost`
 - Authentication: greenfield bearer access session
@@ -13372,7 +13372,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/module-runtime/actions/:targetModuleId/:actionId/:version`
 - Public URL: `https://api.modula.digital/v1/module-runtime/actions/:targetModuleId/:actionId/:version`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1626`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1583`
 - Handler: inline
 - Controller/service calls: `interModuleActions.request`
 - Authentication: module backend bearer token plus HMAC signature
@@ -13450,7 +13450,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/actions/:actionId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/actions/:actionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1500`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1457`
 - Handler: inline
 - Controller/service calls: `actions.execute`
 - Authentication: greenfield bearer access session
@@ -13606,7 +13606,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1664`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1621`
 - Handler: inline
 - Controller/service calls: `backendHealth.diagnostics`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -13645,7 +13645,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/disable`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1697`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1654`
 - Handler: inline
 - Controller/service calls: `backendLifecycle.disable`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -13684,7 +13684,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/discover`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/discover`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1675`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1632`
 - Handler: inline
 - Controller/service calls: `backendDiscovery.discover`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -13723,7 +13723,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/events`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/events`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1708`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1665`
 - Handler: inline
 - Controller/service calls: `backendEvents.ingest`
 - Authentication: module backend bearer token plus HMAC signature
@@ -13762,7 +13762,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/health`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/health`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1686`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1643`
 - Handler: inline
 - Controller/service calls: `backendHealth.check`, `runtimeAccess.resolve`
 - Authentication: greenfield bearer access session
@@ -13801,7 +13801,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/backend/webhooks/modula`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/backend/webhooks/modula`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1717`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1674`
 - Handler: inline
 - Controller/service calls: `backendWebhooks.receive`
 - Authentication: module backend bearer token plus HMAC signature
@@ -13840,7 +13840,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:665`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:622`
 - Handler: inline
 - Controller/service calls: `dataLedger.list`
 - Authentication: greenfield bearer access session
@@ -13879,7 +13879,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:680`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:637`
 - Handler: inline
 - Controller/service calls: `dataLedger.register`
 - Authentication: greenfield bearer access session
@@ -13918,7 +13918,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources/:resourceId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources/:resourceId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:695`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:652`
 - Handler: inline
 - Controller/service calls: `dataLedger.get`
 - Authentication: greenfield bearer access session
@@ -13957,7 +13957,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources/:resourceId/migrations`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources/:resourceId/migrations`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:709`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:666`
 - Handler: inline
 - Controller/service calls: `dataLedger.recordMigration`
 - Authentication: greenfield bearer access session
@@ -13996,7 +13996,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/data-resources/:resourceId/schemas`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/data-resources/:resourceId/schemas`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:725`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:682`
 - Handler: inline
 - Controller/service calls: `dataLedger.declareSchemaVersion`
 - Authentication: greenfield bearer access session
@@ -14035,7 +14035,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/disable`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:905`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:862`
 - Handler: inline
 - Controller/service calls: `installations.disable`
 - Authentication: greenfield bearer access session
@@ -14074,7 +14074,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/enable`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/enable`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:895`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:852`
 - Handler: inline
 - Controller/service calls: `installations.enable`
 - Authentication: greenfield bearer access session
@@ -14113,7 +14113,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/export`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/export`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1643`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1600`
 - Handler: inline
 - Controller/service calls: `exports.create`
 - Authentication: greenfield bearer access session
@@ -14152,7 +14152,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/frontend`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/frontend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1136`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1093`
 - Handler: inline
 - Controller/service calls: `productFrontends.resolve`
 - Authentication: greenfield bearer access session
@@ -14191,7 +14191,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/functions/:functionId/:version/invoke`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/functions/:functionId/:version/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1521`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1478`
 - Handler: inline
 - Controller/service calls: `governedFunctions.invoke`
 - Authentication: greenfield bearer access session
@@ -14230,7 +14230,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/health`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/health`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1654`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1611`
 - Handler: inline
 - Controller/service calls: `health.get`
 - Authentication: greenfield bearer access session
@@ -14269,7 +14269,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-executors`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-executors`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1540`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1497`
 - Handler: inline
 - Controller/service calls: `governedFunctions.registerHostExecutor`
 - Authentication: greenfield bearer access session
@@ -14308,7 +14308,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-executors/:executorId/requests`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-executors/:executorId/requests`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1553`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1510`
 - Handler: inline
 - Controller/service calls: `governedFunctions.pendingHostRequests`
 - Authentication: greenfield bearer access session
@@ -14347,7 +14347,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-requests/:requestId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-requests/:requestId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1564`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1521`
 - Handler: inline
 - Controller/service calls: `governedFunctions.getHostRequest`
 - Authentication: greenfield bearer access session
@@ -14386,7 +14386,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-requests/:requestId/cancel`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-requests/:requestId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1588`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1545`
 - Handler: inline
 - Controller/service calls: `governedFunctions.cancelHostRequest`
 - Authentication: greenfield bearer access session
@@ -14425,7 +14425,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/host-function-requests/:requestId/complete`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/host-function-requests/:requestId/complete`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1575`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1532`
 - Handler: inline
 - Controller/service calls: `governedFunctions.completeHostRequest`
 - Authentication: greenfield bearer access session
@@ -14464,7 +14464,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1068`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1025`
 - Handler: inline
 - Controller/service calls: `uninstall.uninstall`
 - Authentication: greenfield bearer access session
@@ -14503,7 +14503,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:809`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:766`
 - Handler: inline
 - Controller/service calls: `distribution.installationDescriptor`, `distribution.packageInstallPlan`, `gubic.assertCatalogueInstallAllowed`, `installations.install`, `packages.find`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -14542,7 +14542,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install-descriptor`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install-descriptor`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:856`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:813`
 - Handler: inline
 - Controller/service calls: `installations.getInstallDescriptor`
 - Authentication: greenfield bearer access session
@@ -14581,7 +14581,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install-plan`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install-plan`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:774`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:731`
 - Handler: inline
 - Controller/service calls: `distribution.installPlan`, `gubic.assertCatalogueInstallAllowed`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -14620,7 +14620,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/install-preview`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/install-preview`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:762`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:719`
 - Handler: inline
 - Controller/service calls: `gubic.assertCatalogueInstallAllowed`, `installations.installPreview`
 - Authentication: greenfield bearer access session
@@ -14659,7 +14659,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/installation-descriptor`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/installation-descriptor`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:867`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:824`
 - Handler: inline
 - Controller/service calls: `distribution.installationDescriptor`
 - Authentication: greenfield bearer access session
@@ -14698,9 +14698,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/package-install-plan`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/package-install-plan`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:792`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:749`
 - Handler: inline
-- Controller/service calls: `distribution.packageInstallPlan`, `gubic.assertCatalogueInstallAllowed`
+- Controller/service calls: `cached.some`, `distribution.packageInstallPlan`, `gubic.assertCatalogueInstallAllowed`
 - Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
@@ -14709,7 +14709,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
-- Request body: none observed
+- Request body: `Record<string, unknown> | null) ?? {}`
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
@@ -14737,7 +14737,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/permissions/review`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/permissions/review`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1044`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1001`
 - Handler: inline
 - Controller/service calls: `approvedPermissions.filter`, `installations.reviewPermissions`
 - Authentication: greenfield bearer access session
@@ -14776,7 +14776,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1223`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1180`
 - Handler: inline
 - Controller/service calls: `recordSharing.revoke`
 - Authentication: greenfield bearer access session
@@ -14815,7 +14815,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1178`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1135`
 - Handler: inline
 - Controller/service calls: `recordSharing.read`
 - Authentication: greenfield bearer access session
@@ -14854,7 +14854,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1212`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1169`
 - Handler: inline
 - Controller/service calls: `recordSharing.update`
 - Authentication: greenfield bearer access session
@@ -14893,7 +14893,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId/record`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId/record`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1201`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1158`
 - Handler: inline
 - Controller/service calls: `recordSharing.edit`
 - Authentication: greenfield bearer access session
@@ -14932,7 +14932,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/record-shares/:shareId/revisions`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/record-shares/:shareId/revisions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1189`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1146`
 - Handler: inline
 - Controller/service calls: `recordSharing.history`
 - Authentication: greenfield bearer access session
@@ -14971,7 +14971,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1249`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1206`
 - Handler: inline
 - Controller/service calls: `records.list`
 - Authentication: greenfield bearer access session
@@ -15010,7 +15010,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1260`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1217`
 - Handler: inline
 - Controller/service calls: `records.create`
 - Authentication: greenfield bearer access session
@@ -15049,7 +15049,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1451`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1408`
 - Handler: inline
 - Controller/service calls: `records.delete`
 - Authentication: greenfield bearer access session
@@ -15088,7 +15088,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1278`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1235`
 - Handler: inline
 - Controller/service calls: `records.get`
 - Authentication: greenfield bearer access session
@@ -15127,7 +15127,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1432`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1389`
 - Handler: inline
 - Controller/service calls: `records.patch`
 - Authentication: greenfield bearer access session
@@ -15166,7 +15166,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1300`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1257`
 - Handler: inline
 - Controller/service calls: `mediaBindings.list`
 - Authentication: greenfield bearer access session
@@ -15205,7 +15205,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1311`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1268`
 - Handler: inline
 - Controller/service calls: `mediaBindings.bind`
 - Authentication: greenfield bearer access session
@@ -15244,7 +15244,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1344`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1301`
 - Handler: inline
 - Controller/service calls: `mediaBindings.unbind`
 - Authentication: greenfield bearer access session
@@ -15283,7 +15283,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1333`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1290`
 - Handler: inline
 - Controller/service calls: `mediaBindings.updateMetadata`
 - Authentication: greenfield bearer access session
@@ -15322,7 +15322,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/media/order`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/media/order`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1322`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1279`
 - Handler: inline
 - Controller/service calls: `mediaBindings.reorder`
 - Authentication: greenfield bearer access session
@@ -15361,7 +15361,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/permanent`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/permanent`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1489`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1446`
 - Handler: inline
 - Controller/service calls: `records.purge`
 - Authentication: greenfield bearer access session
@@ -15400,7 +15400,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/references`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/references`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1397`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1354`
 - Handler: inline
 - Controller/service calls: `records.forwardReferences`
 - Authentication: greenfield bearer access session
@@ -15439,7 +15439,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/restore`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/restore`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1470`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1427`
 - Handler: inline
 - Controller/service calls: `records.restore`
 - Authentication: greenfield bearer access session
@@ -15478,7 +15478,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/reverse-references`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/reverse-references`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1415`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1372`
 - Handler: inline
 - Controller/service calls: `records.reverseReferences`
 - Authentication: greenfield bearer access session
@@ -15517,7 +15517,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/revisions`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1355`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1312`
 - Handler: inline
 - Controller/service calls: `records.listRevisions`
 - Authentication: greenfield bearer access session
@@ -15556,7 +15556,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions/:revision`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1380`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1337`
 - Handler: inline
 - Controller/service calls: `records.getRevision`
 - Authentication: greenfield bearer access session
@@ -15595,7 +15595,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/revisions/current`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/revisions/current`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1369`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1326`
 - Handler: inline
 - Controller/service calls: `records.currentRevision`
 - Authentication: greenfield bearer access session
@@ -15634,7 +15634,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/:collection/:recordId/shares`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/:collection/:recordId/shares`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1289`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1246`
 - Handler: inline
 - Controller/service calls: `recordSharing.create`
 - Authentication: greenfield bearer access session
@@ -15673,7 +15673,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/shares/owned`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/shares/owned`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1167`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1124`
 - Handler: inline
 - Controller/service calls: `recordSharing.listOwned`
 - Authentication: greenfield bearer access session
@@ -15712,7 +15712,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/shares/received`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/shares/received`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1157`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1114`
 - Handler: inline
 - Controller/service calls: `recordSharing.listReceived`
 - Authentication: greenfield bearer access session
@@ -15751,7 +15751,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/records/sync`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/records/sync`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1234`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1191`
 - Handler: inline
 - Controller/service calls: `records.sync`
 - Authentication: greenfield bearer access session
@@ -15790,7 +15790,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/rollback`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/rollback`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1016`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:973`
 - Handler: inline
 - Controller/service calls: `distribution.releaseDescriptorById`, `distribution.updatePlan`, `updates.update`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -15829,7 +15829,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/runtime`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/runtime`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:655`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:612`
 - Handler: inline
 - Controller/service calls: `runtime2.runtimeSummary`
 - Authentication: greenfield bearer access session
@@ -15868,7 +15868,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/runtime-credentials`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/runtime-credentials`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1599`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1556`
 - Handler: inline
 - Controller/service calls: `interModuleActions.issueRuntimeCredential`
 - Authentication: greenfield bearer access session
@@ -15907,7 +15907,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/runtime-credentials/:credentialId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/runtime-credentials/:credentialId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1613`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1570`
 - Handler: inline
 - Controller/service calls: `interModuleActions.revokeRuntimeCredential`
 - Authentication: greenfield bearer access session
@@ -15946,7 +15946,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/services/:serviceId/invoke`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/services/:serviceId/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:741`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:698`
 - Handler: inline
 - Controller/service calls: `runtime2.invokeService`
 - Authentication: greenfield bearer access session
@@ -15985,7 +15985,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/settings`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/settings`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1100`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1057`
 - Handler: inline
 - Controller/service calls: `settings.get`
 - Authentication: greenfield bearer access session
@@ -16024,7 +16024,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/settings`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/settings`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1110`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1067`
 - Handler: inline
 - Controller/service calls: `settings.patch`
 - Authentication: greenfield bearer access session
@@ -16063,7 +16063,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/settings-schema`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/settings-schema`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1090`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1047`
 - Handler: inline
 - Controller/service calls: `settings.schema`
 - Authentication: greenfield bearer access session
@@ -16102,7 +16102,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/uninstall-preview`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/uninstall-preview`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1058`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1015`
 - Handler: inline
 - Controller/service calls: `uninstall.preview`
 - Authentication: greenfield bearer access session
@@ -16141,7 +16141,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/update`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/update`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:978`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:935`
 - Handler: inline
 - Controller/service calls: `approvedPermissions.filter`, `distribution.packageInstallPlan`, `packages.find`, `updates.update`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -16157,7 +16157,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `500`
-- Database reads: `greenfield_entitlements`, `greenfield_module_install_plans`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_mps_ingestions`, `greenfield_offers`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
+- Database reads: `greenfield_module_install_plans`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_mps_ingestions`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`, `greenfield_release_frontends`
 - Database writes: `failed`, `greenfield_module_install_plans`, `greenfield_module_permission_reviews`, `objects`, `plan`, `policy`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
@@ -16180,7 +16180,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/update-plan`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/update-plan`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:943`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:900`
 - Handler: inline
 - Controller/service calls: `distribution.updatePlan`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -16219,7 +16219,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/version-preview`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/version-preview`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:929`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:886`
 - Handler: inline
 - Controller/service calls: `updates.preview`, `version.trim`
 - Authentication: greenfield bearer access session
@@ -16258,7 +16258,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/versions`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/versions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:917`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:874`
 - Handler: inline
 - Controller/service calls: `updates.versions`
 - Authentication: greenfield bearer access session
@@ -16297,7 +16297,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/views`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/views`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1126`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1083`
 - Handler: inline
 - Controller/service calls: `views.listViews`
 - Authentication: greenfield bearer access session
@@ -16336,7 +16336,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/:moduleId/views/:viewId`
 - Public URL: `https://api.modula.digital/v1/modules/:moduleId/views/:viewId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1146`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1103`
 - Handler: inline
 - Controller/service calls: `views.getView`
 - Authentication: greenfield bearer access session
@@ -16375,7 +16375,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/contributions`
 - Public URL: `https://api.modula.digital/v1/modules/contributions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1120`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1077`
 - Handler: inline
 - Controller/service calls: `contributions.list`
 - Authentication: greenfield bearer access session
@@ -16414,7 +16414,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/installations/:installationId/update-policy`
 - Public URL: `https://api.modula.digital/v1/modules/installations/:installationId/update-policy`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:960`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:917`
 - Handler: inline
 - Controller/service calls: `distribution.setUpdatePolicy`
 - Authentication: greenfield bearer access session
@@ -16453,7 +16453,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/installed`
 - Public URL: `https://api.modula.digital/v1/modules/installed`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:502`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:459`
 - Handler: inline
 - Controller/service calls: `installations.listInstalled`
 - Authentication: greenfield bearer access session
@@ -16492,7 +16492,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/installed/:moduleId`
 - Public URL: `https://api.modula.digital/v1/modules/installed/:moduleId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:508`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:465`
 - Handler: inline
 - Controller/service calls: `installations.getInstalled`
 - Authentication: greenfield bearer access session
@@ -16531,7 +16531,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/modules/updates`
 - Public URL: `https://api.modula.digital/v1/modules/updates`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:881`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:838`
 - Handler: inline
 - Controller/service calls: `distribution.updateFeed`
 - Authentication: greenfield bearer access session
@@ -17974,7 +17974,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/product-standard/products/:productId`
 - Public URL: `https://api.modula.digital/v1/product-standard/products/:productId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:323`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:280`
 - Handler: inline
 - Controller/service calls: `mpsIngest.getLatest`
 - Authentication: none
@@ -18013,7 +18013,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/product-standard/products/:productId/versions/:version`
 - Public URL: `https://api.modula.digital/v1/product-standard/products/:productId/versions/:version`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:335`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:292`
 - Handler: inline
 - Controller/service calls: `mpsIngest.get`
 - Authentication: none
@@ -19027,7 +19027,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/artifacts/:sha256`
 - Public URL: `https://api.modula.digital/v1/registry/artifacts/:sha256`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:448`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:405`
 - Handler: inline
 - Controller/service calls: `distribution.readArtifact`
 - Authentication: none
@@ -19066,7 +19066,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules`
 - Public URL: `https://api.modula.digital/v1/registry/modules`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:172`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:129`
 - Handler: inline
 - Controller/service calls: `registry.listModules`
 - Authentication: none
@@ -19105,7 +19105,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:296`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:253`
 - Handler: inline
 - Controller/service calls: `registry.getModule`
 - Authentication: none
@@ -19144,7 +19144,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId/rating`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId/rating`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:483`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:440`
 - Handler: inline
 - Controller/service calls: `marketplace.submitRating`
 - Authentication: greenfield bearer access session
@@ -19183,7 +19183,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId/versions`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId/versions`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:393`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:350`
 - Handler: inline
 - Controller/service calls: `registry.listVersions`
 - Authentication: none
@@ -19222,7 +19222,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/modules/:moduleId/versions/:version`
 - Public URL: `https://api.modula.digital/v1/registry/modules/:moduleId/versions/:version`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:402`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:359`
 - Handler: inline
 - Controller/service calls: `registry.getVersionDetail`
 - Authentication: none
@@ -19261,7 +19261,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/products`
 - Public URL: `https://api.modula.digital/v1/registry/products`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:181`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:138`
 - Handler: inline
 - Controller/service calls: `registry.listModules`
 - Authentication: none
@@ -19300,7 +19300,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/products/:productId`
 - Public URL: `https://api.modula.digital/v1/registry/products/:productId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:305`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:262`
 - Handler: inline
 - Controller/service calls: `registry.getModule`
 - Authentication: none
@@ -19339,7 +19339,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/products/:productId/relationships`
 - Public URL: `https://api.modula.digital/v1/registry/products/:productId/relationships`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:314`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:271`
 - Handler: inline
 - Controller/service calls: `extensionFabric.relationships`
 - Authentication: none
@@ -19378,7 +19378,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/publishers/:publisherId`
 - Public URL: `https://api.modula.digital/v1/registry/publishers/:publisherId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:495`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:452`
 - Handler: inline
 - Controller/service calls: `publishers.getPublisher`
 - Authentication: none
@@ -19417,7 +19417,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/publishers/:publisherId/signing-keys`
 - Public URL: `https://api.modula.digital/v1/registry/publishers/:publisherId/signing-keys`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:412`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:369`
 - Handler: inline
 - Controller/service calls: `signingKeys.listForPublisher`
 - Authentication: none
@@ -19456,7 +19456,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/releases/:releaseId/artifact`
 - Public URL: `https://api.modula.digital/v1/registry/releases/:releaseId/artifact`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:422`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:379`
 - Handler: inline
 - Controller/service calls: `distribution.readArtifact`, `presentation.readReleaseArtifact`
 - Authentication: none
@@ -19495,7 +19495,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/releases/:releaseId/assets/:assetId`
 - Public URL: `https://api.modula.digital/v1/registry/releases/:releaseId/assets/:assetId`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:461`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:418`
 - Handler: inline
 - Controller/service calls: `presentation.readAsset`
 - Authentication: none
@@ -19534,7 +19534,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/registry/releases/:releaseId/descriptor`
 - Public URL: `https://api.modula.digital/v1/registry/releases/:releaseId/descriptor`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:436`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:393`
 - Handler: inline
 - Controller/service calls: `distribution.releaseDescriptorById`
 - Authentication: none

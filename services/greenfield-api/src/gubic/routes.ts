@@ -77,11 +77,25 @@ export async function registerGubicPlayRoutes(
 
   // Lobby WebSocket: change notifications + size/rate-limited opaque relay.
   if (!app.hasDecorator('websocketServer')) await app.register(websocket, {options: {maxPayload: 8192}})
-  app.get('/v1/gubic/lobbies/:lobbyId/socket', {websocket: true}, async (socket: any, request: any) => {
+  // Authenticate and authorise BEFORE the HTTP upgrade is accepted: replying in
+  // preValidation makes @fastify/websocket reject the handshake with that status
+  // instead of answering 101 and closing afterwards.
+  const socketAuth = new WeakMap<object, {accountId: string}>()
+  app.get('/v1/gubic/lobbies/:lobbyId/socket', {
+    websocket: true,
+    preValidation: async (request: any, reply: any) => {
+      const lobbyId = String(request.params.lobbyId ?? '')
+      const auth = await resolve(request).catch(() => null)
+      if (!auth) return reply.code(401).send(failureEnvelope('UNAUTHENTICATED', 'Authentication required', request.id))
+      if (!lobbyId || !(await play.isActiveMember(lobbyId, auth.accountId).catch(() => false))) {
+        return reply.code(404).send(failureEnvelope('NOT_FOUND', 'Lobby not found', request.id))
+      }
+      socketAuth.set(request, {accountId: auth.accountId})
+    },
+  } as any, async (socket: any, request: any) => {
     const lobbyId = String(request.params.lobbyId ?? '')
-    const auth = await resolve(request).catch(() => null)
+    const auth = socketAuth.get(request)
     if (!auth) { socket.close(4401, 'Authentication required'); return }
-    if (!(await play.isActiveMember(lobbyId, auth.accountId).catch(() => false))) { socket.close(4404, 'Lobby not found'); return }
     const subscriber: GubicLobbySubscriber = {accountId: auth.accountId, send: event => socket.send(JSON.stringify(event))}
     const unsubscribe = hub.subscribe(lobbyId, subscriber)
     socket.send(JSON.stringify({type: 'hello', lobbyId}))
