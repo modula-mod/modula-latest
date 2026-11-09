@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-09T22:44:39.568Z",
+  "capturedAt": "2026-11-09T23:38:08.701Z",
   "source": {
-    "branch": "mosaic/pr151-update",
-    "headAtCapture": "9f17d2c94bbb6d702d141c81882fa66a28e554ca",
+    "branch": "mosaic/pr157-update",
+    "headAtCapture": "f6a8f1a1f1f2a6eb77e42c7bf9f09fefbfa57822",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "0045808f86d1648dfb583ccf397183eeda9f6351231bab0cf2182772b5ad4c17"
+    "apiSourceSha256": "62e18c6dd040833879171f3d9926b94834a501738d45c3fd0c35d39ba44320ef"
   },
   "runtimeRoutes": [
     {
