@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/pr148-update",
-      "sourceSha256": "963cdc92c2b1cd38ae637602c7046ef1fcf54c2de68c8a8f535d22c36886e981",
-      "capturedAt": "2026-11-09T22:09:11.730Z",
+      "branch": "mosaic/pr160-084-privileges",
+      "sourceSha256": "ae54a8e50b3c47d850ae78cdf7b20733a5e297897aabe03ff0a9945356392257",
+      "capturedAt": "2026-11-09T22:02:27.020Z",
       "routeCount": 793
     },
     "status": "PASS"
@@ -23082,7 +23082,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 54
+        "line": 37
       },
       "handler": "inline",
       "controllerServices": [
@@ -23196,7 +23196,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 75
+        "line": 58
       },
       "handler": "inline",
       "controllerServices": [
@@ -23232,8 +23232,8 @@
         "params": [],
         "query": [],
         "body": [],
-        "explicitFastifySchema": true,
-        "manualValidationObserved": true,
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -23249,7 +23249,6 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "successCodes": [
-        200,
         201
       ],
       "expectedErrors": [
@@ -23262,13 +23261,12 @@
       ],
       "data": {
         "reads": [
-          "actors",
           "blocks",
           "follows",
-          "greenfield_accounts",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
+          "greenfield_message_reactions",
           "profiles"
         ],
         "writes": [
@@ -23278,13 +23276,18 @@
         ],
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#follows",
+          "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWay",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
+          "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
           "services/greenfield-api/src/domains/messaging/service.ts#participants",
           "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
+          "services/greenfield-api/src/domains/messaging/service.ts#send",
           "services/greenfield-api/src/domains/messaging/service.ts#startConversation",
-          "services/greenfield-api/src/domains/messaging/service.ts#startDirectConversation",
           "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts"
         ],
         "confidence": "method-level-static"
@@ -23309,7 +23312,7 @@
       "featureState": "enabled",
       "liveProbe": null,
       "status": "candidate-registered-not-production-probed",
-      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
       "contract": null
     },
     {
@@ -23322,7 +23325,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 227
+        "line": 203
       },
       "handler": "inline",
       "controllerServices": [
@@ -23435,7 +23438,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 94
+        "line": 70
       },
       "handler": "inline",
       "controllerServices": [
@@ -23552,7 +23555,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 106
+        "line": 82
       },
       "handler": "inline",
       "controllerServices": [
@@ -23677,7 +23680,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 158
+        "line": 134
       },
       "handler": "inline",
       "controllerServices": [
@@ -23792,7 +23795,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 146
+        "line": 122
       },
       "handler": "inline",
       "controllerServices": [
@@ -23911,7 +23914,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 181
+        "line": 157
       },
       "handler": "inline",
       "controllerServices": [
@@ -24031,7 +24034,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 170
+        "line": 146
       },
       "handler": "inline",
       "controllerServices": [
@@ -24149,7 +24152,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 216
+        "line": 192
       },
       "handler": "inline",
       "controllerServices": [
@@ -24262,7 +24265,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 121
+        "line": 97
       },
       "handler": "inline",
       "controllerServices": [
@@ -24374,7 +24377,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 205
+        "line": 181
       },
       "handler": "inline",
       "controllerServices": [
@@ -24484,7 +24487,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 193
+        "line": 169
       },
       "handler": "inline",
       "controllerServices": [
@@ -24597,7 +24600,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 65
+        "line": 48
       },
       "handler": "inline",
       "controllerServices": [
@@ -34015,7 +34018,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 272
+        "line": 248
       },
       "handler": "inline",
       "controllerServices": [
@@ -34129,7 +34132,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 283
+        "line": 259
       },
       "handler": "inline",
       "controllerServices": [
@@ -34194,9 +34197,7 @@
       ],
       "data": {
         "reads": [
-          "actors",
           "blocks",
-          "greenfield_accounts",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
@@ -34252,7 +34253,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 295
+        "line": 271
       },
       "handler": "inline",
       "controllerServices": [
@@ -34369,7 +34370,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 306
+        "line": 282
       },
       "handler": "inline",
       "controllerServices": [
@@ -37666,7 +37667,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 238
+        "line": 214
       },
       "handler": "inline",
       "controllerServices": [
@@ -37775,7 +37776,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 248
+        "line": 224
       },
       "handler": "inline",
       "controllerServices": [
@@ -37893,7 +37894,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 260
+        "line": 236
       },
       "handler": "inline",
       "controllerServices": [
@@ -67141,7 +67142,6 @@
         "services/greenfield-api/src/ai/provider-runtime-service.ts",
         "services/greenfield-api/src/app/register-routes.ts",
         "services/greenfield-api/src/domains/mentions/service.ts",
-        "services/greenfield-api/src/domains/messaging/service.ts",
         "services/greenfield-api/src/domains/notifications/preferences.ts",
         "services/greenfield-api/src/domains/policy/engine.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
@@ -67183,9 +67183,7 @@
         "POST /v1/comments/:commentId/replies",
         "DELETE /v1/connections/:connectionId",
         "POST /v1/connections/:connectionId/refresh",
-        "POST /v1/conversations",
         "GET /v1/creator/insights",
-        "POST /v1/in-mail",
         "PATCH /v1/me/membership/badge-visibility",
         "POST /v1/me/verification/applications",
         "POST /v1/modules/:moduleId/ai/requests",
@@ -72258,7 +72256,6 @@
         "services/greenfield-api/src/backend-fabric/routes.ts",
         "services/greenfield-api/src/cli/api-atlas-identities.ts",
         "services/greenfield-api/src/developers/service.ts",
-        "services/greenfield-api/src/domains/messaging/service.ts",
         "services/greenfield-api/src/domains/moliboos/service.ts",
         "services/greenfield-api/src/entitlements/routes.ts",
         "services/greenfield-api/src/entitlements/service.ts",
@@ -72316,7 +72313,6 @@
         "POST /v1/auth/passkeys/registration/options",
         "POST /v1/auth/totp/enroll",
         "GET /v1/backend/products/:productId/accounts/:accountId",
-        "POST /v1/conversations",
         "POST /v1/developer/organisations/:organisationId/members",
         "GET /v1/gubic/games/:gameId/lobbies",
         "POST /v1/gubic/games/:gameId/lobbies",
@@ -72325,7 +72321,6 @@
         "POST /v1/gubic/lobbies/:lobbyId/ready",
         "POST /v1/gubic/lobbies/:lobbyId/start",
         "POST /v1/gubic/lobbies/join",
-        "POST /v1/in-mail",
         "PUT /v1/me/moliboos/outfit",
         "POST /v1/modules/:moduleId/records/:collection/:recordId/shares",
         "PATCH /v1/profiles/me",
@@ -88097,6 +88092,7 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [
+        "POST /v1/conversations",
         "GET /v1/conversations/:id/messages",
         "POST /v1/conversations/:id/messages",
         "PATCH /v1/conversations/:id/messages/:messageId",

@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-09T22:09:11.730Z for branch `mosaic/pr148-update`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T22:02:27.020Z for branch `mosaic/pr160-084-privileges`; this does not claim deployment.
 
 - Runtime method routes: 793
 - Application routes: 557
@@ -230,20 +230,20 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Connectors | GET | `/v1/connectors` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1296` | candidate-registered-not-production-probed |
 | Connectors | GET | `/v1/connectors/:providerId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1299` | candidate-registered-not-production-probed |
 | Connectors | POST | `/v1/connectors/:providerId/authorise` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1304` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:54` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:75` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:227` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:94` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:106` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:158` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:146` | candidate-registered-not-production-probed |
-| Reactions | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:181` | candidate-registered-not-production-probed |
-| Reactions | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:170` | candidate-registered-not-production-probed |
-| Social | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:216` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:121` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:205` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:193` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:65` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:37` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:58` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:203` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:70` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:82` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:134` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:122` | candidate-registered-not-production-probed |
+| Reactions | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:157` | candidate-registered-not-production-probed |
+| Reactions | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:146` | candidate-registered-not-production-probed |
+| Social | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:192` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:97` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:181` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:169` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:48` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/insights` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:44` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/payouts` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
@@ -330,10 +330,10 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:84` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/live` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:266` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/ready` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:270` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:272` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:283` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:295` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:306` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:248` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:259` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:271` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:282` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:25` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:16` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:31` | candidate-registered-not-production-probed |
@@ -363,9 +363,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/me/verification/applications/:applicationId/appeals` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:89` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2159` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:137` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:238` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:248` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:260` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:214` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:224` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:236` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/meta` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:282` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:473` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1583` | candidate-registered-not-production-probed |
@@ -10206,7 +10206,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations`
 - Public URL: `https://api.modula.digital/v1/conversations`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:54`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:37`
 - Handler: inline
 - Controller/service calls: `messaging.listConversations`
 - Authentication: legacy or bridged bearer session
@@ -10255,7 +10255,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations`
 - Public URL: `https://api.modula.digital/v1/conversations`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:75`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:58`
 - Handler: inline
 - Controller/service calls: `messaging.startConversation`
 - Authentication: legacy or bridged bearer session
@@ -10269,9 +10269,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Request body: none observed
 - Pagination: none observed
 - Response schema: not declared in Fastify
-- Success codes: `200`, `201`
+- Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `follows`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: `blocks`, `follows`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_reactions`, `profiles`
 - Database writes: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
 - Storage: none observed
 - Events produced: none observed
@@ -10287,12 +10287,12 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Contract authentication: legacy or bridged bearer session
 - Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
-- Contract success: status 200, 201; see response evidence above
+- Contract success: status 201; see response evidence above
 - Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
-- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
 
@@ -10304,7 +10304,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/archive`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/archive`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:227`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:203`
 - Handler: inline
 - Controller/service calls: `messaging.setArchived`
 - Authentication: legacy or bridged bearer session
@@ -10353,7 +10353,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:94`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:70`
 - Handler: inline
 - Controller/service calls: `messaging.listMessages`
 - Authentication: legacy or bridged bearer session
@@ -10402,7 +10402,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:106`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:82`
 - Handler: inline
 - Controller/service calls: `log.warn`, `messaging.send`
 - Authentication: legacy or bridged bearer session
@@ -10451,7 +10451,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:158`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:134`
 - Handler: inline
 - Controller/service calls: `messaging.unsendMessage`
 - Authentication: legacy or bridged bearer session
@@ -10500,7 +10500,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:146`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:122`
 - Handler: inline
 - Controller/service calls: `messaging.editMessage`
 - Authentication: legacy or bridged bearer session
@@ -10549,7 +10549,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:181`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:157`
 - Handler: inline
 - Controller/service calls: `messaging.react`
 - Authentication: legacy or bridged bearer session
@@ -10598,7 +10598,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:170`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:146`
 - Handler: inline
 - Controller/service calls: `messaging.react`
 - Authentication: legacy or bridged bearer session
@@ -10647,7 +10647,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/mute`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/mute`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:216`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:192`
 - Handler: inline
 - Controller/service calls: `messaging.setMuted`
 - Authentication: legacy or bridged bearer session
@@ -10696,7 +10696,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/read`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/read`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:121`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:97`
 - Handler: inline
 - Controller/service calls: `messaging.markRead`
 - Authentication: legacy or bridged bearer session
@@ -10745,7 +10745,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/typing`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/typing`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:205`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:181`
 - Handler: inline
 - Controller/service calls: `messaging.typing`
 - Authentication: legacy or bridged bearer session
@@ -10794,7 +10794,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/typing`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/typing`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:193`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:169`
 - Handler: inline
 - Controller/service calls: `messaging.setTyping`
 - Authentication: legacy or bridged bearer session
@@ -10843,7 +10843,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/unread`
 - Public URL: `https://api.modula.digital/v1/conversations/unread`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:65`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:48`
 - Handler: inline
 - Controller/service calls: `messaging.unreadSummary`
 - Authentication: legacy or bridged bearer session
@@ -15106,7 +15106,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail`
 - Public URL: `https://api.modula.digital/v1/in-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:272`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:248`
 - Handler: inline
 - Controller/service calls: `messaging.listInMail`
 - Authentication: legacy or bridged bearer session
@@ -15155,7 +15155,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail`
 - Public URL: `https://api.modula.digital/v1/in-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:283`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:259`
 - Handler: inline
 - Controller/service calls: `messaging.composeInMail`
 - Authentication: legacy or bridged bearer session
@@ -15171,7 +15171,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
 - Database writes: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
 - Storage: none observed
 - Events produced: none observed
@@ -15204,7 +15204,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail/:id`
 - Public URL: `https://api.modula.digital/v1/in-mail/:id`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:295`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:271`
 - Handler: inline
 - Controller/service calls: `messaging.getInMail`
 - Authentication: legacy or bridged bearer session
@@ -15253,7 +15253,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail/:id/replies`
 - Public URL: `https://api.modula.digital/v1/in-mail/:id/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:306`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:282`
 - Handler: inline
 - Controller/service calls: `messaging.replyInMail`
 - Authentication: legacy or bridged bearer session
@@ -16723,7 +16723,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests`
 - Public URL: `https://api.modula.digital/v1/message-requests`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:238`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:214`
 - Handler: inline
 - Controller/service calls: `messaging.listRequests`
 - Authentication: legacy or bridged bearer session
@@ -16772,7 +16772,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests/:id/accept`
 - Public URL: `https://api.modula.digital/v1/message-requests/:id/accept`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:248`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:224`
 - Handler: inline
 - Controller/service calls: `messaging.acceptRequest`
 - Authentication: legacy or bridged bearer session
@@ -16821,7 +16821,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests/:id/decline`
 - Public URL: `https://api.modula.digital/v1/message-requests/:id/decline`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:260`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:236`
 - Handler: inline
 - Controller/service calls: `messaging.declineRequest`
 - Authentication: legacy or bridged bearer session
