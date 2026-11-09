@@ -6,14 +6,23 @@ import {createRequestId} from '../transport/envelope.js'
 import {registerGracefulShutdown} from './graceful-shutdown.js'
 import {registerPlugins} from './register-plugins.js'
 import {registerRoutes} from './register-routes.js'
+import type {PublisherConsoleTestOptions} from '../publisher/routes.js'
+import type {PublisherReleaseJobRunner} from '../publisher/release-job-runner.js'
+
+/** Programmatic test hooks only; never read from environment or production config. */
+export type CreateServerTestOptions = {
+  publisherConsole?: PublisherConsoleTestOptions
+}
 
 export type CreatedServer = {
   app: FastifyInstance
   db: ModulaDb
   config: AppConfig
+  /** Present only with publisherConsole test options. Tick explicitly, off the HTTP path. */
+  publisherReleaseJobRunner?: PublisherReleaseJobRunner
 }
 
-export async function createServer(config: AppConfig): Promise<CreatedServer> {
+export async function createServer(config: AppConfig, testOptions: CreateServerTestOptions = {}): Promise<CreatedServer> {
   const app = Fastify({
     logger: {
       level: config.logLevel,
@@ -44,9 +53,9 @@ export async function createServer(config: AppConfig): Promise<CreatedServer> {
   })
   const db = createDb(config.databaseUrl, error => app.log.error({error: safeDatabaseError(error)}, 'database pool idle client error'))
   await registerPlugins(app, config)
-  await registerRoutes(app, db, config)
+  const {publisherReleaseJobRunner} = await registerRoutes(app, db, config, testOptions)
   registerGracefulShutdown(app, db, config.shutdownTimeoutMs)
-  return {app, db, config}
+  return {app, db, config, publisherReleaseJobRunner}
 }
 
 export function requestIdFromHeaders(headers: IncomingHttpHeaders): string {

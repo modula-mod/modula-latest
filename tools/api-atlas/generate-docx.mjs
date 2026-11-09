@@ -21,10 +21,10 @@ function escapeXml(value) {
     .replaceAll("'", '&apos;')
 }
 
-function value(input) {
-  if (input === null || input === undefined) return 'none'
-  if (typeof input === 'string') return input
-  return JSON.stringify(input)
+function value(value) {
+  if (value === null || value === undefined) return 'none'
+  if (typeof value === 'string') return value
+  return JSON.stringify(value)
 }
 
 function paragraph(text, style = null) {
@@ -83,6 +83,8 @@ try {
     const target = join(temporaryDirectory, relativePath)
     mkdirSync(join(target, '..'), {recursive: true})
     writeFileSync(target, contents)
+    // ZIP central-directory entries preserve source modes. Pin them so the
+    // generated DOCX is byte-identical under developer and CI process umasks.
     chmodSync(target, 0o644)
     utimesSync(target, fixedDate, fixedDate)
   }

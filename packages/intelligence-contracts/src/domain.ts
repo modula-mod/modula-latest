@@ -61,6 +61,11 @@ export type GaiaAvailableAction = {
   moduleId?: string
   actionId?: string
   collection?: string
+  limits?: {
+    min?: number
+    max?: number
+    default?: number
+  }
 }
 
 export type GaiaPlanningInput = {
