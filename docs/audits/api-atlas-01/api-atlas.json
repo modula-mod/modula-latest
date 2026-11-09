@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "integration/gate-01",
-      "sourceSha256": "ac45dc1785e5b2905826d06f8e36c7bb7b0d3377fe4f13e0aca187039328ba1e",
-      "capturedAt": "2026-11-09T21:00:11.875Z",
+      "sourceSha256": "ae54a8e50b3c47d850ae78cdf7b20733a5e297897aabe03ff0a9945356392257",
+      "capturedAt": "2026-11-09T21:10:05.020Z",
       "routeCount": 793
     },
     "status": "PASS"
