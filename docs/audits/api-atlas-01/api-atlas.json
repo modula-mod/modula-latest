@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "feat/qa-moliboo-series2-packs",
-      "sourceSha256": "4e7839d0540032934bce14723950445e83cad6c0328e1118d9860f1ae2b3d3bc",
-      "capturedAt": "2026-11-02T15:51:37.382Z",
+      "branch": "integration/gate-01-builder",
+      "sourceSha256": "deff9dffdeb95008d9d099f800a52eeb838e060da6d3afead7b006dfd4422771",
+      "capturedAt": "2026-11-09T20:13:39.812Z",
       "routeCount": 773
     },
     "status": "PASS"
@@ -6712,7 +6712,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/gubic/routes.ts",
-        "line": 107
+        "line": 121
       },
       "handler": "inline",
       "controllerServices": [
@@ -6811,7 +6811,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/gubic/routes.ts",
-        "line": 108
+        "line": 122
       },
       "handler": "inline",
       "controllerServices": [
@@ -25227,7 +25227,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/gubic/routes.ts",
-        "line": 105
+        "line": 119
       },
       "handler": "inline",
       "controllerServices": [
@@ -25326,7 +25326,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/gubic/routes.ts",
-        "line": 104
+        "line": 118
       },
       "handler": "inline",
       "controllerServices": [
@@ -25439,7 +25439,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/gubic/routes.ts",
-        "line": 106
+        "line": 120
       },
       "handler": "inline",
       "controllerServices": [
@@ -32261,9 +32261,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -32370,9 +32372,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -32473,9 +32477,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -32581,9 +32587,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -32603,7 +32611,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/gubic/routes.ts",
-        "line": 80
+        "line": 84
       },
       "handler": "inline",
       "controllerServices": [
@@ -32613,7 +32621,8 @@
         "raw.toString",
         "socket.close",
         "socket.on",
-        "socket.send"
+        "socket.send",
+        "socketAuth.get"
       ],
       "authentication": "none",
       "authorization": {
@@ -32686,9 +32695,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -32792,9 +32803,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gubic.play.integration.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,

@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-02T15:51:37.382Z for branch `feat/qa-moliboo-series2-packs`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-09T20:13:39.812Z for branch `integration/gate-01-builder`; this does not claim deployment.
 
 - Runtime method routes: 773
 - Application routes: 544
@@ -83,8 +83,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | POST | `/v1/admin/developer/namespaces/:namespace/verify` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:48` | candidate-registered-not-production-probed |
 | Admin | PATCH | `/v1/admin/developer/programme/:accountId` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:47` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/gubic/games/:gameId/review` | ADMIN | none | `services/greenfield-api/src/developers/routes.ts:51` | candidate-registered-not-production-probed |
-| Admin | GET | `/v1/admin/gubic/submissions` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:107` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/gubic/submissions/:submissionId/decision` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:108` | candidate-registered-not-production-probed |
+| Admin | GET | `/v1/admin/gubic/submissions` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:121` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/gubic/submissions/:submissionId/decision` | ADMIN | none | `services/greenfield-api/src/gubic/routes.ts:122` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/moderation/reports` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1946` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/moderation/reports/:reportId` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1964` | candidate-registered-not-production-probed |
 | Admin | PATCH | `/v1/admin/moderation/reports/:reportId` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:1975` | candidate-registered-not-production-probed |
@@ -249,9 +249,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | GET | `/v1/developer/board` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:38` | candidate-registered-not-production-probed |
 | Developer | PUT | `/v1/developer/gubic/games/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:50` | candidate-registered-not-production-probed |
-| Developer | GET | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:105` | candidate-registered-not-production-probed |
-| Developer | POST | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:104` | candidate-registered-not-production-probed |
-| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:106` | candidate-registered-not-production-probed |
+| Developer | GET | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:119` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:118` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:120` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:40` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/invitations/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:42` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/members` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:41` | candidate-registered-not-production-probed |
@@ -317,7 +317,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:73` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/leave` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:74` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/ready` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:75` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:80` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:84` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/:lobbyId/start` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:76` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/lobbies/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:71` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/me/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:67` | candidate-registered-not-production-probed |
@@ -2990,7 +2990,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/gubic/submissions`
 - Public URL: `https://api.modula.digital/v1/admin/gubic/submissions`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:107`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:121`
 - Handler: inline
 - Controller/service calls: `play.reviewQueue`
 - Authentication: none
@@ -3039,7 +3039,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/gubic/submissions/:submissionId/decision`
 - Public URL: `https://api.modula.digital/v1/admin/gubic/submissions/:submissionId/decision`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:108`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:122`
 - Handler: inline
 - Controller/service calls: `play.decide`
 - Authentication: none
@@ -11124,7 +11124,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/developer/gubic/submissions`
 - Public URL: `https://api.modula.digital/v1/developer/gubic/submissions`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:105`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:119`
 - Handler: inline
 - Controller/service calls: `play.listSubmissions`
 - Authentication: none
@@ -11173,7 +11173,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/developer/gubic/submissions`
 - Public URL: `https://api.modula.digital/v1/developer/gubic/submissions`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:104`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:118`
 - Handler: inline
 - Controller/service calls: `play.submit`
 - Authentication: none
@@ -11222,7 +11222,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/developer/gubic/submissions/:submissionId/withdraw`
 - Public URL: `https://api.modula.digital/v1/developer/gubic/submissions/:submissionId/withdraw`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:106`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:120`
 - Handler: inline
 - Controller/service calls: `play.withdraw`
 - Authentication: none
@@ -14283,7 +14283,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14332,7 +14332,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14381,7 +14381,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14430,7 +14430,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14456,9 +14456,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/gubic/lobbies/:lobbyId/socket`
 - Public URL: `https://api.modula.digital/v1/gubic/lobbies/:lobbyId/socket`
 - API version: v1
-- Source file: `services/greenfield-api/src/gubic/routes.ts:80`
+- Source file: `services/greenfield-api/src/gubic/routes.ts:84`
 - Handler: inline
-- Controller/service calls: `hub.relay`, `hub.subscribe`, `play.isActiveMember`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`
+- Controller/service calls: `hub.relay`, `hub.subscribe`, `play.isActiveMember`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`, `socketAuth.get`
 - Authentication: none
 - Authorization: PUBLIC
 - Ownership rule: authenticated account id is passed into the service/repository scope
@@ -14479,7 +14479,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14528,7 +14528,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gubic.play.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
