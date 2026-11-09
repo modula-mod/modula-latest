@@ -142,7 +142,9 @@ export function createGreenfieldMissionRuntimePorts(
         if (input.signal.aborted) {
           throw new IntelligenceError('INVALID_MISSION_STATE', 'Mission was cancelled', {status: 'cancelled'})
         }
-        return boundary.execute(input.accountId, input.proposal)
+        // Date objects have no enumerable keys; MissionRuntime.redact would turn
+        // them into {}. ISO-8601 strings keep updated_at parseable in the result DTO.
+        return isoJson(await boundary.execute(input.accountId, input.proposal))
       },
     },
   }
@@ -168,3 +170,12 @@ export function getOrCreateGreenfieldMissionRuntime(
   return cached
 }
 
+
+function isoJson(value: unknown): unknown {
+  if (value instanceof Date) return value.toISOString()
+  if (Array.isArray(value)) return value.map(isoJson)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, isoJson(item)]))
+  }
+  return value
+}

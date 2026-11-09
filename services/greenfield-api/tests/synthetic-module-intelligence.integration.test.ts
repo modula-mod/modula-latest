@@ -52,7 +52,7 @@ describeIfDb('synthetic authorized module intelligence path', () => {
     await seedRuntime(db)
     app = Fastify()
     await registerIntelligenceRoutes(app, db, {
-      resolveAccess: async (token: string) => token === 'token-a' ? {accountId: accountA} : null,
+      resolveAccess: async (token: string) => token === 'token-a' ? {accountId: accountA} : token === 'token-b' ? {accountId: accountB} : null,
     } as any, {profileConfig: {}, writeConfig: {}}, developmentTrust)
     await app.ready()
   })
@@ -86,6 +86,81 @@ describeIfDb('synthetic authorized module intelligence path', () => {
       modelProviderStatus: DETERMINISTIC_TEST_ADAPTER_STATUS,
       limitation: DETERMINISTIC_TEST_ADAPTER_LIMITATION,
     })
+  })
+
+  it('denies a cross-owner HTTP execute of a completed proposal without leaking the result', async () => {
+    const mission = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-xowner-${suffix}`})
+    const detail = await service.start(accountA, mission.id)
+    expect(detail.mission.status).toBe('completed')
+    const proposalId = detail.proposals[0]!.id
+    const secret = 'Synthetic 0'
+    expect(JSON.stringify(detail.executions[0]?.result)).toContain(secret)
+
+    const denied = await app.inject({
+      method: 'POST',
+      url: `/v1/intelligence/missions/${mission.id}/proposals/${proposalId}/execute`,
+      headers: {authorization: 'Bearer token-b'},
+    })
+    expect(denied.statusCode).toBe(403)
+    expect(denied.json().error.code).toBe('MISSION_ACCESS_DENIED')
+    const body = JSON.stringify(denied.json())
+    expect(body).not.toContain(secret)
+    expect(body).not.toContain('Synthetic 1')
+    expect(denied.json()).not.toHaveProperty('data')
+    await expect(service.execute(accountB, mission.id, proposalId)).rejects.toMatchObject({code: 'MISSION_ACCESS_DENIED'})
+  })
+
+  it('denies executing a completed proposal under another owned mission without leaking the result', async () => {
+    const completed = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-bound-src-${suffix}`})
+    const detail = await service.start(accountA, completed.id)
+    expect(detail.mission.status).toBe('completed')
+    const proposalId = detail.proposals[0]!.id
+    const secret = 'Synthetic 0'
+    expect(JSON.stringify(detail.executions[0]?.result)).toContain(secret)
+    const other = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-bound-dst-${suffix}`})
+
+    const denied = await app.inject({
+      method: 'POST',
+      url: `/v1/intelligence/missions/${other.id}/proposals/${proposalId}/execute`,
+      headers: {authorization: 'Bearer token-a'},
+    })
+    expect(denied.statusCode).toBe(404)
+    expect(denied.json().error.code).toBe('MISSION_NOT_FOUND')
+    const body = JSON.stringify(denied.json())
+    expect(body).not.toContain(secret)
+    expect(body).not.toContain('Synthetic 1')
+    expect(denied.json()).not.toHaveProperty('data')
+    await expect(service.execute(accountA, other.id, proposalId)).rejects.toMatchObject({code: 'MISSION_NOT_FOUND'})
+  })
+
+  it('serializes mission list updatedAt and query result updated_at as ISO-8601', async () => {
+    const mission = await service.createMission(accountA, {objective: genericQueryObjective, correlationId: `syn-iso-${suffix}`})
+    const detail = await service.start(accountA, mission.id)
+    expect(detail.mission.status).toBe('completed')
+    const iso = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+    expect(detail.mission.updatedAt).toMatch(iso)
+    expect(Number.isFinite(Date.parse(String(detail.mission.updatedAt)))).toBe(true)
+
+    const listed = await app.inject({
+      method: 'GET',
+      url: '/v1/intelligence/missions',
+      headers: {authorization: 'Bearer token-a'},
+    })
+    expect(listed.statusCode).toBe(200)
+    const missions = listed.json().data as Array<{id: string; updatedAt?: unknown; updated_at?: unknown}>
+    const row = missions.find(item => item.id === mission.id)
+    expect(row).toBeTruthy()
+    const listStamp = row!.updatedAt ?? row!.updated_at
+    expect(String(listStamp)).toMatch(iso)
+    expect(Number.isFinite(Date.parse(String(listStamp)))).toBe(true)
+
+    const items = ((detail.executions[0]?.result as {items?: Array<{updated_at?: unknown; updatedAt?: unknown}>})?.items) ?? []
+    expect(items.length).toBeGreaterThan(0)
+    for (const item of items) {
+      const stamp = item.updated_at ?? item.updatedAt
+      expect(String(stamp)).toMatch(iso)
+      expect(Number.isFinite(Date.parse(String(stamp)))).toBe(true)
+    }
   })
 
   it('does not discover a readable collection that has no AI-callable declaration', async () => {
