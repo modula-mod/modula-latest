@@ -29,16 +29,109 @@ describe('AKI v0', () => {
   })
 })
 
+const syntheticModuleId = 'test.modula.synthetic-records'
+const syntheticCollection = 'item'
+const syntheticReadCapability = `records:module.${syntheticModuleId}.${syntheticCollection}:read`
+const genericQueryObjective = 'Query the authorized module collection for recently updated records.'
+const syntheticQueryAction = {
+  family: 'record.query' as const,
+  capability: syntheticReadCapability,
+  moduleId: syntheticModuleId,
+  collection: syntheticCollection,
+}
+
+function planner() {
+  let sequence = 0
+  return new DeterministicTestPlanner(() => `id-${++sequence}`)
+}
+
 describe('deterministic GAIA v0', () => {
-  it('produces a real record.query proposal for the acceptance objective', async () => {
-    let sequence = 0
-    const plan = await new DeterministicTestPlanner(() => `id-${++sequence}`).plan({
+  it('isolates the Vault Notes GAI-01 special case as a defect to retire', async () => {
+    const plan = await planner().plan({
       mission: {...mission, objective: RECENT_VAULT_NOTES_OBJECTIVE},
       availableActions: [{family: 'record.query', capability: 'records:module.digital.modula.vault-notes.note:read', moduleId: 'digital.modula.vault-notes', collection: 'note'}],
       now: '2026-01-01T00:00:00.000Z',
     })
     expect(plan.steps).toHaveLength(1)
     expect(plan.steps[0]?.actionProposal).toMatchObject({family: 'record.query', input: {collection: 'note', limit: 5, sort: 'updatedAt', direction: 'desc'}})
+  })
+})
+
+describe('generic GAIA discovery from authorized module actions', () => {
+  it('maps an authorized synthetic-module action to record.query without product-specific IDs', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: genericQueryObjective},
+      availableActions: [syntheticQueryAction],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal).toMatchObject({
+      family: 'record.query',
+      moduleId: syntheticModuleId,
+      capability: syntheticReadCapability,
+      input: {collection: syntheticCollection, limit: 25, sort: 'updatedAt', direction: 'desc'},
+    })
+    expect(plan.steps[0]?.actionProposal.moduleId).not.toBe('digital.modula.vault-notes')
+    expect(String(plan.steps[0]?.actionProposal.capability)).not.toContain('vault-notes')
+  })
+
+  it('honors a limit declared on the available action instead of parsing a number from the objective', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: 'Query the authorized module collection for the five most recently updated records.'},
+      availableActions: [{...syntheticQueryAction, limits: {min: 1, max: 100, default: 10}}],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal.input).toEqual({
+      collection: syntheticCollection,
+      limit: 10,
+      sort: 'updatedAt',
+      direction: 'desc',
+    })
+  })
+
+  it('keeps limit 25 when the declaration omits a limit, even if the objective mentions a number', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: 'Return the five most recently updated records from the authorized module collection.'},
+      availableActions: [syntheticQueryAction],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal.input).toMatchObject({
+      collection: syntheticCollection,
+      limit: 25,
+      sort: 'updatedAt',
+      direction: 'desc',
+    })
+  })
+
+  it('clamps a declared default to the declared maximum', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: genericQueryObjective},
+      availableActions: [{...syntheticQueryAction, limits: {min: 1, max: 8, default: 25}}],
+      now: '2026-01-01T00:00:00.000Z',
+    })
+    expect(plan.steps[0]?.actionProposal.input).toMatchObject({limit: 8})
+  })
+
+  it('treats module absence as a supported blocked state', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: genericQueryObjective},
+      availableActions: [],
+    })
+    const proposal = plan.steps[0]!.actionProposal
+    expect(proposal).toMatchObject({family: 'module.absent', capability: 'module.absent', input: {}})
+    const decision = await aki({proposal, registered: false, permissionGranted: false, ...classifyActionRisk(proposal.family)})
+    expect(decision.verdict).toBe('deny')
+    expect(new GovernorV0().decide({id: 'gov', proposal, aki: decision}).authorization).toBe('blocked')
+  })
+
+  it('refuses authorization when the discovered action is no longer permitted', async () => {
+    const plan = await planner().plan({
+      mission: {...mission, objective: genericQueryObjective},
+      availableActions: [syntheticQueryAction],
+    })
+    const proposal = plan.steps[0]!.actionProposal
+    const decision = await aki({proposal, permissionGranted: false})
+    expect(decision.verdict).toBe('deny')
+    expect(new GovernorV0().decide({id: 'gov', proposal, aki: decision}).authorization).toBe('blocked')
   })
 })
 
