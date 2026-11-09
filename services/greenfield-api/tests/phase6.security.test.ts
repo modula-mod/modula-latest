@@ -1,9 +1,42 @@
-import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {runSeed} from '../seeds/preview-seed.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../src/security/ssrf.js'
+import {
+  ATPROTO_PREVIEW_BLOCKED_BENCHMARK_ADDRESS,
+  ATPROTO_PREVIEW_PDS_HOSTNAME,
+  installBlockedAtprotoPreviewDnsStub,
+  installSafeAtprotoPreviewDnsStub,
+} from './helpers/atproto-preview-dns-stub.js'
+
+const previewDns = vi.hoisted(() => {
+  let original: typeof import('node:dns').lookup | undefined
+  const lookup = vi.fn()
+  return {
+    lookup,
+    setOriginal(fn: typeof import('node:dns').lookup) {
+      original = fn
+      lookup.mockReset()
+      lookup.mockImplementation(fn)
+    },
+    original() {
+      if (!original) throw new Error('node:dns lookup mock was not initialised')
+      return original
+    },
+  }
+})
+
+vi.mock('node:dns', async importOriginal => {
+  const actual = await importOriginal<typeof import('node:dns')>()
+  previewDns.setOriginal(actual.lookup)
+  return {
+    ...actual,
+    lookup: previewDns.lookup,
+  }
+})
+
 import {claimNextJob} from '../../greenfield-worker/src/jobs/claim.js'
 import {createWorkerDb} from '../../greenfield-worker/src/database.js'
 import {randomUUID} from 'node:crypto'
@@ -94,26 +127,56 @@ describeIf('Phase 6 security', () => {
   })
 
   it('denies cross-actor connection access', async () => {
-    const start = await app.inject({
-      method: 'POST',
-      url: '/v1/atproto/oauth/start',
-      headers: {authorization: `Bearer ${andreiToken}`},
-      payload: {returnRoute: '/settings/connections/atproto', clientKind: 'web'},
-    })
-    const state = start.json().data.state
-    const callback = await app.inject({
-      method: 'GET',
-      url: `/v1/atproto/oauth/callback?preview=1&state=${state}&handle=andrei.preview.test&pdsUrl=https://bsky.social`,
-      headers: {authorization: `Bearer ${andreiToken}`},
-    })
-    expect(callback.statusCode).toBe(200)
-    const connectionId = callback.json().data.connection.id
-    const other = await app.inject({
-      method: 'GET',
-      url: `/v1/atproto/connections/${connectionId}/status`,
-      headers: {authorization: `Bearer ${gaiaToken}`},
-    })
-    expect(other.statusCode).toBe(404)
+    const restoreDns = installSafeAtprotoPreviewDnsStub(previewDns.lookup, previewDns.original())
+    try {
+      const start = await app.inject({
+        method: 'POST',
+        url: '/v1/atproto/oauth/start',
+        headers: {authorization: `Bearer ${andreiToken}`},
+        payload: {returnRoute: '/settings/connections/atproto', clientKind: 'web'},
+      })
+      const state = start.json().data.state
+      const callback = await app.inject({
+        method: 'GET',
+        url: `/v1/atproto/oauth/callback?preview=1&state=${state}&handle=andrei.preview.test&pdsUrl=https://${ATPROTO_PREVIEW_PDS_HOSTNAME}`,
+        headers: {authorization: `Bearer ${andreiToken}`},
+      })
+      expect(callback.statusCode).toBe(200)
+      const connectionId = callback.json().data.connection.id
+      const other = await app.inject({
+        method: 'GET',
+        url: `/v1/atproto/connections/${connectionId}/status`,
+        headers: {authorization: `Bearer ${gaiaToken}`},
+      })
+      expect(other.statusCode).toBe(404)
+    } finally {
+      restoreDns()
+    }
+  })
+
+  it('fails closed when bsky.social resolves to the benchmarking range without the preview DNS stub', async () => {
+    expect(isBlockedIp(ATPROTO_PREVIEW_BLOCKED_BENCHMARK_ADDRESS)).toBe(true)
+    const restoreDns = installBlockedAtprotoPreviewDnsStub(previewDns.lookup, previewDns.original())
+    try {
+      await expect(assertSafeHttpsUrl(`https://${ATPROTO_PREVIEW_PDS_HOSTNAME}`)).rejects.toThrow(
+        /Blocked|disallowed/i,
+      )
+      const start = await app.inject({
+        method: 'POST',
+        url: '/v1/atproto/oauth/start',
+        headers: {authorization: `Bearer ${andreiToken}`},
+        payload: {returnRoute: '/settings/connections/atproto', clientKind: 'web'},
+      })
+      const state = start.json().data.state
+      const callback = await app.inject({
+        method: 'GET',
+        url: `/v1/atproto/oauth/callback?preview=1&state=${state}&handle=andrei.preview.test&pdsUrl=https://${ATPROTO_PREVIEW_PDS_HOSTNAME}`,
+        headers: {authorization: `Bearer ${andreiToken}`},
+      })
+      expect(callback.statusCode).toBe(403)
+    } finally {
+      restoreDns()
+    }
   })
 
   it('rejects expired and revoked sessions', async () => {
@@ -301,6 +364,7 @@ describeIf('Phase 6 security', () => {
     expect(isBlockedIp('127.0.0.1')).toBe(true)
     expect(isBlockedIp('169.254.169.254')).toBe(true)
     expect(isBlockedIp('10.0.0.5')).toBe(true)
+    expect(isBlockedIp(ATPROTO_PREVIEW_BLOCKED_BENCHMARK_ADDRESS)).toBe(true)
     await expect(assertSafeHttpsUrl('http://example.com')).rejects.toThrow(/https/i)
     await expect(assertSafeHttpsUrl('https://127.0.0.1/metadata')).rejects.toThrow(/Blocked|disallowed/i)
     const privatePds = await app.inject({
