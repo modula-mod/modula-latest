@@ -114,6 +114,9 @@ export function buildApnsPayload(row: Row, options: {title: string | null; badge
       resourceType: typeof data.resourceType === 'string' ? data.resourceType : undefined,
       resourceId: typeof data.resourceId === 'string' ? data.resourceId : undefined,
       conversationId: typeof data.conversationId === 'string' ? data.conversationId : undefined,
+      // Lets the MODULA_MESSAGE Reply / Mark-read actions target the exact message.
+      messageId: typeof data.messageId === 'string' ? data.messageId : undefined,
+      messageType: data.type === 'mention' || data.type === 'message' ? data.type : undefined,
       followRequestId,
     },
   }
