@@ -1383,8 +1383,8 @@ export interface Database {
     muted_until: Date | null
     archived_at: Date | null
     typing_at: Date | null
-    role: 'owner' | 'admin' | 'member'
-    added_by_actor_id: string | null
+    role: Generated<'owner' | 'admin' | 'member'>
+    added_by_actor_id: Generated<string | null>
   }
   greenfield_conversation_messages: {
     message_id: string
@@ -1396,8 +1396,8 @@ export interface Database {
     reply_to_message_id: string | null
     edited_at: Date | null
     deleted_at: Date | null
-    message_kind: 'text' | 'voice' | 'media'
-    client_message_id: string | null
+    message_kind: Generated<'text' | 'voice' | 'media'>
+    client_message_id: Generated<string | null>
   }
   greenfield_message_reactions: {
     message_id: string
