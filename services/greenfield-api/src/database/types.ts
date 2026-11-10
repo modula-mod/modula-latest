@@ -1328,6 +1328,16 @@ export interface Database {
     validation: unknown
     permission_delta: unknown | null
     permission_change_acknowledged: Generated<boolean>
+    approved_facts: unknown | null
+    approval_sha256: string | null
+    approved_at: Date | null
+    signing_request_id: string | null
+    signing_idempotency_key: string | null
+    sign_requested_by_account_id: string | null
+    signing_identity_id: string | null
+    signing_started_at: Date | null
+    signed_at: Date | null
+    signing_receipt: unknown | null
     error: unknown | null
     idempotency_key: string | null
     publish_requested_by_account_id: string | null
@@ -1339,6 +1349,9 @@ export interface Database {
     cancelled_at: Date | null
   }
   greenfield_publisher_release_job_logs: {log_id: Generated<number>; job_id: string; level: 'info' | 'warn' | 'error'; step: string | null; message: string; created_at: Generated<Date>}
+  greenfield_publisher_online_signing_identities: {identity_id: string; publisher_id: string; signing_key_id: string; provider: 'VAULT_TRANSIT' | 'DISPOSABLE_TEST'; provider_key_ref: string; purpose: 'PUBLISHER' | 'MODULA_FIRST_PARTY'; state: 'ACTIVE' | 'SUSPENDED' | 'REVOKED'; first_party_authorized: Generated<boolean>; valid_from: Date; valid_until: Date; suspended_at: Date | null; suspension_reason: string | null; revoked_at: Date | null; revocation_reason: string | null; created_by_account_id: string | null; created_at: Date; updated_at: Date}
+  greenfield_publisher_signing_authorizations: {authorization_id: string; publisher_id: string; product_id: string; account_id: string; state: 'ACTIVE' | 'SUSPENDED' | 'REVOKED'; first_party_authorized: Generated<boolean>; valid_from: Date; valid_until: Date | null; granted_by_account_id: string; suspended_at: Date | null; revoked_at: Date | null; reason: string | null; created_at: Date; updated_at: Date}
+  greenfield_publisher_signing_audit_events: {event_id: string; event_type: 'identity_registered' | 'identity_suspended' | 'identity_resumed' | 'identity_rotated' | 'identity_revoked' | 'signing_requested' | 'signing_started' | 'release_invalidated' | 'signature_created' | 'signature_verified' | 'signing_failed' | 'publication_authorized'; job_id: string | null; identity_id: string | null; publisher_id: string; module_id: string | null; actor_account_id: string | null; approval_sha256: string | null; statement_sha256: string | null; receipt: unknown; details: unknown; created_at: Date}
   greenfield_publisher_owners: {publisher_owner_id: string; publisher_id: string; owner_type: 'ACCOUNT' | 'ORGANISATION'; account_id: string | null; organisation_id: string | null; created_at: Date}
   greenfield_developer_agreements: {agreement_id: string; version: string; document_hash: string; effective_at: Date; superseded_at: Date | null; created_at: Date}
   greenfield_developer_agreement_acceptances: {acceptance_id: string; agreement_id: string; agreement_version: string; accepted_by_account_id: string; accepted_at: Date; document_hash: string}
