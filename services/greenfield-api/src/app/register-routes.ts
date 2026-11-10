@@ -2715,7 +2715,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     feedConfig,
     writeConfig,
   })
-  await registerMessagingRoutes(app, db, {feedConfig, writeConfig})
+  await registerMessagingRoutes(app, db, {feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, mediaEnabled: config.messaging.mediaEnabled})
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   await registerMolibooRoutes(app, db, config, {feedConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
