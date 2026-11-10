@@ -145,6 +145,19 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  /** Apple StoreKit 2 verification for isolated sandbox/QA only. Refused in production. */
+  MODULA_PREMIUM_APPLE_SANDBOX_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  MODULA_PREMIUM_APPLE_BUNDLE_ID: z.string().min(3).max(255).optional(),
+  /** Comma-separated absolute paths to DER-encoded Apple root CA certificates. */
+  MODULA_PREMIUM_APPLE_ROOT_CA_FILES: z.string().optional(),
+  /** Certificate revocation checks. May only be disabled by isolated tests. */
+  MODULA_PREMIUM_APPLE_ONLINE_CHECKS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
   /** Independent identity verification routes and public status. Off by default. */
   MODULA_VERIFICATION_ENABLED: z
     .string()
@@ -252,6 +265,12 @@ export type AppConfig = {
     qaAssignmentsEnabled: boolean
     verificationEnabled: boolean
     verificationQaReviewEnabled: boolean
+    appleSandbox: {
+      enabled: boolean
+      bundleId: string | null
+      rootCaFiles: string[]
+      onlineChecks: boolean
+    }
   }
 }
 
@@ -538,11 +557,35 @@ function premiumConfig(raw: z.infer<typeof envSchema>): AppConfig['premium'] {
   const production = raw.MODULA_ENVIRONMENT === 'production'
   if (production && raw.MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED) refuse('MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED is refused in production')
   if (production && raw.MODULA_VERIFICATION_QA_REVIEW_ENABLED) refuse('MODULA_VERIFICATION_QA_REVIEW_ENABLED is refused in production')
+  if (production && raw.MODULA_PREMIUM_APPLE_SANDBOX_ENABLED) refuse('MODULA_PREMIUM_APPLE_SANDBOX_ENABLED is refused in production')
+  if (!raw.MODULA_PREMIUM_APPLE_ONLINE_CHECKS_ENABLED && raw.NODE_ENV !== 'test') {
+    refuse('MODULA_PREMIUM_APPLE_ONLINE_CHECKS_ENABLED may only be false in tests')
+  }
+  const rootCaFiles = Array.from(new Set((raw.MODULA_PREMIUM_APPLE_ROOT_CA_FILES ?? '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
+    .map(value => resolve(value))))
+  if (raw.MODULA_PREMIUM_APPLE_SANDBOX_ENABLED && !raw.MODULA_PREMIUM_ENTITLEMENTS_ENABLED) {
+    refuse('MODULA_PREMIUM_ENTITLEMENTS_ENABLED is required for Apple sandbox verification')
+  }
+  if (raw.MODULA_PREMIUM_APPLE_SANDBOX_ENABLED && !raw.MODULA_PREMIUM_APPLE_BUNDLE_ID) {
+    refuse('MODULA_PREMIUM_APPLE_BUNDLE_ID is required for Apple sandbox verification')
+  }
+  if (raw.MODULA_PREMIUM_APPLE_SANDBOX_ENABLED && rootCaFiles.length === 0) {
+    refuse('MODULA_PREMIUM_APPLE_ROOT_CA_FILES is required for Apple sandbox verification')
+  }
   return {
     enabled: Boolean(raw.MODULA_PREMIUM_ENTITLEMENTS_ENABLED),
     qaAssignmentsEnabled: Boolean(raw.MODULA_PREMIUM_QA_ASSIGNMENTS_ENABLED),
     verificationEnabled: Boolean(raw.MODULA_VERIFICATION_ENABLED),
     verificationQaReviewEnabled: Boolean(raw.MODULA_VERIFICATION_QA_REVIEW_ENABLED),
+    appleSandbox: {
+      enabled: Boolean(raw.MODULA_PREMIUM_APPLE_SANDBOX_ENABLED),
+      bundleId: raw.MODULA_PREMIUM_APPLE_BUNDLE_ID ?? null,
+      rootCaFiles,
+      onlineChecks: raw.MODULA_PREMIUM_APPLE_ONLINE_CHECKS_ENABLED,
+    },
   }
 }
 

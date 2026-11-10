@@ -8,10 +8,12 @@ import {registerPlugins} from './register-plugins.js'
 import {registerRoutes} from './register-routes.js'
 import type {PublisherConsoleTestOptions} from '../publisher/routes.js'
 import type {PublisherReleaseJobRunner} from '../publisher/release-job-runner.js'
+import type {PremiumAppleVerifier} from '../premium/apple-verifier.js'
 
 /** Programmatic test hooks only; never read from environment or production config. */
 export type CreateServerTestOptions = {
   publisherConsole?: PublisherConsoleTestOptions
+  premiumAppleVerifier?: PremiumAppleVerifier | null
 }
 
 export type CreatedServer = {
@@ -43,6 +45,8 @@ export async function createServer(config: AppConfig, testOptions: CreateServerT
           'databaseUrl',
           'MODULA_DATABASE_URL',
           'connectionString',
+          'req.body.signedTransaction',
+          'req.body.signedPayload',
         ],
         remove: true,
       },
