@@ -1363,8 +1363,10 @@ export interface Database {
   greenfield_account_deletion_tombstones: {account_id: string; data_request_id: string; retained_domains: unknown; deletion_manifest_sha256: string; completed_at: Date}
   greenfield_conversations: {
     conversation_id: string
-    kind: 'direct' | 'inmail'
+    kind: 'direct' | 'inmail' | 'group'
     subject: string | null
+    title: string | null
+    description: string | null
     direct_key: string | null
     created_by_actor_id: string
     created_at: Date
@@ -1374,13 +1376,15 @@ export interface Database {
   greenfield_conversation_members: {
     conversation_id: string
     actor_id: string
-    state: 'active' | 'pending' | 'declined'
+    state: 'active' | 'pending' | 'declined' | 'left' | 'removed'
     last_read_at: Date | null
     joined_at: Date
     updated_at: Date
     muted_until: Date | null
     archived_at: Date | null
     typing_at: Date | null
+    role: 'owner' | 'admin' | 'member'
+    added_by_actor_id: string | null
   }
   greenfield_conversation_messages: {
     message_id: string
@@ -1392,12 +1396,40 @@ export interface Database {
     reply_to_message_id: string | null
     edited_at: Date | null
     deleted_at: Date | null
+    message_kind: 'text' | 'voice' | 'media'
+    client_message_id: string | null
   }
   greenfield_message_reactions: {
     message_id: string
     actor_id: string
     emoji: string
     created_at: Date
+  }
+  greenfield_message_mentions: {
+    message_id: string
+    actor_id: string
+    created_at: Date
+  }
+  greenfield_message_attachments: {
+    message_id: string
+    attachment_id: string
+    position: number
+    duration_ms: number | null
+    waveform: unknown | null
+    created_at: Date
+  }
+  greenfield_messaging_privacy: {
+    actor_id: string
+    read_receipts_enabled: boolean
+    typing_indicators_enabled: boolean
+    presence_visibility: 'contacts' | 'nobody'
+    notification_preview: 'full' | 'name_only' | 'none'
+    version: number
+    updated_at: Date
+  }
+  greenfield_actor_presence: {
+    actor_id: string
+    last_active_at: Date
   }
   greenfield_communities: {
     community_id: string
