@@ -115,7 +115,7 @@ describeIfDb('Greenfield Backend V1 migration ledger security', () => {
   it('retains the exact migration ledger and schema version', async () => {
     const version = await db.selectFrom('schema_metadata').select('value').where('key', '=', 'schema_version').executeTakeFirstOrThrow()
     const latest = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(db)
-    expect(version.value).toBe('088')
-    expect(latest.rows[0]?.id).toBe('088_greenfield_premium_apple_sandbox')
+    expect(version.value).toBe('089')
+    expect(latest.rows[0]?.id).toBe('089_greenfield_online_signing_authority')
   })
 })

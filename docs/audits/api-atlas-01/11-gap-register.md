@@ -207,7 +207,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Evidence: `api-atlas.json#/routes`, `openapi.generated.yaml`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src`
-- Production impact: All 597 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
+- Production impact: All 600 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
 - Recommended fix: Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.
 - Dependencies: API contract ownership
 - Verification: Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.
