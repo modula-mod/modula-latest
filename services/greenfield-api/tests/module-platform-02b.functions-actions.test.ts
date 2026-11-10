@@ -15,6 +15,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import type {Database} from '../src/database/types.js'
 import {advanceActionLineage, GreenfieldInterModuleActionService} from '../src/modules/inter-module-action-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -66,6 +67,7 @@ describeIf('MODULE-PLATFORM-02B governed functions and inter-module actions', ()
     app = created.app
     db = created.db
     await app.ready()
+    await authorizeFirstPartyPublisherFixture(db, 'audit', 'Audit Fixtures', 'audit.module')
     const account = await registerAccount(`mp02b-functions-${suffix}@example.com`, `mp02bfn${suffix}`.slice(0, 20))
     token = account.token
     accountId = account.accountId
