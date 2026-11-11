@@ -251,6 +251,14 @@ export type AtprotoPublicationStatus =
   | 'failed'
   | 'revoked'
 
+export type CallState = 'ringing' | 'connecting' | 'active' | 'reconnecting' | 'declined' | 'cancelled' | 'missed' | 'ended' | 'failed'
+export type CallTerminalReason =
+  | 'user_action' | 'declined' | 'cancelled' | 'no_answer' | 'negotiation_timeout' | 'reconnect_timeout'
+  | 'policy_revoked' | 'blocked' | 'media_failed' | 'busy' | 'unavailable'
+export type CallEventType =
+  | 'started' | 'accepted' | 'declined' | 'cancelled' | 'missed' | 'ended' | 'failed'
+  | 'media_connected' | 'media_disconnected' | 'reconnected'
+
 export interface Database {
   schema_metadata: {
     key: string
@@ -1430,6 +1438,112 @@ export interface Database {
   greenfield_actor_presence: {
     actor_id: string
     last_active_at: Date
+  }
+  greenfield_calls: {
+    call_id: string
+    conversation_id: string
+    initiator_actor_id: string
+    recipient_actor_id: string
+    media_kind: 'audio' | 'video'
+    state: CallState
+    revision: number
+    ring_deadline_at: Date
+    state_deadline_at: Date | null
+    accepted_at: Date | null
+    connected_at: Date | null
+    ended_at: Date | null
+    terminal_reason: CallTerminalReason | null
+    ended_by_actor_id: string | null
+    accepted_session_id: string | null
+    accepted_device_id: string | null
+    negotiation_id: string | null
+    idempotency_key: string
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_call_participants: {
+    call_id: string
+    actor_id: string
+    role: 'initiator' | 'recipient'
+    response: 'invited' | 'accepted' | 'declined'
+    live: boolean
+    selected_session_id: string | null
+    selected_device_id: string | null
+    media_state: 'none' | 'connected' | 'disconnected'
+    media_negotiation_id: string | null
+    credential_window_started_at: Date | null
+    credential_window_count: number
+    joined_at: Date | null
+    left_at: Date | null
+    updated_at: Date
+  }
+  greenfield_call_events: {
+    event_id: string
+    call_id: string
+    revision: number
+    event_type: CallEventType
+    from_state: CallState | null
+    to_state: CallState
+    actor_id: string | null
+    session_id: string | null
+    device_id: string | null
+    request_id: string | null
+    idempotency_key: string | null
+    reason: string | null
+    metadata: unknown
+    occurred_at: Date
+  }
+  greenfield_call_signalling_tickets: {
+    ticket_id: string
+    ticket_hash: string
+    call_id: string
+    actor_id: string
+    session_id: string
+    device_id: string | null
+    expires_at: Date
+    consumed_at: Date | null
+    revoked_at: Date | null
+    created_at: Date
+  }
+  greenfield_call_push_tokens: {
+    registration_id: string
+    account_id: string
+    actor_id: string
+    device_id: string
+    token_hash: string
+    token_ciphertext: Buffer
+    key_version: number
+    environment: 'development' | 'production'
+    topic: string
+    app_version: string | null
+    created_at: Date
+    updated_at: Date
+    last_seen_at: Date
+    disabled_at: Date | null
+    disabled_reason: string | null
+  }
+  greenfield_call_device_invitations: {
+    invitation_id: string
+    call_id: string
+    actor_id: string
+    registration_id: string
+    status: 'queued' | 'sending' | 'sent' | 'failed' | 'cancelled' | 'expired'
+    attempts: number
+    next_attempt_at: Date
+    deadline_at: Date
+    leased_until: Date | null
+    apns_id: string | null
+    last_error: string | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_call_settings: {
+    actor_id: string
+    incoming_calls: 'accepted_directs' | 'nobody'
+    allow_video: boolean
+    relay_only: boolean
+    version: number
+    updated_at: Date
   }
   greenfield_communities: {
     community_id: string
