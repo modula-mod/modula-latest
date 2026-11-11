@@ -140,6 +140,27 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  /**
+   * 1:1 voice and video calls. Off by default. Even when true, calls are only
+   * reported as enabled when TURN (URLs + shared secret) and the ticket pepper
+   * are configured; nothing is advertised that cannot work.
+   */
+  MODULA_CALLS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  /** Comma-separated stun: URLs returned to call participants. */
+  MODULA_CALLS_STUN_URLS: z.string().optional(),
+  /** Comma-separated turn:/turns: URLs (coturn with use-auth-secret). */
+  MODULA_CALLS_TURN_URLS: z.string().optional(),
+  /** coturn static-auth-secret (TURN REST HMAC). Never sent to clients. */
+  MODULA_CALLS_TURN_SECRET: z.string().min(32).optional(),
+  /** TURN credential lifetime in seconds (default 600, bounded 60..3600). */
+  MODULA_CALLS_TURN_TTL_SECONDS: z.coerce.number().int().min(60).max(3600).default(600),
+  /** Server-side pepper for signalling-ticket hashes. */
+  MODULA_CALLS_TICKET_PEPPER: z.string().min(32).optional(),
+  /** Base64 32-byte AES-256-GCM key for PushKit VoIP tokens at rest. VoIP push is off without it. */
+  MODULA_CALLS_VOIP_TOKEN_KEY: z.string().optional(),
   /** Modula Premium entitlement routes and public badge fields. Off by default. */
   MODULA_PREMIUM_ENTITLEMENTS_ENABLED: z
     .string()
@@ -269,6 +290,7 @@ export type AppConfig = {
     /** Photo/video message kinds; voice notes are always available. */
     mediaEnabled: boolean
   }
+  calls: CallsConfig
   premium: {
     enabled: boolean
     qaAssignmentsEnabled: boolean
@@ -559,7 +581,49 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       .filter(Boolean),
     gubic: {playEnabled: Boolean(raw.MODULA_GUBIC_PLAY_ENABLED)},
     messaging: {mediaEnabled: Boolean(raw.MODULA_MESSAGING_MEDIA_ENABLED)},
+    calls: callsConfig(raw),
     premium: premiumConfig(raw),
+  }
+}
+
+export type CallsConfig = {
+  /** Effective switch: the flag AND every prerequisite below. */
+  enabled: boolean
+  /** Why calls are off when the flag is on (for startup logs; never sent to clients). */
+  disabledReason: string | null
+  stunUrls: string[]
+  turnUrls: string[]
+  turnSecret: string | null
+  turnTtlSeconds: number
+  ticketPepper: string | null
+  voipTokenKey: Buffer | null
+}
+
+function callsConfig(raw: z.infer<typeof envSchema>): CallsConfig {
+  const list = (value: string | undefined, schemes: string[]) => Array.from(new Set((value ?? '')
+    .split(',').map(item => item.trim()).filter(Boolean)))
+    .filter(url => schemes.some(scheme => url.startsWith(`${scheme}:`)))
+  const stunUrls = list(raw.MODULA_CALLS_STUN_URLS, ['stun', 'stuns'])
+  const turnUrls = list(raw.MODULA_CALLS_TURN_URLS, ['turn', 'turns'])
+  let voipTokenKey: Buffer | null = null
+  if (raw.MODULA_CALLS_VOIP_TOKEN_KEY) {
+    const decoded = Buffer.from(raw.MODULA_CALLS_VOIP_TOKEN_KEY, 'base64')
+    if (decoded.length !== 32) refuse('MODULA_CALLS_VOIP_TOKEN_KEY must be base64 of exactly 32 bytes')
+    voipTokenKey = decoded
+  }
+  let disabledReason: string | null = null
+  if (!raw.MODULA_CALLS_ENABLED) disabledReason = 'MODULA_CALLS_ENABLED is not true'
+  else if (turnUrls.length === 0 || !raw.MODULA_CALLS_TURN_SECRET) disabledReason = 'TURN is not configured (MODULA_CALLS_TURN_URLS, MODULA_CALLS_TURN_SECRET)'
+  else if (!raw.MODULA_CALLS_TICKET_PEPPER) disabledReason = 'MODULA_CALLS_TICKET_PEPPER is not configured'
+  return {
+    enabled: disabledReason === null,
+    disabledReason,
+    stunUrls,
+    turnUrls,
+    turnSecret: raw.MODULA_CALLS_TURN_SECRET ?? null,
+    turnTtlSeconds: raw.MODULA_CALLS_TURN_TTL_SECONDS,
+    ticketPepper: raw.MODULA_CALLS_TICKET_PEPPER ?? null,
+    voipTokenKey,
   }
 }
 
