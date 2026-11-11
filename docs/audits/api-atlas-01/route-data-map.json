@@ -2853,6 +2853,261 @@
       "services/greenfield-api/src/domains/board/service.ts#patch"
     ]
   },
+  "GET /v1/calls/:callId": {
+    "reads": [
+      "greenfield_calls",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#snapshot",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition"
+    ]
+  },
+  "POST /v1/calls/:callId/accept": {
+    "reads": [
+      "actors",
+      "blocks",
+      "greenfield_accounts",
+      "greenfield_call_events",
+      "greenfield_calls",
+      "profiles",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#activeAccount",
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#command",
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition"
+    ]
+  },
+  "POST /v1/calls/:callId/cancel": {
+    "reads": [
+      "actors",
+      "blocks",
+      "greenfield_accounts",
+      "greenfield_call_events",
+      "greenfield_calls",
+      "profiles",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#activeAccount",
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#command",
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition"
+    ]
+  },
+  "POST /v1/calls/:callId/decline": {
+    "reads": [
+      "actors",
+      "blocks",
+      "greenfield_accounts",
+      "greenfield_call_events",
+      "greenfield_calls",
+      "profiles",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#activeAccount",
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#command",
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition"
+    ]
+  },
+  "POST /v1/calls/:callId/end": {
+    "reads": [
+      "actors",
+      "blocks",
+      "greenfield_accounts",
+      "greenfield_call_events",
+      "greenfield_calls",
+      "profiles",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#activeAccount",
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#command",
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition"
+    ]
+  },
+  "POST /v1/calls/:callId/media-credentials": {
+    "reads": [
+      "blocks",
+      "greenfield_call_participants",
+      "greenfield_call_settings",
+      "greenfield_calls"
+    ],
+    "writes": [
+      "greenfield_call_participants"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#mediaCredentials",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#settingsFor"
+    ]
+  },
+  "GET /v1/calls/:callId/signalling": {
+    "reads": [
+      "actors",
+      "blocks",
+      "greenfield_accounts",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_calls",
+      "profiles",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#activeAccount",
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#command",
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#lockCall",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#reportMedia",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf",
+      "services/greenfield-api/src/domains/calls/service.ts#socketSnapshot",
+      "services/greenfield-api/src/domains/calls/service.ts#stillAuthorized",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#allowCandidate",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#firstSeen",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#frame",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#join",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#relay",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#room",
+      "services/greenfield-api/src/domains/calls/signalling-hub.ts#take"
+    ]
+  },
+  "POST /v1/calls/:callId/signalling-ticket": {
+    "reads": [
+      "blocks",
+      "greenfield_calls",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_signalling_tickets"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#issueTicket",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#roleOf"
+    ]
+  },
   "DELETE /v1/comments/:commentId": {
     "reads": [
       "greenfield_comments"
@@ -3757,6 +4012,45 @@
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#setArchived"
+    ]
+  },
+  "POST /v1/conversations/:id/calls": {
+    "reads": [
+      "actors",
+      "blocks",
+      "greenfield_accounts",
+      "greenfield_call_participants",
+      "greenfield_call_push_tokens",
+      "greenfield_call_settings",
+      "greenfield_calls",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_device_invitations",
+      "greenfield_call_events",
+      "greenfield_call_participants",
+      "greenfield_call_signalling_tickets",
+      "greenfield_calls"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#activeAccount",
+      "services/greenfield-api/src/domains/calls/service.ts#blockedBetween",
+      "services/greenfield-api/src/domains/calls/service.ts#directPeers",
+      "services/greenfield-api/src/domains/calls/service.ts#dto",
+      "services/greenfield-api/src/domains/calls/service.ts#expireIfDue",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice",
+      "services/greenfield-api/src/domains/calls/service.ts#settingsFor",
+      "services/greenfield-api/src/domains/calls/service.ts#start",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto",
+      "services/greenfield-api/src/domains/calls/service.ts#transition"
     ]
   },
   "GET /v1/conversations/:id/messages": {
@@ -5973,6 +6267,54 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": []
+  },
+  "GET /v1/me/call-settings": {
+    "reads": [
+      "greenfield_call_settings"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#getSettings",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#settingsFor"
+    ]
+  },
+  "PATCH /v1/me/call-settings": {
+    "reads": [
+      "greenfield_call_settings"
+    ],
+    "writes": [
+      "call",
+      "greenfield_call_settings"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#settingsFor",
+      "services/greenfield-api/src/domains/calls/service.ts#updateSettings"
+    ]
+  },
+  "GET /v1/me/calls": {
+    "reads": [
+      "greenfield_calls",
+      "greenfield_conversation_members",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#history",
+      "services/greenfield-api/src/domains/calls/service.ts#profiles",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#toDto"
+    ]
   },
   "GET /v1/me/collections": {
     "reads": [
@@ -9344,7 +9686,7 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/domains/moderation/repository.ts#block",
       "services/greenfield-api/src/domains/profiles/writes.ts#actorIdForProfileId"
@@ -9876,6 +10218,49 @@
     "evidence": [
       "services/greenfield-api/src/domains/push/service.ts#ensure",
       "services/greenfield-api/src/domains/push/service.ts#patch"
+    ]
+  },
+  "GET /v1/push/voip-devices": {
+    "reads": [
+      "greenfield_call_push_tokens"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#listVoip",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled"
+    ]
+  },
+  "POST /v1/push/voip-devices": {
+    "reads": [
+      "greenfield_call_push_tokens",
+      "push_device_tokens"
+    ],
+    "writes": [
+      "greenfield_call_push_tokens"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#registerVoip",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled",
+      "services/greenfield-api/src/domains/calls/service.ts#requireOwnedDevice"
+    ]
+  },
+  "DELETE /v1/push/voip-devices/:registrationId": {
+    "reads": [],
+    "writes": [
+      "greenfield_call_push_tokens"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/calls/service.ts#deleteVoip",
+      "services/greenfield-api/src/domains/calls/service.ts#requireEnabled"
     ]
   },
   "GET /v1/reels": {
