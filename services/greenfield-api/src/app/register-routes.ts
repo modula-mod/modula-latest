@@ -71,6 +71,7 @@ import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
 import {registerPushRoutes} from './register-push-routes.js'
 import {registerMessagingRoutes} from './register-messaging-routes.js'
+import {callsCapabilities, registerCallsRoutes, type CallPolicyHooks} from './register-calls-routes.js'
 import {registerMolibooGameRoutes} from './register-moliboo-game-routes.js'
 import {registerPremiumRoutes} from '../premium/routes.js'
 import type {PremiumAppleVerifier} from '../premium/apple-verifier.js'
@@ -174,6 +175,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const postMediaStorage = new PostMediaStorage(config)
   const profileWrites = new ProfileWriteService(db)
   const moderation = new ModerationRepository(db)
+  const callHooks: CallPolicyHooks = {}
   const notifications = new NotificationRepository(db)
   const notificationPreferences = new NotificationPreferencesService(db)
   const policies = new GreenfieldPolicyEngine(db)
@@ -1874,6 +1876,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const actorId = await profileWrites.actorIdForProfileId(profileId)
       if (!actorId) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
       await moderation.block(auth.actorId, actorId)
+      await callHooks.onBlock?.(auth.actorId, actorId).catch(error => request.log.warn({error: error?.message}, 'ending calls after block failed'))
       return reply.send(successEnvelope({blocked: true}, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Block failed')
@@ -2715,7 +2718,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     feedConfig,
     writeConfig,
   })
-  await registerMessagingRoutes(app, db, {feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, mediaEnabled: config.messaging.mediaEnabled})
+  const {hub: messagingHub} = await registerMessagingRoutes(app, db, {
+    feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, mediaEnabled: config.messaging.mediaEnabled,
+    callsCapabilities: callsCapabilities(config.calls),
+  })
+  await registerCallsRoutes(app, db, {
+    config: config.calls, feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, bundleId: config.pushBundleId,
+    messagingHub, hooks: callHooks,
+  })
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   await registerMolibooRoutes(app, db, config, {feedConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})

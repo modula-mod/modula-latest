@@ -18,6 +18,7 @@ import {failureEnvelope, statusForError, successEnvelope} from '../transport/env
 
 /** Socket heartbeat: clients ping at this interval; presence is refreshed at most once per interval. */
 export const MESSAGING_SOCKET_HEARTBEAT_MS = 25_000
+const MESSAGING_FRAME_MAX_BYTES = 8192
 
 function mapDomainError(reply: any, error: any, requestId: string, fallback: string) {
   const code = error?.code
@@ -64,6 +65,8 @@ export async function registerMessagingRoutes(
     /** Photo/video message kinds. Off unless explicitly enabled. */
     mediaEnabled?: boolean
     hub?: MessagingRealtimeHub
+    /** Calls capability block (see register-calls-routes). Absent means calls are off. */
+    callsCapabilities?: Record<string, unknown>
   },
 ): Promise<{hub: MessagingRealtimeHub; messaging: MessagingService}> {
   const messaging = new MessagingService(db, {publicApiUrl: options.publicApiUrl})
@@ -318,6 +321,7 @@ export async function registerMessagingRoutes(
       privacyControls: ['readReceipts', 'typingIndicators', 'presenceVisibility', 'notificationPreview'],
       idempotentSend: true,
       notificationActions: ['reply', 'markRead'],
+      calls: options.callsCapabilities ?? {enabled: false, audio: false, video: false, voipPush: false},
     }, request.id))
   })
 
@@ -491,7 +495,9 @@ export async function registerMessagingRoutes(
   // preHandler, which runs after the global auth hook and BEFORE the upgrade
   // is accepted: an unauthenticated client receives 401 instead of a 101
   // handshake. Membership is re-derived from the database for every event.
-  if (!app.hasDecorator('websocketServer')) await app.register(websocket, {options: {maxPayload: 8192}})
+  // The shared WebSocket server allows call-signalling frames (72 KiB, SDP);
+  // messaging frames keep their own 8 KiB bound in the handler below.
+  if (!app.hasDecorator('websocketServer')) await app.register(websocket, {options: {maxPayload: 72 * 1024}})
   const socketAuth = new WeakMap<object, {actorId: string}>()
   app.get('/v1/messaging/socket', {
     ...read(),
@@ -524,6 +530,7 @@ export async function registerMessagingRoutes(
     }
     send({type: 'hello', actorId: auth.actorId, heartbeatMs: MESSAGING_SOCKET_HEARTBEAT_MS})
     socket.on('message', async (raw: Buffer) => {
+      if (raw.length > MESSAGING_FRAME_MAX_BYTES) { send({type: 'error', reason: 'too-large'}); return }
       let message: any
       try { message = JSON.parse(raw.toString('utf8')) } catch { send({type: 'error', reason: 'invalid-json'}); return }
       if (message?.type === 'ping') { await touch(); send({type: 'pong'}); return }

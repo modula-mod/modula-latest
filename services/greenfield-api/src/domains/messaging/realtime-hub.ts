@@ -18,6 +18,10 @@ export type MessagingRealtimeEvent =
   | {type: 'read'; conversationId: string; actorId: string; readAt: string}
   | {type: 'conversation.updated'; conversationId: string; reason: 'group-info' | 'members' | 'membership' | 'mute' | 'archive'}
   | {type: 'presence'; actorId: string; status: 'online' | 'offline'; lastActiveAt: string}
+  | {
+    type: 'call.updated'; callId: string; conversationId: string; state: string; revision: number
+    mediaKind: 'audio' | 'video'; initiatorActorId: string; event: string; terminalReason: string | null
+  }
 
 export type MessagingSubscriber = {actorId: string; send: (event: MessagingRealtimeEvent) => void}
 
