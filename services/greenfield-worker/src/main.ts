@@ -15,6 +15,7 @@ import {metrics} from './observability/metrics.js'
 import {runAttachmentCleanup} from './media/cleanup.js'
 import {ApnsSender, loadApnsConfig} from './push/apns.js'
 import {runPushPass} from './push/dispatch.js'
+import {loadVoipTokenKey, runVoipPass} from './push/voip.js'
 
 const METRICS_LOG_INTERVAL_MS = 60_000
 
@@ -50,6 +51,22 @@ async function main() {
   const apnsConfig = loadApnsConfig()
   const apns = apnsConfig ? new ApnsSender(apnsConfig) : null
   const pushIntervalMs = Number(process.env.MODULA_WORKER_PUSH_INTERVAL_MS ?? 2_000)
+  const voipKey = loadVoipTokenKey()
+  const voipIntervalMs = Number(process.env.MODULA_WORKER_VOIP_INTERVAL_MS ?? 500)
+  log.info({voipConfigured: Boolean(apns && voipKey)}, 'voip push lane')
+  // Incoming calls ring within a 30 s window, so the VoIP lane runs on its own
+  // short loop instead of waiting out the main loop's empty-poll backoff.
+  const voipLoop = apns && voipKey ? (async () => {
+    while (!stopping) {
+      try {
+        const result = await runVoipPass(db, apns, {key: voipKey, onAuthError: () => apns.invalidateProviderToken()})
+        if (result.claimed > 0 || result.cancelled > 0) log.info({operation: 'push.voip', ...result}, 'voip pass')
+      } catch (error) {
+        log.error({operation: 'push.voip', error}, 'voip pass failed')
+      }
+      await delay(voipIntervalMs)
+    }
+  })() : Promise.resolve()
   log.info({apnsConfigured: Boolean(apns), apnsEnvironment: apnsConfig?.defaultEnvironment}, 'push dispatcher')
   const startedAt = new Date()
   const releaseSha = process.env.MODULA_RELEASE_SHA ?? null
@@ -146,6 +163,7 @@ async function main() {
       await delay(backoffMs)
     }
   }
+  await voipLoop
   apns?.close()
   await db.destroy()
   if (shutdownTimer) clearTimeout(shutdownTimer)

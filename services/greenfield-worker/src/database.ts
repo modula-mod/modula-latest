@@ -392,6 +392,42 @@ export interface Database {
     created_at: Date
     updated_at: Date
   }
+  greenfield_calls: {
+    call_id: string
+    conversation_id: string
+    initiator_actor_id: string
+    recipient_actor_id: string
+    media_kind: 'audio' | 'video'
+    state: string
+    revision: number
+    ring_deadline_at: Date
+  }
+  greenfield_call_push_tokens: {
+    registration_id: string
+    actor_id: string
+    token_ciphertext: Buffer
+    key_version: number
+    environment: 'development' | 'production'
+    topic: string
+    updated_at: Date
+    disabled_at: Date | null
+    disabled_reason: string | null
+  }
+  greenfield_call_device_invitations: {
+    invitation_id: string
+    call_id: string
+    actor_id: string
+    registration_id: string
+    status: 'queued' | 'sending' | 'sent' | 'failed' | 'cancelled' | 'expired'
+    attempts: number
+    next_attempt_at: Date
+    deadline_at: Date
+    leased_until: Date | null
+    apns_id: string | null
+    last_error: string | null
+    created_at: Date
+    updated_at: Date
+  }
   push_deliveries: {
     id: string
     recipient_actor_id: string

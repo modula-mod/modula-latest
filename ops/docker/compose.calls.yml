@@ -1,0 +1,35 @@
+# coturn for Modula 1:1 calls. NOT part of the automated deploy:
+# ops/deploy/greenfield-production.sh only builds and restarts the API and
+# worker from compose.production.yml. Start this by hand after Andy approves:
+#
+#   docker compose -f ops/docker/compose.calls.yml up -d coturn
+#
+# See docs/ops/calls-coturn.md for the env, firewall and nginx steps.
+name: modula-calls
+
+services:
+  coturn:
+    image: coturn/coturn:4.6.3
+    restart: unless-stopped
+    # TURN relays a UDP port range; host networking avoids publishing ~40
+    # ports through docker-proxy and keeps the real client address.
+    network_mode: host
+    mem_limit: 512m
+    cpus: 2
+    pids_limit: 256
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    command: ['-c', '/etc/coturn/turnserver.conf']
+    volumes:
+      - /etc/modula/turnserver.conf:/etc/coturn/turnserver.conf:ro
+      # Certificate for TURN_REALM (for turns: on 5349).
+      - /etc/modula/turn-tls:/etc/modula/turn-tls:ro
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ['CMD', 'turnutils_stunclient', '127.0.0.1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
