@@ -58,7 +58,7 @@ MODULA_WORKER_VOIP_INTERVAL_MS=500    # optional, default 500
 ```
 
 The worker only sends VoIP pushes when APNs is already configured
-(`MODULA_APNS_*`) and the key is present. VoIP uses topic
+(`APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_KEY_P8`, `APNS_BUNDLE_ID`, `APNS_ENV`) and the key is present. VoIP uses topic
 `<bundle>.voip`, `apns-push-type: voip`, priority 10 and `apns-expiration: 0`;
 the existing APNs auth key (.p8) works for it.
 
