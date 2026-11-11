@@ -75,6 +75,12 @@ describe('payloads, categories and deep links', () => {
     expect(payload.aps).toMatchObject({alert: {title: '@alice', body: 'commented on your post'}, badge: 3, category: 'MODULA_COMMENT', sound: 'default'})
     expect(payload.modula).toMatchObject({deliveryId: 'd1', deepLink: 'modula://post/p1/comments', notificationId: 'n1', resourceId: 'p1'})
   })
+  it('carries conversation and message ids for message notification actions', () => {
+    const message = {...row, category: 'messages', thread_id: 'messages:c1', data: {conversationId: 'c1', messageId: 'm1', type: 'mention'}}
+    const payload = buildApnsPayload(message, {title: 'Group', badge: 1}) as any
+    expect(payload.aps.category).toBe('MODULA_MESSAGE')
+    expect(payload.modula).toMatchObject({conversationId: 'c1', messageId: 'm1', messageType: 'mention'})
+  })
   it('maps follow requests to Accept and plain follows to profile', () => {
     const request = {...row, category: 'follows', thread_id: 'follow-request:req-9:v1:requested'}
     expect(apnsCategoryFor(request)).toBe('MODULA_FOLLOW_REQUEST')

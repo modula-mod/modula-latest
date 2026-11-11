@@ -135,6 +135,11 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  /** Photo and video direct/group messages. Off by default; voice notes do not need this. */
+  MODULA_MESSAGING_MEDIA_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   /** Modula Premium entitlement routes and public badge fields. Off by default. */
   MODULA_PREMIUM_ENTITLEMENTS_ENABLED: z
     .string()
@@ -259,6 +264,10 @@ export type AppConfig = {
   adminHandles: string[]
   gubic: {
     playEnabled: boolean
+  }
+  messaging: {
+    /** Photo/video message kinds; voice notes are always available. */
+    mediaEnabled: boolean
   }
   premium: {
     enabled: boolean
@@ -549,6 +558,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       .map(h => h.trim().toLowerCase())
       .filter(Boolean),
     gubic: {playEnabled: Boolean(raw.MODULA_GUBIC_PLAY_ENABLED)},
+    messaging: {mediaEnabled: Boolean(raw.MODULA_MESSAGING_MEDIA_ENABLED)},
     premium: premiumConfig(raw),
   }
 }

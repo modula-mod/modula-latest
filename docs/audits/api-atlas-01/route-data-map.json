@@ -2006,7 +2006,11 @@
       "greenfield_communities",
       "greenfield_community_events",
       "greenfield_community_memberships",
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
       "greenfield_extension_installations",
+      "greenfield_message_attachments",
       "greenfield_module_permission_reviews",
       "greenfield_module_record_media_bindings",
       "greenfield_module_record_shares",
@@ -2032,6 +2036,8 @@
     "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/domains/attachments/service.ts#openStored",
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#canViewMessageAttachment",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/profiles/repository.ts#canView",
@@ -3678,6 +3684,7 @@
   },
   "GET /v1/conversations": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
@@ -3688,7 +3695,10 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
+      "services/greenfield-api/src/domains/messaging/service.ts#latestPreviews",
       "services/greenfield-api/src/domains/messaging/service.ts#listConversations",
       "services/greenfield-api/src/domains/messaging/service.ts#listForViewer",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -3716,6 +3726,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
       "services/greenfield-api/src/domains/messaging/service.ts#ensureDirectConversationInTransaction",
       "services/greenfield-api/src/domains/messaging/service.ts#insertDirectMessageInTransaction",
@@ -3749,11 +3761,17 @@
   },
   "GET /v1/conversations/:id/messages": {
     "reads": [
+      "an",
+      "attachments",
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
       "greenfield_domain_events",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions",
       "greenfield_message_reactions",
+      "greenfield_messaging_privacy",
       "profiles"
     ],
     "writes": [],
@@ -3761,28 +3779,37 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#listMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
       "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
-      "services/greenfield-api/src/domains/messaging/service.ts#storyContexts"
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+      "services/greenfield-api/src/domains/messaging/service.ts#storyContexts",
+      "services/greenfield-api/src/domains/messaging/service.ts#visibleReadTimes"
     ]
   },
   "POST /v1/conversations/:id/messages": {
     "reads": [
+      "attachments",
       "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions",
       "greenfield_message_reactions",
       "profiles"
     ],
     "writes": [
+      "attachments",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
-      "greenfield_conversations"
+      "greenfield_conversations",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions"
     ],
     "emits": [],
     "jobs": [],
@@ -3796,7 +3823,9 @@
       "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
-      "services/greenfield-api/src/domains/messaging/service.ts#send"
+      "services/greenfield-api/src/domains/messaging/service.ts#resolveMentions",
+      "services/greenfield-api/src/domains/messaging/service.ts#sendDetailed",
+      "services/greenfield-api/src/domains/messaging/service.ts#validateAttachments"
     ]
   },
   "DELETE /v1/conversations/:id/messages/:messageId": {
@@ -3820,9 +3849,12 @@
   },
   "PATCH /v1/conversations/:id/messages/:messageId": {
     "reads": [
+      "attachments",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions",
       "greenfield_message_reactions",
       "profiles"
     ],
@@ -3843,9 +3875,12 @@
   },
   "DELETE /v1/conversations/:id/messages/:messageId/reactions": {
     "reads": [
+      "attachments",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions",
       "greenfield_message_reactions",
       "profiles"
     ],
@@ -3863,11 +3898,35 @@
       "services/greenfield-api/src/domains/messaging/service.ts#react"
     ]
   },
-  "PUT /v1/conversations/:id/messages/:messageId/reactions": {
+  "GET /v1/conversations/:id/messages/:messageId/reactions": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
+      "greenfield_message_reactions",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#reactionDetails"
+    ]
+  },
+  "PUT /v1/conversations/:id/messages/:messageId/reactions": {
+    "reads": [
+      "attachments",
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions",
       "greenfield_message_reactions",
       "profiles"
     ],
@@ -3883,6 +3942,29 @@
       "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
       "services/greenfield-api/src/domains/messaging/service.ts#react"
+    ]
+  },
+  "GET /v1/conversations/:id/messages/:messageId/receipts": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "greenfield_messaging_privacy",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+      "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#messageReceipts",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor"
     ]
   },
   "POST /v1/conversations/:id/mute": {
@@ -3904,24 +3986,33 @@
   },
   "POST /v1/conversations/:id/read": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
-      "greenfield_conversations"
+      "greenfield_conversations",
+      "greenfield_messaging_privacy"
     ],
     "writes": [
       "greenfield_conversation_members"
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
       "services/greenfield-api/src/domains/messaging/service.ts#markRead",
-      "services/greenfield-api/src/domains/messaging/service.ts#membership"
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+      "services/greenfield-api/src/domains/messaging/service.ts#realtimeRecipients",
+      "services/greenfield-api/src/domains/messaging/service.ts#receiptRecipients"
     ]
   },
   "GET /v1/conversations/:id/typing": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversations",
+      "greenfield_messaging_privacy",
       "profiles"
     ],
     "writes": [],
@@ -3929,15 +4020,18 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
       "services/greenfield-api/src/domains/messaging/service.ts#typing"
     ]
   },
   "POST /v1/conversations/:id/typing": {
     "reads": [
       "greenfield_conversation_members",
-      "greenfield_conversations"
+      "greenfield_conversations",
+      "greenfield_messaging_privacy"
     ],
     "writes": [
       "greenfield_conversation_members",
@@ -3948,11 +4042,13 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
       "services/greenfield-api/src/domains/messaging/service.ts#setTyping"
     ]
   },
   "GET /v1/conversations/unread": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations"
@@ -3962,6 +4058,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts",
       "services/greenfield-api/src/domains/messaging/service.ts#unreadSummary"
     ]
@@ -4866,6 +4963,172 @@
       "services/greenfield-api/src/domains/gifs/service.ts#trending"
     ]
   },
+  "POST /v1/groups": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_accounts",
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_conversation_members",
+      "greenfield_conversations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
+      "services/greenfield-api/src/domains/messaging/service.ts#createGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#inviteStates",
+      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
+      "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
+      "services/greenfield-api/src/domains/messaging/service.ts#resolveHandles",
+      "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts"
+    ]
+  },
+  "GET /v1/groups/:id": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants"
+    ]
+  },
+  "PATCH /v1/groups/:id": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_conversations",
+      "group"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#updateGroup"
+    ]
+  },
+  "POST /v1/groups/:id/leave": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversations"
+    ],
+    "writes": [
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+      "services/greenfield-api/src/domains/messaging/service.ts#leaveGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership"
+    ]
+  },
+  "POST /v1/groups/:id/members": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_accounts",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#addGroupMembers",
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+      "services/greenfield-api/src/domains/messaging/service.ts#inviteStates",
+      "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
+      "services/greenfield-api/src/domains/messaging/service.ts#resolveHandles"
+    ]
+  },
+  "DELETE /v1/groups/:id/members/:actorId": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#removeGroupMember"
+    ]
+  },
+  "POST /v1/groups/:id/members/:actorId/role": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+      "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#setGroupRole"
+    ]
+  },
   "GET /v1/gubic/capabilities": {
     "reads": [
       "greenfield_premium_capabilities",
@@ -5221,8 +5484,6 @@
     "jobs": [],
     "confidence": "partial-static",
     "evidence": [
-      "services/greenfield-api/src/gubic/lobby-hub.ts#relay",
-      "services/greenfield-api/src/gubic/lobby-hub.ts#subscribe",
       "services/greenfield-api/src/gubic/play-service.ts#activeMember",
       "services/greenfield-api/src/gubic/play-service.ts#isActiveMember"
     ]
@@ -5417,6 +5678,7 @@
   },
   "GET /v1/in-mail": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
@@ -5427,6 +5689,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#listForViewer",
       "services/greenfield-api/src/domains/messaging/service.ts#listInMail",
@@ -5496,9 +5759,12 @@
       "profiles"
     ],
     "writes": [
+      "attachments",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
-      "greenfield_conversations"
+      "greenfield_conversations",
+      "greenfield_message_attachments",
+      "greenfield_message_mentions"
     ],
     "emits": [],
     "jobs": [],
@@ -6159,6 +6425,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#listForViewer",
       "services/greenfield-api/src/domains/messaging/service.ts#listRequests",
@@ -6168,6 +6435,7 @@
   },
   "POST /v1/message-requests/:id/accept": {
     "reads": [
+      "blocks",
       "greenfield_conversation_members",
       "greenfield_conversation_messages",
       "greenfield_conversations",
@@ -6181,6 +6449,8 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/messaging/service.ts#acceptRequest",
+      "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
       "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
@@ -6205,6 +6475,89 @@
       "services/greenfield-api/src/domains/messaging/service.ts#declineRequest",
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#pendingRequest"
+    ]
+  },
+  "GET /v1/messages/search": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversation_messages",
+      "greenfield_conversations",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#participants",
+      "services/greenfield-api/src/domains/messaging/service.ts#searchMessages"
+    ]
+  },
+  "GET /v1/messaging/capabilities": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/messaging/privacy": {
+    "reads": [
+      "greenfield_messaging_privacy"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor"
+    ]
+  },
+  "PATCH /v1/messaging/privacy": {
+    "reads": [
+      "greenfield_messaging_privacy"
+    ],
+    "writes": [
+      "greenfield_conversation_members",
+      "greenfield_messaging_privacy",
+      "messaging"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+      "services/greenfield-api/src/domains/messaging/service.ts#updatePrivacy"
+    ]
+  },
+  "GET /v1/messaging/socket": {
+    "reads": [
+      "blocks",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "greenfield_messaging_privacy"
+    ],
+    "writes": [
+      "greenfield_actor_presence",
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#contactsOf",
+      "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#presenceRecipients",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+      "services/greenfield-api/src/domains/messaging/service.ts#setTyping",
+      "services/greenfield-api/src/domains/messaging/service.ts#touchPresence"
     ]
   },
   "GET /v1/meta": {
@@ -8810,6 +9163,38 @@
     "evidence": [
       "services/greenfield-api/src/premium/service.ts#activeCatalogueVersion",
       "services/greenfield-api/src/premium/service.ts#catalogue"
+    ]
+  },
+  "GET /v1/presence": {
+    "reads": [
+      "blocks",
+      "greenfield_actor_presence",
+      "greenfield_conversation_members",
+      "greenfield_conversations",
+      "greenfield_messaging_privacy"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+      "services/greenfield-api/src/domains/messaging/service.ts#contactsOf",
+      "services/greenfield-api/src/domains/messaging/service.ts#presence",
+      "services/greenfield-api/src/domains/messaging/service.ts#privacyFor"
+    ]
+  },
+  "POST /v1/presence/heartbeat": {
+    "reads": [],
+    "writes": [
+      "greenfield_actor_presence",
+      "presence"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#touchPresence"
     ]
   },
   "GET /v1/product-standard/products/:productId": {

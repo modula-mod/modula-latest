@@ -5,6 +5,7 @@ import type {ModulaDb} from '../database/client.js'
 import {AttachmentService} from '../domains/attachments/service.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
+import {MessagingService} from '../domains/messaging/service.js'
 import {StoryService, storyItemLiveCutoff} from '../domains/stories/service.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
@@ -33,6 +34,7 @@ export async function registerAttachmentRoutes(
   const posts = new PostRepository(db, config.publicApiUrl)
   const profiles = new ProfileRepository(db)
   const stories = new StoryService(db, config)
+  const messaging = new MessagingService(db, {publicApiUrl: config.publicApiUrl})
   const moduleAccess = new GreenfieldModuleRuntimeAccessService(db, config)
   const {writeConfig, feedConfig, mutationsAllowed} = options
 
@@ -146,6 +148,12 @@ export async function registerAttachmentRoutes(
           .where('community_id', '=', communityBinding.community_id)
           .where('actor_id', '=', request.auth.actorId).where('status', '=', 'active').executeTakeFirst())
       }
+    }
+    if (!allowed && request.auth?.actorId) {
+      // Direct and group message attachments (voice notes): only active
+      // members of the conversation, never for unsent messages, and never
+      // across a block inside a group.
+      allowed = await messaging.canViewMessageAttachment(request.auth.actorId, attachmentId)
     }
     if (!allowed) {
       // Story media follows the story group's visibility and block policy. An

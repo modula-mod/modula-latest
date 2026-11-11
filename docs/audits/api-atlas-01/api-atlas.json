@@ -8,21 +8,21 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/pr158-update",
-      "sourceSha256": "a21249d5c30b63dfd9236a880ac88d6d1358bc66cdd244a007e49ee33624b455",
-      "capturedAt": "2026-11-09T23:57:23.792Z",
-      "routeCount": 847
+      "branch": "andy/messaging-backend-1",
+      "sourceSha256": "44683d1f5791da5af84aae81f7b1a25a3af0608f7b97cd706a031a8836af2443",
+      "capturedAt": "2026-11-10T23:43:28.931Z",
+      "routeCount": 871
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 847,
-    "applicationRuntimeRoutes": 597,
-    "mappedApplicationRoutes": 597,
+    "runtimeMethodRoutes": 871,
+    "applicationRuntimeRoutes": 613,
+    "mappedApplicationRoutes": 613,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 597,
+    "sourceRoutes": 613,
     "sourceOnlyRoutes": 0,
-    "explicitlyExcludedFrameworkRoutes": 250,
+    "explicitlyExcludedFrameworkRoutes": 258,
     "frameworkRoutes": [
       {
         "method": "OPTIONS",
@@ -986,6 +986,46 @@
       },
       {
         "method": "HEAD",
+        "path": "/v1/messaging/capabilities",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/messaging/privacy",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/groups/:id",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/conversations/:id/messages/:messageId/reactions",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/conversations/:id/messages/:messageId/receipts",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/messages/search",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/presence",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/messaging/socket",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
         "path": "/v1/message-requests",
         "reason": "Fastify automatic HEAD companion for GET"
       },
@@ -1276,7 +1316,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "847 = 597 application + 250 framework-derived"
+    "equation": "871 = 613 application + 258 framework-derived"
   },
   "routes": [
     {
@@ -2390,6 +2430,7 @@
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/gubic.play.integration.test.ts",
           "services/greenfield-api/tests/helpers/registry-fixtures.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
           "services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts",
@@ -5050,6 +5091,7 @@
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/gubic.play.integration.test.ts",
           "services/greenfield-api/tests/helpers/registry-fixtures.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
           "services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts",
@@ -5441,6 +5483,7 @@
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/gubic.play.integration.test.ts",
           "services/greenfield-api/tests/helpers/registry-fixtures.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
           "services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts",
@@ -15119,7 +15162,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 81
+        "line": 83
       },
       "handler": "inline",
       "controllerServices": [
@@ -15210,6 +15253,7 @@
           "services/greenfield-api/src/domains/attachments/service.ts",
           "services/greenfield-api/src/domains/comments/media.ts",
           "services/greenfield-api/src/domains/communities/service.ts",
+          "services/greenfield-api/src/domains/messaging/service.ts",
           "services/greenfield-api/src/domains/profiles/writes.ts",
           "services/greenfield-api/src/domains/stories/service.ts"
         ],
@@ -15217,6 +15261,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
@@ -15241,7 +15286,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 70
+        "line": 72
       },
       "handler": "inline",
       "controllerServices": [
@@ -15327,6 +15372,7 @@
           "services/greenfield-api/src/domains/attachments/service.ts",
           "services/greenfield-api/src/domains/comments/media.ts",
           "services/greenfield-api/src/domains/communities/service.ts",
+          "services/greenfield-api/src/domains/messaging/service.ts",
           "services/greenfield-api/src/domains/profiles/writes.ts",
           "services/greenfield-api/src/domains/stories/service.ts"
         ],
@@ -15334,6 +15380,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
@@ -15358,13 +15405,14 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 94
+        "line": 96
       },
       "handler": "inline",
       "controllerServices": [
         "attachments.openStored",
         "db.selectFrom",
         "eb.or",
+        "messaging.canViewMessageAttachment",
         "moduleAccess.enforceCapability",
         "moduleAccess.resolve",
         "posts.getById",
@@ -15433,7 +15481,11 @@
           "greenfield_communities",
           "greenfield_community_events",
           "greenfield_community_memberships",
+          "greenfield_conversation_members",
+          "greenfield_conversation_messages",
+          "greenfield_conversations",
           "greenfield_extension_installations",
+          "greenfield_message_attachments",
           "greenfield_module_permission_reviews",
           "greenfield_module_record_media_bindings",
           "greenfield_module_record_shares",
@@ -15456,6 +15508,8 @@
         "writes": [],
         "evidence": [
           "services/greenfield-api/src/domains/attachments/service.ts#openStored",
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#canViewMessageAttachment",
           "services/greenfield-api/src/domains/posts/repository.ts#getById",
           "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
           "services/greenfield-api/src/domains/profiles/repository.ts#canView",
@@ -15484,6 +15538,7 @@
           "services/greenfield-api/src/domains/attachments/service.ts",
           "services/greenfield-api/src/domains/comments/media.ts",
           "services/greenfield-api/src/domains/communities/service.ts",
+          "services/greenfield-api/src/domains/messaging/service.ts",
           "services/greenfield-api/src/domains/profiles/writes.ts",
           "services/greenfield-api/src/domains/stories/service.ts"
         ],
@@ -15491,6 +15546,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
@@ -15515,7 +15571,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 39
+        "line": 41
       },
       "handler": "inline",
       "controllerServices": [
@@ -15605,6 +15661,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
@@ -15629,7 +15686,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "line": 52
+        "line": 54
       },
       "handler": "inline",
       "controllerServices": [
@@ -15730,6 +15787,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/phase7i.f5-stories.test.ts",
           "services/greenfield-api/tests/post04.attachments.test.ts"
         ]
@@ -25661,7 +25719,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 54
+        "line": 83
       },
       "handler": "inline",
       "controllerServices": [
@@ -25726,6 +25784,7 @@
       ],
       "data": {
         "reads": [
+          "blocks",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
@@ -25733,7 +25792,10 @@
         ],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
+          "services/greenfield-api/src/domains/messaging/service.ts#latestPreviews",
           "services/greenfield-api/src/domains/messaging/service.ts#listConversations",
           "services/greenfield-api/src/domains/messaging/service.ts#listForViewer",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
@@ -25750,6 +25812,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -25776,7 +25839,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 75
+        "line": 104
       },
       "handler": "inline",
       "controllerServices": [
@@ -25857,6 +25920,8 @@
           "greenfield_conversations"
         ],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
           "services/greenfield-api/src/domains/messaging/service.ts#ensureDirectConversationInTransaction",
           "services/greenfield-api/src/domains/messaging/service.ts#insertDirectMessageInTransaction",
@@ -25880,6 +25945,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -25906,7 +25972,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 227
+        "line": 274
       },
       "handler": "inline",
       "controllerServices": [
@@ -25994,6 +26060,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26020,7 +26087,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 94
+        "line": 123
       },
       "handler": "inline",
       "controllerServices": [
@@ -26087,22 +26154,31 @@
       ],
       "data": {
         "reads": [
+          "an",
+          "attachments",
+          "blocks",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
           "greenfield_domain_events",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions",
           "greenfield_message_reactions",
+          "greenfield_messaging_privacy",
           "profiles"
         ],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#listMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
           "services/greenfield-api/src/domains/messaging/service.ts#messageDto",
           "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
           "services/greenfield-api/src/domains/messaging/service.ts#participants",
-          "services/greenfield-api/src/domains/messaging/service.ts#storyContexts"
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#storyContexts",
+          "services/greenfield-api/src/domains/messaging/service.ts#visibleReadTimes"
         ],
         "confidence": "method-level-static"
       },
@@ -26114,6 +26190,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26140,12 +26217,12 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 106
+        "line": 135
       },
       "handler": "inline",
       "controllerServices": [
         "log.warn",
-        "messaging.send"
+        "messaging.sendDetailed"
       ],
       "authentication": "legacy or bridged bearer session",
       "authorization": {
@@ -26164,8 +26241,8 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "authenticated actor id is passed into the service/repository scope",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -26196,6 +26273,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "successCodes": [
+        200,
         201
       ],
       "expectedErrors": [
@@ -26208,17 +26286,23 @@
       ],
       "data": {
         "reads": [
+          "attachments",
           "blocks",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions",
           "greenfield_message_reactions",
           "profiles"
         ],
         "writes": [
+          "attachments",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
-          "greenfield_conversations"
+          "greenfield_conversations",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions"
         ],
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
@@ -26229,11 +26313,15 @@
           "services/greenfield-api/src/domains/messaging/service.ts#messageExtras",
           "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
           "services/greenfield-api/src/domains/messaging/service.ts#participants",
-          "services/greenfield-api/src/domains/messaging/service.ts#send"
+          "services/greenfield-api/src/domains/messaging/service.ts#resolveMentions",
+          "services/greenfield-api/src/domains/messaging/service.ts#sendDetailed",
+          "services/greenfield-api/src/domains/messaging/service.ts#validateAttachments"
         ],
         "confidence": "partial-static"
       },
-      "storage": [],
+      "storage": [
+        "host bind mount: /var/lib/modula/greenfield-media"
+      ],
       "eventsProduced": [],
       "jobsProduced": [],
       "externalIntegrations": [],
@@ -26241,6 +26329,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26267,7 +26356,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 158
+        "line": 197
       },
       "handler": "inline",
       "controllerServices": [
@@ -26357,6 +26446,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26383,7 +26473,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 146
+        "line": 184
       },
       "handler": "inline",
       "controllerServices": [
@@ -26450,9 +26540,12 @@
       ],
       "data": {
         "reads": [
+          "attachments",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions",
           "greenfield_message_reactions",
           "profiles"
         ],
@@ -26477,6 +26570,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26503,7 +26597,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 181
+        "line": 223
       },
       "handler": "inline",
       "controllerServices": [
@@ -26572,9 +26666,12 @@
       ],
       "data": {
         "reads": [
+          "attachments",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions",
           "greenfield_message_reactions",
           "profiles"
         ],
@@ -26598,6 +26695,124 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
+          "services/greenfield-api/tests/messaging.integration.test.ts",
+          "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/conversations/:id/messages/:messageId/reactions",
+      "domain": "Reactions",
+      "method": "GET",
+      "effectiveRoute": "/v1/conversations/:id/messages/:messageId/reactions",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 436
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.reactionDetails"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversation_messages",
+          "greenfield_conversations",
+          "greenfield_message_reactions",
+          "profiles"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#reactionDetails"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26624,7 +26839,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 170
+        "line": 210
       },
       "handler": "inline",
       "controllerServices": [
@@ -26691,9 +26906,12 @@
       ],
       "data": {
         "reads": [
+          "attachments",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions",
           "greenfield_message_reactions",
           "profiles"
         ],
@@ -26717,6 +26935,126 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
+          "services/greenfield-api/tests/messaging.integration.test.ts",
+          "services/greenfield-api/tests/premium.integration.test.ts",
+          "services/greenfield-api/tests/push.routes.test.ts",
+          "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/conversations/:id/messages/:messageId/receipts",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/conversations/:id/messages/:messageId/receipts",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/conversations/:id/messages/:messageId/receipts",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 447
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.messageReceipts"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversation_messages",
+          "greenfield_conversations",
+          "greenfield_messaging_privacy",
+          "profiles"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+          "services/greenfield-api/src/domains/messaging/service.ts#liveMessage",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#messageReceipts",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26743,7 +27081,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 216
+        "line": 263
       },
       "handler": "inline",
       "controllerServices": [
@@ -26831,6 +27169,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26857,11 +27196,13 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 121
+        "line": 155
       },
       "handler": "inline",
       "controllerServices": [
-        "messaging.markRead"
+        "hub.publish",
+        "messaging.markRead",
+        "messaging.receiptRecipients"
       ],
       "authentication": "legacy or bridged bearer session",
       "authorization": {
@@ -26924,17 +27265,24 @@
       ],
       "data": {
         "reads": [
+          "blocks",
           "greenfield_conversation_members",
-          "greenfield_conversations"
+          "greenfield_conversations",
+          "greenfield_messaging_privacy"
         ],
         "writes": [
           "greenfield_conversation_members"
         ],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
           "services/greenfield-api/src/domains/messaging/service.ts#markRead",
-          "services/greenfield-api/src/domains/messaging/service.ts#membership"
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#realtimeRecipients",
+          "services/greenfield-api/src/domains/messaging/service.ts#receiptRecipients"
         ],
-        "confidence": "method-level-static"
+        "confidence": "partial-static"
       },
       "storage": [],
       "eventsProduced": [],
@@ -26944,6 +27292,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -26970,7 +27319,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 205
+        "line": 252
       },
       "handler": "inline",
       "controllerServices": [
@@ -27035,14 +27384,18 @@
       ],
       "data": {
         "reads": [
+          "blocks",
           "greenfield_conversation_members",
           "greenfield_conversations",
+          "greenfield_messaging_privacy",
           "profiles"
         ],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
           "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
           "services/greenfield-api/src/domains/messaging/service.ts#typing"
         ],
         "confidence": "method-level-static"
@@ -27055,6 +27408,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -27081,7 +27435,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 193
+        "line": 237
       },
       "handler": "inline",
       "controllerServices": [
@@ -27149,7 +27503,8 @@
       "data": {
         "reads": [
           "greenfield_conversation_members",
-          "greenfield_conversations"
+          "greenfield_conversations",
+          "greenfield_messaging_privacy"
         ],
         "writes": [
           "greenfield_conversation_members",
@@ -27157,6 +27512,7 @@
         ],
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
           "services/greenfield-api/src/domains/messaging/service.ts#setTyping"
         ],
         "confidence": "method-level-static"
@@ -27169,6 +27525,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/premium.integration.test.ts",
           "services/greenfield-api/tests/push.routes.test.ts",
@@ -27195,7 +27552,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 65
+        "line": 94
       },
       "handler": "inline",
       "controllerServices": [
@@ -27258,12 +27615,14 @@
       ],
       "data": {
         "reads": [
+          "blocks",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations"
         ],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts",
           "services/greenfield-api/src/domains/messaging/service.ts#unreadSummary"
         ],
@@ -33219,6 +33578,829 @@
       "contract": null
     },
     {
+      "id": "POST /v1/groups",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/groups",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 345
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.createGroup"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        201
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "blocks",
+          "follows",
+          "greenfield_accounts",
+          "greenfield_conversation_members",
+          "greenfield_conversation_messages",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [
+          "greenfield_conversation_members",
+          "greenfield_conversations"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#createGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#inviteStates",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
+          "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#otherMembers",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
+          "services/greenfield-api/src/domains/messaging/service.ts#resolveHandles",
+          "services/greenfield-api/src/domains/messaging/service.ts#unreadCounts"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/groups/:id",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/groups/:id",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups/:id",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 357
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.getGroup"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "PATCH /v1/groups/:id",
+      "domain": "Platform",
+      "method": "PATCH",
+      "effectiveRoute": "/v1/groups/:id",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups/:id",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 368
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.updateGroup"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [
+          "greenfield_conversations",
+          "group"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#updateGroup"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "POST /v1/groups/:id/leave",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/groups/:id/leave",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups/:id/leave",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 422
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "hub.publish",
+        "messaging.leaveGroup"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_conversation_members",
+          "greenfield_conversations"
+        ],
+        "writes": [
+          "greenfield_conversation_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+          "services/greenfield-api/src/domains/messaging/service.ts#leaveGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "POST /v1/groups/:id/members",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/groups/:id/members",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups/:id/members",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 381
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "hub.publish",
+        "messaging.addGroupMembers"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "actors",
+          "blocks",
+          "follows",
+          "greenfield_accounts",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [
+          "greenfield_conversation_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#addGroupMembers",
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+          "services/greenfield-api/src/domains/messaging/service.ts#inviteStates",
+          "services/greenfield-api/src/domains/messaging/service.ts#isBlockedEitherWayWith",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#resolveHandle",
+          "services/greenfield-api/src/domains/messaging/service.ts#resolveHandles"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "DELETE /v1/groups/:id/members/:actorId",
+      "domain": "Platform",
+      "method": "DELETE",
+      "effectiveRoute": "/v1/groups/:id/members/:actorId",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups/:id/members/:actorId",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 395
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "hub.publish",
+        "messaging.removeGroupMember"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [
+          "greenfield_conversation_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#removeGroupMember"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "POST /v1/groups/:id/members/:actorId/role",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/groups/:id/members/:actorId/role",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/groups/:id/members/:actorId/role",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 409
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.setGroupRole"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [
+          "greenfield_conversation_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#getGroup",
+          "services/greenfield-api/src/domains/messaging/service.ts#groupMembership",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#setGroupRole"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
       "id": "GET /v1/gubic/capabilities",
       "domain": "Platform",
       "method": "GET",
@@ -35312,8 +36494,6 @@
         ],
         "writes": [],
         "evidence": [
-          "services/greenfield-api/src/gubic/lobby-hub.ts#relay",
-          "services/greenfield-api/src/gubic/lobby-hub.ts#subscribe",
           "services/greenfield-api/src/gubic/play-service.ts#activeMember",
           "services/greenfield-api/src/gubic/play-service.ts#isActiveMember"
         ],
@@ -36613,7 +37793,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 272
+        "line": 588
       },
       "handler": "inline",
       "controllerServices": [
@@ -36678,6 +37858,7 @@
       ],
       "data": {
         "reads": [
+          "blocks",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
@@ -36685,6 +37866,7 @@
         ],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#listForViewer",
           "services/greenfield-api/src/domains/messaging/service.ts#listInMail",
@@ -36727,7 +37909,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 283
+        "line": 599
       },
       "handler": "inline",
       "controllerServices": [
@@ -36851,7 +38033,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 295
+        "line": 611
       },
       "handler": "inline",
       "controllerServices": [
@@ -36968,7 +38150,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 306
+        "line": 622
       },
       "handler": "inline",
       "controllerServices": [
@@ -37041,9 +38223,12 @@
           "profiles"
         ],
         "writes": [
+          "attachments",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
-          "greenfield_conversations"
+          "greenfield_conversations",
+          "greenfield_message_attachments",
+          "greenfield_message_mentions"
         ],
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#insertMessage",
@@ -41902,7 +43087,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 238
+        "line": 554
       },
       "handler": "inline",
       "controllerServices": [
@@ -41972,6 +43157,7 @@
         ],
         "writes": [],
         "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#listForViewer",
           "services/greenfield-api/src/domains/messaging/service.ts#listRequests",
@@ -41988,6 +43174,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
@@ -42012,7 +43199,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 248
+        "line": 564
       },
       "handler": "inline",
       "controllerServices": [
@@ -42079,6 +43266,7 @@
       ],
       "data": {
         "reads": [
+          "blocks",
           "greenfield_conversation_members",
           "greenfield_conversation_messages",
           "greenfield_conversations",
@@ -42089,6 +43277,8 @@
         ],
         "evidence": [
           "services/greenfield-api/src/domains/messaging/service.ts#acceptRequest",
+          "services/greenfield-api/src/domains/messaging/service.ts#activeMemberCounts",
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
           "services/greenfield-api/src/domains/messaging/service.ts#conversationFor",
           "services/greenfield-api/src/domains/messaging/service.ts#latestMessages",
           "services/greenfield-api/src/domains/messaging/service.ts#membership",
@@ -42107,6 +43297,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
@@ -42131,7 +43322,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
-        "line": 260
+        "line": 576
       },
       "handler": "inline",
       "controllerServices": [
@@ -42219,6 +43410,7 @@
         "clients": [],
         "server": [],
         "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/story-dm-replies.integration.test.ts"
         ]
@@ -42231,6 +43423,550 @@
       "liveProbe": null,
       "status": "candidate-registered-not-production-probed",
       "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/messages/search",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/messages/search",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/messages/search",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 458
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.searchMessages"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversation_messages",
+          "greenfield_conversations",
+          "profiles"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#participants",
+          "services/greenfield-api/src/domains/messaging/service.ts#searchMessages"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/messaging/capabilities",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/messaging/capabilities",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/messaging/capabilities",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 299
+      },
+      "handler": "inline",
+      "controllerServices": [],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "not evident in the route handler; inspect downstream service",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [],
+        "evidence": [],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "host bind mount: /var/lib/modula/greenfield-media"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/messaging/privacy",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/messaging/privacy",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/messaging/privacy",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 324
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.getPrivacy"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_messaging_privacy"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "PATCH /v1/messaging/privacy",
+      "domain": "Platform",
+      "method": "PATCH",
+      "effectiveRoute": "/v1/messaging/privacy",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/messaging/privacy",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 334
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.updatePrivacy"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "Record<string, unknown> : {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_messaging_privacy"
+        ],
+        "writes": [
+          "greenfield_conversation_members",
+          "greenfield_messaging_privacy",
+          "messaging"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#updatePrivacy"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/messaging/socket",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/messaging/socket",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/messaging/socket",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 496
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "at.toISOString",
+        "hub.connectionCount",
+        "hub.isOnline",
+        "hub.subscribe",
+        "messaging.presenceRecipients",
+        "messaging.setTyping",
+        "messaging.touchPresence",
+        "raw.toString",
+        "socket.close",
+        "socket.on",
+        "socket.send",
+        "socketAuth.get"
+      ],
+      "authentication": "none",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "greenfield_messaging_privacy"
+        ],
+        "writes": [
+          "greenfield_actor_presence",
+          "greenfield_conversation_members"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#contactsOf",
+          "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
+          "services/greenfield-api/src/domains/messaging/service.ts#membership",
+          "services/greenfield-api/src/domains/messaging/service.ts#presenceRecipients",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
+          "services/greenfield-api/src/domains/messaging/service.ts#setTyping",
+          "services/greenfield-api/src/domains/messaging/service.ts#touchPresence"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
       "contract": null
     },
     {
@@ -60098,6 +61834,221 @@
       "contract": null
     },
     {
+      "id": "GET /v1/presence",
+      "domain": "Platform",
+      "method": "GET",
+      "effectiveRoute": "/v1/presence",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/presence",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 479
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "hub.isOnline",
+        "messaging.presence"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        403,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "blocks",
+          "greenfield_actor_presence",
+          "greenfield_conversation_members",
+          "greenfield_conversations",
+          "greenfield_messaging_privacy"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
+          "services/greenfield-api/src/domains/messaging/service.ts#contactsOf",
+          "services/greenfield-api/src/domains/messaging/service.ts#presence",
+          "services/greenfield-api/src/domains/messaging/service.ts#privacyFor"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "POST /v1/presence/heartbeat",
+      "domain": "Platform",
+      "method": "POST",
+      "effectiveRoute": "/v1/presence/heartbeat",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/presence/heartbeat",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "line": 468
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "messaging.touchPresence"
+      ],
+      "authentication": "legacy or bridged bearer session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [
+          "greenfield_actor_presence",
+          "presence"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/domains/messaging/service.ts#touchPresence"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
       "id": "GET /v1/product-standard/products/:productId",
       "domain": "Modules",
       "method": "GET",
@@ -68527,6 +70478,7 @@
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/gubic.play.integration.test.ts",
           "services/greenfield-api/tests/helpers/registry-fixtures.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
           "services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts",
@@ -68680,6 +70632,7 @@
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/gubic.play.integration.test.ts",
           "services/greenfield-api/tests/helpers/registry-fixtures.ts",
+          "services/greenfield-api/tests/messaging-v3.integration.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
           "services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts",
@@ -71969,6 +73922,8 @@
         "POST /v1/connections/:connectionId/refresh",
         "POST /v1/conversations",
         "GET /v1/creator/insights",
+        "POST /v1/groups",
+        "POST /v1/groups/:id/members",
         "POST /v1/in-mail",
         "PATCH /v1/me/membership/badge-visibility",
         "POST /v1/me/verification/applications",
@@ -75162,6 +77117,7 @@
         "services/greenfield-api/src/domains/communities/service.ts",
         "services/greenfield-api/src/domains/discovery/repository.ts",
         "services/greenfield-api/src/domains/drafts/service.ts",
+        "services/greenfield-api/src/domains/messaging/service.ts",
         "services/greenfield-api/src/domains/posts/repository.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
@@ -75174,6 +77130,7 @@
         "services/greenfield-api/src/domains/comments/media.ts",
         "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/communities/service.ts",
+        "services/greenfield-api/src/domains/messaging/service.ts",
         "services/greenfield-api/src/domains/posts/writes.ts",
         "services/greenfield-api/src/domains/profiles/writes.ts",
         "services/greenfield-api/src/domains/stories/service.ts",
@@ -75196,6 +77153,11 @@
         "PATCH /v1/communities/:communityId",
         "POST /v1/communities/:communityId/events",
         "PATCH /v1/communities/:communityId/events/:eventId",
+        "GET /v1/conversations/:id/messages",
+        "POST /v1/conversations/:id/messages",
+        "PATCH /v1/conversations/:id/messages/:messageId",
+        "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "PUT /v1/conversations/:id/messages/:messageId/reactions",
         "GET /v1/discover",
         "GET /v1/feed/home",
         "GET /v1/feed/profile/:profileId",
@@ -75228,6 +77190,8 @@
         "PATCH /v1/communities/:communityId",
         "POST /v1/communities/:communityId/events",
         "PATCH /v1/communities/:communityId/events/:eventId",
+        "POST /v1/conversations/:id/messages",
+        "POST /v1/in-mail/:id/replies",
         "POST /v1/modules/:moduleId/records/:collection/:recordId/media",
         "POST /v1/posts",
         "POST /v1/posts/:postId/comments",
@@ -75835,14 +77799,32 @@
         "GET /v1/comments/:commentId/replies",
         "DELETE /v1/connections/:connectionId",
         "POST /v1/connections/:connectionId/refresh",
+        "GET /v1/conversations",
         "POST /v1/conversations",
+        "GET /v1/conversations/:id/messages",
         "POST /v1/conversations/:id/messages",
+        "GET /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/receipts",
+        "POST /v1/conversations/:id/read",
+        "GET /v1/conversations/:id/typing",
+        "GET /v1/conversations/unread",
         "GET /v1/feed/home",
+        "POST /v1/groups",
+        "GET /v1/groups/:id",
+        "PATCH /v1/groups/:id",
+        "POST /v1/groups/:id/members",
+        "DELETE /v1/groups/:id/members/:actorId",
+        "POST /v1/groups/:id/members/:actorId/role",
+        "GET /v1/in-mail",
         "POST /v1/in-mail",
         "POST /v1/in-mail/:id/replies",
         "GET /v1/media/stories/:mediaFile",
+        "POST /v1/message-requests/:id/accept",
+        "GET /v1/messages/search",
+        "GET /v1/messaging/socket",
         "GET /v1/notifications",
         "GET /v1/posts/:postId/comments",
+        "GET /v1/presence",
         "GET /v1/profiles/:handle",
         "GET /v1/profiles/:handle/followers",
         "GET /v1/profiles/:handle/following",
@@ -76193,6 +78175,8 @@
         "POST /v1/conversations",
         "GET /v1/creator/insights",
         "GET /v1/feed/home",
+        "POST /v1/groups",
+        "POST /v1/groups/:id/members",
         "GET /v1/media/stories/:mediaFile",
         "GET /v1/profiles/:handle",
         "GET /v1/profiles/:handle/followers",
@@ -77118,6 +79102,8 @@
         "GET /v1/backend/products/:productId/accounts/:accountId",
         "POST /v1/conversations",
         "POST /v1/developer/organisations/:organisationId/members",
+        "POST /v1/groups",
+        "POST /v1/groups/:id/members",
         "GET /v1/gubic/games/:gameId/lobbies",
         "POST /v1/gubic/games/:gameId/lobbies",
         "GET /v1/gubic/lobbies/:lobbyId",
@@ -77143,6 +79129,38 @@
         "POST /v1/accounts/register",
         "POST /v1/accounts/verify-email",
         "PATCH /v1/profiles/me"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_actor_presence",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield actor presence",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "089_messaging_v3.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/presence"
+      ],
+      "routeWrites": [
+        "GET /v1/messaging/socket",
+        "POST /v1/presence/heartbeat"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -82246,7 +84264,6 @@
       "timestamps": [],
       "migrationIntroduced": "075_greenfield_messaging.sql",
       "sourceReads": [
-        "services/greenfield-api/src/app/register-messaging-routes.ts",
         "services/greenfield-api/src/domains/messaging/service.ts"
       ],
       "sourceWrites": [
@@ -82255,6 +84272,7 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [
+        "GET /v1/attachments/:attachmentId/content",
         "GET /v1/conversations",
         "POST /v1/conversations",
         "POST /v1/conversations/:id/archive",
@@ -82263,19 +84281,31 @@
         "DELETE /v1/conversations/:id/messages/:messageId",
         "PATCH /v1/conversations/:id/messages/:messageId",
         "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/reactions",
         "PUT /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/receipts",
         "POST /v1/conversations/:id/mute",
         "POST /v1/conversations/:id/read",
         "GET /v1/conversations/:id/typing",
         "POST /v1/conversations/:id/typing",
         "GET /v1/conversations/unread",
+        "POST /v1/groups",
+        "GET /v1/groups/:id",
+        "PATCH /v1/groups/:id",
+        "POST /v1/groups/:id/leave",
+        "POST /v1/groups/:id/members",
+        "DELETE /v1/groups/:id/members/:actorId",
+        "POST /v1/groups/:id/members/:actorId/role",
         "GET /v1/in-mail",
         "POST /v1/in-mail",
         "GET /v1/in-mail/:id",
         "POST /v1/in-mail/:id/replies",
         "GET /v1/message-requests",
         "POST /v1/message-requests/:id/accept",
-        "POST /v1/message-requests/:id/decline"
+        "POST /v1/message-requests/:id/decline",
+        "GET /v1/messages/search",
+        "GET /v1/messaging/socket",
+        "GET /v1/presence"
       ],
       "routeWrites": [
         "POST /v1/conversations",
@@ -82284,11 +84314,18 @@
         "POST /v1/conversations/:id/mute",
         "POST /v1/conversations/:id/read",
         "POST /v1/conversations/:id/typing",
+        "POST /v1/groups",
+        "POST /v1/groups/:id/leave",
+        "POST /v1/groups/:id/members",
+        "DELETE /v1/groups/:id/members/:actorId",
+        "POST /v1/groups/:id/members/:actorId/role",
         "POST /v1/in-mail",
         "GET /v1/in-mail/:id",
         "POST /v1/in-mail/:id/replies",
         "POST /v1/message-requests/:id/accept",
-        "POST /v1/message-requests/:id/decline"
+        "POST /v1/message-requests/:id/decline",
+        "PATCH /v1/messaging/privacy",
+        "GET /v1/messaging/socket"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -82316,6 +84353,7 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [
+        "GET /v1/attachments/:attachmentId/content",
         "GET /v1/conversations",
         "POST /v1/conversations",
         "GET /v1/conversations/:id/messages",
@@ -82323,13 +84361,17 @@
         "DELETE /v1/conversations/:id/messages/:messageId",
         "PATCH /v1/conversations/:id/messages/:messageId",
         "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/reactions",
         "PUT /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/receipts",
         "GET /v1/conversations/unread",
+        "POST /v1/groups",
         "GET /v1/in-mail",
         "POST /v1/in-mail",
         "GET /v1/in-mail/:id",
         "GET /v1/message-requests",
-        "POST /v1/message-requests/:id/accept"
+        "POST /v1/message-requests/:id/accept",
+        "GET /v1/messages/search"
       ],
       "routeWrites": [
         "POST /v1/conversations",
@@ -82365,6 +84407,7 @@
       "jobReads": [],
       "jobWrites": [],
       "routeReads": [
+        "GET /v1/attachments/:attachmentId/content",
         "GET /v1/conversations",
         "POST /v1/conversations",
         "POST /v1/conversations/:id/archive",
@@ -82373,23 +84416,37 @@
         "DELETE /v1/conversations/:id/messages/:messageId",
         "PATCH /v1/conversations/:id/messages/:messageId",
         "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/reactions",
         "PUT /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/receipts",
         "POST /v1/conversations/:id/mute",
         "POST /v1/conversations/:id/read",
         "GET /v1/conversations/:id/typing",
         "POST /v1/conversations/:id/typing",
         "GET /v1/conversations/unread",
+        "POST /v1/groups",
+        "GET /v1/groups/:id",
+        "PATCH /v1/groups/:id",
+        "POST /v1/groups/:id/leave",
+        "POST /v1/groups/:id/members",
+        "DELETE /v1/groups/:id/members/:actorId",
+        "POST /v1/groups/:id/members/:actorId/role",
         "GET /v1/in-mail",
         "POST /v1/in-mail",
         "GET /v1/in-mail/:id",
         "POST /v1/in-mail/:id/replies",
         "GET /v1/message-requests",
         "POST /v1/message-requests/:id/accept",
-        "POST /v1/message-requests/:id/decline"
+        "POST /v1/message-requests/:id/decline",
+        "GET /v1/messages/search",
+        "GET /v1/messaging/socket",
+        "GET /v1/presence"
       ],
       "routeWrites": [
         "POST /v1/conversations",
         "POST /v1/conversations/:id/messages",
+        "POST /v1/groups",
+        "PATCH /v1/groups/:id",
         "POST /v1/in-mail",
         "POST /v1/in-mail/:id/replies"
       ],
@@ -93228,6 +95285,79 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_message_attachments",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield message attachments",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "089_messaging_v3.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/attachments/:attachmentId/content",
+        "GET /v1/conversations/:id/messages",
+        "POST /v1/conversations/:id/messages",
+        "PATCH /v1/conversations/:id/messages/:messageId",
+        "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "PUT /v1/conversations/:id/messages/:messageId/reactions"
+      ],
+      "routeWrites": [
+        "POST /v1/conversations/:id/messages",
+        "POST /v1/in-mail/:id/replies"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_message_mentions",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield message mentions",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "089_messaging_v3.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/conversations/:id/messages",
+        "POST /v1/conversations/:id/messages",
+        "PATCH /v1/conversations/:id/messages/:messageId",
+        "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "PUT /v1/conversations/:id/messages/:messageId/reactions"
+      ],
+      "routeWrites": [
+        "POST /v1/conversations/:id/messages",
+        "POST /v1/in-mail/:id/replies"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_message_reactions",
       "columns": [],
       "primaryKey": [],
@@ -93253,12 +95383,52 @@
         "POST /v1/conversations/:id/messages",
         "PATCH /v1/conversations/:id/messages/:messageId",
         "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/reactions",
         "PUT /v1/conversations/:id/messages/:messageId/reactions"
       ],
       "routeWrites": [
         "DELETE /v1/conversations/:id/messages/:messageId",
         "DELETE /v1/conversations/:id/messages/:messageId/reactions",
         "PUT /v1/conversations/:id/messages/:messageId/reactions"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_messaging_privacy",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield messaging privacy",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "089_messaging_v3.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/domains/messaging/service.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/conversations/:id/messages",
+        "GET /v1/conversations/:id/messages/:messageId/receipts",
+        "POST /v1/conversations/:id/read",
+        "GET /v1/conversations/:id/typing",
+        "POST /v1/conversations/:id/typing",
+        "GET /v1/messaging/privacy",
+        "PATCH /v1/messaging/privacy",
+        "GET /v1/messaging/socket",
+        "GET /v1/presence"
+      ],
+      "routeWrites": [
+        "PATCH /v1/messaging/privacy"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
@@ -114085,7 +116255,6 @@
       "sourceReads": [
         "services/greenfield-api/src/account-data/service.ts",
         "services/greenfield-api/src/app/register-attachment-routes.ts",
-        "services/greenfield-api/src/app/register-messaging-routes.ts",
         "services/greenfield-api/src/app/register-routes.ts",
         "services/greenfield-api/src/domains/comments/service.ts",
         "services/greenfield-api/src/domains/messaging/service.ts",
@@ -114136,16 +116305,25 @@
         "POST /v1/conversations/:id/messages",
         "PATCH /v1/conversations/:id/messages/:messageId",
         "DELETE /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/reactions",
         "PUT /v1/conversations/:id/messages/:messageId/reactions",
+        "GET /v1/conversations/:id/messages/:messageId/receipts",
         "GET /v1/conversations/:id/typing",
         "GET /v1/feed/profile/:profileId",
         "POST /v1/follow-requests/:requestId/accept",
+        "POST /v1/groups",
+        "GET /v1/groups/:id",
+        "PATCH /v1/groups/:id",
+        "POST /v1/groups/:id/members",
+        "DELETE /v1/groups/:id/members/:actorId",
+        "POST /v1/groups/:id/members/:actorId/role",
         "GET /v1/in-mail",
         "POST /v1/in-mail",
         "GET /v1/in-mail/:id",
         "POST /v1/in-mail/:id/replies",
         "GET /v1/message-requests",
         "POST /v1/message-requests/:id/accept",
+        "GET /v1/messages/search",
         "GET /v1/posts/:postId/comments",
         "POST /v1/posts/:postId/comments",
         "GET /v1/profiles/:handle",
