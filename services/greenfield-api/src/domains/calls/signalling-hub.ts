@@ -115,7 +115,8 @@ export class FrameRateLimiter {
     this.tokens = burst
   }
   take(now = Date.now()): boolean {
-    this.tokens = Math.min(this.burst, this.tokens + ((now - this.last) / 1000) * this.rate)
+    // Clamp so a wall-clock step backwards never drains the bucket.
+    this.tokens = Math.min(this.burst, this.tokens + (Math.max(0, now - this.last) / 1000) * this.rate)
     this.last = now
     if (this.tokens < 1) return false
     this.tokens -= 1
