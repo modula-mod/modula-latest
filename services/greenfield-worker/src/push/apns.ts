@@ -52,8 +52,15 @@ export interface ApnsRequest {
   environment: ApnsEnvironment
   payload: Record<string, unknown>
   collapseId?: string
-  pushType?: 'alert' | 'background'
+  pushType?: 'alert' | 'background' | 'voip'
   expirationSeconds?: number
+  /**
+   * Absolute `apns-expiration` (unix seconds). 0 = deliver now or never, which
+   * is what PushKit VoIP pushes use. Overrides expirationSeconds.
+   */
+  expiration?: number
+  /** APNs topic override (`<bundle>.voip` for PushKit). Defaults to the bundle id. */
+  topic?: string
 }
 
 export interface ApnsResponse {
@@ -127,10 +134,7 @@ export class ApnsSender implements PushSender {
           ':method': 'POST',
           ':path': `/3/device/${request.token}`,
           authorization: `bearer ${this.providerToken()}`,
-          'apns-topic': this.config.bundleId,
-          'apns-push-type': request.pushType ?? 'alert',
-          'apns-priority': request.pushType === 'background' ? '5' : '10',
-          'apns-expiration': String(Math.floor(Date.now() / 1000) + (request.expirationSeconds ?? 86_400)),
+          ...apnsHeaders(request, this.config.bundleId),
           'content-type': 'application/json',
         }
         if (request.collapseId) headers['apns-collapse-id'] = request.collapseId.slice(0, 64)
@@ -166,5 +170,15 @@ export class ApnsSender implements PushSender {
   close(): void {
     for (const session of this.sessions.values()) session.close()
     this.sessions.clear()
+  }
+}
+
+/** Topic, type, priority and expiry headers. Exported for tests. */
+export function apnsHeaders(request: ApnsRequest, bundleId: string, nowSeconds = Math.floor(Date.now() / 1000)): Record<string, string> {
+  return {
+    'apns-topic': request.topic ?? bundleId,
+    'apns-push-type': request.pushType ?? 'alert',
+    'apns-priority': request.pushType === 'background' ? '5' : '10',
+    'apns-expiration': String(request.expiration ?? nowSeconds + (request.expirationSeconds ?? 86_400)),
   }
 }
