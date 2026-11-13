@@ -8,6 +8,8 @@ import {DeveloperService} from '../src/developers/service.js'
 import {GreenfieldPublisherSigningKeyService} from '../src/modules/release-signing.js'
 import {PublisherReleaseJobProcessor} from '../src/publisher/release-job-processor.js'
 import {PublisherReleaseJobRunner} from '../src/publisher/release-job-runner.js'
+import {PublisherOnlineSigningIdentityService} from '../src/publisher/signing-identity-service.js'
+import {DisposableEd25519SigningProvider} from '../src/publisher/signing-provider.js'
 import {configureRegistryTestEnv, registerAccount} from './helpers/registry-fixtures.js'
 import {
   BUILDER_TEST_COMMIT,
@@ -36,11 +38,21 @@ describeIfDb('BUILDER-01 publisher release console', () => {
   let runner: PublisherReleaseJobRunner
   let publisher: ReturnType<typeof recordingPublisher>
   let signer: FixtureSigner
+  let onlineIdentityId: string
+  let onlineSigningKeyId: string
+  let onlineIdentityLifecycle: PublisherOnlineSigningIdentityService
+  const onlineSigningProvider = new DisposableEd25519SigningProvider({allowInsecureTestProvider: true})
   const network = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => { throw new Error('Live network forbidden in BUILDER-01 fixture suite') })
   const requestLogs: string[] = []
   let logWrite: ReturnType<typeof vi.spyOn>
   let patch = 0
-  let previousNamespace: {publisher_id: string; revoked_at: Date | null} | null = null
+  let previousNamespace: {
+    publisher_id: string
+    verification_method: string
+    verification_evidence: unknown
+    verified_at: Date | null
+    revoked_at: Date | null
+  } | null = null
   const adminHandle = `bfounder${suffix}`.slice(0, 20)
   const nextPatch = () => ++patch
 
@@ -85,6 +97,7 @@ describeIfDb('BUILDER-01 publisher release console', () => {
       githubReleaseSource: source,
       // The app creates its pool; bind the recorder immediately after construction.
       publisher: (moduleId, version) => publisher(moduleId, version),
+      signingProvider: onlineSigningProvider,
     }})
     app = created.app
     db = created.db
@@ -108,9 +121,18 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     // `test.modula` is shared with other suites on the same disposable DB: borrow it for this suite and restore it in afterAll.
     previousNamespace = await db.selectFrom('greenfield_publisher_namespaces').selectAll().where('namespace', '=', BUILDER_TEST_NAMESPACE).executeTakeFirst() ?? null
     await db.insertInto('greenfield_publisher_namespaces').values({namespace: BUILDER_TEST_NAMESPACE, publisher_id: BUILDER_TEST_PUBLISHER_ID, verification_method: 'operatorReview', verification_evidence: {fixture: 'builder-01'}, verified_at: now, revoked_at: null, created_at: now})
-      .onConflict(oc => oc.column('namespace').doUpdateSet({publisher_id: BUILDER_TEST_PUBLISHER_ID, revoked_at: null})).execute()
+      .onConflict(oc => oc.column('namespace').doUpdateSet({
+        publisher_id: BUILDER_TEST_PUBLISHER_ID,
+        verification_method: 'operatorReview',
+        verification_evidence: {fixture: 'builder-01'},
+        verified_at: now,
+        revoked_at: null,
+      })).execute()
     await db.insertInto('greenfield_developer_products').values({product_id: BUILDER_TEST_MODULE_ID, publisher_id: BUILDER_TEST_PUBLISHER_ID, owner_account_id: owner.accountId, owner_organisation_id: null, extension_id: null, kind: 'module', display_name: 'Builder Release Fixture', description: 'BUILDER-01 isolated test fixture', visibility: 'PRIVATE', state: 'DRAFT', created_at: now, updated_at: now} as never)
-      .onConflict(oc => oc.column('product_id').doNothing()).execute()
+      .onConflict(oc => oc.column('product_id').doUpdateSet({
+        publisher_id: BUILDER_TEST_PUBLISHER_ID, owner_account_id: owner.accountId, owner_organisation_id: null,
+        state: 'DRAFT', updated_at: now,
+      })).execute()
     await db.insertInto('greenfield_developer_source_connections').values({source_connection_id: randomUUID(), product_id: BUILDER_TEST_MODULE_ID, provider: 'github', repository: `https://github.com/${BUILDER_TEST_REPOSITORY}`, repository_id: null, default_branch: 'main', credential_ref: null, state: 'ACTIVE', created_by_account_id: owner.accountId, created_at: now, updated_at: now, revoked_at: null})
       .onConflict(oc => oc.columns(['product_id', 'provider', 'repository']).doNothing()).execute()
     // A second, unrelated publisher owned by another account.
@@ -129,8 +151,24 @@ describeIfDb('BUILDER-01 publisher release console', () => {
 
   afterAll(async () => {
     if (db) {
+      if (onlineIdentityId) {
+        const now = new Date()
+        await db.updateTable('greenfield_publisher_online_signing_identities').set({
+          state: 'REVOKED', suspended_at: null, suspension_reason: null, revoked_at: now,
+          revocation_reason: 'disposable fixture teardown', updated_at: now,
+        }).where('identity_id', '=', onlineIdentityId).where('state', '!=', 'REVOKED').execute()
+        await db.updateTable('greenfield_publisher_signing_authorizations').set({
+          state: 'REVOKED', suspended_at: null, revoked_at: now, updated_at: now,
+        }).where('publisher_id', '=', BUILDER_TEST_PUBLISHER_ID).where('account_id', '=', owner.accountId).where('state', '!=', 'REVOKED').execute()
+      }
       if (previousNamespace && previousNamespace.publisher_id !== BUILDER_TEST_PUBLISHER_ID) {
-        await db.updateTable('greenfield_publisher_namespaces').set({publisher_id: previousNamespace.publisher_id, revoked_at: previousNamespace.revoked_at}).where('namespace', '=', BUILDER_TEST_NAMESPACE).execute()
+        await db.updateTable('greenfield_publisher_namespaces').set({
+          publisher_id: previousNamespace.publisher_id,
+          verification_method: previousNamespace.verification_method,
+          verification_evidence: previousNamespace.verification_evidence,
+          verified_at: previousNamespace.verified_at,
+          revoked_at: previousNamespace.revoked_at,
+        }).where('namespace', '=', BUILDER_TEST_NAMESPACE).execute()
       } else if (!previousNamespace || previousNamespace.publisher_id === BUILDER_TEST_PUBLISHER_ID) {
         await db.deleteFrom('greenfield_publisher_namespaces').where('namespace', '=', BUILDER_TEST_NAMESPACE).where('publisher_id', '=', BUILDER_TEST_PUBLISHER_ID).execute()
       }
@@ -169,7 +207,9 @@ describeIfDb('BUILDER-01 publisher release console', () => {
         ['GET', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/release-jobs`],
         ['GET', `/v1/publisher/release-jobs/${jobId}`],
         ['GET', `/v1/publisher/release-jobs/${jobId}/logs`],
+        ['GET', `/v1/publisher/release-jobs/${jobId}/signing`],
         ['POST', `/v1/publisher/release-jobs/${jobId}/validate`],
+        ['POST', `/v1/publisher/release-jobs/${jobId}/sign`],
         ['POST', `/v1/publisher/release-jobs/${jobId}/publish`],
         ['POST', `/v1/publisher/release-jobs/${jobId}/cancel`],
         ['POST', `/v1/publisher/release-jobs/${jobId}/resume`],
@@ -599,6 +639,226 @@ describeIfDb('BUILDER-01 publisher release console', () => {
       expect(resume.statusCode).toBe(409)
       expect(consoleCode(resume)).toBe('VERSION_CONFLICT')
       expect((await getJob(cancelledJob)).state).toBe('cancelled')
+    })
+  })
+
+  describe('publisher-scoped online signing', () => {
+    beforeAll(async () => {
+      const now = new Date()
+      onlineIdentityId = `psi_${randomUUID()}`
+      onlineSigningKeyId = `builder-${suffix}-online-1`
+      const providerKeyRef = `test/builder-${suffix}-online-1`
+      onlineSigningProvider.createIdentity({providerKeyRef})
+      await db.updateTable('greenfield_developer_products').set({state: 'ACTIVE', updated_at: now} as never)
+        .where('product_id', '=', BUILDER_TEST_MODULE_ID).execute()
+      await db.insertInto('greenfield_developer_profiles').values({
+        account_id: owner.accountId, display_name: 'Builder Signing Fixture', biography: '', website: null,
+        status: 'ACTIVE', created_at: now, updated_at: now,
+      }).onConflict(oc => oc.column('account_id').doUpdateSet({status: 'ACTIVE', updated_at: now})).execute()
+      await db.insertInto('greenfield_developer_programme_memberships').values({
+        programme_membership_id: randomUUID(), account_id: owner.accountId, organisation_id: null, state: 'ACTIVE',
+        state_reason: null, started_at: now, ended_at: null, created_at: now, updated_at: now,
+      }).onConflict(oc => oc.columns(['account_id', 'organisation_id']).doUpdateSet({state: 'ACTIVE', started_at: now, ended_at: null, updated_at: now})).execute()
+      onlineIdentityLifecycle = new PublisherOnlineSigningIdentityService(db, loadConfig(), onlineSigningProvider)
+      const registeredIdentity = await onlineIdentityLifecycle.register({
+        actorAccountId: founderAdmin.accountId,
+        publisherId: BUILDER_TEST_PUBLISHER_ID,
+        signingKeyId: onlineSigningKeyId,
+        providerKeyRef,
+        purpose: 'PUBLISHER',
+        firstPartyAuthorized: false,
+        validFrom: new Date(now.getTime() - 60_000),
+        validUntil: new Date(now.getTime() + 24 * 60 * 60_000),
+      })
+      onlineIdentityId = registeredIdentity.identityId
+      await db.insertInto('greenfield_publisher_signing_authorizations').values({
+        authorization_id: `psa_${randomUUID()}`, publisher_id: BUILDER_TEST_PUBLISHER_ID, product_id: BUILDER_TEST_MODULE_ID,
+        account_id: owner.accountId, state: 'ACTIVE', first_party_authorized: false,
+        valid_from: new Date(now.getTime() - 60_000), valid_until: new Date(now.getTime() + 24 * 60 * 60_000),
+        granted_by_account_id: founderAdmin.accountId, suspended_at: null, revoked_at: null,
+        reason: 'GREENFIELD-SIGNER-01 disposable integration fixture', created_at: now, updated_at: now,
+      }).execute()
+    })
+
+    it('lists only public permitted identity facts and rejects arbitrary signing payloads', async () => {
+      const identities = await api(owner.token, 'GET', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/signing-identities`)
+      expect(identities.statusCode, identities.body).toBe(200)
+      expect(identities.json().data).toEqual([expect.objectContaining({
+        identityId: onlineIdentityId,
+        publisherId: BUILDER_TEST_PUBLISHER_ID,
+        signingKeyId: onlineSigningKeyId,
+        provider: 'DISPOSABLE_TEST',
+        purpose: 'PUBLISHER',
+        state: 'ACTIVE',
+        publicKeyFingerprint: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
+      })])
+      expect(identities.body).not.toMatch(/PRIVATE KEY|providerKeyRef/)
+
+      const {jobId, job} = await validatedJob({signer: null})
+      expect(job).toMatchObject({state: 'ready_for_signing', actions: {canRequestSigning: true}, signing: {approval: {sha256: expect.stringMatching(/^[0-9a-f]{64}$/)}}})
+      for (const body of [
+        {keyId: onlineSigningKeyId},
+        {payload: 'arbitrary-bytes'},
+        {digest: 'f'.repeat(64)},
+        {signingKeyId: onlineSigningKeyId, permissionChangeAcknowledged: true},
+      ]) {
+        const response = await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, body)
+        expect(response.statusCode, response.body).toBe(400)
+        expect(consoleCode(response)).toBe('INVALID_REQUEST')
+      }
+      expect((await getJob(jobId)).state).toBe('ready_for_signing')
+    })
+
+    it('signs, independently verifies and publishes the exact approved release idempotently', async () => {
+      const {jobId, release, job} = await validatedJob({signer: null})
+      expect(job.state).toBe('ready_for_signing')
+      const idempotencyKey = `sign-${suffix}-${jobId}`
+      const responses = await Promise.all([1, 2, 3].map(() => api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {}, {'idempotency-key': idempotencyKey})))
+      expect(responses.every(response => response.statusCode === 202), responses.map(response => response.body).join('\n')).toBe(true)
+      expect(new Set(responses.map(response => response.json().data.jobId))).toEqual(new Set([jobId]))
+      expect(await db.selectFrom('background_jobs').select('id').where('trace_id', '=', jobId).where('job_type', '=', 'publisher.release-job.sign').execute()).toHaveLength(1)
+      await drain()
+
+      const signed = await getJob(jobId)
+      expect(signed).toMatchObject({
+        state: 'ready_for_review',
+        signature: {state: 'verified', keyId: onlineSigningKeyId, algorithm: 'Ed25519', publicKeyFingerprint: expect.stringMatching(/^sha256:[0-9a-f]{64}$/)},
+        validation: {passed: true},
+        signing: {requestId: expect.stringMatching(/^psr_/), identityId: onlineIdentityId, receipt: {
+          provider: 'DISPOSABLE_TEST', identityId: onlineIdentityId, keyId: onlineSigningKeyId,
+          approvalSha256: job.signing.approval.sha256, statementSha256: expect.stringMatching(/^[0-9a-f]{64}$/),
+        }},
+      })
+      expect(signed.signing.receipt.statementSha256).not.toBe(signed.signing.receipt.approvalSha256)
+      expect(signed.releaseId).toBeTruthy()
+      const signatures = await db.selectFrom('greenfield_module_release_signatures').select(['signature_key_id', 'verification_state'])
+        .where('release_id', '=', signed.releaseId).execute()
+      expect(signatures).toEqual([{signature_key_id: onlineSigningKeyId, verification_state: 'verified'}])
+
+      const status = await api(owner.token, 'GET', `/v1/publisher/release-jobs/${jobId}/signing`)
+      expect(status.statusCode, status.body).toBe(200)
+      expect(status.json().data.receipt).toMatchObject({identityId: onlineIdentityId, keyId: onlineSigningKeyId})
+      expect(status.json().data.auditHistory.map((event: any) => event.eventType)).toEqual(expect.arrayContaining([
+        'signing_requested', 'signing_started', 'signature_created', 'signature_verified',
+      ]))
+      const auditEvent = await db.selectFrom('greenfield_publisher_signing_audit_events').select('event_id').where('job_id', '=', jobId).executeTakeFirstOrThrow()
+      await expect(db.updateTable('greenfield_publisher_signing_audit_events').set({details: {tampered: true}} as never)
+        .where('event_id', '=', auditEvent.event_id).execute()).rejects.toThrow(/append-only/)
+
+      const publish = await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/publish`, {})
+      expect(publish.statusCode, publish.body).toBe(202)
+      await drain()
+      expect((await getJob(jobId)).state).toBe('published')
+      expect(publisher.calls.filter(call => call.version === release.version)).toHaveLength(1)
+      expect((await api(owner.token, 'GET', `/v1/publisher/release-jobs/${jobId}/signing`)).json().data.auditHistory.map((event: any) => event.eventType))
+        .toContain('publication_authorized')
+    })
+
+    it('does not let another publisher inspect identities or sign the release', async () => {
+      const {jobId} = await validatedJob({signer: null})
+      const identities = await api(otherPublisher.token, 'GET', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/signing-identities`)
+      expect(identities.statusCode).toBe(403)
+      expect(consoleCode(identities)).toBe('FORBIDDEN_NOT_PUBLISHER')
+      const sign = await api(otherPublisher.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {})
+      expect(sign.statusCode).toBe(403)
+      expect(consoleCode(sign)).toBe('FORBIDDEN_NOT_PUBLISHER')
+      expect((await getJob(jobId)).state).toBe('ready_for_signing')
+    })
+
+    it('does not infer elevated first-party signing authority from ordinary publisher ownership', async () => {
+      const {jobId} = await validatedJob({signer: null})
+      await db.updateTable('greenfield_publishers').set({trust_level: 'firstParty', updated_at: new Date()})
+        .where('publisher_id', '=', BUILDER_TEST_PUBLISHER_ID).execute()
+      try {
+        const response = await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {})
+        expect(response.statusCode, response.body).toBe(403)
+        expect(consoleCode(response)).toBe('SIGNING_AUTHORIZATION_REQUIRED')
+        expect((await getJob(jobId)).state).toBe('ready_for_signing')
+      } finally {
+        await db.updateTable('greenfield_publishers').set({trust_level: 'verifiedPublisher', updated_at: new Date()})
+          .where('publisher_id', '=', BUILDER_TEST_PUBLISHER_ID).execute()
+      }
+    })
+
+    it('rejects a suspended Builder Programme member', async () => {
+      const {jobId} = await validatedJob({signer: null})
+      await db.updateTable('greenfield_developer_programme_memberships').set({state: 'SUSPENDED', updated_at: new Date()} as never)
+        .where('account_id', '=', owner.accountId).execute()
+      const response = await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {})
+      expect(response.statusCode, response.body).toBe(403)
+      expect(consoleCode(response)).toBe('SIGNING_AUTHORIZATION_REQUIRED')
+      expect((await getJob(jobId)).state).toBe('ready_for_signing')
+      await db.updateTable('greenfield_developer_programme_memberships').set({state: 'ACTIVE', updated_at: new Date()} as never)
+        .where('account_id', '=', owner.accountId).execute()
+    })
+
+    it('operator suspension fails closed and rotation rebinds the identity to a new public key', async () => {
+      await onlineIdentityLifecycle.suspend(founderAdmin.accountId, onlineIdentityId, 'isolated suspension coverage')
+      const suspended = await api(owner.token, 'GET', `/v1/publisher/modules/${BUILDER_TEST_MODULE_ID}/signing-identities`)
+      expect(suspended.statusCode, suspended.body).toBe(409)
+      expect(consoleCode(suspended)).toBe('SIGNING_IDENTITY_UNAVAILABLE')
+      await onlineIdentityLifecycle.resume(founderAdmin.accountId, onlineIdentityId)
+
+      const previousKeyId = onlineSigningKeyId
+      const newKeyId = `builder-${suffix}-online-2`
+      const rotated = await onlineIdentityLifecycle.rotate(
+        founderAdmin.accountId,
+        onlineIdentityId,
+        newKeyId,
+        new Date(Date.now() + 24 * 60 * 60_000),
+      )
+      onlineSigningKeyId = newKeyId
+      expect(rotated).toMatchObject({identityId: onlineIdentityId, signingKeyId: newKeyId, state: 'ACTIVE'})
+      expect(await new GreenfieldPublisherSigningKeyService(db).get(previousKeyId)).toMatchObject({state: 'ROTATED', rotatedToKeyId: newKeyId})
+      expect(await db.selectFrom('greenfield_publisher_online_signing_identities').select(['signing_key_id', 'state'])
+        .where('identity_id', '=', onlineIdentityId).executeTakeFirst()).toEqual({signing_key_id: newKeyId, state: 'ACTIVE'})
+      expect((await db.selectFrom('greenfield_publisher_signing_audit_events').select('event_type')
+        .where('identity_id', '=', onlineIdentityId).execute()).map(row => row.event_type)).toEqual(expect.arrayContaining([
+        'identity_registered', 'identity_suspended', 'identity_resumed', 'identity_rotated',
+      ]))
+    })
+
+    it('invalidates approval when source, manifest or artifacts change after validation', async () => {
+      const patchNo = nextPatch()
+      const release = addFixtureRelease(source, patchNo, {signer: null})
+      const created = await createJob(release.tag)
+      const jobId = created.json().data.jobId
+      await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/validate`)
+      await drain()
+      expect((await getJob(jobId)).state).toBe('ready_for_signing')
+
+      // Same tag/version, different manifest and package bytes.
+      addFixtureRelease(source, patchNo, {signer: null, permissions: [{permission: 'jobs:create', reason: 'post-approval mutation', risk: 'high'}] as any})
+      expect((await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {})).statusCode).toBe(202)
+      await drain()
+      const invalidated = await getJob(jobId)
+      expect(invalidated).toMatchObject({state: 'validation_failed', error: {code: 'RELEASE_APPROVAL_INVALIDATED'}, signing: {approval: null, receipt: null}})
+      expect(await db.selectFrom('greenfield_module_releases').select('release_id').where('module_id', '=', BUILDER_TEST_MODULE_ID).where('version', '=', release.version).executeTakeFirst()).toBeUndefined()
+    })
+
+    it('keeps publication closed when the signing service fails', async () => {
+      const {jobId, release} = await validatedJob({signer: null})
+      onlineSigningProvider.simulateSigningFailure('simulated isolated provider outage')
+      expect((await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {})).statusCode).toBe(202)
+      const processor = new PublisherReleaseJobProcessor(db, {source, config: loadConfig(), publish: publisher, signingProvider: onlineSigningProvider})
+      await expect(processor.sign(jobId)).rejects.toMatchObject({code: 'PROVIDER_FAILURE'})
+      onlineSigningProvider.simulateSigningFailure(null)
+      expect((await getJob(jobId)).state).toBe('signing')
+      await processor.markExhausted(jobId, 'simulated signing retries exhausted')
+      await drain()
+      expect(await getJob(jobId)).toMatchObject({state: 'signing_failed', error: {code: 'SIGNING_FAILED'}})
+      expect(await db.selectFrom('greenfield_module_releases').select('release_id').where('module_id', '=', BUILDER_TEST_MODULE_ID).where('version', '=', release.version).executeTakeFirst()).toBeUndefined()
+      expect(publisher.calls.some(call => call.version === release.version)).toBe(false)
+    })
+
+    it('refuses new signatures after the registered publisher key is revoked', async () => {
+      const {jobId, release} = await validatedJob({signer: null})
+      await onlineIdentityLifecycle.revoke(founderAdmin.accountId, onlineIdentityId, 'GREENFIELD-SIGNER-01 test revocation')
+      const response = await api(owner.token, 'POST', `/v1/publisher/release-jobs/${jobId}/sign`, {})
+      expect(response.statusCode, response.body).toBe(409)
+      expect(consoleCode(response)).toBe('SIGNING_IDENTITY_UNAVAILABLE')
+      expect((await getJob(jobId)).state).toBe('ready_for_signing')
+      expect(await db.selectFrom('greenfield_module_releases').select('release_id').where('module_id', '=', BUILDER_TEST_MODULE_ID).where('version', '=', release.version).executeTakeFirst()).toBeUndefined()
     })
   })
 })

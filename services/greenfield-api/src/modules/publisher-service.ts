@@ -16,29 +16,34 @@ export class GreenfieldModulePublisherService {
 
   async ensurePublisherForManifest(manifest: GreenfieldModuleManifest): Promise<void> {
     const now = new Date()
-    const firstParty = manifest.trust.requestedLevel === 'firstParty' || manifest.license.status === 'firstParty'
-    await this.db
-      .insertInto('greenfield_publishers')
-      .values({
+    const claimsFirstParty = manifest.trust.requestedLevel === 'firstParty' || manifest.license.status === 'firstParty'
+    const reserved = usesReservedNamespace(manifest.moduleId)
+    const existing = await this.getPublisher(manifest.publisher.publisherId)
+    if (!existing) {
+      if (claimsFirstParty || reserved) throw moduleError('FORBIDDEN', 'First-party publishers and reserved namespaces must be pre-authorized by registry policy')
+      await this.db.insertInto('greenfield_publishers').values({
         publisher_id: manifest.publisher.publisherId,
         display_name: manifest.publisher.displayName,
         website: manifest.publisher.website ?? null,
-        status: firstParty ? 'verified' : 'pending',
-        trust_level: manifest.trust.requestedLevel,
+        status: 'pending',
+        trust_level: 'untrustedManifest',
         created_at: now,
         updated_at: now,
-        verified_at: firstParty ? now : null,
+        verified_at: null,
         suspended_at: null,
         revoked_at: null,
-      })
-      .onConflict(oc =>
-        oc.column('publisher_id').doUpdateSet({
-          display_name: manifest.publisher.displayName,
-          website: manifest.publisher.website ?? null,
-          updated_at: now,
-        }),
-      )
-      .execute()
+      }).execute()
+    } else {
+      const authoritativeFirstParty = existing.status === 'verified' && existing.trust_level === 'firstParty' && !existing.revoked_at
+      if ((claimsFirstParty || reserved) && !authoritativeFirstParty) {
+        throw moduleError('FORBIDDEN', 'Manifest claims cannot grant first-party trust or reserved namespace authority')
+      }
+      await this.db.updateTable('greenfield_publishers').set({
+        display_name: manifest.publisher.displayName,
+        website: manifest.publisher.website ?? null,
+        updated_at: now,
+      }).where('publisher_id', '=', manifest.publisher.publisherId).execute()
+    }
 
     await this.ensureNamespace(manifest)
   }
@@ -49,32 +54,36 @@ export class GreenfieldModulePublisherService {
       .selectFrom('greenfield_publisher_namespaces')
       .selectAll()
       .where('namespace', '=', namespace)
-      .where('revoked_at', 'is', null)
       .executeTakeFirst()
     if (existing && existing.publisher_id !== manifest.publisher.publisherId) {
       throw moduleError('CONFLICT', `Namespace ${namespace} is already owned by ${existing.publisher_id}`)
     }
-    const firstParty = manifest.trust.requestedLevel === 'firstParty' || manifest.license.status === 'firstParty'
-    if (usesReservedNamespace(manifest.moduleId) && !firstParty) {
-      throw moduleError('FORBIDDEN', `Reserved namespace ${namespace} requires first-party verification`)
+    if (existing?.revoked_at) throw moduleError('FORBIDDEN', `Namespace ${namespace} is revoked and requires registry review`)
+    const publisher = await this.getPublisher(manifest.publisher.publisherId)
+    const authoritativeFirstParty = publisher?.status === 'verified' && publisher.trust_level === 'firstParty' && !publisher.revoked_at
+    const claimsFirstParty = manifest.trust.requestedLevel === 'firstParty' || manifest.license.status === 'firstParty'
+    if (claimsFirstParty && !authoritativeFirstParty) {
+      throw moduleError('FORBIDDEN', 'Manifest claims cannot grant first-party trust')
     }
+    if (usesReservedNamespace(manifest.moduleId)) {
+      if (!authoritativeFirstParty || !existing || !existing.verified_at || existing.publisher_id !== manifest.publisher.publisherId) {
+        throw moduleError('FORBIDDEN', `Reserved namespace ${namespace} requires authoritative registry policy`)
+      }
+      return
+    }
+    if (existing) return
     await this.db
       .insertInto('greenfield_publisher_namespaces')
       .values({
         namespace,
         publisher_id: manifest.publisher.publisherId,
-        verification_method: firstParty ? 'firstPartyPolicy' : 'manifestDeclaration',
-        verification_evidence: firstParty ? {policy: 'Modula first-party publisher policy'} : {manifest: manifest.moduleId},
-        verified_at: firstParty ? new Date() : null,
+        verification_method: 'manifestDeclaration',
+        verification_evidence: {manifest: manifest.moduleId},
+        verified_at: null,
         revoked_at: null,
         created_at: new Date(),
       })
-      .onConflict(oc =>
-        oc.column('namespace').doUpdateSet({
-          publisher_id: manifest.publisher.publisherId,
-          revoked_at: null,
-        }),
-      )
+      .onConflict(oc => oc.column('namespace').doNothing())
       .execute()
   }
 
