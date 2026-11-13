@@ -10,6 +10,7 @@ import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
 import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
+import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -50,6 +51,7 @@ describeIf('MODULE-PLATFORM-02 generic Tasks records', () => {
     db = created.db
     workerDb = createWorkerDb(databaseUrl!)
     await app.ready()
+    await authorizeFirstPartyPublisherFixture(db, 'audit', 'Audit Fixtures', 'audit.module')
 
     const suffix = Date.now().toString(36)
     alphaRecordId = `alpha-${suffix}`
