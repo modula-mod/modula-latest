@@ -5,362 +5,362 @@
   "jobs": [
     {
       "jobType": "notification.create",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:40",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:69",
       "handler": "await handleNotificationCreate(db, job.payload)"
     },
     {
       "jobType": "notification.reaction",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:43",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:72",
       "handler": "await handleSocialNotification(db, 'reaction', job.payload)"
     },
     {
       "jobType": "notification.comment",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:46",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:75",
       "handler": "await handleSocialNotification(db, 'comment', job.payload)"
     },
     {
       "jobType": "notification.reply",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:49",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:78",
       "handler": "await handleSocialNotification(db, 'reply', job.payload)"
     },
     {
       "jobType": "notification.mention",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:52",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:81",
       "handler": "await handleSocialNotification(db, 'mention', job.payload)"
     },
     {
       "jobType": "notification.repost",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:55",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:84",
       "handler": "await handleSocialNotification(db, 'repost', job.payload)"
     },
     {
       "jobType": "notification.quote",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:58",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:87",
       "handler": "await handleSocialNotification(db, 'quote', job.payload)"
     },
     {
       "jobType": "notification.follow",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:61",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:90",
       "handler": "await handleSocialNotification(db, 'follow', job.payload)"
     },
     {
       "jobType": "extension.notification",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:64",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:93",
       "handler": "await handleSocialNotification(db, 'extension', job.payload)"
     },
     {
       "jobType": "plugin.install",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:67",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:96",
       "handler": "await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))"
     },
     {
       "jobType": "plugin.enable",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:68",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:97",
       "handler": "await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))"
     },
     {
       "jobType": "plugin.disable",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:69",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:98",
       "handler": "await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))"
     },
     {
       "jobType": "plugin.configure",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:70",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:99",
       "handler": "await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))"
     },
     {
       "jobType": "plugin.uninstall",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:71",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:100",
       "handler": "await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))"
     },
     {
       "jobType": "function.invoke",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:74",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:103",
       "handler": "await handleFunctionInvoke(db, job.payload)"
     },
     {
       "jobType": "mail.deliver",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:77",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:106",
       "handler": "await handleMailDeliver(db, config, job.payload)"
     },
     {
       "jobType": "mail.identity.provision",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:80",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:109",
       "handler": "await handleMailIdentityProvision(db, config, job.payload)"
     },
     {
       "jobType": "mail.identity.forward",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:83",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:112",
       "handler": "await handleMailIdentityForward(db, config, job.payload)"
     },
     {
       "jobType": "module.registry.sync",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:86",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:115",
       "handler": "await handleModuleRegistrySync(db, config, job.payload)"
     },
     {
       "jobType": "module.github.syncRepository",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:89",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:118",
       "handler": "await handleModuleGithubJob(db, config, job.payload)"
     },
     {
       "jobType": "module.github.fetchManifest",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:90",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:119",
       "handler": "await handleModuleGithubJob(db, config, job.payload)"
     },
     {
       "jobType": "module.github.fetchLicenseEvidence",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:91",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:120",
       "handler": "await handleModuleGithubJob(db, config, job.payload)"
     },
     {
       "jobType": "module.github.fetchReleaseMetadata",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:92",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:121",
       "handler": "await handleModuleGithubJob(db, config, job.payload)"
     },
     {
       "jobType": "module.github.verifyCommit",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:93",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:122",
       "handler": "await handleModuleGithubJob(db, config, job.payload)"
     },
     {
       "jobType": "module.github.verifyReleaseIntegrity",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:94",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:123",
       "handler": "await handleModuleGithubJob(db, config, job.payload)"
     },
     {
       "jobType": "module.discovered",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:97",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:126",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.release.imported",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:98",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:127",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.release.verified",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:99",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:128",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.release.published",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:100",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:129",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.release.quarantined",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:101",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:130",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.release.revoked",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:102",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:131",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.install.requested",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:103",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:132",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.installed",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:104",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:133",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.enable.requested",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:105",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:134",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.enabled",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:106",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:135",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.disable.requested",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:107",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:136",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.disabled",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:108",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:137",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.update.requested",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:109",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:138",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.updated",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:110",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:139",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.uninstall.requested",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:111",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:140",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.uninstalled",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:112",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:141",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
       "jobType": "module.failed",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:113",
-      "handler": "no-op (acknowledged event or reserved job type)"
-    },
-    {
-      "jobType": "module.release.verify",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:115",
-      "handler": "await handleModuleReleaseVerify(db, config, job.payload)"
-    },
-    {
-      "jobType": "module.release.publish",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:118",
-      "handler": "await handleModuleReleasePublish(db, config, job.payload)"
-    },
-    {
-      "jobType": "module.install",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:121",
-      "handler": "await handleModuleInstall(db, config, job.payload)"
-    },
-    {
-      "jobType": "module.enable",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:124",
-      "handler": "await handleModuleEnable(db, config, job.payload)"
-    },
-    {
-      "jobType": "module.disable",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:127",
-      "handler": "await handleModuleDisable(db, job.payload)"
-    },
-    {
-      "jobType": "module.update",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:130",
-      "handler": "await handleModuleUpdate(db, config, job.payload)"
-    },
-    {
-      "jobType": "module.uninstall",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:133",
-      "handler": "await handleModuleUninstall(db, job.payload)"
-    },
-    {
-      "jobType": "module.schemas.register",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:136",
-      "handler": "await registerModuleSchemas(db, (job.payload as any)?.releaseId)"
-    },
-    {
-      "jobType": "module.schemas.unregister",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:139",
-      "handler": "await unregisterModuleSchemas(db, (job.payload as any)?.releaseId)"
-    },
-    {
-      "jobType": "module.settings.migrate",
       "source": "services/greenfield-worker/src/jobs/runner.ts:142",
       "handler": "no-op (acknowledged event or reserved job type)"
     },
     {
-      "jobType": "module.contributions.register",
+      "jobType": "module.release.verify",
       "source": "services/greenfield-worker/src/jobs/runner.ts:144",
+      "handler": "await handleModuleReleaseVerify(db, config, job.payload)"
+    },
+    {
+      "jobType": "module.release.publish",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:147",
+      "handler": "await handleModuleReleasePublish(db, config, job.payload)"
+    },
+    {
+      "jobType": "module.install",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:150",
+      "handler": "await handleModuleInstall(db, config, job.payload)"
+    },
+    {
+      "jobType": "module.enable",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:153",
+      "handler": "await handleModuleEnable(db, config, job.payload)"
+    },
+    {
+      "jobType": "module.disable",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:156",
+      "handler": "await handleModuleDisable(db, job.payload)"
+    },
+    {
+      "jobType": "module.update",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:159",
+      "handler": "await handleModuleUpdate(db, config, job.payload)"
+    },
+    {
+      "jobType": "module.uninstall",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:162",
+      "handler": "await handleModuleUninstall(db, job.payload)"
+    },
+    {
+      "jobType": "module.schemas.register",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:165",
+      "handler": "await registerModuleSchemas(db, (job.payload as any)?.releaseId)"
+    },
+    {
+      "jobType": "module.schemas.unregister",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:168",
+      "handler": "await unregisterModuleSchemas(db, (job.payload as any)?.releaseId)"
+    },
+    {
+      "jobType": "module.settings.migrate",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:171",
+      "handler": "no-op (acknowledged event or reserved job type)"
+    },
+    {
+      "jobType": "module.contributions.register",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:173",
       "handler": "await registerModuleContributions(db, (job.payload as any)?.releaseId, (job.payload as any)?.extensionVersionId, {enableExecutable: false})"
     },
     {
       "jobType": "module.contributions.unregister",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:147",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:176",
       "handler": "await unregisterModuleContributions(db, (job.payload as any)?.releaseId)"
     },
     {
       "jobType": "module.plugin.install",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:150",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:179",
       "handler": "await handleModulePluginLifecycle(db, config, job.payload)"
     },
     {
       "jobType": "module.plugin.enable",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:151",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:180",
       "handler": "await handleModulePluginLifecycle(db, config, job.payload)"
     },
     {
       "jobType": "module.plugin.disable",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:152",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:181",
       "handler": "await handleModulePluginLifecycle(db, config, job.payload)"
     },
     {
       "jobType": "module.plugin.uninstall",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:153",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:182",
       "handler": "await handleModulePluginLifecycle(db, config, job.payload)"
     },
     {
       "jobType": "extension.job.execute",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:156",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:185",
       "handler": "await handleExtensionJob(db, job.payload)"
     },
     {
       "jobType": "extension.event.dispatch",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:159",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:188",
       "handler": "await handleExtensionEventDispatch(db, job.payload)"
     },
     {
       "jobType": "search.index",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:162",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:191",
       "handler": "await handleSearchIndex(db, normalizeSearchPayload(job.job_type, job.payload))"
     },
     {
       "jobType": "search.index.post",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:163",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:192",
       "handler": "await handleSearchIndex(db, normalizeSearchPayload(job.job_type, job.payload))"
     },
     {
       "jobType": "search.index.profile",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:164",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:193",
       "handler": "await handleSearchIndex(db, normalizeSearchPayload(job.job_type, job.payload))"
     },
     {
       "jobType": "search.reindex",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:167",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:196",
       "handler": "await handleSearchReindex(db, job.payload)"
     },
     {
       "jobType": "atproto.publish",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:170",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:199",
       "handler": "await handleAtprotoPublish(db, config, job.payload)"
     },
     {
       "jobType": "atproto.publish.create",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:171",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:200",
       "handler": "await handleAtprotoPublish(db, config, job.payload)"
     },
     {
       "jobType": "atproto.update",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:174",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:203",
       "handler": "await handleAtprotoUpdate(db, config, job.payload)"
     },
     {
       "jobType": "atproto.publish.update",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:175",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:204",
       "handler": "await handleAtprotoUpdate(db, config, job.payload)"
     },
     {
       "jobType": "atproto.delete",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:178",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:207",
       "handler": "await handleAtprotoDelete(db, config, job.payload)"
     },
     {
       "jobType": "atproto.publish.delete",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:179",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:208",
       "handler": "await handleAtprotoDelete(db, config, job.payload)"
     },
     {
       "jobType": "atproto.profile.publish",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:182",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:211",
       "handler": "await handleAtprotoProfilePublish(db, config, job.payload)"
     },
     {
       "jobType": "audit.checkpoint",
-      "source": "services/greenfield-worker/src/jobs/runner.ts:185",
+      "source": "services/greenfield-worker/src/jobs/runner.ts:214",
       "handler": "no-op (acknowledged event or reserved job type)"
     }
   ]

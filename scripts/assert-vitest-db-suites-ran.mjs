@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // GF-CALL-01: fail CI when a DB-gated Vitest suite was skipped instead of run.
 //
-// The calls v1 / messaging v3 / VoIP push integration suites use
+// The calls v1 / messaging v3 / VoIP push / worker lease-renewal integration suites use
 // `describe.skip` when MODULA_TEST_DATABASE_URL is absent, and Vitest exits 0
 // for skipped files. This reads a Vitest JSON report and requires every
 // expected file to be present, to contain at least one test, and to have every

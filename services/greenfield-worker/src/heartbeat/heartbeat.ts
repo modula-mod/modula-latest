@@ -1,5 +1,6 @@
 import type {Kysely} from 'kysely'
 import type {Database} from '../database.js'
+import {startPeriodic, type PeriodicTask} from '../timers/periodic.js'
 
 export const HEARTBEAT_INTERVAL_MS = 15_000
 
@@ -27,4 +28,31 @@ export async function recordHeartbeat(
 
 export function heartbeatDue(lastBeatAt: number, now: number, intervalMs = HEARTBEAT_INTERVAL_MS): boolean {
   return now - lastBeatAt >= intervalMs
+}
+
+/**
+ * GF-OPS-01(c): writes the heartbeat on its own timer so a long-running job in
+ * the main loop can no longer let `last_seen_at` age past the health threshold.
+ * Writes never overlap, a failed write is reported through `onFailure` (no
+ * error detail, so no connection string can reach the logs) and never throws,
+ * and the returned task must be stopped on shutdown before the pool closes.
+ */
+export function startHeartbeat(
+  db: Kysely<Database>,
+  input: {
+    workerId: string
+    releaseSha: string | null
+    startedAt: Date
+    intervalMs?: number
+    onFailure?: () => void
+  },
+): PeriodicTask {
+  return startPeriodic(
+    async () => {
+      const ok = await recordHeartbeat(db, {workerId: input.workerId, releaseSha: input.releaseSha, startedAt: input.startedAt})
+      if (!ok) input.onFailure?.()
+    },
+    input.intervalMs ?? HEARTBEAT_INTERVAL_MS,
+    {runImmediately: true},
+  )
 }

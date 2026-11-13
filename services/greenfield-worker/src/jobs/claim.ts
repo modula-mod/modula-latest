@@ -103,6 +103,33 @@ export async function markJobRunning(
   if (!row) throw Object.assign(new Error('Job lease is no longer owned by this worker'), {code: 'JOB_LEASE_LOST'})
 }
 
+/**
+ * GF-OPS-01(c): extends the lease of a job this worker is still running.
+ *
+ * The guard matches completeJob/scheduleRetry/deadLetterJob: the row must still
+ * be RUNNING and leased to `workerId`. Once the reaper has moved the job to
+ * RETRYING/DEAD_LETTER (clearing lease_owner) or another worker has claimed it,
+ * no row matches and this returns false, so a renewal can never take a
+ * reclaimed job back. It never changes status, attempts or payload.
+ */
+export async function renewJobLease(
+  db: ModulaWorkerDb,
+  jobId: string,
+  workerId: string,
+  leaseDurationMs: number,
+  now: Date = new Date(),
+): Promise<boolean> {
+  const row = await db
+    .updateTable('background_jobs')
+    .set({lease_expires_at: new Date(now.getTime() + leaseDurationMs), updated_at: now})
+    .where('id', '=', jobId)
+    .where('status', '=', 'RUNNING')
+    .where('lease_owner', '=', workerId)
+    .returning('id')
+    .executeTakeFirst()
+  return Boolean(row)
+}
+
 export async function completeJob(db: ModulaWorkerDb, jobId: string, workerId: string, now: Date = new Date()): Promise<void> {
   const row = await db
     .updateTable('background_jobs')

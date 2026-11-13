@@ -8,7 +8,7 @@ import {reapExpiredLeases} from './jobs/claim.js'
 import {reapExpiredEventDeliveryLeases} from './events/claim.js'
 import {ingestAllConnections} from './bridges/atproto/ingest.js'
 import {isOperationalFlagSet} from './bridges/atproto/session.js'
-import {heartbeatDue, recordHeartbeat} from './heartbeat/heartbeat.js'
+import {startHeartbeat} from './heartbeat/heartbeat.js'
 import {DIGEST_PASS_INTERVAL_MS, runDigestPass} from './digests/digests.js'
 import {infrastructureBackoffMs} from './jobs/retry.js'
 import {metrics} from './observability/metrics.js'
@@ -43,7 +43,6 @@ async function main() {
   let lastReap = 0
   let lastDrain = 0
   let lastIngest = 0
-  let lastBeat = 0
   let lastDigest = 0
   let lastMetricsLog = 0
   let lastMediaCleanup = 0
@@ -71,14 +70,20 @@ async function main() {
   const startedAt = new Date()
   const releaseSha = process.env.MODULA_RELEASE_SHA ?? null
   let consecutiveInfrastructureFailures = 0
+  // GF-OPS-01(c): liveness is written on its own timer, not from this loop, so a
+  // long job blocking the loop no longer lets the heartbeat go stale.
+  const heartbeat = startHeartbeat(db, {
+    workerId: config.workerId,
+    releaseSha,
+    startedAt,
+    intervalMs: config.heartbeatIntervalMs,
+    onFailure: () => log.warn({operation: 'worker.heartbeat'}, 'worker heartbeat write failed'),
+  })
+  log.info({heartbeatIntervalMs: config.heartbeatIntervalMs, leaseDurationMs: config.leaseDurationMs, leaseRenewIntervalMs: config.leaseRenewIntervalMs}, 'worker liveness timers')
 
   while (!stopping) {
     try {
       const now = Date.now()
-      if (heartbeatDue(lastBeat, now)) {
-        await recordHeartbeat(db, {workerId: config.workerId, releaseSha, startedAt})
-        lastBeat = now
-      }
       if (now - lastMetricsLog >= METRICS_LOG_INTERVAL_MS) {
         log.info({operation: 'worker.metrics', metrics: metrics.read()}, 'worker metrics')
         lastMetricsLog = now
@@ -152,7 +157,7 @@ async function main() {
         continue
       }
 
-      const worked = (await processOneEventDelivery(db, config)) || (await processOneJob(db, config))
+      const worked = (await processOneEventDelivery(db, config)) || (await processOneJob(db, config, {log}))
       consecutiveInfrastructureFailures = 0
       await delay(worked ? config.pollIntervalMs : config.emptyPollBackoffMs)
     } catch (error) {
@@ -164,6 +169,7 @@ async function main() {
     }
   }
   await voipLoop
+  await heartbeat.stop()
   apns?.close()
   await db.destroy()
   if (shutdownTimer) clearTimeout(shutdownTimer)

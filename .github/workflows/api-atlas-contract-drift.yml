@@ -262,6 +262,7 @@ jobs:
           && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-call-01-api-vitest.json
           tests/messaging-v3.integration.test.ts
           tests/calls.integration.test.ts
+      # GF-OPS-01(c): lease renewal + independent heartbeat suite rides the same skip guard.
       - name: Calls v1 VoIP and push dispatch worker database integration
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
@@ -271,9 +272,11 @@ jobs:
           CI=true pnpm --filter @modula/greenfield-worker exec vitest run
           tests/push.voip.test.ts
           tests/push.dispatch.test.ts
+          tests/lease-renewal.integration.test.ts
           --maxWorkers=1 --no-file-parallelism
           --reporter=default --reporter=json
           --outputFile.json=/tmp/gf-call-01-worker-vitest.json
           && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-call-01-worker-vitest.json
           tests/push.voip.test.ts
           tests/push.dispatch.test.ts
+          tests/lease-renewal.integration.test.ts
