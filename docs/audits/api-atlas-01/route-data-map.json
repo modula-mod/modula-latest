@@ -6202,6 +6202,16 @@
       "services/greenfield-api/src/intelligence/service.ts#start"
     ]
   },
+  "GET /v1/intelligence/nodus/releases/latest": {
+    "reads": [
+      "the"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
   "POST /v1/internal/build-service/builds/:buildId/result": {
     "reads": [
       "greenfield_build_service_registrations",
@@ -10319,6 +10329,21 @@
     "evidence": [
       "services/greenfield-api/src/domains/discovery/repository.ts#excludedActorIds",
       "services/greenfield-api/src/domains/discovery/repository.ts#listReels"
+    ]
+  },
+  "GET /v1/reels/:id": {
+    "reads": [
+      "attachments",
+      "mutes",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/discovery/repository.ts#excludedActorIds",
+      "services/greenfield-api/src/domains/discovery/repository.ts#getReel"
     ]
   },
   "GET /v1/registry/artifacts/:sha256": {

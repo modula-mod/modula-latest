@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T11:42:47.858Z",
+  "capturedAt": "2026-11-13T12:42:38.135Z",
   "source": {
-    "branch": "synapse/gf-sign-01",
-    "headAtCapture": "df59ac738f214007c6d8c5b149cba0db9cf01457",
+    "branch": "forge/native-endpoints-01",
+    "headAtCapture": "f8cc0f15bd551c89cb5bd96d3a8861af579c6d09",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "98826bbec44409a9fc89dd922cbbb70f71770f3a87e6726101df7d095a880012"
+    "apiSourceSha256": "cd9cccf939a9b72b4bf857fa7d3efa2b0b55ec971c56d0738d314fa4395f7edf"
   },
   "runtimeRoutes": [
     {
@@ -9514,6 +9514,74 @@
           }
         }
       },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/nodus/releases/latest",
+      "path": "/v1/intelligence/nodus/releases/latest",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            "hostVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/nodus/releases/latest",
+      "path": "/v1/intelligence/nodus/releases/latest",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            },
+            "hostVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/reels/:id",
+      "path": "/v1/reels/:id",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/reels/:id",
+      "path": "/v1/reels/:id",
+      "prefix": "",
+      "schema": null,
       "config": null,
       "handler": ""
     },
