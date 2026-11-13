@@ -98,19 +98,25 @@ async function verifyProductionConvergence() {
   await verifyPublicVersion('WEB PUBLIC VERSION', 'https://modula.digital/version.json', head, false)
   await verifyPublicVersion('API PUBLIC VERSION', 'https://api.modula.digital/version.json', head, true)
   verifyContainer('API SHA', 'modula-production-greenfield-api-1', head, true)
-  verifyContainer('WORKER SHA', 'modula-production-greenfield-worker-1', head, false)
+  // GF-OPS-01: the worker now has a heartbeat healthcheck (compose.production.yml), so require healthy.
+  verifyContainer('WORKER SHA', 'modula-production-greenfield-worker-1', head, true)
 
   const postgres = 'modula-production-greenfield-postgres-1'
   const productionDatabase = productionDatabaseName(postgres)
   const schema = dockerPsql(postgres, productionDatabase, "SELECT value FROM schema_metadata WHERE key='schema_version'")
   const applied = dockerPsql(postgres, productionDatabase, 'SELECT id FROM schema_migrations ORDER BY id').split('\n').filter(Boolean)
+  // GF-OPS-01: derive the expected schema from the source migration tip
+  // (the runner applies up files in filename order; every tip migration writes
+  // schema_metadata.schema_version = its numeric prefix) instead of a stale pin.
   const source = readdirSync(join(root, 'services/greenfield-api/migrations'))
     .filter(file => file.endsWith('.sql') && !file.includes('.down.'))
     .map(file => file.replace(/\.sql$/, ''))
     .sort()
+  const sourceTip = source.at(-1) ?? ''
+  const expectedSchema = sourceTip.slice(0, 3)
   const pending = source.filter(id => !applied.includes(id))
   const unknown = applied.filter(id => !source.includes(id))
-  record('PRODUCTION SCHEMA', schema === '055', schema)
+  record('PRODUCTION SCHEMA', /^\d{3}$/.test(expectedSchema) && schema === expectedSchema, `${schema} (expected ${expectedSchema || 'none'} from ${sourceTip || 'no migrations'})`)
   record('PRODUCTION MIGRATION LEDGER', applied.length === source.length && unknown.length === 0, `${applied.length}/${source.length}; unknown=${unknown.length}`)
   record('PENDING MIGRATIONS', pending.length === 0, pending.join(',') || '0')
 

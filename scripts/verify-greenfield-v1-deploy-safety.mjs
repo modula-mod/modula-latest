@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import {existsSync, readFileSync} from 'node:fs'
 import {spawnSync} from 'node:child_process'
+import {checkComposeReleasePins} from './verify-compose-release-pins.mjs'
 
 const deploy = readFileSync('ops/deploy/greenfield-production.sh', 'utf8')
 const backup = readFileSync('ops/backup/greenfield-v1-backup.mjs', 'utf8')
@@ -21,6 +22,14 @@ check(backup.includes("revision !== sourceRevision"), 'backup wrapper verifies r
 
 const syntax = spawnSync('bash', ['-n', 'ops/deploy/greenfield-production.sh'], {encoding: 'utf8'})
 check(syntax.status === 0, `deployment script parses${syntax.status === 0 ? '' : `: ${syntax.stderr.trim()}`}`)
+
+// GF-OPS-01: release identity is required in production compose, no migration id defaults, worker heartbeat healthcheck.
+check(deploy.includes('export SOURCE_EXPECTED_MIGRATION="${EXPECTED_MIGRATION}"'), 'deploy exports the explicit expected migration to compose')
+const pins = checkComposeReleasePins()
+for (const failure of pins.failures) check(false, failure)
+check(pins.ok, 'production compose requires release identity, has no migration id defaults, and health-checks the worker heartbeat')
+const helper = spawnSync('bash', ['-n', 'ops/deploy/running-release-env.sh'], {encoding: 'utf8'})
+check(helper.status === 0, `running release env helper parses${helper.status === 0 ? '' : `: ${helper.stderr.trim()}`}`)
 
 if (failures.length) {
   console.error(`GreenField v1 deploy safety verifier failed: ${failures.length} issue(s)`)

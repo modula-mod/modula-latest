@@ -41,7 +41,7 @@ only environment variable names and `PRESENT`, `MISSING`, or `DISABLED`.
 
 Acquire the deployment lock. Verify exact merged SHA and backup. Build immutable
 API/worker images, migrate under the advisory lock, start API, require ready,
-start worker, require current heartbeat, then smoke. If startup fails after a
+start worker, require current heartbeat (worker container `healthy`), then smoke. If startup fails after a
 forward-compatible migration, start the accepted prior images and run smoke. If
 the prior application is not compatible with the forward database, stop writes
 and restore the verified pre-deploy backup plus prior media/artifact/config set.
@@ -53,6 +53,42 @@ took 0.90 seconds on the 1.3 GB closeout fixture (100k records / 25k shares),
 but it briefly blocks writes to those two tables. Apply it only under the
 deployment and database advisory locks in the maintenance window; abort before
 cutover if the production lock wait exceeds the operator budget.
+
+## Release identity for hand-run Compose commands (GF-OPS-01)
+
+`ops/docker/compose.production.yml` has no defaults for `SOURCE_RELEASE_SHA`,
+`SOURCE_BUILT_AT` or `SOURCE_EXPECTED_MIGRATION`; every `docker compose -f
+ops/docker/compose.production.yml ...` invocation (including `ps`, `logs`,
+`exec` and `run`) fails fast with `required variable ... is missing a value`
+until they are set. The previous `076_greenfield_premium_entitlements` default
+let a hand-run container advertise a stale expected migration and fail
+readiness. `ops/deploy/greenfield-production.sh` exports all three from
+`--expected-sha` / `--expected-migration`. For ad-hoc commands against the
+running release, load its non-secret labels first:
+
+```sh
+eval "$(ops/deploy/running-release-env.sh)"
+docker compose -f ops/docker/compose.production.yml ps
+```
+
+Never type a migration id from memory; it must equal the source tip of the
+deployed SHA (`ls services/greenfield-api/migrations | grep -v '\.down\.' | tail -1`).
+CI enforces this with `pnpm verify:greenfield-v1-deploy-safety`
+(`scripts/verify-compose-release-pins.mjs`).
+
+## Worker health (G033)
+
+The production worker has a Docker healthcheck
+(`ops/docker/greenfield-worker-heartbeat-healthcheck.cjs`, mounted read-only).
+It reads `greenfield_worker_heartbeats` with the worker's own database role and
+reports healthy only when a heartbeat for the container's `MODULA_RELEASE_SHA`
+(and `MODULA_WORKER_ID` when set), started after the container started, is at
+most 90 seconds old - the same threshold `/v1/status` uses for `operational`.
+It publishes no port and never prints the database URL. Override the threshold
+with `MODULA_WORKER_HEALTHCHECK_MAX_AGE_SECONDS` in the worker env file only
+with a recorded reason. An `unhealthy` worker is not restarted automatically;
+treat it like the 60-second heartbeat page above. `scripts/verify-greenfield-backend-v1.mjs`
+now requires the worker container to be `running|healthy|0`.
 
 ## Dead letters and outbox
 
