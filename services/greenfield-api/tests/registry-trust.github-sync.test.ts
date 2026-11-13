@@ -211,7 +211,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
-    process.env.MODULA_ADMIN_HANDLES = `gubicadmin${suffix},gubicreview${suffix}`
+    process.env.MODULA_ADMIN_HANDLES = `gubicadmin${suffix},gubicreview${suffix},gubicenable${suffix}`
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -1018,4 +1018,85 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     // Retiring does not need a trusted release.
     expect((await review(quarantined, 'retired', 'unavailable')).statusCode).toBe(200)
   }, 180_000)
+
+  it('applies the GUBIC catalogue gate to enable, so an installed retired or unentitled game cannot be re-enabled', async () => {
+    const fixtures = await testModulaGamePublisher('enable')
+    const admin = await registerAccount(app, `gubic-enable-admin-${suffix}@example.invalid`, `gubicenable${suffix}`, db)
+    const gameId = `test.modula.gubic-enable-${suffix}.reference-tap`
+    const release = await fixtures.sync(gameId, '1.0.0')
+    await fixtures.register(gameId)
+    const review = async (publicationStatus: string, availability: string) => {
+      const response = await app.inject({
+        method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`, headers: {authorization: `Bearer ${admin.token}`},
+        payload: {publicationStatus, availability, featured: false, reason: `GUBIC enable gate ${publicationStatus}`},
+      })
+      expect(response.statusCode, response.body).toBe(200)
+    }
+    await review('published', 'available')
+    const headers = fixtures.headers
+    const plan = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/package-install-plan`, headers,
+      payload: {version: '1.0.0', hostVersion: '1.1.0', platform: 'ios', cachedPublicDigests: []},
+    })
+    expect(plan.statusCode, plan.body).toBe(200)
+    const install = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `gubic-enable-install-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios', hostVersion: '1.1.0', packageLockSha256: plan.json().data.lockSha256},
+    })
+    expect(install.statusCode, install.body).toBe(202)
+    const installationId = install.json().data.installationId
+    const workerDb = createWorkerDb(databaseUrl!)
+    try {
+      await handleModuleInstall(workerDb, loadWorkerConfig(), {
+        planId: install.json().data.planId, installationId, releaseId: release.releaseId, moduleId: gameId, accountId: fixtures.owner.accountId,
+      })
+    } finally {
+      await workerDb.destroy()
+    }
+    const enable = (key: string) => app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/enable`, headers: {...headers, 'idempotency-key': `gubic-enable-${key}-${suffix}`}, payload: {},
+    })
+    const status = async () => (await db.selectFrom('greenfield_extension_installations').select('status')
+      .where('installation_id', '=', installationId).executeTakeFirstOrThrow()).status
+    const installedStatus = await status()
+    expect(installedStatus).not.toBe('enabling')
+
+    // Retired after install: enable refused, nothing queued.
+    await review('retired', 'unavailable')
+    const retired = await enable('retired')
+    expect(retired.statusCode, retired.body).toBe(403)
+    expect(retired.json().error).toMatchObject({code: 'FORBIDDEN', message: 'Game is not approved for catalogue installation'})
+
+    // Published again but now paid, and not owned: enable refused.
+    await review('published', 'available')
+    const now = new Date()
+    const offerId = `offer:${gameId}`
+    await db.insertInto('greenfield_offers').values({
+      offer_id: offerId, product_id: gameId, kind: 'ONE_TIME', display_name: 'Owned reference game',
+      capabilities: sql`${JSON.stringify([])}::jsonb`, commercial_terms: sql`${JSON.stringify({})}::jsonb`,
+      trial_duration_seconds: null, state: 'ACTIVE', created_by_account_id: admin.accountId, created_at: now, updated_at: now,
+    }).execute()
+    const unentitled = await enable('unentitled')
+    expect(unentitled.statusCode, unentitled.body).toBe(403)
+    expect(unentitled.json().error).toMatchObject({code: 'FORBIDDEN', message: 'An active game entitlement is required'})
+    expect(await status()).toBe(installedStatus)
+
+    // Published, available and entitled: enable is accepted.
+    await db.insertInto('greenfield_entitlements').values({
+      entitlement_id: `entitlement:${gameId}:${fixtures.owner.accountId}`, owner_type: 'ACCOUNT', owner_account_id: fixtures.owner.accountId,
+      owner_organisation_id: null, product_id: gameId, offer_id: offerId, source: 'ADMIN', state: 'ACTIVE',
+      external_receipt_id: null, provenance_reference: 'isolated-gubic-enable-qa', started_at: now, expires_at: null,
+      created_at: now, updated_at: now,
+    }).execute()
+    const allowed = await enable('allowed')
+    expect(allowed.statusCode, allowed.body).toBe(202)
+    expect(await status()).toBe('enabling')
+
+    // Non-game modules are not affected by the gate (no game projection).
+    const plain = nextId()
+    const plainBuilt = buildRelease(plain, '1.0.0')
+    await new GreenfieldGithubReleaseSyncService(db, plainBuilt.source).sync({repository: REPOSITORY, releaseTag: plainBuilt.tag, publish: true, dryRun: false})
+    const plainEnable = await app.inject({method: 'POST', url: `/v1/modules/${plain}/enable`, headers: {...headers, 'idempotency-key': `gubic-enable-plain-${suffix}`}, payload: {}})
+    expect(plainEnable.json().error?.message ?? '').not.toMatch(/catalogue|entitlement/)
+  }, 120_000)
 })
