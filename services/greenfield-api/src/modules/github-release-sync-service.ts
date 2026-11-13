@@ -9,6 +9,7 @@ import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModuleManifestService} from './manifest-service.js'
 import {GreenfieldModuleReleaseService, type GreenfieldModuleReleaseEvidence} from './release-service.js'
+import {assertWebGameContentPolicy, WebGameContentPolicyError} from '../gubic/web-game-csp.js'
 
 /**
  * Automated GitHub release ingestion. Given a repository and an immutable
@@ -496,10 +497,12 @@ export function verifyWebGameArchive(bytes: Buffer): void {
     }
     if (inventory.files[path] !== sha256(files.get(path)!)) throw moduleError('VALIDATION_FAILED', `Web game member digest mismatch: ${path}`)
   }
-  const html = entry.toString('utf8')
-  if (!/Content-Security-Policy/i.test(html) || !/default-src 'none'/i.test(html)
-    || !/connect-src 'none'/i.test(html) || !/script-src 'self'/i.test(html)) {
-    throw moduleError('VALIDATION_FAILED', 'Web game entry lacks the required restrictive CSP')
+  // Parsed CSP (exactly one effective meta element, directive-level policy),
+  // no remote <script src>, and no eval()/new Function() in shipped scripts.
+  try { assertWebGameContentPolicy(files, 'index.html') }
+  catch (error) {
+    if (error instanceof WebGameContentPolicyError) throw moduleError('VALIDATION_FAILED', error.message)
+    throw error
   }
 }
 
