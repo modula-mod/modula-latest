@@ -102,8 +102,36 @@ test('refuses plaintext payloads, undeclared files and bad signatures', () => {
   try { assert.throws(() => push(stray.dir, stray.target, {signingKey: key}), /not declared by the signed manifest/) } finally { stray.cleanup() }
   const forged = fixture()
   try { assert.throws(() => push(forged.dir, forged.target, {signingKey: randomBytes(32).toString('base64url')}), /signature invalid/) } finally { forged.cleanup() }
-  const unsigned = fixture()
-  try { assert.equal(inspectSet(unsigned.dir, {signingKey: ''}).signature, 'not-checked') } finally { unsigned.cleanup() }
+})
+
+test('fails closed without a signing key: no unverified manifest is inspected, pushed or pulled', () => {
+  const f = fixture()
+  const saved = process.env.MODULA_RECOVERY_SIGNING_KEY
+  delete process.env.MODULA_RECOVERY_SIGNING_KEY
+  try {
+    const refused = /MODULA_RECOVERY_SIGNING_KEY is required: refusing a recovery set whose manifest signature cannot be verified/
+    for (const signingKey of [undefined, '', null, 0]) assert.throws(() => inspectSet(f.dir, {signingKey}), refused, String(signingKey))
+    assert.throws(() => inspectSet(f.dir), refused)
+    assert.throws(() => push(f.dir, f.target), refused)
+    assert.throws(() => push(f.dir, f.target, {dryRun: true}), refused)
+    assert.equal(existsSync(f.remote), false)
+    push(f.dir, f.target, {signingKey: key})
+    assert.throws(() => pull(SET, join(f.root, 'restore-nokey'), f.target), refused)
+    assert.equal(existsSync(join(f.root, 'restore-nokey')), false, 'nothing staged without a key')
+    const env = {...process.env, MODULA_OFFHOST_BACKUP_ENABLED: '1', MODULA_OFFHOST_BACKUP_TARGET: `file://${f.remote}`}
+    delete env.MODULA_RECOVERY_SIGNING_KEY
+    for (const args of [['check', '--backup-dir', f.dir], ['pull', '--set', SET, '--to', join(f.root, 'restore-cli')]]) {
+      const result = spawnSync(process.execPath, [tool, ...args], {env, encoding: 'utf8'})
+      assert.equal(result.status, 1, args[0])
+      assert.match(result.stderr, refused, args[0])
+    }
+    assert.equal(existsSync(join(f.root, 'restore-cli')), false, 'CLI pull staged nothing without a key')
+    assert.equal(inspectSet(f.dir, {signingKey: key}).signature, 'valid')
+  } finally {
+    if (saved === undefined) delete process.env.MODULA_RECOVERY_SIGNING_KEY
+    else process.env.MODULA_RECOVERY_SIGNING_KEY = saved
+    f.cleanup()
+  }
 })
 
 test('ssh transport is non-interactive, host-key pinned and credential-free', () => {

@@ -50,8 +50,19 @@ export function parseTarget(value) {
   fail(`unsupported off-host target scheme: ${url.protocol}`)
 }
 
-/** Validate a local set: signed manifest (when key present), digests, age headers, no stray files. */
+/**
+ * Validate a local set: HMAC-verified manifest, digests, age headers, no stray files.
+ * Fails closed: without MODULA_RECOVERY_SIGNING_KEY nothing is pushed or accepted, because an
+ * unverified manifest would let a substituted set (or stray files it declares) through. There is
+ * deliberately no opt-out; tests pass an ephemeral key.
+ */
+function requireSigningKey(signingKey) {
+  if (typeof signingKey !== 'string' || !signingKey) fail('MODULA_RECOVERY_SIGNING_KEY is required: refusing a recovery set whose manifest signature cannot be verified')
+  return signingKey
+}
+
 export function inspectSet(backupDir, {signingKey = process.env.MODULA_RECOVERY_SIGNING_KEY} = {}) {
+  requireSigningKey(signingKey)
   const dir = resolve(backupDir)
   const setId = basename(dir)
   if (!SET_ID.test(setId)) fail(`not a recovery set directory: ${setId}`)
@@ -60,13 +71,10 @@ export function inspectSet(backupDir, {signingKey = process.env.MODULA_RECOVERY_
   const manifest = JSON.parse(encoded.toString('utf8'))
   if (manifest.format !== 'modula.greenfield.recovery.v1' || manifest.backupSetId !== setId || !Array.isArray(manifest.payloads)) fail('unsupported or mismatched recovery manifest')
   if (manifest.encryption?.algorithm !== 'age') fail('recovery set is not age-encrypted')
-  let signature = 'not-checked'
-  if (signingKey) {
-    const expected = createHmac('sha256', signingKey).update(encoded).digest()
-    const provided = Buffer.from(readFileSync(join(dir, 'manifest.hmac'), 'utf8').trim(), 'hex')
-    if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) fail('recovery manifest signature invalid')
-    signature = 'valid'
-  }
+  const expected = createHmac('sha256', signingKey).update(encoded).digest()
+  const provided = Buffer.from(readFileSync(join(dir, 'manifest.hmac'), 'utf8').trim(), 'hex')
+  if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) fail('recovery manifest signature invalid')
+  const signature = 'valid'
   const declared = new Map(manifest.payloads.map(payload => [payload.file, payload]))
   const files = listFiles(dir)
   for (const file of files) {
@@ -96,7 +104,8 @@ export function push(backupDir, target, {dryRun = false, now = new Date(), signi
   return plan
 }
 
-export function pull(setId, destination, target, {signingKey} = {}) {
+export function pull(setId, destination, target, {signingKey = process.env.MODULA_RECOVERY_SIGNING_KEY} = {}) {
+  requireSigningKey(signingKey) // before anything is fetched: an unverifiable copy is never staged
   if (!SET_ID.test(setId)) fail('invalid set id')
   const into = resolve(destination)
   if (existsSync(into) && readdirSync(into).length) fail('pull destination must be empty')
