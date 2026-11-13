@@ -23,6 +23,7 @@ import {GreenfieldModuleIdentityMigrationService} from './identity-migration-ser
 import {GreenfieldExtensionFabricService} from './extension-fabric-service.js'
 import {GreenfieldInstallDescriptorService, type IssuedInstallDescriptor} from './install-descriptor-service.js'
 import {GreenfieldRegistryTrustService, type RegistryTrustOptions} from './registry-trust-service.js'
+import {GreenfieldArtifactClosureService} from './artifact-closure-service.js'
 import {
   moduleIdentityAliasesFor,
   moduleIdFamily,
@@ -50,6 +51,7 @@ export class GreenfieldModuleInstallationService {
   private readonly extensionFabric: GreenfieldExtensionFabricService
   private readonly descriptors: GreenfieldInstallDescriptorService
   private readonly trust: GreenfieldRegistryTrustService
+  private readonly artifacts: GreenfieldArtifactClosureService
 
   constructor(
     private readonly db: ModulaDb,
@@ -58,6 +60,7 @@ export class GreenfieldModuleInstallationService {
     this.registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
     this.descriptors = new GreenfieldInstallDescriptorService(db, config.publicApiUrl)
     this.trust = new GreenfieldRegistryTrustService(db)
+    this.artifacts = new GreenfieldArtifactClosureService(db)
     this.dependencies = new GreenfieldModuleDependencyResolver(db)
     this.permissions = new GreenfieldModulePermissionService(db)
     this.runtime2 = new GreenfieldModuleRuntime2Service(db)
@@ -147,6 +150,9 @@ export class GreenfieldModuleInstallationService {
   async installPreview(accountId: string, moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' | 'server' = 'web', hostVersion?: string | null): Promise<GreenfieldModuleInstallPreview> {
     const release = version ? await this.registry.getVersion(moduleId, version) : await this.registry.latestPublished(moduleId)
     this.assertExecutableTrust(await this.trust.forRelease(release, {platform, hostVersion}))
+    // GF-MOD-01: fail closed when the immutable package bytes are absent or no
+    // longer hash to the recorded release digest (install() runs this preview).
+    await this.artifacts.assertPackageInstallable(release, {allowMissingInDevelopment: this.developmentUntrustedAllowed()})
     const publisher = await this.db.selectFrom('greenfield_publishers').select(['status']).where('publisher_id', '=', release.publisherId).executeTakeFirst()
     const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
     const extensionReview = await this.extensionFabric.targetReview(accountId, release)
@@ -449,9 +455,13 @@ export class GreenfieldModuleInstallationService {
     return {installationId: installed.installationId, moduleId, grantedPermissions, deniedPermissions}
   }
 
+  private developmentUntrustedAllowed(): boolean {
+    return this.config.environment === 'development' && this.config.moduleAllowUntrustedDevelopmentReleases
+  }
+
   private assertExecutableTrust(trust: Awaited<ReturnType<GreenfieldRegistryTrustService['forRelease']>>): void {
     if (trust.verified) return
-    if (this.config.environment === 'development' && this.config.moduleAllowUntrustedDevelopmentReleases) return
+    if (this.developmentUntrustedAllowed()) return
     throw moduleError('UNTRUSTED_RELEASE', `Release is not production-trusted (signature: ${trust.signature.state})`)
   }
 

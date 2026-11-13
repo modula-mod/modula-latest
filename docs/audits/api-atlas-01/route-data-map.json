@@ -7280,6 +7280,7 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
+      "services/greenfield-api/src/modules/installation-service.ts#developmentUntrustedAllowed",
       "services/greenfield-api/src/modules/installation-service.ts#enable",
       "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
       "services/greenfield-api/src/modules/installation-service.ts#getInstallationForAccount",
@@ -7518,6 +7519,7 @@
       "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
       "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
+      "services/greenfield-api/src/modules/installation-service.ts#developmentUntrustedAllowed",
       "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#install",
@@ -7592,6 +7594,7 @@
       "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
       "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
+      "services/greenfield-api/src/modules/installation-service.ts#developmentUntrustedAllowed",
       "services/greenfield-api/src/modules/installation-service.ts#installPreview"
     ]
   },

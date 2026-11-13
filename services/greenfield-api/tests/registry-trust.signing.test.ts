@@ -10,7 +10,7 @@ import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldRegistryTrustService} from '../src/modules/registry-trust-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, parsePublisherPublicKey, statementBytes} from '../src/modules/release-signing.js'
-import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
+import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256, storeFixturePackageArtifact} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
@@ -155,6 +155,8 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     await releases.importPendingReview(manifest, evidence)
     const published = await releases.publishRelease(id, '1.0.0')
     await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: published.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
+    // GF-MOD-01: strict policy also requires the stored immutable package bytes.
+    await storeFixturePackageArtifact(db, published)
 
     const response = await app.inject({
       method: 'POST',
