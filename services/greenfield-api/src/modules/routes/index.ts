@@ -981,6 +981,9 @@ export async function registerModuleRoutes(
     try {
       const body = (request.body as any) ?? {}
       const moduleId = canonicalModuleParam(request)
+      // Same catalogue policy as install: a retired, unavailable or unentitled
+      // game cannot be moved to another release through the generic route.
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, moduleId)
       const hostContext = distributionContext(body)
       let exactPackageVersion: string | undefined
       try {
@@ -1018,6 +1021,8 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as Record<string, unknown> | null) ?? {}
+      // Same catalogue policy as install and update (see above).
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, canonicalModuleParam(request))
       const currentPlan = await distribution.updatePlan(auth.accountId, canonicalModuleParam(request), null, distributionContext(body))
       const requestedVersion = typeof body.version === 'string' && body.version.trim() ? body.version.trim() : null
       const candidate = currentPlan.rollbackCandidateReleaseId

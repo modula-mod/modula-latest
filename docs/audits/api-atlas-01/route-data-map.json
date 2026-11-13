@@ -8208,11 +8208,15 @@
   },
   "POST /v1/modules/:moduleId/rollback": {
     "reads": [
+      "greenfield_entitlements",
       "greenfield_extension_installations",
+      "greenfield_game_catalogue_entries",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
       "greenfield_module_release_signatures",
       "greenfield_module_releases",
+      "greenfield_mps_ingestions",
+      "greenfield_offers",
       "greenfield_release_artifacts",
       "greenfield_release_asset_blobs",
       "greenfield_release_frontends"
@@ -8235,6 +8239,9 @@
       "services/greenfield-api/src/modules/distribution-service.ts#resolveUpdateTarget",
       "services/greenfield-api/src/modules/distribution-service.ts#rollbackCandidate",
       "services/greenfield-api/src/modules/distribution-service.ts#updatePlan",
+      "services/greenfield-api/src/modules/gubic-service.ts#assertCatalogueInstallAllowed",
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
       "services/greenfield-api/src/modules/update-service.ts#planKey",
       "services/greenfield-api/src/modules/update-service.ts#update",
       "services/greenfield-api/src/modules/update-service.ts#updateInternal"
@@ -8373,6 +8380,7 @@
   "POST /v1/modules/:moduleId/update": {
     "reads": [
       "greenfield_entitlements",
+      "greenfield_game_catalogue_entries",
       "greenfield_module_install_plans",
       "greenfield_module_release_signatures",
       "greenfield_module_releases",
@@ -8399,6 +8407,9 @@
       "services/greenfield-api/src/modules/distribution-service.ts#packageInstallPlan",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptor",
       "services/greenfield-api/src/modules/distribution-service.ts#releaseDescriptorById",
+      "services/greenfield-api/src/modules/gubic-service.ts#assertCatalogueInstallAllowed",
+      "services/greenfield-api/src/modules/gubic-service.ts#catalogueEntry",
+      "services/greenfield-api/src/modules/gubic-service.ts#entitlement",
       "services/greenfield-api/src/modules/update-service.ts#planKey",
       "services/greenfield-api/src/modules/update-service.ts#update",
       "services/greenfield-api/src/modules/update-service.ts#updateInternal"
