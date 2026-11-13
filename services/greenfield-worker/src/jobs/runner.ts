@@ -48,7 +48,8 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, op
   let renewal: PeriodicTask | null = null
 
   try {
-    await markJobRunning(db, job.id, config.workerId)
+    // Renewal starts at claim (status LEASED), not at RUNNING, so a delayed
+    // markJobRunning cannot leave a claimed job's lease unrenewed.
     renewal = startPeriodic(async () => {
       try {
         if (await renewJobLease(db, job.id, config.workerId, config.leaseDurationMs)) {
@@ -64,6 +65,7 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, op
         log?.error({operation: 'job.lease.renew', jobId: job.id, jobType: job.job_type, error: safeError(error)}, 'job lease renewal failed')
       }
     }, config.leaseRenewIntervalMs)
+    await markJobRunning(db, job.id, config.workerId)
     await withTimeout((async () => {
       switch (job.job_type) {
       case 'notification.create':

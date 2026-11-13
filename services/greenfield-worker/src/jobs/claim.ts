@@ -104,13 +104,14 @@ export async function markJobRunning(
 }
 
 /**
- * GF-OPS-01(c): extends the lease of a job this worker is still running.
+ * GF-OPS-01(c): extends the lease of a job this worker has claimed (LEASED) or
+ * is running (RUNNING).
  *
- * The guard matches completeJob/scheduleRetry/deadLetterJob: the row must still
- * be RUNNING and leased to `workerId`. Once the reaper has moved the job to
- * RETRYING/DEAD_LETTER (clearing lease_owner) or another worker has claimed it,
- * no row matches and this returns false, so a renewal can never take a
- * reclaimed job back. It never changes status, attempts or payload.
+ * The row must still be LEASED or RUNNING and leased to `workerId` (the same
+ * ownership guard as markJobRunning/completeJob/scheduleRetry/deadLetterJob).
+ * Once the reaper has moved the job to RETRYING/DEAD_LETTER (clearing
+ * lease_owner) or another worker has claimed it, no row matches and this
+ * returns false, so a renewal can never take a reclaimed job back. It never changes status, attempts or payload.
  */
 export async function renewJobLease(
   db: ModulaWorkerDb,
@@ -123,7 +124,7 @@ export async function renewJobLease(
     .updateTable('background_jobs')
     .set({lease_expires_at: new Date(now.getTime() + leaseDurationMs), updated_at: now})
     .where('id', '=', jobId)
-    .where('status', '=', 'RUNNING')
+    .where('status', 'in', ['LEASED', 'RUNNING'])
     .where('lease_owner', '=', workerId)
     .returning('id')
     .executeTakeFirst()

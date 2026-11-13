@@ -17,8 +17,24 @@ import {processOneJob} from '../src/jobs/runner.js'
 import {metrics} from '../src/observability/metrics.js'
 
 const slowJob = vi.hoisted(() => ({durationMs: 0, during: null as null | ((elapsedMs: number) => Promise<void>)}))
+// Delays markJobRunning to model a large claim -> RUNNING gap (job sits LEASED).
+const slowMark = vi.hoisted(() => ({delayMs: 0, during: null as null | (() => Promise<void>), handlerRuns: 0}))
+vi.mock('../src/jobs/claim.js', async importOriginal => {
+  const actual = await importOriginal<typeof import('../src/jobs/claim.js')>()
+  return {
+    ...actual,
+    markJobRunning: async (...args: Parameters<typeof actual.markJobRunning>) => {
+      if (slowMark.delayMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, slowMark.delayMs))
+        if (slowMark.during) await slowMark.during()
+      }
+      return actual.markJobRunning(...args)
+    },
+  }
+})
 vi.mock('../src/notifications/create.js', () => ({
   handleNotificationCreate: async () => {
+    slowMark.handlerRuns += 1
     const started = Date.now()
     while (Date.now() - started < slowJob.durationMs) {
       await new Promise(resolve => setTimeout(resolve, 50))
@@ -96,6 +112,9 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
   beforeEach(() => {
     slowJob.durationMs = 0
     slowJob.during = null
+    slowMark.delayMs = 0
+    slowMark.during = null
+    slowMark.handlerRuns = 0
   })
 
   afterAll(async () => {
@@ -170,8 +189,10 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     const a = `gf-ops-01c-a-${suffix}`
     const job = await claimNextJob(db, a, LEASE_MS)
     expect(job?.id).toBe(jobId)
+    expect(await renewJobLease(db, jobId, a, LEASE_MS)).toBe(true) // LEASED
+    expect(await renewJobLease(db, jobId, 'gf-ops-01c-not-owner', LEASE_MS)).toBe(false)
     await markJobRunning(db, jobId, a)
-    expect(await renewJobLease(db, jobId, a, LEASE_MS)).toBe(true)
+    expect(await renewJobLease(db, jobId, a, LEASE_MS)).toBe(true) // RUNNING
 
     // Reaper reclaims it (scoped to just past this job's lease expiry) ...
     const expiry = new Date((await jobRow(jobId)).lease_expires_at!)
@@ -219,6 +240,46 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     expect(operations).toEqual(['job.lease.renew', 'job.lease.lost'])
     expect(JSON.stringify(log.warn.mock.calls)).not.toMatch(/postgres(ql)?:\/\//)
     expect(await db.selectFrom('job_failures').select('id').where('job_id', '=', jobId).execute()).toHaveLength(0)
+  })
+
+  it('renews the lease of a job still LEASED when markJobRunning is delayed past the lease', async () => {
+    const cfg = config(`gf-ops-01c-leased-${suffix}`)
+    const jobId = await enqueue()
+    const renewalsBefore = metrics.read().jobLeaseRenewals
+    let probed = false
+    // markJobRunning only starts after 1.5x the lease; the job is LEASED the whole time.
+    slowMark.delayMs = Math.round(LEASE_MS * 1.5)
+    slowMark.during = async () => {
+      probed = true
+      await reapExpiredLeases(db)
+      const row = await jobRow(jobId)
+      expect(row).toMatchObject({status: 'LEASED', lease_owner: cfg.workerId})
+      expect(new Date(row.lease_expires_at!).getTime()).toBeGreaterThan(Date.now())
+    }
+    await expect(processOneJob(db, cfg)).resolves.toBe(true)
+    expect(probed).toBe(true)
+    expect(metrics.read().jobLeaseRenewals - renewalsBefore).toBeGreaterThanOrEqual(3)
+    expect(slowMark.handlerRuns).toBe(1)
+    expect(await jobRow(jobId)).toMatchObject({status: 'SUCCEEDED', lease_owner: null, attempt_count: 1})
+  })
+
+  it('does not run the handler or record an outcome when a LEASED job is reclaimed before it starts', async () => {
+    const cfg = config(`gf-ops-01c-leased-lost-${suffix}`)
+    const jobId = await enqueue()
+    const other = `gf-ops-01c-leased-owner-${suffix}`
+    slowMark.delayMs = RENEW_MS
+    slowMark.during = async () => {
+      await db.updateTable('background_jobs')
+        .set({status: 'LEASED', lease_owner: other, lease_expires_at: new Date(Date.now() + 60_000), attempt_count: 2})
+        .where('id', '=', jobId).execute()
+    }
+    const log = {warn: vi.fn(), error: vi.fn()}
+    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    expect(slowMark.handlerRuns).toBe(0)
+    expect(await jobRow(jobId)).toMatchObject({status: 'LEASED', lease_owner: other, attempt_count: 2})
+    expect(log.warn.mock.calls.map(([fields]) => (fields as {operation: string}).operation)).toContain('job.lease.lost')
+    expect(await db.selectFrom('job_failures').select('id').where('job_id', '=', jobId).execute()).toHaveLength(0)
+    await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
   })
 
   it('stops the renewal timer when the job finishes and the heartbeat timer on shutdown', async () => {
