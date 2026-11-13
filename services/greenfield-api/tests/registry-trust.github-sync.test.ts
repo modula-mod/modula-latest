@@ -211,7 +211,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
-    process.env.MODULA_ADMIN_HANDLES = `gubicadmin${suffix}`
+    process.env.MODULA_ADMIN_HANDLES = `gubicadmin${suffix},gubicreview${suffix},gubicenable${suffix}`
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -921,4 +921,182 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const forbidden = await app.inject({method: 'POST', url: '/v1/admin/registry/sync', headers: {authorization: `Bearer ${user.token}`}, payload: {repository: REPOSITORY, releaseTag: 'x'}})
     expect(forbidden.statusCode).toBe(403)
   })
+
+  // Signed test.modula.* web-game fixtures under the seeded `modula` publisher
+  // (which owns the test.modula namespace). Keys are generated per test, in memory.
+  async function testModulaGamePublisher(label: string) {
+    const owner = await registerAccount(app, `gubic-${label}-owner-${suffix}@example.invalid`, `gubic${label}owner${suffix}`, db)
+    await db.insertInto('greenfield_publisher_owners').values({
+      publisher_owner_id: randomUUID(), publisher_id: 'modula', owner_type: 'ACCOUNT',
+      account_id: owner.accountId, organisation_id: null, created_at: new Date(),
+    }).execute()
+    const keys = generateKeyPairSync('ed25519')
+    const keyId = `gubic-${label}-${suffix}`
+    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'">')
+    const sync = async (gameId: string, version: string, publish = true) => {
+      const javascript = Buffer.from(`document.title="${gameId} ${version}"`)
+      const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
+      const gameBytes = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', javascript), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
+      const built = buildRelease(gameId, version, {
+        sign: {keyId, privateKey: keys.privateKey},
+        mutateProduct: (mps) => {
+          mps.identity.kind = 'game'
+          mps.permissions = []
+          mps.gameRuntime = {
+            contractVersion: '1.0.0', type: 'web-mini-game', engine: 'phaser', engineVersion: '4.2.1',
+            entryPath: 'index.html', artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz'},
+            compressedSizeLimitBytes: 50 * 1024 * 1024, minimumHostVersion: '>=1.1.0', offline: true,
+            network: 'none', assetInventory: 'game.files.json', orientation: 'any', graphics: 'none', touchControls: 'pointer',
+          }
+          mps.distribution = {
+            schema: 'modula.package.1', category: 'game-content',
+            artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz', compressedSizeBytes: gameBytes.length, installedSizeEstimateBytes: 4096},
+            minimumHostVersion: '>=1.1.0', platforms: ['ios'], dependencies: [], requiredCapabilities: [],
+            cachePolicy: 'retain-while-owned', sharing: 'public-immutable',
+          }
+        },
+        mutateFiles: files => { files['game/game.tgz'] = gameBytes },
+      })
+      return await new GreenfieldGithubReleaseSyncService(db, built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish, dryRun: false}) as {releaseId: string}
+    }
+    const headers = {authorization: `Bearer ${owner.token}`}
+    const register = async (gameId: string) => {
+      const response = await app.inject({
+        method: 'PUT', url: `/v1/developer/gubic/games/${gameId}`, headers,
+        payload: {publisherId: 'modula', origin: 'modula-developed', genre: 'arcade', categories: ['arcade'], runtimeCategory: 'phaser', ageClassification: {}, availability: 'available'},
+      })
+      expect(response.statusCode, response.body).toBe(200)
+    }
+    return {owner, headers, sync, register}
+  }
+
+  it('publishes a catalogue game by direct registry lookup, including test-only games past the first 100 products', async () => {
+    const fixtures = await testModulaGamePublisher('review')
+    const admin = await registerAccount(app, `gubic-review-admin-${suffix}@example.invalid`, `gubicreview${suffix}`, db)
+    const adminHeaders = {authorization: `Bearer ${admin.token}`}
+    const namespace = `test.modula.gubic-review-${suffix}`
+    // 100 published game products that sort before the target, so the target is product #101.
+    for (let index = 0; index < 100; index += 1) await fixtures.sync(`${namespace}.a${String(index).padStart(3, '0')}`, '1.0.0')
+    const target = `${namespace}.zz-target`
+    await fixtures.sync(target, '1.0.0')
+    await fixtures.sync(target, '1.1.0')
+    const publishedGames = await db.selectFrom('greenfield_module_releases as release')
+      .innerJoin('greenfield_mps_ingestions as ingestion', 'ingestion.release_id', 'release.release_id')
+      .select(['release.module_id']).distinct()
+      .where('ingestion.registry_kind', '=', 'game').where('release.release_state', '=', 'published')
+      .where('release.module_id', '<', target).where('release.module_id', 'like', `${namespace}.%`)
+      .execute()
+    expect(publishedGames).toHaveLength(100)
+    await fixtures.register(target)
+    const review = (gameId: string, publicationStatus: string, availability = 'available') => app.inject({
+      method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`, headers: adminHeaders,
+      payload: {publicationStatus, availability, featured: false, reason: 'GUBIC catalogue lookup QA'},
+    })
+    const published = await review(target, 'published')
+    expect(published.statusCode, published.body).toBe(200)
+    expect(published.json().data).toMatchObject({game_id: target, publication_status: 'published', availability: 'available'})
+    const event = await db.selectFrom('greenfield_game_catalogue_events').select(['event_type', 'publication_status'])
+      .where('game_id', '=', target).orderBy('occurred_at', 'desc').executeTakeFirstOrThrow()
+    expect(event).toEqual({event_type: 'published', publication_status: 'published'})
+
+    // Still fail closed: a catalogue entry whose game has no published release cannot be published.
+    const draftOnly = `${namespace}.draft-only`
+    await fixtures.sync(draftOnly, '1.0.0', false)
+    await fixtures.register(draftOnly)
+    const refused = await review(draftOnly, 'published')
+    expect(refused.statusCode, refused.body).toBe(403)
+    expect(refused.json().error).toMatchObject({code: 'FORBIDDEN', message: 'A trusted published registry release owned by this publisher is required'})
+
+    // ... nor one whose newest published release is quarantined out of the published set.
+    const quarantined = `${namespace}.quarantined`
+    const quarantinedRelease = await fixtures.sync(quarantined, '1.0.0')
+    await fixtures.register(quarantined)
+    await db.updateTable('greenfield_module_releases').set({release_state: 'quarantined'} as never)
+      .where('release_id', '=', quarantinedRelease.releaseId).execute()
+    expect((await review(quarantined, 'published')).statusCode).toBe(403)
+    // Retiring does not need a trusted release.
+    expect((await review(quarantined, 'retired', 'unavailable')).statusCode).toBe(200)
+  }, 180_000)
+
+  it('applies the GUBIC catalogue gate to enable, so an installed retired or unentitled game cannot be re-enabled', async () => {
+    const fixtures = await testModulaGamePublisher('enable')
+    const admin = await registerAccount(app, `gubic-enable-admin-${suffix}@example.invalid`, `gubicenable${suffix}`, db)
+    const gameId = `test.modula.gubic-enable-${suffix}.reference-tap`
+    const release = await fixtures.sync(gameId, '1.0.0')
+    await fixtures.register(gameId)
+    const review = async (publicationStatus: string, availability: string) => {
+      const response = await app.inject({
+        method: 'POST', url: `/v1/admin/gubic/games/${gameId}/review`, headers: {authorization: `Bearer ${admin.token}`},
+        payload: {publicationStatus, availability, featured: false, reason: `GUBIC enable gate ${publicationStatus}`},
+      })
+      expect(response.statusCode, response.body).toBe(200)
+    }
+    await review('published', 'available')
+    const headers = fixtures.headers
+    const plan = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/package-install-plan`, headers,
+      payload: {version: '1.0.0', hostVersion: '1.1.0', platform: 'ios', cachedPublicDigests: []},
+    })
+    expect(plan.statusCode, plan.body).toBe(200)
+    const install = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `gubic-enable-install-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios', hostVersion: '1.1.0', packageLockSha256: plan.json().data.lockSha256},
+    })
+    expect(install.statusCode, install.body).toBe(202)
+    const installationId = install.json().data.installationId
+    const workerDb = createWorkerDb(databaseUrl!)
+    try {
+      await handleModuleInstall(workerDb, loadWorkerConfig(), {
+        planId: install.json().data.planId, installationId, releaseId: release.releaseId, moduleId: gameId, accountId: fixtures.owner.accountId,
+      })
+    } finally {
+      await workerDb.destroy()
+    }
+    const enable = (key: string) => app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/enable`, headers: {...headers, 'idempotency-key': `gubic-enable-${key}-${suffix}`}, payload: {},
+    })
+    const status = async () => (await db.selectFrom('greenfield_extension_installations').select('status')
+      .where('installation_id', '=', installationId).executeTakeFirstOrThrow()).status
+    const installedStatus = await status()
+    expect(installedStatus).not.toBe('enabling')
+
+    // Retired after install: enable refused, nothing queued.
+    await review('retired', 'unavailable')
+    const retired = await enable('retired')
+    expect(retired.statusCode, retired.body).toBe(403)
+    expect(retired.json().error).toMatchObject({code: 'FORBIDDEN', message: 'Game is not approved for catalogue installation'})
+
+    // Published again but now paid, and not owned: enable refused.
+    await review('published', 'available')
+    const now = new Date()
+    const offerId = `offer:${gameId}`
+    await db.insertInto('greenfield_offers').values({
+      offer_id: offerId, product_id: gameId, kind: 'ONE_TIME', display_name: 'Owned reference game',
+      capabilities: sql`${JSON.stringify([])}::jsonb`, commercial_terms: sql`${JSON.stringify({})}::jsonb`,
+      trial_duration_seconds: null, state: 'ACTIVE', created_by_account_id: admin.accountId, created_at: now, updated_at: now,
+    }).execute()
+    const unentitled = await enable('unentitled')
+    expect(unentitled.statusCode, unentitled.body).toBe(403)
+    expect(unentitled.json().error).toMatchObject({code: 'FORBIDDEN', message: 'An active game entitlement is required'})
+    expect(await status()).toBe(installedStatus)
+
+    // Published, available and entitled: enable is accepted.
+    await db.insertInto('greenfield_entitlements').values({
+      entitlement_id: `entitlement:${gameId}:${fixtures.owner.accountId}`, owner_type: 'ACCOUNT', owner_account_id: fixtures.owner.accountId,
+      owner_organisation_id: null, product_id: gameId, offer_id: offerId, source: 'ADMIN', state: 'ACTIVE',
+      external_receipt_id: null, provenance_reference: 'isolated-gubic-enable-qa', started_at: now, expires_at: null,
+      created_at: now, updated_at: now,
+    }).execute()
+    const allowed = await enable('allowed')
+    expect(allowed.statusCode, allowed.body).toBe(202)
+    expect(await status()).toBe('enabling')
+
+    // Non-game modules are not affected by the gate (no game projection).
+    const plain = nextId()
+    const plainBuilt = buildRelease(plain, '1.0.0')
+    await new GreenfieldGithubReleaseSyncService(db, plainBuilt.source).sync({repository: REPOSITORY, releaseTag: plainBuilt.tag, publish: true, dryRun: false})
+    const plainEnable = await app.inject({method: 'POST', url: `/v1/modules/${plain}/enable`, headers: {...headers, 'idempotency-key': `gubic-enable-plain-${suffix}`}, payload: {}})
+    expect(plainEnable.json().error?.message ?? '').not.toMatch(/catalogue|entitlement/)
+  }, 120_000)
 })
