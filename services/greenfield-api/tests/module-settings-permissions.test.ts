@@ -10,6 +10,7 @@ import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleSettingsService} from '../src/modules/settings-service.js'
 import {statusForError} from '../src/transport/envelope.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount} from './helpers/registry-fixtures.js'
+import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -52,6 +53,8 @@ describeIfDb.sequential('neutral module settings authorization matrix', () => {
     app = created.app
     db = created.db
     await app.ready()
+    // Online signing (GF-SIGN-01) requires reserved namespaces to be registry-authorized first-party policy.
+    await authorizeFirstPartyPublisherFixture(db, 'modula', 'Modula', 'modula.mp02settings')
     const owner = await registerAccount(app, `settings-owner-${suffix}@example.com`, `setown${suffix}`.slice(0, 20), db)
     const foreign = await registerAccount(app, `settings-foreign-${suffix}@example.com`, `setfor${suffix}`.slice(0, 20), db)
     accountId = owner.accountId

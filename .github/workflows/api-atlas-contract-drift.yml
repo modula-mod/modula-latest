@@ -85,6 +85,17 @@ jobs:
           node-version: 24.18.0
           cache: pnpm
           cache-dependency-path: modula-latest/pnpm-lock.yaml
+      - name: Migration numbering and runner order guard (GF-SIGN-02)
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "${BASE_REF}" ]; then
+            git fetch --no-tags --depth=1 origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+            node scripts/verify-migration-ordering.mjs --base-ref "origin/${BASE_REF}"
+          else
+            node scripts/verify-migration-ordering.mjs
+          fi
+          node --test scripts/verify-migration-ordering.test.mjs
       - name: Build pinned Module Standard contracts
         working-directory: modula-mod/modula-module-standard
         run: pnpm install --frozen-lockfile && pnpm build
@@ -245,3 +256,35 @@ jobs:
           tests/module-platform-02b.search-contract.test.ts
           tests/module-platform-02b.canonical-mutations.test.ts
           --maxWorkers=1 --no-file-parallelism
+      # GF-CALL-01: these suites are describe.skip without MODULA_TEST_DATABASE_URL,
+      # so the JSON report is checked to prove every test ran (none skipped).
+      - name: Messaging v3 and calls v1 database integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/messaging-v3.integration.test.ts
+          tests/calls.integration.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-call-01-api-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-call-01-api-vitest.json
+          tests/messaging-v3.integration.test.ts
+          tests/calls.integration.test.ts
+      - name: Calls v1 VoIP and push dispatch worker database integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-worker exec vitest run
+          tests/push.voip.test.ts
+          tests/push.dispatch.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-call-01-worker-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-call-01-worker-vitest.json
+          tests/push.voip.test.ts
+          tests/push.dispatch.test.ts
