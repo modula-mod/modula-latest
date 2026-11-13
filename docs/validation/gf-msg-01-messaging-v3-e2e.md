@@ -10,12 +10,14 @@ test tooling only.
 `tools/e2e/messaging-v3-two-account.mjs` stands up a throwaway stack and drives
 it end to end. It:
 
-1. refuses to start unless every URL is a literal loopback address
+1. refuses to start (exit 2) unless every URL is a literal loopback address
    (`127.0.0.1` or `[::1]`). `localhost`, any DNS name, `*.modula.digital` and
    `test.modula.*` are all refused (`tools/e2e/loopback-guard.mjs`). This is
-   stricter than the mission text, pending ATLAS confirmation;
+   stricter than the mission text, pending ATLAS confirmation. See *Safety
+   properties* below for the database URL rules;
 2. creates a fresh database `gf_msg_01_<run>` on the loopback Postgres and
-   applies the full migration chain;
+   applies the full migration chain (90 migrations on `a91d490e`; the count
+   follows whichever main it runs on);
 3. starts a **real API process** (`services/greenfield-api/dist/main.js`),
    bound to `127.0.0.1` on a free port, with a fixed development environment.
    It does not inherit the caller's `MODULA_*` variables, so a stray production
@@ -27,8 +29,10 @@ it end to end. It:
    from the messaging socket's `hello` frame;
 5. runs the scenario over HTTP and the messaging WebSocket (Node's built-in
    `WebSocket`, so there is no new dependency);
-6. stops the API and drops the database (`--keep-db` keeps it). Exit code: 0
-   when everything passed, 1 on a failed check, 2 when it refused to run.
+6. stops the API, removes the media temp dir and drops the database, but only
+   if this run created it (`--keep-db` keeps it). Exit code: 0 when
+   everything passed, 1 on a failed check, 2 when it refused to run, and
+   130/143 after SIGINT/SIGTERM (cleanup still runs).
 
 ## Run it (one command)
 
@@ -40,11 +44,39 @@ pnpm install --frozen-lockfile
 pnpm --filter "@modula/greenfield-api..." build
 MODULA_E2E_ADMIN_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55533/postgres \
   node tools/e2e/messaging-v3-two-account.mjs          # add --json for a machine-readable report
-node --test tools/e2e/loopback-guard.test.mjs          # guard unit tests
+node --test tools/e2e/loopback-guard.test.mjs tools/e2e/disposable-db.test.mjs   # guard + ownership tests
 ```
 
 The admin URL above is a dummy credential for a local throwaway cluster, not a
 secret. Never point this at a shared database.
+
+## Safety properties (SENTINEL #176 F1–F3)
+
+- **F1, loopback guard.** A database URL is accepted only if all of these hold:
+  - the scheme is `postgres:` or `postgresql:`;
+  - there is no query string and no fragment, with no allowlist, so `?host=`,
+    `?hostaddr=`, `?port=`, `ssl*` and `options` are all refused;
+  - there is no multi-host list and no percent-encoded host;
+  - there is an explicit port and a plain database name;
+  - the URL host is literally `127.0.0.1` or `[::1]`;
+  - `pg-connection-string`, the same copy `pg` loads, so no new dependency,
+    parses it to the same loopback host, port and database, with no
+    `hostaddr`.
+
+  API and socket URLs must be `http:`/`ws:` on a literal loopback host with
+  no credentials, query or fragment. The harness also clears `PG*` variables
+  from its own environment, and the API child gets a scrubbed environment.
+- **F2, ownership.** `tools/e2e/disposable-db.mjs` marks the database as
+  created only after `CREATE DATABASE` succeeds. There is no `IF NOT EXISTS`,
+  so a name collision fails the run. `DROP` runs only for a database this run
+  created, and at most once. A pre-existing database is never dropped:
+  `disposable-db.test.mjs` covers this with a recorder, plus a live collision
+  check when `MODULA_E2E_ADMIN_DATABASE_URL` is set.
+- **F3, signals.** SIGINT and SIGTERM run the same idempotent cleanup as a
+  normal exit: stop the API child, remove the media dir, drop the owned
+  database. The harness then exits 130/143. If a signal lands while
+  `CREATE DATABASE` is still in flight, the database is not yet marked owned
+  and is left behind rather than risk dropping something else.
 
 ## Acceptance matrix
 

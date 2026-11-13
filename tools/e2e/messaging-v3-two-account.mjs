@@ -29,7 +29,8 @@ import net from 'node:net'
 import {tmpdir} from 'node:os'
 import path from 'node:path'
 import {fileURLToPath, pathToFileURL} from 'node:url'
-import {assertLoopbackUrls} from './loopback-guard.mjs'
+import {assertLoopbackDatabaseUrls, assertLoopbackHttpUrls} from './loopback-guard.mjs'
+import {createOwnedDatabase, dropOwnedDatabase} from './disposable-db.mjs'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const apiDir = path.join(repoRoot, 'services', 'greenfield-api')
@@ -72,6 +73,9 @@ function log(line) { process.stderr.write(`${line}\n`) }
 // ------------------------------------------------------------- stack setup --
 
 const adminUrl = process.env.MODULA_E2E_ADMIN_DATABASE_URL
+// libpq-style PG* variables are defaults pg may fall back to; none may steer
+// the harness's own connections (the API child gets a scrubbed env anyway).
+for (const key of Object.keys(process.env)) if (/^PG[A-Z]/.test(key)) delete process.env[key]
 const requirePg = createRequire(path.join(apiDir, 'package.json'))
 
 function freePort() {
@@ -82,6 +86,37 @@ function freePort() {
       const {port} = server.address()
       server.close(() => resolve(port))
     })
+  })
+}
+
+/** Everything this run owns and must tear down, whichever way it ends. */
+const stack = {child: null, exited: null, mediaRoot: null, database: null}
+let cleanupPromise = null
+/** Idempotent cleanup: API child, media dir, and the database only if this run created it. */
+function cleanup(reason) {
+  if (!cleanupPromise) cleanupPromise = (async () => {
+    if (stack.child && stack.child.exitCode === null && stack.child.signalCode === null) {
+      stack.child.kill('SIGTERM')
+      await Promise.race([stack.exited, sleep(10_000)])
+      if (stack.child.exitCode === null && stack.child.signalCode === null) stack.child.kill('SIGKILL')
+    }
+    if (stack.mediaRoot) rmSync(stack.mediaRoot, {recursive: true, force: true})
+    if (stack.database?.created) {
+      if (keepDb && reason === 'finished') {
+        log(`kept database ${stack.database.name}`)
+      } else {
+        await withAdmin(client => dropOwnedDatabase(sql => client.query(sql), stack.database))
+          .catch(error => log(`warning: could not drop ${stack.database.name}: ${error.message}`))
+      }
+    }
+  })()
+  return cleanupPromise
+}
+for (const [signal, code] of [['SIGINT', 130], ['SIGTERM', 143]]) {
+  process.once(signal, () => {
+    log(`received ${signal}: cleaning up (API process, media dir, owned database) and exiting ${code}`)
+    const force = setTimeout(() => process.exit(code), 20_000)
+    cleanup('signal').finally(() => { clearTimeout(force); process.exit(code) })
   })
 }
 
@@ -119,11 +154,13 @@ async function startApi({databaseUrl, port, mediaRoot}) {
     MODULA_LOG_LEVEL: 'warn',
   }
   const child = spawn(process.execPath, [path.join(apiDir, 'dist', 'main.js')], {cwd: apiDir, env, stdio: ['ignore', 'pipe', 'pipe']})
+  stack.child = child
   let output = ''
   const capture = chunk => { output = (output + chunk.toString()).slice(-20_000) }
   child.stdout.on('data', capture)
   child.stderr.on('data', capture)
   const exited = new Promise(resolve => child.once('exit', code => resolve(code)))
+  stack.exited = exited
   const deadline = Date.now() + 30_000
   while (Date.now() < deadline) {
     if (child.exitCode !== null) throw new Error(`API exited during startup (code ${child.exitCode}):\n${output.slice(-4000)}`)
@@ -240,7 +277,7 @@ async function uploadVoice(token) {
 
 async function runScenario(port) {
   const socketUrl = `ws://127.0.0.1:${port}/v1/messaging/socket`
-  assertLoopbackUrls({socketUrl})
+  assertLoopbackHttpUrls({socketUrl})
   let alice, bob, outsider, dm, group
 
   await scenario('setup', 'register two accounts + outsider and connect them over HTTP only', async () => {
@@ -469,7 +506,7 @@ async function waitFor(predicate, label, timeoutMs = 3000) {
 }
 
 async function main() {
-  assertLoopbackUrls({MODULA_E2E_ADMIN_DATABASE_URL: adminUrl})
+  assertLoopbackDatabaseUrls({MODULA_E2E_ADMIN_DATABASE_URL: adminUrl})
   if (!existsSync(path.join(apiDir, 'dist', 'main.js'))) {
     throw new Error('services/greenfield-api/dist/main.js is missing; run `pnpm --filter @modula/greenfield-api... build` first')
   }
@@ -477,35 +514,31 @@ async function main() {
   const databaseUrl = databaseUrlFor(dbName)
   const port = await freePort()
   base = `http://127.0.0.1:${port}`
-  assertLoopbackUrls({databaseUrl, apiUrl: base})
-  const mediaRoot = mkdtempSync(path.join(tmpdir(), 'gf-msg-01-media-'))
-  let api = null
+  assertLoopbackDatabaseUrls({databaseUrl})
+  assertLoopbackHttpUrls({apiUrl: base})
+  stack.mediaRoot = mkdtempSync(path.join(tmpdir(), 'gf-msg-01-media-'))
   let fatal = null
   const started = Date.now()
   log(`GF-MSG-01 messaging v3 E2E — database ${dbName}, API ${base}`)
   try {
-    await withAdmin(client => client.query(`CREATE DATABASE "${dbName}"`))
+    // CREATE DATABASE fails on a name collision; only a database created here is ever dropped.
+    stack.database = {name: dbName, created: false}
+    stack.database = await withAdmin(client => createOwnedDatabase(sql => client.query(sql), dbName))
     const {migrateUp} = await import(pathToFileURL(path.join(apiDir, 'dist', 'database', 'migrate.js')).href)
     const applied = await migrateUp(databaseUrl)
     log(`migrations applied: ${applied.length} (tip ${applied.at(-1) ?? 'none'})`)
-    api = await startApi({databaseUrl, port, mediaRoot})
-    await runScenario(port)
+    const api = await startApi({databaseUrl, port, mediaRoot: stack.mediaRoot})
+    try {
+      await runScenario(port)
+    } catch (error) {
+      log(api.output().slice(-3000))
+      throw error
+    }
   } catch (error) {
     fatal = error
     log(`FATAL ${error?.stack ?? error}`)
-    if (api) log(api.output().slice(-3000))
   } finally {
-    if (api) {
-      api.child.kill('SIGTERM')
-      await Promise.race([api.exited, sleep(10_000)])
-      if (api.child.exitCode === null) api.child.kill('SIGKILL')
-    }
-    rmSync(mediaRoot, {recursive: true, force: true})
-    if (!keepDb) {
-      await withAdmin(client => client.query(`DROP DATABASE IF EXISTS "${dbName}" WITH (FORCE)`)).catch(error => log(`warning: could not drop ${dbName}: ${error.message}`))
-    } else {
-      log(`kept database ${dbName}`)
-    }
+    await cleanup('finished')
   }
   const summary = {
     mission: 'GF-MSG-01',
