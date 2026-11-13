@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "operation": "restore-drill",
+  "backupSetId": "gbv1-recovery-20261113T121000149Z",
+  "target": "file://<scratch>/offhost-fake-remote/greenfield-v1",
+  "sourceRevision": "a91d490e61ebfff38069378ddf757429eb000449",
+  "startedAt": "2026-11-13T12:10:01.174Z",
+  "completedAt": "2026-11-13T12:10:25.267Z",
+  "checks": [
+    {
+      "name": "off-host copy pulled and matches receipt + signed manifest",
+      "ok": true,
+      "detail": "5 files, signature valid"
+    },
+    {
+      "name": "recovery verify (decrypt + pg_restore --list + archive listing)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "recovery restore into isolated targets",
+      "ok": true,
+      "detail": "greenfield-core,greenfield-media"
+    },
+    {
+      "name": "schema_version equals signed manifest coverage",
+      "ok": true,
+      "detail": "090 vs 090"
+    },
+    {
+      "name": "inventory count accounts equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count registry equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count installations equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count events equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count jobs equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count entitlements equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count builds equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "inventory count accountDataRequests equals manifest",
+      "ok": true,
+      "detail": "0 vs 0"
+    },
+    {
+      "name": "restored migration ledger: zero pending and unknown vs checkout",
+      "ok": true,
+      "detail": "applied=90 source=90 pending=0 unknown=0"
+    },
+    {
+      "name": "restored migration tip equals checkout tip",
+      "ok": true,
+      "detail": "090_calls_v1 vs 090_calls_v1"
+    },
+    {
+      "name": "public table set equal to comparison DB",
+      "ok": true,
+      "detail": "381 vs 381"
+    },
+    {
+      "name": "per-table row counts equal comparison DB",
+      "ok": true,
+      "detail": "381 tables, 5715 rows, mismatched=0"
+    },
+    {
+      "name": "per-table content digests equal comparison DB",
+      "ok": true,
+      "detail": "mismatched=0"
+    },
+    {
+      "name": "role table grants equal comparison DB (ACL-preserving restore)",
+      "ok": true,
+      "detail": "2882 grants"
+    }
+  ]
+}
