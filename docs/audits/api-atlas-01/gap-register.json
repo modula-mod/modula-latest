@@ -949,7 +949,7 @@
       "domain": "testing",
       "type": "untested endpoint",
       "severity": "P2",
-      "title": "83 application routes have no statically matched automated test",
+      "title": "82 application routes have no statically matched automated test",
       "evidence": [
         "api-atlas.json#/routes"
       ],

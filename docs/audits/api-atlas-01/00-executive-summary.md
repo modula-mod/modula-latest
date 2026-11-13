@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 628 application / 891 runtime method routes
-Route evidence: local-candidate-runtime for feature branch andy/calls-1; not deployed
+Route evidence: local-candidate-runtime for feature branch mosaic/gf-mod-02; not deployed
 Public routes: 147
 Authenticated routes: 377
 Admin/internal routes: 104
@@ -15,7 +15,7 @@ Mutating routes: 366
 Read-only routes: 262
 Routes with request schemas: 106
 Routes with response schemas: 0
-Routes with automated tests: 545
+Routes with automated tests: 546
 Routes live-probed: 26 unique routes
 Routes with known callers: 250
 Database tables: 380
@@ -117,7 +117,7 @@ Every item above is expanded with evidence, impact, dependency and verification 
 ## Existing GreenField Capabilities Not Currently Used
 
 - Complete passkey/TOTP/recovery/session security APIs, developer/build coordination, module installation descriptors, generic verified MPS ModuleHost execution, and governed intelligence mission routes exist beyond current observed client usage.
-- 412 registered routes have no statically observed product-client caller; 341 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
+- 412 registered routes have no statically observed product-client caller; 342 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
 - Real AI provider adapters exist, but all real providers are unconfigured; only a development mock is available and excluded by the production resolver.
 
 ## Duplicate or Competing Implementations
