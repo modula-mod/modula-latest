@@ -1,6 +1,7 @@
 import {createHash, randomUUID} from 'node:crypto'
 import {ingestProductManifest} from '@modula/greenfield-product-standard'
 import {isSupportedModulePermission, manifestChecksum, type GreenfieldModuleManifest, type GreenfieldModulePermission} from '@modula/greenfield-module-manifest'
+import {gubicEngineAllowsGraphics, isGubicEngine} from '@modula/greenfield-module-registry-contracts'
 import type {ModulaDb} from '../database/client.js'
 import {readTarGz, TarGzError, type TarEntries} from '../lib/tar-gz.js'
 import {GreenfieldMpsIngestService, verifyPresentationAssetBytes} from '../product-standard/ingest-service.js'
@@ -8,6 +9,7 @@ import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModuleManifestService} from './manifest-service.js'
 import {GreenfieldModuleReleaseService, type GreenfieldModuleReleaseEvidence} from './release-service.js'
+import {assertWebGameContentPolicy, WebGameContentPolicyError} from '../gubic/web-game-csp.js'
 
 /**
  * Automated GitHub release ingestion. Given a repository and an immutable
@@ -230,31 +232,9 @@ export class GreenfieldGithubReleaseSyncService {
     const gameRuntime = mps.gameRuntime as Record<string, any> | undefined
     let game: VerifiedGithubRelease['game'] = null
     if (gameRuntime?.type === 'web-mini-game') {
-      const path = gameRuntime.artifact?.path
-      const digest = gameRuntime.artifact?.sha256
-      if (path !== 'game/game.tgz' || !/^[a-f0-9]{64}$/.test(digest ?? '')
-        || gameRuntime.artifact?.mediaType !== 'application/vnd.modula.game-web+tgz'
-        || gameRuntime.entryPath !== 'index.html'
-        || !['1.0.0', '1.1.0'].includes(gameRuntime.contractVersion)
-        || !['phaser', 'playcanvas'].includes(gameRuntime.engine)
-        || typeof gameRuntime.engineVersion !== 'string' || !gameRuntime.engineVersion.trim()
-        || gameRuntime.assetInventory !== 'game.files.json'
-        || gameRuntime.compressedSizeLimitBytes !== 50 * 1024 * 1024
-        || gameRuntime.minimumHostVersion !== '>=1.1.0'
-        || gameRuntime.network !== 'none' || gameRuntime.offline !== true
-        || !['any', 'portrait', 'landscape'].includes(gameRuntime.orientation)
-        || !['none', 'webgl2'].includes(gameRuntime.graphics)
-        || (gameRuntime.engine === 'playcanvas' && gameRuntime.graphics !== 'webgl2')
-        || typeof gameRuntime.touchControls !== 'string' || !gameRuntime.touchControls.trim()) {
-        throw moduleError('VALIDATION_FAILED', 'Web game runtime artifact contract is invalid')
-      }
-      if (gameRuntime.contractVersion === '1.1.0' && (!gameRuntime.runtimeDependency?.packageId ||
-          !gameRuntime.runtimeDependency?.versionRange ||
-          !mps.distribution?.dependencies?.some((dependency: any) =>
-            dependency.packageId === gameRuntime.runtimeDependency.packageId &&
-            dependency.versionRange === gameRuntime.runtimeDependency.versionRange))) {
-        throw moduleError('VALIDATION_FAILED', 'Externalized game runtime is missing from the package dependency closure')
-      }
+      assertWebGameRuntimeContract(gameRuntime, mps.distribution)
+      const path = gameRuntime.artifact.path as string
+      const digest = gameRuntime.artifact.sha256 as string
       const bytes = file(path)
       if (!bytes || bytes.length > 50 * 1024 * 1024 || sha256(bytes) !== digest) {
         throw moduleError('VALIDATION_FAILED', 'Web game artifact is missing, oversized, or has a mismatched digest')
@@ -462,6 +442,38 @@ export class GreenfieldGithubReleaseSyncService {
   }
 }
 
+/**
+ * Validates the signed `gameRuntime` contract of a `web-mini-game` release.
+ * Accepted engines come from the shared GUBIC engine definition; anything
+ * else (including Unity, Skia/CanvasKit or later-phase engines) is rejected.
+ */
+export function assertWebGameRuntimeContract(gameRuntime: Record<string, any>, distribution?: Record<string, any> | null): void {
+  const path = gameRuntime.artifact?.path
+  const digest = gameRuntime.artifact?.sha256
+  if (path !== 'game/game.tgz' || !/^[a-f0-9]{64}$/.test(digest ?? '')
+    || gameRuntime.artifact?.mediaType !== 'application/vnd.modula.game-web+tgz'
+    || gameRuntime.entryPath !== 'index.html'
+    || !['1.0.0', '1.1.0'].includes(gameRuntime.contractVersion)
+    || !isGubicEngine(gameRuntime.engine)
+    || typeof gameRuntime.engineVersion !== 'string' || !gameRuntime.engineVersion.trim()
+    || gameRuntime.assetInventory !== 'game.files.json'
+    || gameRuntime.compressedSizeLimitBytes !== 50 * 1024 * 1024
+    || gameRuntime.minimumHostVersion !== '>=1.1.0'
+    || gameRuntime.network !== 'none' || gameRuntime.offline !== true
+    || !['any', 'portrait', 'landscape'].includes(gameRuntime.orientation)
+    || !gubicEngineAllowsGraphics(gameRuntime.engine, gameRuntime.graphics)
+    || typeof gameRuntime.touchControls !== 'string' || !gameRuntime.touchControls.trim()) {
+    throw moduleError('VALIDATION_FAILED', 'Web game runtime artifact contract is invalid')
+  }
+  if (gameRuntime.contractVersion === '1.1.0' && (!gameRuntime.runtimeDependency?.packageId ||
+      !gameRuntime.runtimeDependency?.versionRange ||
+      !distribution?.dependencies?.some((dependency: any) =>
+        dependency.packageId === gameRuntime.runtimeDependency.packageId &&
+        dependency.versionRange === gameRuntime.runtimeDependency.versionRange))) {
+    throw moduleError('VALIDATION_FAILED', 'Externalized game runtime is missing from the package dependency closure')
+  }
+}
+
 export function verifyWebGameArchive(bytes: Buffer): void {
   if (bytes.length > 50 * 1024 * 1024) throw moduleError('VALIDATION_FAILED', 'Web game archive exceeds 50 MiB')
   let files: TarEntries
@@ -485,10 +497,12 @@ export function verifyWebGameArchive(bytes: Buffer): void {
     }
     if (inventory.files[path] !== sha256(files.get(path)!)) throw moduleError('VALIDATION_FAILED', `Web game member digest mismatch: ${path}`)
   }
-  const html = entry.toString('utf8')
-  if (!/Content-Security-Policy/i.test(html) || !/default-src 'none'/i.test(html)
-    || !/connect-src 'none'/i.test(html) || !/script-src 'self'/i.test(html)) {
-    throw moduleError('VALIDATION_FAILED', 'Web game entry lacks the required restrictive CSP')
+  // Parsed CSP (exactly one effective meta element, directive-level policy),
+  // no remote <script src>, and no eval()/new Function() in shipped scripts.
+  try { assertWebGameContentPolicy(files, 'index.html') }
+  catch (error) {
+    if (error instanceof WebGameContentPolicyError) throw moduleError('VALIDATION_FAILED', error.message)
+    throw error
   }
 }
 

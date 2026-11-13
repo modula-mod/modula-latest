@@ -832,6 +832,39 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       .rejects.toThrow(/append-only/)
   }, 120_000)
 
+  it('ingests a signed plain html5 test.modula game and refuses an unknown engine', async () => {
+    // test.modula.* is owned by the seeded first-party fixture publisher.
+    const namespace = `test.modula.gubic-p1-${suffix}`
+    const keys = generateKeyPairSync('ed25519')
+    const keyId = `gubic-p1-${suffix}`
+    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'"><canvas></canvas><script src="main.js"></script>')
+    const javascript = Buffer.from('document.querySelector("canvas").getContext("2d").fillRect(0,0,1,1)')
+    const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
+    const gameBytes = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', javascript), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
+    const build = (gameId: string, engine: string) => buildRelease(gameId, '0.1.0', {
+      sign: {keyId, privateKey: keys.privateKey},
+      mutateProduct: (mps) => {
+        mps.identity.kind = 'game'
+        mps.permissions = []
+        mps.gameRuntime = {
+          contractVersion: '1.0.0', type: 'web-mini-game', engine, engineVersion: 'canvas-2d',
+          entryPath: 'index.html', artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz'},
+          compressedSizeLimitBytes: 50 * 1024 * 1024, minimumHostVersion: '>=1.1.0', offline: true,
+          network: 'none', assetInventory: 'game.files.json', orientation: 'any', graphics: 'none', touchControls: 'pointer',
+        }
+      },
+      mutateFiles: files => { files['game/game.tgz'] = gameBytes },
+    })
+    const html5 = build(`${namespace}.reference-tap`, 'html5')
+    const synced = await new GreenfieldGithubReleaseSyncService(db, html5.source).sync({repository: REPOSITORY, releaseTag: html5.tag, publish: true, dryRun: false})
+    expect(synced).toMatchObject({signed: true, releaseState: 'published'})
+    const unknown = build(`${namespace}.unknown-engine`, 'unity')
+    await expect(new GreenfieldGithubReleaseSyncService(db, unknown.source).sync({repository: REPOSITORY, releaseTag: unknown.tag, publish: true, dryRun: false}))
+      .rejects.toThrow(/Web game runtime artifact contract is invalid/)
+    expect(await new GreenfieldModuleReleaseService(db).getRelease(`${namespace}.unknown-engine`, '0.1.0')).toBeUndefined()
+  }, 60_000)
+
   it('performs a governed rollback to the advertised trusted release', async () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `rollback-${suffix}`
