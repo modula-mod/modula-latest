@@ -13,6 +13,7 @@ import {ModuleBackendTokenService} from '../src/modules/backend/token-service.js
 import {ModuleBackendWebhookService} from '../src/modules/backend/webhook-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
+import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -44,6 +45,8 @@ describeIfDb('Phase 7E module backend runtime substrate', () => {
     configureTestEnv()
     await migrateUp(databaseUrl!)
     db = createDb(databaseUrl!)
+    // Online signing (GF-SIGN-01) requires reserved namespaces to be registry-authorized first-party policy.
+    await authorizeFirstPartyPublisherFixture(db, 'modula', 'Modula', 'modula.phase7e')
     config = loadConfig()
     const suffix = randomUUID().slice(0, 8)
     accountId = `backend-account-${suffix}`

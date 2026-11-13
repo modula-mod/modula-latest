@@ -41,6 +41,8 @@ export type PublisherReleaseStatement = {
   signingKeyId: string
 }
 
+export type PublisherReleaseApprovalFacts = Omit<PublisherReleaseStatement, 'signingKeyId'>
+
 export type ReleaseSignatureInput = {algorithm?: string; keyId: string; value: string}
 
 export type SignatureVerificationState = 'verified' | 'invalid' | 'unknownKey' | 'revokedKey'
@@ -74,8 +76,21 @@ export function buildPublisherReleaseStatement(input: {
   frontendSha256?: string | null
   signingKeyId: string
 }): PublisherReleaseStatement {
+  if (!KEY_ID.test(input.signingKeyId)) throw moduleError('VALIDATION_FAILED', 'Signed statement signingKeyId is malformed')
+  return {...buildPublisherReleaseApprovalFacts(input), signingKeyId: input.signingKeyId}
+}
+
+/** Immutable registry-verified facts approved before the online key is resolved. */
+export function buildPublisherReleaseApprovalFacts(input: {
+  manifest: GreenfieldModuleManifest
+  sourceSha: string
+  artifactSha256: string
+  productManifestSha256?: string | null
+  frontendSha256?: string | null
+}): PublisherReleaseApprovalFacts {
   const productManifestSha256 = input.productManifestSha256 ?? null
   const frontendSha256 = input.frontendSha256 ?? null
+  if (!/^[0-9a-f]{40}$/.test(input.sourceSha)) throw moduleError('VALIDATION_FAILED', 'Signed statement sourceSha must be an immutable 40-character commit')
   for (const [label, value] of [['artifactSha256', input.artifactSha256], ['productManifestSha256', productManifestSha256], ['frontendSha256', frontendSha256]] as const) {
     if (value !== null && !SHA256.test(value)) throw moduleError('VALIDATION_FAILED', `Signed statement ${label} must be a lowercase SHA-256`)
   }
@@ -92,8 +107,11 @@ export function buildPublisherReleaseStatement(input: {
     manifestSha256: signingManifestDigest(input.manifest),
     productManifestSha256,
     frontendSha256,
-    signingKeyId: input.signingKeyId,
   }
+}
+
+export function approvalFactsSha256(facts: PublisherReleaseApprovalFacts): string {
+  return createHash('sha256').update(Buffer.from(canonicalJsonStringify(facts), 'utf8')).digest('hex')
 }
 
 export function statementBytes(statement: PublisherReleaseStatement): Buffer {
