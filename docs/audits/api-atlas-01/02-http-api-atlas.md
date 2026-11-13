@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-13T12:12:08.208Z for branch `mosaic/gf-mod-02`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-13T12:28:03.799Z for branch `mosaic/gf-mod-02`; this does not claim deployment.
 
-- Runtime method routes: 891
-- Application routes: 628
-- Automatically generated HEAD routes: 262
+- Runtime method routes: 896
+- Application routes: 631
+- Automatically generated HEAD routes: 264
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `891 = 628 application + 263 framework-derived`
+- Reconciliation: `896 = 631 application + 265 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,10 +17,10 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 628 |
+| yes | yes | not yet | candidate-registered | 631 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 263 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 265 |
 
 ## Error contract
 
@@ -578,18 +578,21 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Modules | GET | `/v1/providers/:capabilityRole` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:28` | candidate-registered-not-production-probed |
 | Modules | PUT | `/v1/providers/:capabilityRole/default` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:32` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/providers/:capabilityRole/resolve` | AUTHENTICATED | none | `services/greenfield-api/src/providers/routes.ts:30` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/modules` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:87` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:88` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/modules/:moduleId/github-releases` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:90` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/modules/:moduleId/release-jobs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:91` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/publisher/modules/:moduleId/release-jobs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:95` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:89` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/release-jobs/:jobId` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:100` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/publisher/release-jobs/:jobId/cancel` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:112` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/publisher/release-jobs/:jobId/logs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:101` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/publisher/release-jobs/:jobId/publish` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:106` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/publisher/release-jobs/:jobId/resume` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:116` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/publisher/release-jobs/:jobId/validate` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:102` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:89` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:90` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/github-releases` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:92` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/release-jobs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:94` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/modules/:moduleId/release-jobs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:98` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/signing-identities` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:93` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/modules/:moduleId/versions` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:91` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/release-jobs/:jobId` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:103` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/cancel` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:129` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/release-jobs/:jobId/logs` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:104` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/publish` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:123` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/resume` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:133` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/sign` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:117` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/publisher/release-jobs/:jobId/signing` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:105` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/publisher/release-jobs/:jobId/validate` | PUBLIC | none | `services/greenfield-api/src/publisher/routes.ts:106` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/push/devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:59` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/push/devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:48` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/push/devices/:token` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:69` | candidate-registered-not-production-probed |
@@ -27329,7 +27332,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/modules`
 - Public URL: `https://api.modula.digital/v1/publisher/modules`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:87`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:89`
 - Handler: inline
 - Controller/service calls: `service.listModules`
 - Authentication: none
@@ -27378,7 +27381,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/modules/:moduleId`
 - Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:88`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:90`
 - Handler: inline
 - Controller/service calls: `service.moduleDetail`
 - Authentication: none
@@ -27427,7 +27430,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/modules/:moduleId/github-releases`
 - Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/github-releases`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:90`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:92`
 - Handler: inline
 - Controller/service calls: `service.githubReleases`
 - Authentication: none
@@ -27476,7 +27479,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/modules/:moduleId/release-jobs`
 - Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/release-jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:91`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:94`
 - Handler: inline
 - Controller/service calls: `service.listJobs`
 - Authentication: none
@@ -27525,7 +27528,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/modules/:moduleId/release-jobs`
 - Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/release-jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:95`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:98`
 - Handler: inline
 - Controller/service calls: `service.createJob`
 - Authentication: none
@@ -27567,6 +27570,55 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/publisher/modules/:moduleId/signing-identities</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/modules/:moduleId/signing-identities`
+- Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/signing-identities`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:93`
+- Handler: inline
+- Controller/service calls: `service.signingIdentities`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: `greenfield_developer_products`, `greenfield_developer_source_connections`, `greenfield_module_releases`, `greenfield_module_versions`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/publisher/modules/:moduleId/versions</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -27574,7 +27626,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/modules/:moduleId/versions`
 - Public URL: `https://api.modula.digital/v1/publisher/modules/:moduleId/versions`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:89`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:91`
 - Handler: inline
 - Controller/service calls: `service.versions`
 - Authentication: none
@@ -27623,7 +27675,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/release-jobs/:jobId`
 - Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:100`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:103`
 - Handler: inline
 - Controller/service calls: `service.getJob`
 - Authentication: none
@@ -27672,7 +27724,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/release-jobs/:jobId/cancel`
 - Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:112`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:129`
 - Handler: inline
 - Controller/service calls: `service.cancel`
 - Authentication: none
@@ -27721,7 +27773,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/release-jobs/:jobId/logs`
 - Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/logs`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:101`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:104`
 - Handler: inline
 - Controller/service calls: `service.logs`
 - Authentication: none
@@ -27770,7 +27822,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/release-jobs/:jobId/publish`
 - Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/publish`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:106`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:123`
 - Handler: inline
 - Controller/service calls: `service.publish`
 - Authentication: none
@@ -27819,7 +27871,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/release-jobs/:jobId/resume`
 - Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/resume`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:116`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:133`
 - Handler: inline
 - Controller/service calls: `service.resume`
 - Authentication: none
@@ -27861,6 +27913,104 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>POST /v1/publisher/release-jobs/:jobId/sign</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/publisher/release-jobs/:jobId/sign`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/sign`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:117`
+- Handler: inline
+- Controller/service calls: `service.requestSigning`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: `greenfield_publisher_release_jobs`, `greenfield_publisher_signing_audit_events`
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/publisher/release-jobs/:jobId/signing</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/publisher/release-jobs/:jobId/signing`
+- Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/signing`
+- API version: v1
+- Source file: `services/greenfield-api/src/publisher/routes.ts:105`
+- Handler: inline
+- Controller/service calls: `service.signingStatus`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/publisher-console.release-jobs.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>POST /v1/publisher/release-jobs/:jobId/validate</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -27868,7 +28018,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/publisher/release-jobs/:jobId/validate`
 - Public URL: `https://api.modula.digital/v1/publisher/release-jobs/:jobId/validate`
 - API version: v1
-- Source file: `services/greenfield-api/src/publisher/routes.ts:102`
+- Source file: `services/greenfield-api/src/publisher/routes.ts:106`
 - Handler: inline
 - Controller/service calls: `service.validate`
 - Authentication: none

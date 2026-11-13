@@ -8,6 +8,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import type {Database} from '../src/database/types.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleMediaBindingService} from '../src/modules/media-binding-service.js'
+import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -45,6 +46,7 @@ describeIf('MODULE-PLATFORM-02B media binding and record sharing', () => {
     app = created.app
     db = created.db
     await app.ready()
+    await authorizeFirstPartyPublisherFixture(db, 'audit', 'Audit Fixtures', 'audit.module')
     suffix = Date.now().toString(36)
     recordId = `record-${suffix}`
     owner = await registerAccount(`mp02b-owner-${suffix}@example.com`, `m2o${suffix}`.slice(0, 20))

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T12:12:08.208Z",
+  "capturedAt": "2026-11-13T12:28:03.799Z",
   "source": {
     "branch": "mosaic/gf-mod-02",
-    "headAtCapture": "a91d490e61ebfff38069378ddf757429eb000449",
+    "headAtCapture": "b370bc469a4817ce68416795527439016e80f335",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "6a75a2802c170e4743776dd202e05cf92d2b370f5f9a82fb7249e9c84931febf"
+    "apiSourceSha256": "47c766610ee104db9c849b2903d1f71921f9e5db2fb560cf1b77f2998b841d89"
   },
   "runtimeRoutes": [
     {
@@ -10580,6 +10580,24 @@
     },
     {
       "method": "GET",
+      "url": "/v1/publisher/modules/:moduleId/signing-identities",
+      "path": "/v1/publisher/modules/:moduleId/signing-identities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/modules/:moduleId/signing-identities",
+      "path": "/v1/publisher/modules/:moduleId/signing-identities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/publisher/modules/:moduleId/release-jobs",
       "path": "/v1/publisher/modules/:moduleId/release-jobs",
       "prefix": "",
@@ -10636,6 +10654,24 @@
       "method": "HEAD",
       "url": "/v1/publisher/release-jobs/:jobId/logs",
       "path": "/v1/publisher/release-jobs/:jobId/logs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/publisher/release-jobs/:jobId/signing",
+      "path": "/v1/publisher/release-jobs/:jobId/signing",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/publisher/release-jobs/:jobId/signing",
+      "path": "/v1/publisher/release-jobs/:jobId/signing",
       "prefix": "",
       "schema": null,
       "config": null,
@@ -10645,6 +10681,15 @@
       "method": "POST",
       "url": "/v1/publisher/release-jobs/:jobId/validate",
       "path": "/v1/publisher/release-jobs/:jobId/validate",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/publisher/release-jobs/:jobId/sign",
+      "path": "/v1/publisher/release-jobs/:jobId/sign",
       "prefix": "",
       "schema": null,
       "config": null,
