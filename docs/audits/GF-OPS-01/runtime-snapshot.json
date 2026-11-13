@@ -1,0 +1,41 @@
+{
+  "mission": "GF-OPS-01",
+  "schemaVersion": 1,
+  "capturedBy": "SENTINEL (read-only, unauthenticated public HTTPS GET + public DNS-over-HTTPS only)",
+  "captureWindowUtc": {"start": "2026-11-13T11:38:24Z", "end": "2026-11-13T11:38:27Z"},
+  "captureWindowGmtNote": "Europe/London is UTC+0 on 2026-11-13, so GMT == UTC for these values",
+  "sourceBaseline": {
+    "repository": "modula-mod/modula-latest",
+    "originMain": "a91d490e61ebfff38069378ddf757429eb000449",
+    "originMainTree": "8eb1f04d4658b61caf25d66a1c1dc785dc297a77",
+    "originMainMethod": "git ls-remote https://github.com/modula-mod/modula-latest refs/heads/main + fresh clone, 2026-11-13 ~11:37 GMT",
+    "migrationTip": "090_calls_v1",
+    "upMigrationCount": 90,
+    "duplicateUpMigrationNumbers": []
+  },
+  "fields": {
+    "api.revision": {"value": "a91d490e61ebfff38069378ddf757429eb000449", "status": "OBSERVED (self-reported)", "source": "GET https://api.modula.digital/v1/version and /version.json -> data.commit (from MODULA_RELEASE_SHA env)", "timestamp": "2026-11-13T11:38:26Z", "method": "unauthenticated HTTPS GET via Cloudflare edge, cf-cache-status DYNAMIC, cache-control no-store", "caveat": "Self-reported env value; OCI image label / image digest not observed."},
+    "api.releaseId": {"value": "greenfield-v1-a91d490e61eb", "status": "OBSERVED (self-reported)", "source": "/v1/version data.releaseId", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"},
+    "api.builtAt": {"value": "2026-11-11T01:18:10Z", "status": "OBSERVED (self-reported)", "source": "/v1/version data.builtAt", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"},
+    "api.expectedMigration": {"value": "090_calls_v1", "status": "OBSERVED (self-reported)", "source": "/v1/version data.expectedMigration (MODULA_EXPECTED_MIGRATION env)", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"},
+    "api.environment": {"value": "production", "status": "OBSERVED", "source": "/v1/version, /v1/meta", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"},
+    "api.health.live": {"value": "200 live", "status": "OBSERVED", "source": "/v1/health/live", "timestamp": "2026-11-13T11:38:25Z", "method": "public GET"},
+    "api.health.ready": {"value": "200 ready", "status": "OBSERVED", "source": "/v1/health/ready", "timestamp": "2026-11-13T11:38:25Z", "method": "public GET"},
+    "api.imageDigest": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "No host/docker access from SENTINEL box", "accessNeeded": "root-read on VPS: docker image inspect modula-greenfield-api:<sha> (RepoDigests, Labels)"},
+    "worker.revision": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "Public endpoints expose only the API's configured expectation for the worker (worker.expectedCommit=a91d490e...) and heartbeat age; not the worker's own heartbeat release SHA or image label", "accessNeeded": "DB read of greenfield_worker_heartbeats.release_sha (migration 062) or docker inspect modula-production-greenfield-worker-1 label org.opencontainers.image.revision"},
+    "worker.expectedCommitConfiguredInApi": {"value": "a91d490e61ebfff38069378ddf757429eb000449", "status": "OBSERVED (API config, not worker identity)", "source": "/v1/version data.worker.expectedCommit", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"},
+    "worker.heartbeat": {"value": "operational, lastSeenAt 2026-11-13T11:38:17.530Z, age 9s", "status": "OBSERVED", "source": "/v1/status components[worker]", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"},
+    "db.migrationLedgerTip": {"value": "090_calls_v1", "status": "INFERRED (not directly read)", "source": "/v1/health/ready == 200 while /v1/version expectedMigration == 090_calls_v1", "timestamp": "2026-11-13T11:38:25Z", "method": "services/greenfield-api/src/domains/system/health.ts:10-19 returns not-ready on unknown or pending migrations or when applied.at(-1) != MODULA_EXPECTED_MIGRATION; ready=200 therefore implies ledger tip == 090_calls_v1 with no pending/unknown, relative to the migrations bundled in the running image", "caveat": "Direct read of schema_migrations not performed; requires DB read access"},
+    "featureFlags.publicCapabilities": {"value": "see evidence/api_v1_meta.body", "status": "OBSERVED (public subset only)", "source": "/v1/meta capabilities", "timestamp": "2026-11-13T11:38:27Z", "method": "public GET", "highlights": {"mutations": true, "registration.mode": "open", "emailVerificationRequired": true, "inviteOnly": false, "atproto": false, "modules": false, "greenfieldModuleRegistry": true, "greenfieldModuleInstallation": true, "greenfieldModuleRemoteFunctions": false, "greenfieldModuleCommunityExecution": false, "greenfieldDimon": false, "greenfieldAiGateway": true, "modulaMail": true, "appleAuthentication": false, "mailProvisioner.mode": "disabled"}},
+    "featureFlags.MODULA_CALLS_ENABLED": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "Not exposed on any unauthenticated endpoint; calls routes require a session; /v1/meta has no calls capability key", "accessNeeded": "authenticated GET /v1/me/call-settings with a non-person audit identity, or read-only inspection of /etc/modula/greenfield-api.env NAME presence (values redacted)"},
+    "featureFlags.full": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "Env files /etc/modula/*.env not accessible", "accessNeeded": "root-read on VPS; record names + present/redacted only"},
+    "dns": {"value": "api/apex/www/pds.modula.digital -> A 104.21.27.33, 172.67.168.220; AAAA 2606:4700:3034::ac43:a8dc, 2606:4700:3036::6815:1b21 (Cloudflare proxied); no CNAME", "status": "OBSERVED", "source": "Cloudflare DoH (cloudflare-dns.com/dns-query), evidence/dns-doh-cloudflare.json", "timestamp": "2026-11-13T11:38:27Z", "method": "public DNS-over-HTTPS"},
+    "edge": {"value": "server: cloudflare; HSTS max-age=31536000; includeSubDomains; cf-cache-status DYNAMIC on all probed endpoints", "status": "OBSERVED", "source": "response headers", "timestamp": "2026-11-13T11:38:25Z", "method": "public GET"},
+    "originIp": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "Origin hidden behind Cloudflare proxy", "accessNeeded": "Cloudflare dashboard read or VPS access"},
+    "nginx.liveConfig": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "No host access; public probes cannot prove which location blocks (e.g. /v1/messaging/socket, /v1/calls/:id/signalling WebSocket) are installed", "accessNeeded": "root-read: nginx -T and diff against ops/nginx/api.modula.digital.greenfield.conf at a91d490e"},
+    "snapshots": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "No hosting-provider console or host access", "accessNeeded": "VPS provider snapshot list (read-only)"},
+    "backup.localLastSuccess": {"value": "UNKNOWN", "status": "UNKNOWN", "reason": "Marker /var/backups/modula/greenfield-v1/last-success.json not reachable", "accessNeeded": "root-read of marker + systemctl list-timers modula-greenfield-backup.timer"},
+    "backup.offHost": {"value": "UNKNOWN", "status": "UNKNOWN (source shows no off-host transport)", "reason": "No host access; and no off-host upload mechanism exists in ops/backup at a91d490e", "accessNeeded": "Owner evidence of an independent destination + restore proof"},
+    "publicStatus": {"value": "operational (api 10ms, database 1ms, worker 9s, jobs pending 0, mail pending 0)", "status": "OBSERVED", "source": "/v1/status", "timestamp": "2026-11-13T11:38:26Z", "method": "public GET"}
+  }
+}
