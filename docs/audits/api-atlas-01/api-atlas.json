@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "mosaic/gf-mod-01",
       "sourceSha256": "8deea02f9d3ddbd70c8d3901ac464a10cc82026bec8298f6ec053dfc0f53d4e1",
-      "capturedAt": "2026-11-13T12:33:10.928Z",
+      "capturedAt": "2026-11-13T13:21:28.521Z",
       "routeCount": 896
     },
     "status": "PASS"

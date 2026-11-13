@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T12:33:10.928Z",
+  "capturedAt": "2026-11-13T13:21:28.521Z",
   "source": {
     "branch": "mosaic/gf-mod-01",
-    "headAtCapture": "421ed1bd481a7c22fc5609dfb6d5a1ebbfb31189",
+    "headAtCapture": "ab7a83b29410eedc11c859389b342d0a630d272e",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "8deea02f9d3ddbd70c8d3901ac464a10cc82026bec8298f6ec053dfc0f53d4e1"
   },
