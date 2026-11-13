@@ -98,6 +98,43 @@ export class DiscoveryRepository {
     return out
   }
 
+  /**
+   * GF native endpoints: one reel by id. A reel is retrievable here only when it
+   * would appear in listReels for the same viewer (public, not deleted, has a
+   * ready video attachment, author not blocked/muted by or blocking the viewer,
+   * and readable under the post.read policy). Anything else is null (404).
+   */
+  async getReel(reelId: string, viewerActorId: string | null = null): Promise<ReelItemDto | null> {
+    const row = await this.db
+      .selectFrom('posts as p')
+      .select(['p.id', 'p.author_actor_id'])
+      .where('p.id', '=', reelId)
+      .where('p.deleted_at', 'is', null)
+      .where('p.audience', '=', 'public')
+      .where(({exists, selectFrom}) => exists(selectFrom('post_content as c')
+        .innerJoin('attachments as a', 'a.attachment_id', 'c.attachment_id')
+        .select('c.content_id').whereRef('c.post_id', '=', 'p.id')
+        .where('c.content_type', '=', 'video').where('a.status', '=', 'ready')))
+      .executeTakeFirst()
+    if (!row) return null
+    const excluded = await this.excludedActorIds(viewerActorId)
+    if (excluded.includes(row.author_actor_id)) return null
+    await publicIdentitiesForActors(this.db, [row.author_actor_id])
+    const post = await new PostRepository(this.db, this.publicApiUrl).getById(row.id, viewerActorId)
+    if (!post || !post.content?.some(block => block.type === 'video' && block.attachment.status === 'ready')) return null
+    return {
+      id: post.id,
+      author: post.author,
+      caption: post.text ?? '',
+      source: 'video-post',
+      colour: post.glowColour ?? '#111111',
+      liked: post.liked,
+      likeCount: post.likeCount,
+      replyCount: post.replyCount,
+      post,
+    }
+  }
+
   async listActivity(viewerActorId: string | null = null): Promise<ActivityItemDto[]> {
     const excluded = await this.excludedActorIds(viewerActorId)
     let query = this.db
