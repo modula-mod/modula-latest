@@ -10046,6 +10046,23 @@
       "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
     ]
   },
+  "GET /v1/publisher/modules/:moduleId/signing-identities": {
+    "reads": [
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedModule",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
+      "services/greenfield-api/src/publisher/release-job-service.ts#signingIdentities"
+    ]
+  },
   "GET /v1/publisher/modules/:moduleId/versions": {
     "reads": [
       "greenfield_developer_products",
@@ -10137,6 +10154,32 @@
       "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher",
       "services/greenfield-api/src/publisher/release-job-service.ts#resume",
       "services/greenfield-api/src/publisher/release-job-service.ts#startFetching"
+    ]
+  },
+  "POST /v1/publisher/release-jobs/:jobId/sign": {
+    "reads": [
+      "greenfield_publisher_release_jobs",
+      "greenfield_publisher_signing_audit_events"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#dto",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requestSigning",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requireOwnedJob",
+      "services/greenfield-api/src/publisher/release-job-service.ts#requirePublisher"
+    ]
+  },
+  "GET /v1/publisher/release-jobs/:jobId/signing": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/publisher/release-job-service.ts#signingStatus"
     ]
   },
   "POST /v1/publisher/release-jobs/:jobId/validate": {
