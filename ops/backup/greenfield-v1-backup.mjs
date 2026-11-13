@@ -2,6 +2,7 @@
 import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync} from 'node:fs'
 import {basename, dirname, join, resolve} from 'node:path'
 import {spawnSync} from 'node:child_process'
+import {commitBackupRun, offHostPushViaCli} from './greenfield-v1-backup-markers.mjs'
 
 process.umask(0o077)
 
@@ -81,8 +82,16 @@ try {
     backupDir: report.backupDir,
     payloadCount: report.payloadCount,
   }
-  writeFileSync(join(outputRoot, 'last-success.json'), `${JSON.stringify(marker, null, 2)}\n`, {mode: 0o600})
-  process.stdout.write(`${JSON.stringify({ok: true, ...marker})}\n`)
+  // GF-OPS-02: off-host copy (opt-in) first, last-success.json last; see greenfield-v1-backup-markers.mjs.
+  const committed = commitBackupRun({
+    outputRoot,
+    marker,
+    backupDir: report.backupDir,
+    pushOffHost: backupDir => offHostPushViaCli(join(repo, 'ops/backup/greenfield-v1-offhost.mjs'), backupDir, process.env),
+    redact: bounded,
+  })
+  if (committed.offhost.status === 'failed') process.stderr.write(`${JSON.stringify({ok: false, offhost: 'failed', error: committed.offhost.error})}\n`)
+  process.stdout.write(`${JSON.stringify({ok: true, ...committed})}\n`)
 } finally {
   rmSync(stage, {recursive: true, force: true})
 }

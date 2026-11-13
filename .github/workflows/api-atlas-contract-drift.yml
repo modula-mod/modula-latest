@@ -95,6 +95,8 @@ jobs:
         run: CI=true pnpm verify:greenfield-v1-permissions
       - name: GreenField v1 deployment and backup safety contract
         run: CI=true pnpm verify:greenfield-v1-deploy-safety
+      - name: GreenField v1 off-host backup copy contract (GF-OPS-02)
+        run: CI=true pnpm verify:greenfield-v1-offhost-backup
       - name: API tests
         run: CI=true pnpm api:test
       - name: Worker tests
