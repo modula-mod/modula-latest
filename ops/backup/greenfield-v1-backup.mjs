@@ -2,6 +2,7 @@
 import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync} from 'node:fs'
 import {basename, dirname, join, resolve} from 'node:path'
 import {spawnSync} from 'node:child_process'
+import {commitBackupRun, offHostPushViaCli} from './greenfield-v1-backup-markers.mjs'
 
 process.umask(0o077)
 
@@ -81,31 +82,18 @@ try {
     backupDir: report.backupDir,
     payloadCount: report.payloadCount,
   }
-  writeFileSync(join(outputRoot, 'last-success.json'), `${JSON.stringify(marker, null, 2)}\n`, {mode: 0o600})
-  process.stdout.write(`${JSON.stringify({ok: true, ...marker})}\n`)
-  if (process.env.MODULA_OFFHOST_BACKUP_ENABLED === '1') copyOffHost(report.backupDir, marker)
+  // GF-OPS-02: off-host copy (opt-in) first, last-success.json last; see greenfield-v1-backup-markers.mjs.
+  const committed = commitBackupRun({
+    outputRoot,
+    marker,
+    backupDir: report.backupDir,
+    pushOffHost: backupDir => offHostPushViaCli(join(repo, 'ops/backup/greenfield-v1-offhost.mjs'), backupDir, process.env),
+    redact: bounded,
+  })
+  if (committed.offhost.status === 'failed') process.stderr.write(`${JSON.stringify({ok: false, offhost: 'failed', error: committed.offhost.error})}\n`)
+  process.stdout.write(`${JSON.stringify({ok: true, ...committed})}\n`)
 } finally {
   rmSync(stage, {recursive: true, force: true})
-}
-
-// GF-OPS-02: opt-in off-host copy of the verified, already age-encrypted set.
-// Disabled unless MODULA_OFFHOST_BACKUP_ENABLED=1. A failed copy is recorded in
-// last-offhost-failure.json; it fails this run only when
-// MODULA_OFFHOST_BACKUP_REQUIRED=1 (otherwise the local set remains valid).
-function copyOffHost(backupDir, marker) {
-  const tool = join(repo, 'ops/backup/greenfield-v1-offhost.mjs')
-  const result = spawnSync(process.execPath, [tool, 'push', '--backup-dir', backupDir], {env: process.env, encoding: 'utf8', maxBuffer: 4 * 1024 * 1024})
-  const at = new Date().toISOString()
-  if (result.status === 0) {
-    const report = JSON.parse(result.stdout.trim().split('\n').at(-1))
-    writeFileSync(join(outputRoot, 'last-offhost-success.json'), `${JSON.stringify({format: 'modula.greenfield.offhost-success.v1', completedAt: at, sourceRevision: marker.sourceRevision, backupSetId: report.backupSetId, target: report.target, fileCount: report.fileCount}, null, 2)}\n`, {mode: 0o600})
-    process.stdout.write(`${JSON.stringify({ok: true, offhost: report})}\n`)
-    return
-  }
-  const error = bounded(result.stderr || result.stdout || 'off-host copy failed')
-  writeFileSync(join(outputRoot, 'last-offhost-failure.json'), `${JSON.stringify({format: 'modula.greenfield.offhost-failure.v1', failedAt: at, backupSetId: marker.backupSetId, error}, null, 2)}\n`, {mode: 0o600})
-  if (process.env.MODULA_OFFHOST_BACKUP_REQUIRED === '1') fail(`off-host copy failed: ${error}`)
-  process.stderr.write(`${JSON.stringify({ok: false, offhost: 'failed', error})}\n`)
 }
 
 function snapshotProductionConfiguration(destination) {

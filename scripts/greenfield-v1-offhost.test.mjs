@@ -143,3 +143,49 @@ test('ssh transport is non-interactive, host-key pinned and credential-free', ()
   assert.doesNotMatch(flat, /password|secret|AGE-SECRET-KEY/i)
   assert.equal(commands.at(-1)[1].at(-1), `backup@offhost.example:/srv/modula/greenfield-v1/${SET}.receipt.json`)
 })
+
+// Forge review of #175: last-success.json must be written after the off-host outcome is known.
+test('backup markers: off-host outcome first, last-success.json last, REQUIRED keeps the previous success marker', async () => {
+  const {commitBackupRun} = await import('../ops/backup/greenfield-v1-backup-markers.mjs')
+  const root = mkdtempSync(join(tmpdir(), 'gf-ops-02-markers-'))
+  const read = name => JSON.parse(readFileSync(join(root, name), 'utf8'))
+  const previous = {format: 'modula.greenfield.backup-success.v1', completedAt: '2026-11-12T00:00:00.000Z', sourceRevision: 'p'.repeat(40), backupSetId: 'gbv1-recovery-20261112T000000000Z'}
+  const marker = {format: 'modula.greenfield.backup-success.v1', completedAt: '2026-11-13T12:00:00.000Z', sourceRevision: 'a'.repeat(40), backupSetId: SET, backupDir: `/x/${SET}`, payloadCount: 2}
+  const reset = () => { for (const name of readdirSync(root)) rmSync(join(root, name)); writeFileSync(join(root, 'last-success.json'), JSON.stringify(previous)) }
+  const seenAtPush = []
+  const ok = () => { seenAtPush.push(read('last-success.json').backupSetId); return {ok: true, report: {backupSetId: SET, target: 'file:///off/gf', fileCount: 4}} }
+  const broken = () => { seenAtPush.push(read('last-success.json').backupSetId); return {ok: false, error: 'rsync failed postgres://user:pw@db/x'} }
+  const redact = value => String(value).replaceAll(/postgres:\/\/\S+/g, '[redacted-database-url]')
+  try {
+    reset()
+    let calls = 0
+    const disabled = commitBackupRun({outputRoot: root, marker, backupDir: marker.backupDir, env: {}, pushOffHost: () => { calls += 1 }, redact})
+    assert.equal(calls, 0)
+    assert.deepEqual(disabled.offhost, {status: 'disabled'})
+    assert.deepEqual(read('last-success.json'), {...marker, offhost: {status: 'disabled'}})
+    assert.deepEqual(readdirSync(root).sort(), ['last-success.json'])
+
+    reset()
+    const copied = commitBackupRun({outputRoot: root, marker, backupDir: marker.backupDir, env: {MODULA_OFFHOST_BACKUP_ENABLED: '1'}, pushOffHost: ok, redact})
+    assert.equal(seenAtPush.at(-1), previous.backupSetId, 'last-success.json must not be updated before the off-host copy finished')
+    assert.equal(copied.offhost.status, 'copied')
+    assert.equal(read('last-success.json').backupSetId, SET)
+    assert.equal(read('last-offhost-success.json').backupSetId, SET)
+
+    reset()
+    const failed = commitBackupRun({outputRoot: root, marker, backupDir: marker.backupDir, env: {MODULA_OFFHOST_BACKUP_ENABLED: '1'}, pushOffHost: broken, redact})
+    assert.equal(seenAtPush.at(-1), previous.backupSetId)
+    assert.equal(failed.offhost.status, 'failed')
+    assert.equal(read('last-success.json').offhost.status, 'failed', 'optional off-host: local success is recorded with the failure visible')
+    assert.equal(read('last-offhost-failure.json').error, 'rsync failed [redacted-database-url]')
+
+    reset()
+    assert.throws(() => commitBackupRun({outputRoot: root, marker, backupDir: marker.backupDir, env: {MODULA_OFFHOST_BACKUP_ENABLED: '1', MODULA_OFFHOST_BACKUP_REQUIRED: '1'}, pushOffHost: broken, redact}), /MODULA_OFFHOST_BACKUP_REQUIRED=1; last-success.json not updated/)
+    assert.deepEqual(read('last-success.json'), previous, 'required off-host failure must leave the previous success marker untouched')
+    assert.equal(read('last-offhost-failure.json').backupSetId, SET)
+    assert.deepEqual(readdirSync(root).filter(name => name.endsWith('.tmp')), [], 'no temp marker left behind')
+  } finally { rmSync(root, {recursive: true, force: true}) }
+  const wrapper = readFileSync('ops/backup/greenfield-v1-backup.mjs', 'utf8')
+  assert.ok(!wrapper.includes("'last-success.json'"), 'the backup wrapper must not write last-success.json itself')
+  assert.ok(wrapper.includes('commitBackupRun({'), 'the backup wrapper commits markers through commitBackupRun')
+})
