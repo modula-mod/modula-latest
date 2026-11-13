@@ -102,7 +102,7 @@
     "verify:mp02b-vault-special-cases": "node scripts/verify-mp02b-vault-special-cases.mjs",
     "verify:greenfield-v1-contract-freeze": "node scripts/verify-greenfield-v1-contract-freeze.mjs",
     "verify:greenfield-v1-permissions": "node scripts/verify-greenfield-v1-permissions.mjs",
-    "verify:greenfield-v1-deploy-safety": "node scripts/verify-greenfield-v1-deploy-safety.mjs",
+    "verify:greenfield-v1-deploy-safety": "node scripts/verify-greenfield-v1-deploy-safety.mjs && node --test scripts/verify-compose-release-pins.test.mjs",
     "verify:greenfield-v1-closeout": "pnpm verify:greenfield-v1-contract-freeze && pnpm verify:greenfield-v1-permissions && pnpm verify:greenfield-v1-deploy-safety && pnpm verify:mp02b-vault-special-cases && pnpm verify:api-atlas",
     "ops:greenfield-v1-health": "node scripts/greenfield-v1-health.mjs",
     "ops:greenfield-v1-load": "node tools/greenfield-closeout/mixed-load.mjs",

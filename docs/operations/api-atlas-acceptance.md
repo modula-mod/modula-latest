@@ -18,6 +18,7 @@ pnpm --filter @modula/greenfield-api build
 set -a
 . /etc/modula/api-atlas.env
 set +a
+eval "$(ops/deploy/running-release-env.sh)"  # release identity labels; compose has no defaults (GF-OPS-01)
 docker compose -f ops/docker/compose.production.yml run --rm --no-deps greenfield-api node services/greenfield-api/dist/cli/api-atlas-identities.js
 pnpm api:atlas:acceptance
 pnpm api:atlas:lineage

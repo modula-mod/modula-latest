@@ -19,7 +19,9 @@ reused while fixture rows exist.
 
 From the clean accepted `/root/modula-latest` checkout, with the accepted SHA
 as `SOURCE_RELEASE_SHA` and its actual image build timestamp as
-`SOURCE_BUILT_AT`, load `/etc/modula/api-atlas.env` into the shell without
+`SOURCE_BUILT_AT` (and the deployed tip as `SOURCE_EXPECTED_MIGRATION`; the
+production Compose file has no defaults - `eval "$(ops/deploy/running-release-env.sh)"`
+sets all three from the running API labels), load `/etc/modula/api-atlas.env` into the shell without
 printing values. Run the one-off production API image on the existing Compose
 network with `--no-deps --rm`, forwarding only `API_ATLAS_A_EMAIL`,
 `API_ATLAS_A_PASSWORD`, and `API_ATLAS_BASE_URL` by variable *name*. Invoke:
