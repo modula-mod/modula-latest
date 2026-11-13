@@ -81,9 +81,21 @@ CI enforces this with `pnpm verify:greenfield-v1-deploy-safety`
 The production worker has a Docker healthcheck
 (`ops/docker/greenfield-worker-heartbeat-healthcheck.cjs`, mounted read-only).
 It reads `greenfield_worker_heartbeats` with the worker's own database role and
-reports healthy only when a heartbeat for the container's `MODULA_RELEASE_SHA`
-(and `MODULA_WORKER_ID` when set), started after the container started, is at
-most 90 seconds old - the same threshold `/v1/status` uses for `operational`.
+reports healthy only when the heartbeat row of this worker - exact
+`MODULA_WORKER_ID` and `MODULA_RELEASE_SHA`, both required - started after the
+container started and is at most 90 seconds old (the same threshold
+`/v1/status` uses for `operational`). Compose pins
+`MODULA_WORKER_ID=greenfield-worker-<SOURCE_RELEASE_SHA>`, overriding any value
+in `/etc/modula/greenfield-worker.env`, so another process's heartbeat can never
+make this container read healthy. The service is single-instance: do not scale
+it, and give any one-off `compose run greenfield-worker` its own
+`MODULA_WORKER_ID`, because the id is also the job lease owner.
+
+A worker whose loop is blocked by a long job is reported **unhealthy on
+purpose** (fail-closed): until GF-OPS-01 (c) lands in the worker runtime the
+heartbeat, outbox drain and lease reaper all share the job loop, so a blocked
+loop is indistinguishable from a hung worker. See
+`docs/audits/GF-OPS-01/README.md`.
 It publishes no port and never prints the database URL. Override the threshold
 with `MODULA_WORKER_HEALTHCHECK_MAX_AGE_SECONDS` in the worker env file only
 with a recorded reason. An `unhealthy` worker is not restarted automatically;

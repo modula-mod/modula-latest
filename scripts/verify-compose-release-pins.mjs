@@ -8,7 +8,9 @@
  *   container that reports the wrong expected migration and fails readiness.
  * - No compose interpolation default in ops/docker may hard-code a migration id.
  * - The production worker must carry the heartbeat healthcheck (G033) without
- *   publishing a port.
+ *   publishing a port, with a fixed MODULA_WORKER_ID (no worker-<pid> fallback,
+ *   no optional default) that the healthcheck must match, and must stay a
+ *   single instance (a fixed id shared by replicas would mask a dead worker).
  * - The canonical backend verifier must not pin a literal schema version.
  *
  * Compose interpolation is emulated here (compose-spec rules for ${V}, ${V:-d},
@@ -124,15 +126,40 @@ export function checkComposeReleasePins({root = '.', read = path => readFileSync
     if (!/\n {4}healthcheck:\n {6}test: \['CMD', 'node', '\/opt\/modula\/healthcheck\/worker-heartbeat\.cjs'\]/.test(worker)) fail('greenfield-worker lacks the heartbeat healthcheck')
     if (!worker.includes('./greenfield-worker-heartbeat-healthcheck.cjs:/opt/modula/healthcheck/worker-heartbeat.cjs:ro')) fail('greenfield-worker healthcheck script is not mounted read-only')
     if (/\n {4}ports:/.test(worker)) fail('greenfield-worker must not publish ports')
+    checkWorkerId(worker, baseEnv, fail)
   }
   const probe = existsSync(join(root, 'ops/docker/greenfield-worker-heartbeat-healthcheck.cjs')) ? read('ops/docker/greenfield-worker-heartbeat-healthcheck.cjs') : ''
   if (!probe.includes('greenfield_worker_heartbeats')) fail('worker healthcheck does not read greenfield_worker_heartbeats')
   if (/\b(INSERT|UPDATE|DELETE|TRUNCATE|ALTER|DROP|CREATE)\b/.test(probe.replace(/\/\/.*$/gm, ''))) fail('worker healthcheck must be read-only')
+  const probeCode = probe.replace(/\/\/.*$/gm, '')
+  if (!/if \(!workerId\) return done\(false,/.test(probeCode)) fail('worker healthcheck must refuse when MODULA_WORKER_ID is unset')
+  if (!/if \(!releaseSha\) return done\(false,/.test(probeCode)) fail('worker healthcheck must refuse when MODULA_RELEASE_SHA is unset')
+  if (!/\bworker_id = \$2\b/.test(probeCode) || /\$2::text IS NULL/.test(probeCode)) fail('worker healthcheck must require an exact worker_id match')
+  if (!/\brelease_sha = \$1\b/.test(probeCode) || /\$1::text IS NULL/.test(probeCode)) fail('worker healthcheck must require an exact release_sha match')
 
   const verifier = read('scripts/verify-greenfield-backend-v1.mjs')
   if (/schema\s*===\s*'\d{3}'/.test(verifier)) fail('scripts/verify-greenfield-backend-v1.mjs pins a literal schema version')
 
   return {ok: failures.length === 0, failures}
+}
+
+export const WORKER_ID_LINE = /\n {6}MODULA_WORKER_ID: *(.*)\n/
+
+function checkWorkerId(worker, baseEnv, fail) {
+  const match = WORKER_ID_LINE.exec(worker)
+  if (!match) return fail('greenfield-worker does not set a fixed MODULA_WORKER_ID (worker falls back to worker-<pid>)')
+  const value = match[1].trim().replace(/^(['"])(.*)\1$/, '$2')
+  let items = []
+  try { items = expansions(value) } catch (error) { return fail(`greenfield-worker MODULA_WORKER_ID is not valid interpolation: ${error.message}`) }
+  for (const item of items) {
+    if (item.operator !== ':?' && !(item.nested && item.operator === '')) fail(`greenfield-worker MODULA_WORKER_ID must be a literal or built only from required variables, found ${item.raw}`)
+    else if (item.operator === ':?' && !REQUIRED_RELEASE_VARIABLES.includes(item.name)) fail(`greenfield-worker MODULA_WORKER_ID may only use release identity variables, found ${item.raw}`)
+  }
+  let rendered = ''
+  try { rendered = interpolate(value, baseEnv) } catch (error) { return fail(`greenfield-worker MODULA_WORKER_ID does not interpolate: ${error.message}`) }
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,159}$/.test(rendered)) fail(`greenfield-worker MODULA_WORKER_ID renders to an unusable id: ${JSON.stringify(rendered)}`)
+  if (/pid|hostname|\$\$/i.test(value)) fail('greenfield-worker MODULA_WORKER_ID must not depend on a process id or hostname')
+  if (/\n {4}(scale|replicas):|\n {6}replicas:/.test(worker)) fail('greenfield-worker must stay single-instance while it uses a fixed MODULA_WORKER_ID')
 }
 
 function serviceBlock(text, name) {

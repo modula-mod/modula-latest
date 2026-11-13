@@ -68,3 +68,49 @@ test('a literal schema pin in the canonical backend verifier fails', () => {
   }))
   assert.deepEqual(result.failures, ['scripts/verify-greenfield-backend-v1.mjs pins a literal schema version'])
 })
+
+// Forge review of #174 (b): without a fixed MODULA_WORKER_ID the worker uses worker-<pid>
+// (services/greenfield-worker/src/config.ts:8) and the healthcheck cannot match its own row.
+const HEALTHCHECK = 'ops/docker/greenfield-worker-heartbeat-healthcheck.cjs'
+const WORKER_ID = /\n {6}MODULA_WORKER_ID: [^\n]*/
+
+test('production worker id is fixed, release-scoped and required', () => {
+  const rendered = interpolate(real(PRODUCTION_COMPOSE), {SOURCE_RELEASE_SHA: 'a'.repeat(40), SOURCE_BUILT_AT: 'x', SOURCE_EXPECTED_MIGRATION: '999_fixture_tip'})
+  assert.match(rendered, new RegExp(`\\n {6}MODULA_WORKER_ID: greenfield-worker-${'a'.repeat(40)}\\n`))
+})
+
+test('a missing MODULA_WORKER_ID fails', () => {
+  const result = checkComposeReleasePins(variant({[PRODUCTION_COMPOSE]: text => text.replace(WORKER_ID, '')}))
+  assert.deepEqual(result.failures, ['greenfield-worker does not set a fixed MODULA_WORKER_ID (worker falls back to worker-<pid>)'])
+})
+
+test('an optional or defaulted MODULA_WORKER_ID fails', () => {
+  for (const value of ['${MODULA_WORKER_ID:-greenfield-worker}', '${WORKER_NAME}', 'greenfield-worker-${SOURCE_RELEASE_SHA:-dev}', '${MODULA_WORKER_ID:?set it}']) {
+    const result = checkComposeReleasePins(variant({[PRODUCTION_COMPOSE]: text => text.replace(WORKER_ID, `\n      MODULA_WORKER_ID: ${value}`)}))
+    assert.equal(result.ok, false, value)
+    assert.ok(result.failures.some(f => f.startsWith('greenfield-worker MODULA_WORKER_ID ')), `${value}\n${result.failures.join('\n')}`)
+  }
+})
+
+test('a fixed literal MODULA_WORKER_ID is accepted; a pid-shaped or empty one is not', () => {
+  const literal = checkComposeReleasePins(variant({[PRODUCTION_COMPOSE]: text => text.replace(WORKER_ID, '\n      MODULA_WORKER_ID: greenfield-worker-primary')}))
+  assert.deepEqual(literal.failures, [])
+  const pid = checkComposeReleasePins(variant({[PRODUCTION_COMPOSE]: text => text.replace(WORKER_ID, '\n      MODULA_WORKER_ID: worker-pid')}))
+  assert.ok(pid.failures.includes('greenfield-worker MODULA_WORKER_ID must not depend on a process id or hostname'), pid.failures.join('\n'))
+  const empty = checkComposeReleasePins(variant({[PRODUCTION_COMPOSE]: text => text.replace(WORKER_ID, "\n      MODULA_WORKER_ID: ''")}))
+  assert.ok(empty.failures.some(f => f.startsWith('greenfield-worker MODULA_WORKER_ID renders to an unusable id')), empty.failures.join('\n'))
+})
+
+test('scaling the worker while its id is fixed fails', () => {
+  const result = checkComposeReleasePins(variant({[PRODUCTION_COMPOSE]: text => text.replace(/(\n {4}image: modula-greenfield-worker:[^\n]*)/, '$1\n    scale: 2')}))
+  assert.ok(result.failures.includes('greenfield-worker must stay single-instance while it uses a fixed MODULA_WORKER_ID'), result.failures.join('\n'))
+})
+
+test('a healthcheck that accepts any worker id or release fails', () => {
+  const anyWorker = checkComposeReleasePins(variant({[HEALTHCHECK]: text => text.replace('AND worker_id = $2', 'AND ($2::text IS NULL OR worker_id = $2)')}))
+  assert.deepEqual(anyWorker.failures, ['worker healthcheck must require an exact worker_id match'])
+  const anyRelease = checkComposeReleasePins(variant({[HEALTHCHECK]: text => text.replace('WHERE release_sha = $1', 'WHERE ($1::text IS NULL OR release_sha = $1)')}))
+  assert.deepEqual(anyRelease.failures, ['worker healthcheck must require an exact release_sha match'])
+  const noRefusal = checkComposeReleasePins(variant({[HEALTHCHECK]: text => text.replace(/\n {2}if \(!workerId\) return done\(false,[^\n]*/, '')}))
+  assert.deepEqual(noRefusal.failures, ['worker healthcheck must refuse when MODULA_WORKER_ID is unset'])
+})

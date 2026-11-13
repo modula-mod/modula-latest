@@ -131,6 +131,12 @@ services:
       MODULA_RELEASE_ID: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
       MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:?SOURCE_EXPECTED_MIGRATION must be set to the exact target migration id}
       MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+      # Fixed, release-scoped worker identity (heartbeat row key and job lease
+      # owner). Without it the worker falls back to worker-<pid>, and the
+      # healthcheck could not tell this container's heartbeat from another
+      # process's. Single-instance service: do not scale it or `compose run` a
+      # second copy without overriding MODULA_WORKER_ID.
+      MODULA_WORKER_ID: greenfield-worker-${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
     volumes:
       - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
       - ./greenfield-worker-heartbeat-healthcheck.cjs:/opt/modula/healthcheck/worker-heartbeat.cjs:ro

@@ -3,10 +3,16 @@
 //
 // Uses the existing liveness mechanism only: the worker upserts its row in
 // greenfield_worker_heartbeats every 15 s (services/greenfield-worker/src/heartbeat).
-// The check passes when a heartbeat for this container's release, started after
-// this container started, is younger than the operational threshold used by
-// /v1/status (WORKER_OPERATIONAL_SECONDS = 90). No new port, no app code change,
-// read-only SELECT with the worker's own database role. Never prints the URL.
+// The check passes only when the heartbeat row of THIS worker (MODULA_WORKER_ID,
+// set to a fixed release-scoped value by compose.production.yml) for this
+// container's release (MODULA_RELEASE_SHA), started after this container started,
+// is younger than the operational threshold used by /v1/status
+// (WORKER_OPERATIONAL_SECONDS = 90). Both identifiers are required: without them
+// another process's heartbeat could make a dead worker read healthy, so the
+// check fails closed. A worker whose heartbeat goes stale because a long job
+// blocks its loop is reported unhealthy on purpose (see
+// docs/audits/GF-OPS-01/README.md). No new port, no app code change, read-only
+// SELECT with the worker's own database role. Never prints the URL.
 'use strict'
 const {createRequire} = require('node:module')
 const {readFileSync} = require('node:fs')
@@ -14,8 +20,8 @@ const {readFileSync} = require('node:fs')
 const appRoot = process.env.MODULA_HEALTHCHECK_APP_ROOT || '/app/'
 const maxAgeSeconds = Number(process.env.MODULA_WORKER_HEALTHCHECK_MAX_AGE_SECONDS || 90)
 const url = process.env.MODULA_DATABASE_URL
-const releaseSha = (process.env.MODULA_RELEASE_SHA || '').slice(0, 80) || null
-const workerId = process.env.MODULA_WORKER_ID ? process.env.MODULA_WORKER_ID.slice(0, 160) : null
+const releaseSha = (process.env.MODULA_RELEASE_SHA || '').slice(0, 80)
+const workerId = (process.env.MODULA_WORKER_ID || '').slice(0, 160)
 
 function done(ok, message) {
   process.stdout.write(`worker-heartbeat ${ok ? 'healthy' : 'unhealthy'}: ${message}\n`)
@@ -44,6 +50,8 @@ function containerStartedAtEpoch() {
 
 async function main() {
   if (!url) return done(false, 'MODULA_DATABASE_URL is not set')
+  if (!workerId) return done(false, 'MODULA_WORKER_ID is not set; refusing to accept any worker heartbeat')
+  if (!releaseSha) return done(false, 'MODULA_RELEASE_SHA is not set; refusing to accept any release heartbeat')
   if (!Number.isFinite(maxAgeSeconds) || maxAgeSeconds <= 0) return done(false, 'invalid max age')
   let pg
   try {
@@ -58,13 +66,13 @@ async function main() {
     const {rows} = await client.query(
       `SELECT EXTRACT(EPOCH FROM (now() - max(last_seen_at)))::float8 AS age_seconds, count(*)::int AS rows
          FROM greenfield_worker_heartbeats
-        WHERE ($1::text IS NULL OR release_sha = $1)
-          AND ($2::text IS NULL OR worker_id = $2)
+        WHERE release_sha = $1
+          AND worker_id = $2
           AND ($3::float8 IS NULL OR started_at >= to_timestamp($3::float8 - 5))`,
       [releaseSha, workerId, startedAt],
     )
     const age = rows[0]?.age_seconds
-    if (age === null || age === undefined) return done(false, `no heartbeat for release ${releaseSha ?? '(any)'} since container start`)
+    if (age === null || age === undefined) return done(false, `no heartbeat for worker ${workerId} on release ${releaseSha} since container start`)
     if (age > maxAgeSeconds) return done(false, `heartbeat age ${Math.round(age)}s > ${maxAgeSeconds}s`)
     return done(true, `heartbeat age ${Math.max(0, Math.round(age))}s`)
   } catch (error) {
