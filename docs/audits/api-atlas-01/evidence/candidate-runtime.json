@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-11T00:56:18.502Z",
+  "capturedAt": "2026-11-13T12:01:18.592Z",
   "source": {
-    "branch": "andy/calls-1",
-    "headAtCapture": "1d4fde84008c3a20ebae137c9aea0f2a2c853e52",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "9b720217e17ba12e6fa3cc4170f4ad08372b259b250f0861946683b8fdba10cb"
+    "branch": "mosaic/gf-mod-01",
+    "headAtCapture": "a91d490e61ebfff38069378ddf757429eb000449",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "9b168fc953b458bbbe43468d06ae5d5b11ff4167b960674639f445aba321889b"
   },
   "runtimeRoutes": [
     {
