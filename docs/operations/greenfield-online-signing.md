@@ -111,3 +111,39 @@ MODULA_TEST_DATABASE_URL=postgresql://... CI=true pnpm --filter @modula/greenfie
 The non-production Vault Notes `2.1.0-rc.4` fixture uses artifact SHA-256 `727c718436f97baf9562d3bc0562c24704362a1962c97704c409f1ecdb7b5aca` and temporary disposable test material. With signing key ID `fixture-vault-notes-online-2026-01`, the canonical `modula.publisher-release.v1` statement SHA-256 is `6995c0114955b13121bd06024dacdb49acee1557d0cd332b08cd7cc4f69a597a`.
 
 That digest changes when the authorized online key ID changes. The fixture signature is not an official Modula signature, is not registered in production and must not be published or substituted for the offline signature.
+
+## GF-SIGN-01: migration number 091 and rollback
+
+PR #165 originally shipped this schema as `089_greenfield_online_signing_authority`, cut from a base before
+`089_messaging_v3` and `090_calls_v1` landed on main. The runner (`src/database/migrate.ts`) orders up
+migrations by filename and records the file stem in `schema_migrations`; there is no separate registry or
+manifest. The only other places that pin migration identity are the ledger tests
+(`tests/api-fix-01.migration.test.ts`, `tests/greenfield-backend-v1.migration-ledger-security.test.ts`) and
+the generated API atlas. The schema is restaged unchanged as `091_greenfield_online_signing_authority`, which
+is the next free number. It writes `schema_version = '091'` and its `.down.sql` restores `'090'`. 091 touches
+only publisher signing objects, the `greenfield_publisher_release_jobs` signing columns and constraints, and
+`publisher.release-job.sign` background jobs. It touches no messaging (089) or calls (090) objects.
+
+The old id `089_greenfield_online_signing_authority` was never merged to main. A disposable database that
+applied it from the #165 branch reports that id as `unknown` in `migrateStatus`. Rebuild that database, or run
+the #165 down migration from that branch first. Do not rename a ledger row, and do not add the old id to
+`KNOWN_LEGACY_MIGRATIONS` without architecture approval.
+
+Rollback of 091 (staging and disposable databases; production only with owner approval):
+
+1. Roll back the feature first. Set `MODULA_ONLINE_SIGNING_ENABLED=false` for the API and worker, and stop the
+   publisher signing consumer.
+2. Take a backup before any schema rollback, and keep it with the audit evidence. Use `pg_dump` with `-t` for
+   `greenfield_publisher_online_signing_identities`, `greenfield_publisher_signing_authorizations` and
+   `greenfield_publisher_signing_audit_events`, plus the signing columns of `greenfield_publisher_release_jobs`.
+3. Roll back only while 091 is the ledger tip: `pnpm --filter @modula/greenfield-api db:rollback` runs once
+   and removes 091. Never roll back 090 or 089 to reach 091.
+4. Verify that `schema_version` is `090`, that `migrateStatus` reports `pending = [091_greenfield_online_signing_authority]`,
+   and that the calls and messaging v3 tables are still present.
+
+The `.down.sql` is destructive. It drops the online identities, the authorizations and the append-only signing
+audit trail. It drops the release-job approval, request and receipt columns. It cancels queued sign jobs and
+moves `ready_for_signing`, `signing` and `signing_failed` jobs to `failed`. It never publishes a release.
+Registry public keys, signing-key events and release-signature rows from earlier migrations are retained.
+After any real online signature exists, prefer a forward-fix migration. The down migration does not recover
+audit facts, and only the backup in step 2 preserves them.
