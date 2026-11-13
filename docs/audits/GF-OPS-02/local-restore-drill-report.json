@@ -1,11 +1,11 @@
 {
   "ok": true,
   "operation": "restore-drill",
-  "backupSetId": "gbv1-recovery-20261113T121000149Z",
+  "backupSetId": "gbv1-recovery-20261113T124518931Z",
   "target": "file://<scratch>/offhost-fake-remote/greenfield-v1",
-  "sourceRevision": "a91d490e61ebfff38069378ddf757429eb000449",
-  "startedAt": "2026-11-13T12:10:01.174Z",
-  "completedAt": "2026-11-13T12:10:25.267Z",
+  "sourceRevision": "7110693f3a7d730e0b2619c685d7b25f7c373784",
+  "startedAt": "2026-11-13T12:45:20.107Z",
+  "completedAt": "2026-11-13T12:45:42.936Z",
   "checks": [
     {
       "name": "off-host copy pulled and matches receipt + signed manifest",
