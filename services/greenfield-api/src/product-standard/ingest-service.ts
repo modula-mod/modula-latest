@@ -75,6 +75,8 @@ export class GreenfieldMpsIngestService {
       throw moduleError('VALIDATION_FAILED', 'frontend.mode none cannot ingest a frontend artifact')
     }
     const assetBytes = verifyPresentationAssetBytes(product.presentationAssets, input.assets ?? [])
+    // GF-MOD-02 (G004): never record presentation metadata without its bytes.
+    await assertPresentationAssetBlobsAvailable(this.db, product.presentationAssets, assetBytes)
     const frontendBytes = input.frontend
       ? Buffer.isBuffer(input.frontend.bytes) ? input.frontend.bytes : Buffer.from(input.frontend.bytes)
       : null
@@ -430,6 +432,34 @@ export function verifyPresentationAssetBytes(
     verified.push({path: item.path, sha256, mediaType: matches[0]!.mediaType, bytes})
   }
   return verified
+}
+
+/**
+ * GF-MOD-02 (G004): every declared presentation asset must be backed by bytes,
+ * either supplied and verified in this ingestion or already stored in the
+ * content-addressed blob table under the digest the manifest declares. A
+ * declaration without a digest can only be satisfied by supplied bytes.
+ * Read-only; runs before any ingestion write so a rejection leaves no rows.
+ */
+export async function assertPresentationAssetBlobsAvailable(
+  db: any,
+  declared: Array<{path: string; sha256?: string}>,
+  verified: Array<{path: string; sha256: string}>,
+): Promise<void> {
+  const supplied = new Set(verified.map(asset => asset.path))
+  const unsupplied = declared.filter(asset => !supplied.has(asset.path))
+  if (!unsupplied.length) return
+  const withoutDigest = unsupplied.find(asset => !asset.sha256)
+  if (withoutDigest) {
+    throw moduleError('VALIDATION_FAILED', `Presentation asset ${withoutDigest.path} has no bytes and no declared SHA-256 to resolve a stored blob`)
+  }
+  const digests = [...new Set(unsupplied.map(asset => asset.sha256!))]
+  const stored = await db.selectFrom('greenfield_release_asset_blobs').select('sha256').where('sha256', 'in', digests).execute() as Array<{sha256: string}>
+  const present = new Set(stored.map(row => row.sha256))
+  const missing = unsupplied.filter(asset => !present.has(asset.sha256!))
+  if (missing.length) {
+    throw moduleError('VALIDATION_FAILED', `Presentation asset bytes are required: ${missing.map(asset => asset.path).join(', ')}`)
+  }
 }
 
 async function storeAssetBlobs(db: any, assets: VerifiedAssetBytes[]) {
