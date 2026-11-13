@@ -216,10 +216,15 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
   })
 })
 
-function readProduct(name: string): {bytes: string; frontend: {path: string; bytes: Buffer} | null} {
+function readProduct(name: string): {bytes: string; frontend: {path: string; bytes: Buffer} | null; assets: Array<{path: string; bytes: Buffer}>} {
   const root = join(fixtures, name)
   const bytes = readFileSync(join(root, 'modula.product.json'), 'utf8')
-  const manifest = JSON.parse(bytes) as {frontend?: {artifact?: {path?: unknown}}}
+  const manifest = JSON.parse(bytes) as {frontend?: {artifact?: {path?: unknown}}; presentation?: Record<string, any>}
   const path = typeof manifest.frontend?.artifact?.path === 'string' ? manifest.frontend.artifact.path : null
-  return {bytes, frontend: path ? {path, bytes: readFileSync(join(root, path))} : null}
+  // GF-MOD-02: ingestion requires the bytes of every declared presentation asset.
+  const presentation = manifest.presentation ?? {}
+  const declared = [...(presentation.assets ?? []), ...(presentation.screenshots ?? []),
+    presentation.icon, presentation.logo, presentation.wordmark, presentation.cover, presentation.hero].filter(Boolean) as Array<{path: string}>
+  const assets = [...new Set(declared.map(asset => asset.path))].map(assetPath => ({path: assetPath, bytes: readFileSync(join(root, assetPath))}))
+  return {bytes, frontend: path ? {path, bytes: readFileSync(join(root, path))} : null, assets}
 }

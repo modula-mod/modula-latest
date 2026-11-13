@@ -42,6 +42,7 @@ import {
 } from './version-switch-service.js'
 import {allRuntimePermissionKeys} from './runtime2-service.js'
 import {resolvePackageClosure} from './package-closure-resolver.js'
+import {presentationAssetsMissingBlobs} from './presentation-blob-gaps.js'
 
 export type DistributionHostContext = {
   hostVersion?: string | null
@@ -868,11 +869,18 @@ export class GreenfieldModuleDistributionService {
       .where('presentation.asset_id', 'is', null)
       .orderBy('blob.created_at')
       .execute()
+    // GF-MOD-02 (G004): the inverse gap, metadata that references missing bytes.
+    const missingPresentation = await presentationAssetsMissingBlobs(this.db)
     return {
       mode: 'DRY_RUN' as const,
       count: rows.length,
       bytes: rows.reduce((sum, row) => sum + row.byte_size, 0),
       artifacts: rows.map(row => ({sha256: row.sha256, contentType: row.media_type, size: row.byte_size, createdAt: row.created_at.toISOString()})),
+      missingPresentationBlobs: {
+        count: missingPresentation.length,
+        releases: new Set(missingPresentation.map(gap => gap.releaseId ?? `${gap.productId}@${gap.version}`)).size,
+        assets: missingPresentation,
+      },
     }
   }
 

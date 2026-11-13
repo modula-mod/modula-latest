@@ -20,6 +20,7 @@ import {moduleError} from './module-errors.js'
 import {GreenfieldModulePublisherService} from './publisher-service.js'
 import type {VerifiedGithubRelease} from './github-release-sync-service.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
+import {presentationAssetsMissingBlobs} from './presentation-blob-gaps.js'
 import {isModuleIdentityAlias, moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
@@ -627,6 +628,11 @@ export class GreenfieldModuleReleaseService {
     if (release.releaseState === 'pendingReview') release = await this.verifyRelease(moduleId, version)
     if (release.releaseState !== 'verified') {
       throw moduleError('VALIDATION_FAILED', `Release ${moduleId}@${version} cannot be published from ${release.releaseState}`)
+    }
+    // GF-MOD-02 (G004): do not publish presentation metadata whose bytes are not stored.
+    const presentationGaps = await presentationAssetsMissingBlobs(this.db, {releaseId: release.releaseId})
+    if (presentationGaps.length) {
+      throw moduleError('VALIDATION_FAILED', `Release ${moduleId}@${version} has presentation assets without stored bytes: ${presentationGaps.map(gap => gap.path).join(', ')}`)
     }
     const now = new Date()
     const sourceVersion = Math.floor(now.getTime() / 1000)

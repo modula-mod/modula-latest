@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "synapse/gf-sign-01",
-      "sourceSha256": "98826bbec44409a9fc89dd922cbbb70f71770f3a87e6726101df7d095a880012",
-      "capturedAt": "2026-11-13T11:42:47.858Z",
+      "branch": "mosaic/gf-mod-02",
+      "sourceSha256": "47c766610ee104db9c849b2903d1f71921f9e5db2fb560cf1b77f2998b841d89",
+      "capturedAt": "2026-11-13T12:34:17.748Z",
       "routeCount": 896
     },
     "status": "PASS"
@@ -10721,7 +10721,8 @@
         "clients": [],
         "server": [],
         "tests": [
-          "scripts/verify-greenfield-mps-v1.mjs"
+          "scripts/verify-greenfield-mps-v1.mjs",
+          "services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts"
         ]
       },
       "automatedTest": true,
@@ -11772,9 +11773,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -70161,6 +70164,7 @@
           "services/greenfield-api/src/modules/registry-presentation-service.ts"
         ],
         "tests": [
+          "services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
         ]
@@ -70284,6 +70288,7 @@
           "services/greenfield-api/src/modules/registry-presentation-service.ts"
         ],
         "tests": [
+          "services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
         ]
@@ -70412,6 +70417,7 @@
           "services/greenfield-api/src/modules/registry-presentation-service.ts"
         ],
         "tests": [
+          "services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts"
         ]
@@ -110106,8 +110112,10 @@
         "services/greenfield-api/src/modules/distribution-service.ts",
         "services/greenfield-api/src/modules/gubic-service.ts",
         "services/greenfield-api/src/modules/install-descriptor-service.ts",
+        "services/greenfield-api/src/modules/presentation-blob-gaps.ts",
         "services/greenfield-api/src/modules/registry-presentation-service.ts",
-        "services/greenfield-api/src/modules/registry-service.ts"
+        "services/greenfield-api/src/modules/registry-service.ts",
+        "services/greenfield-api/src/product-standard/ingest-service.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/modules/github-release-sync-service.ts",
@@ -110528,6 +110536,7 @@
       "migrationIntroduced": "054_greenfield_mps_v1_product_contract.sql",
       "sourceReads": [
         "services/greenfield-api/src/modules/distribution-service.ts",
+        "services/greenfield-api/src/modules/presentation-blob-gaps.ts",
         "services/greenfield-api/src/modules/registry-presentation-service.ts",
         "services/greenfield-api/src/modules/registry-trust-service.ts",
         "services/greenfield-api/src/product-standard/ingest-service.ts"
