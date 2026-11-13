@@ -1,4 +1,5 @@
 import {sql} from 'kysely'
+import {GUBIC_RUNTIME_CATEGORIES} from '@modula/greenfield-module-registry-contracts'
 import type {
   GubicAvailability,
   GubicCatalogueEntryInput,
@@ -30,9 +31,8 @@ export type GubicListFilters = {
 const ORIGINS = new Set<GubicGameOrigin>([
   'modula-developed', 'external-open-source', 'independent-publisher', 'commercial-publisher',
 ])
-const RUNTIMES = new Set<GubicRuntimeCategory>([
-  'html5-javascript', 'phaser', 'playcanvas', 'browser-runtime', 'streamed',
-])
+// Derived from the shared GUBIC engine definition (one list for catalogue, submission and ingestion).
+const RUNTIMES = new Set<GubicRuntimeCategory>(GUBIC_RUNTIME_CATEGORIES)
 const AVAILABILITIES = new Set<GubicAvailability>([
   'available', 'coming-soon', 'unavailable', 'region-restricted',
 ])
