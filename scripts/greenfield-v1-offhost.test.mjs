@@ -230,3 +230,26 @@ test('restore drill staging: resolved-path containment refuses traversal, prefix
   assert.ok(drill.includes('resolveDrillStaging(required(\'staging\')'), 'restore drill uses resolved-path containment')
   assert.ok(!/test\(staging\)/.test(drill), 'no substring test on the staging path remains')
 })
+
+// Forge review of #175: the local drill hard-coded SENTINEL workspace paths.
+test('local drill is parameterised with safe defaults and refuses non-loopback databases', () => {
+  const script = 'docs/audits/GF-OPS-02/local-drill.sh'
+  const text = readFileSync(script, 'utf8')
+  assert.equal(spawnSync('bash', ['-n', script]).status, 0, 'drill parses')
+  assert.ok(!/\/workspace\/|sentinel-gate-01|\/home\//.test(text), 'no machine-specific absolute paths')
+  assert.equal([...text.matchAll(/127\.0\.0\.1:55491/g)].length, 2, 'loopback port appears only in the documented default')
+  for (const name of ['GF_OPS02_REPO', 'GF_OPS02_PG_ADMIN_URL', 'GF_OPS02_LOG_DIR', 'GF_OPS02_SCRATCH_DIR', 'GF_OPS02_NODE_MODULES', 'GF_OPS02_AGE_BIN_DIR']) assert.ok(text.includes(`\${${name}`), name)
+  assert.ok(text.includes('--staging "$MODULA_RESTORE_DRILL_ROOT/stage"'), 'drill stages inside the containment root')
+  const scratch = mkdtempSync(join(tmpdir(), 'gf-ops-02-drillparams-'))
+  try {
+    for (const url of ['postgres://u@db.example.com:5432/postgres', 'postgres://u@10.0.0.5:5432/postgres', 'postgres://u@127.0.0.1.evil.example:5432/postgres']) {
+      const run = spawnSync('bash', [script], {encoding: 'utf8', env: {...process.env, GF_OPS02_PG_ADMIN_URL: url, GF_OPS02_SCRATCH_DIR: scratch, GF_OPS02_LOG_DIR: join(scratch, 'logs')}})
+      assert.equal(run.status, 2, url)
+      assert.match(run.stderr, /REFUSING: GF_OPS02_PG_ADMIN_URL must point at a loopback disposable server/, url)
+    }
+    const noPg = spawnSync('bash', [script], {encoding: 'utf8', env: {...process.env, GF_OPS02_NODE_MODULES: join(scratch, 'none'), GF_OPS02_SCRATCH_DIR: scratch, GF_OPS02_LOG_DIR: join(scratch, 'logs')}})
+    assert.equal(noPg.status, 2)
+    assert.match(noPg.stderr, /pg not found under GF_OPS02_NODE_MODULES/)
+    assert.deepEqual(readdirSync(scratch), [], 'refused runs create nothing')
+  } finally { rmSync(scratch, {recursive: true, force: true}) }
+})

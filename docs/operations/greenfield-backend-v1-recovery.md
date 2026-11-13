@@ -86,8 +86,9 @@ behavior; and removes every generated fixture.
 Every copy of a recovery set on the VPS is lost with the VPS (SPOF register,
 "Backup destination"). `ops/backup/greenfield-v1-offhost.mjs` copies a
 verified set off the host. It never decrypts and adds no plaintext: before
-copying it checks the manifest HMAC (when `MODULA_RECOVERY_SIGNING_KEY` is
-present, as it is for the backup service), that every file is declared by the
+copying it checks the manifest HMAC with `MODULA_RECOVERY_SIGNING_KEY` (fail
+closed: `push`, `pull` and `check` refuse to run without the key, and `pull`
+stages nothing; there is no opt-out), that every file is declared by the
 signed manifest, that every payload starts with the age header, and that every
 ciphertext digest matches. The destination receives the set under
 `<target>/<set-id>/` and then `<target>/<set-id>.receipt.json`, written last
@@ -111,9 +112,13 @@ its own directory; append-only or object-lock storage on the destination is
 recommended so a compromised VPS cannot delete history.
 
 When enabled, `ops/backup/greenfield-v1-backup.mjs` pushes each verified set
-after writing `last-success.json` and records `last-offhost-success.json` or
-`last-offhost-failure.json` in the output root. A failure is fatal only with
-`MODULA_OFFHOST_BACKUP_REQUIRED=1`; otherwise the local set stays valid and the
+first, records `last-offhost-success.json` or `last-offhost-failure.json`, and
+only then writes `last-success.json` (atomically; its `offhost.status` is
+`disabled`, `copied` or `failed`). With `MODULA_OFFHOST_BACKUP_REQUIRED=1` an
+off-host failure fails the run and `last-success.json` is not updated, so it
+keeps pointing at the previous fully successful run (and the deploy gate's
+freshness check fails). Without it the local set stays valid,
+`last-success.json` is written with `offhost.status: "failed"`, and the
 failure marker must be alerted on. Off-host retention is managed at the
 destination; the local retention job does not delete off-host copies.
 
@@ -141,7 +146,12 @@ node ops/backup/greenfield-v1-restore-drill.mjs \
   --report /var/lib/modula/restore-drill/report.json
 ```
 
-The drill pulls the committed off-host copy into an empty isolated staging
+`--staging` must resolve (symlinks included) strictly inside
+`MODULA_RESTORE_DRILL_ROOT` (default `/var/lib/modula/restore-drill`, a dedicated
+directory whose name contains restore/recovery/dr/drill/test as a segment) and
+must not overlap the backup output root, a `file://` off-host target or the
+checkout; `..` traversal, sibling-prefix names and escaping symlinks are refused.
+The drill pulls the committed off-host copy into that empty isolated staging
 directory, verifies it against the receipt and signed manifest, runs the
 recovery tool's `verify` and `restore` (targets must be empty and named
 restore/recovery/DR/test), then checks schema version and inventory counts
@@ -153,4 +163,5 @@ report and the date as `last_restore_test_at` only when it exits 0.
 
 `CI=true pnpm verify:greenfield-v1-offhost-backup` covers the copy contract
 against a local fake remote (disabled default, dry-run, receipt-last commit,
-tamper/plaintext/undeclared-file/forged-signature refusal, SSH argv).
+tamper/plaintext/undeclared-file/forged-signature refusal, missing signing key
+refusal, marker ordering, staging containment, drill parameters, SSH argv).
