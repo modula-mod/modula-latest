@@ -82,7 +82,11 @@ describeIfDb('GF-MOD-01 artifact closure and fail-closed install preview', () =>
    * Returns a cleanup that removes the corrupt rows and revalidates.
    */
   async function corruptBlob(digest: string, releaseId: string) {
-    const admin = createDb(adminDatabaseUrl!)
+    // The admin URL may name a maintenance database (CI uses /postgres); keep
+    // its superuser credentials but target this suite's test database.
+    const privilegedUrl = new URL(adminDatabaseUrl!)
+    privilegedUrl.pathname = new URL(databaseUrl!).pathname
+    const admin = createDb(privilegedUrl.toString())
     const checks = await sql<{conname: string; def: string}>`
       SELECT conname, pg_get_constraintdef(oid) AS def FROM pg_constraint
       WHERE conrelid = 'greenfield_release_asset_blobs'::regclass AND contype = 'c'
