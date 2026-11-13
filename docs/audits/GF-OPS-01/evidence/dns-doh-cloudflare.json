@@ -1,0 +1,74 @@
+{
+  "api.modula.digital-A": {
+    "status": 0,
+    "answers": [
+      "172.67.168.220",
+      "104.21.27.33"
+    ]
+  },
+  "api.modula.digital-AAAA": {
+    "status": 0,
+    "answers": [
+      "2606:4700:3034::ac43:a8dc",
+      "2606:4700:3036::6815:1b21"
+    ]
+  },
+  "api.modula.digital-CNAME": {
+    "status": 0,
+    "answers": []
+  },
+  "modula.digital-A": {
+    "status": 0,
+    "answers": [
+      "104.21.27.33",
+      "172.67.168.220"
+    ]
+  },
+  "modula.digital-AAAA": {
+    "status": 0,
+    "answers": [
+      "2606:4700:3036::6815:1b21",
+      "2606:4700:3034::ac43:a8dc"
+    ]
+  },
+  "modula.digital-CNAME": {
+    "status": 0,
+    "answers": []
+  },
+  "pds.modula.digital-A": {
+    "status": 0,
+    "answers": [
+      "172.67.168.220",
+      "104.21.27.33"
+    ]
+  },
+  "pds.modula.digital-AAAA": {
+    "status": 0,
+    "answers": [
+      "2606:4700:3034::ac43:a8dc",
+      "2606:4700:3036::6815:1b21"
+    ]
+  },
+  "pds.modula.digital-CNAME": {
+    "status": 0,
+    "answers": []
+  },
+  "www.modula.digital-A": {
+    "status": 0,
+    "answers": [
+      "104.21.27.33",
+      "172.67.168.220"
+    ]
+  },
+  "www.modula.digital-AAAA": {
+    "status": 0,
+    "answers": [
+      "2606:4700:3034::ac43:a8dc",
+      "2606:4700:3036::6815:1b21"
+    ]
+  },
+  "www.modula.digital-CNAME": {
+    "status": 0,
+    "answers": []
+  }
+}

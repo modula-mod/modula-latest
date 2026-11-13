@@ -1,0 +1,28 @@
+HTTP/2 200 
+date: Fri, 13 Nov 2026 11:38:27 GMT
+content-type: application/json; charset=utf-8
+server: cloudflare
+vary: Accept-Encoding
+vary: Origin
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-xss-protection: 0
+x-request-id: 84cabd3f-d4b8-4c95-8990-3026480b1b6d
+x-ratelimit-limit: 120
+x-ratelimit-remaining: 119
+x-ratelimit-reset: 60
+cache-control: no-store
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=37RIxyOfoS1Bgsr2apczpje3zpkaf8R%2FrKiQSH9qPcyS1%2BMEMGwMawi%2BcWFk%2FtATQq9au3XoukZYpf5y6On2ZXaCmvv40UwUpbqlR39%2FMOFDvDGcU1mHfWPl8jm%2B6T1v5FFvICwYKkUEotimAi1TYp4%3D"}]}
+cf-cache-status: DYNAMIC
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cf-ray: a59d7d7e5d90064d-IAD
+alt-svc: h3=":443"; ma=86400
+
