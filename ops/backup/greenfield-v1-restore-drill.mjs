@@ -11,6 +11,10 @@
  *    the checkout, and (optional, disposable sources only) every public table's
  *    row count and content digest plus role grants equal a comparison DB.
  *
+ * --staging must resolve strictly inside MODULA_RESTORE_DRILL_ROOT (default
+ * /var/lib/modula/restore-drill) and must not overlap the backup output root,
+ * a file:// off-host target or the checkout (greenfield-v1-drill-paths.mjs).
+ *
  * Never point --compare-url-env at production; it is for drills whose source is
  * itself a disposable database. Prints no connection strings.
  *
@@ -23,6 +27,7 @@ import {dirname, join, resolve} from 'node:path'
 import {spawnSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {parseTarget, pull} from './greenfield-v1-offhost.mjs'
+import {DEFAULT_DRILL_ROOT, resolveDrillStaging} from './greenfield-v1-drill-paths.mjs'
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const args = parseArgs(process.argv.slice(2))
@@ -31,9 +36,12 @@ const record = (name, ok, detail = '') => { checks.push({name, ok: Boolean(ok), 
 
 try {
   const setId = required('set')
-  const staging = resolve(required('staging'))
-  if (!/(restore|recovery|(^|[._/-])dr([._/-]|$)|test|drill)/i.test(staging)) throw new Error('staging path is not positively identified as an isolated drill path')
   const target = parseTarget(process.env.MODULA_OFFHOST_BACKUP_TARGET)
+  // Resolved-path containment under the dedicated drill root (no substring/prefix matching).
+  const staging = resolveDrillStaging(required('staging'), {
+    root: process.env.MODULA_RESTORE_DRILL_ROOT || DEFAULT_DRILL_ROOT,
+    avoid: [process.env.MODULA_RECOVERY_OUTPUT_ROOT || '/var/backups/modula/greenfield-v1', target.kind === 'file' ? target.path : '', repo],
+  })
   const config = JSON.parse(readFileSync(resolve(required('config')), 'utf8'))
   const targetsPath = resolve(required('targets'))
   const targets = JSON.parse(readFileSync(targetsPath, 'utf8'))

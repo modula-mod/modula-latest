@@ -189,3 +189,44 @@ test('backup markers: off-host outcome first, last-success.json last, REQUIRED k
   assert.ok(!wrapper.includes("'last-success.json'"), 'the backup wrapper must not write last-success.json itself')
   assert.ok(wrapper.includes('commitBackupRun({'), 'the backup wrapper commits markers through commitBackupRun')
 })
+
+// Forge review of #175: restore-drill staging used an unanchored substring check.
+test('restore drill staging: resolved-path containment refuses traversal, prefix and symlink tricks', async () => {
+  const {resolveDrillStaging} = await import('../ops/backup/greenfield-v1-drill-paths.mjs')
+  const {symlinkSync} = await import('node:fs')
+  const base = mkdtempSync(join(tmpdir(), 'gf-ops-02-paths-'))
+  const root = join(base, 'restore-drill')
+  mkdirSync(root)
+  mkdirSync(join(base, 'outside'))
+  symlinkSync(join(base, 'outside'), join(root, 'escape'))
+  const outContained = /must be strictly inside MODULA_RESTORE_DRILL_ROOT/
+  try {
+    assert.equal(resolveDrillStaging(join(root, 'stage'), {root}), join(root, 'stage'))
+    assert.equal(resolveDrillStaging(join(root, 'a', 'b', 'stage'), {root}), join(root, 'a', 'b', 'stage'), 'not-yet-created nested dir is fine')
+    assert.equal(resolveDrillStaging(join(root, 'x', '..', 'stage'), {root}), join(root, 'stage'), 'normalised inside root is fine')
+    assert.equal(resolveDrillStaging(join(root, '..foo'), {root}), join(root, '..foo'), 'a name that merely starts with .. is still inside')
+    for (const bad of [
+      root, // the root itself
+      `${root}/`,
+      join(root, '..'), // parent
+      join(root, '..', 'outside', 'stage'), // traversal
+      join(root, 'a', '..', '..', 'outside'), // deeper traversal
+      `${root}-evil/stage`, // sibling prefix trick
+      `${root}evil`, // bare prefix trick
+      join(base, 'latest', 'stage'), // old regex accepted any path containing "test"
+      join(base, 'drill-but-not-root'), // old regex accepted any path containing "drill"
+      '/var/backups/modula/greenfield-v1/restore', // old regex accepted "restore" anywhere
+      join(root, 'escape', 'stage'), // symlink inside root pointing outside
+    ]) assert.throws(() => resolveDrillStaging(bad, {root}), outContained, bad)
+    assert.throws(() => resolveDrillStaging('', {root}), /staging path is required/)
+    assert.throws(() => resolveDrillStaging(join(root, 's'), {root: 'relative/restore-drill'}), /must be an absolute path/)
+    for (const broad of ['/', '/tmp', '/var/lib/modula', '/var/backups/modula', '/root']) assert.throws(() => resolveDrillStaging(`${broad}/x/stage`, {root: broad}), /dedicated directory/, broad)
+    assert.throws(() => resolveDrillStaging(join(base, 'latest', 's'), {root: join(base, 'latest')}), /must identify a restore drill directory/)
+    assert.throws(() => resolveDrillStaging(join(root, 'stage'), {root, avoid: [join(root, 'stage', 'offhost')]}), /overlaps a protected path/)
+    assert.throws(() => resolveDrillStaging(join(root, 'stage', 'deeper'), {root, avoid: [join(root, 'stage')]}), /overlaps a protected path/)
+    assert.equal(resolveDrillStaging(join(root, 'stage'), {root, avoid: [join(base, 'outside'), `${root}-stage`]}), join(root, 'stage'))
+  } finally { rmSync(base, {recursive: true, force: true}) }
+  const drill = readFileSync('ops/backup/greenfield-v1-restore-drill.mjs', 'utf8')
+  assert.ok(drill.includes('resolveDrillStaging(required(\'staging\')'), 'restore drill uses resolved-path containment')
+  assert.ok(!/test\(staging\)/.test(drill), 'no substring test on the staging path remains')
+})
