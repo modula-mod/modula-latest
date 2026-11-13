@@ -85,6 +85,17 @@ jobs:
           node-version: 24.18.0
           cache: pnpm
           cache-dependency-path: modula-latest/pnpm-lock.yaml
+      - name: Migration numbering and runner order guard (GF-SIGN-02)
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ -n "${BASE_REF}" ]; then
+            git fetch --no-tags --depth=1 origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+            node scripts/verify-migration-ordering.mjs --base-ref "origin/${BASE_REF}"
+          else
+            node scripts/verify-migration-ordering.mjs
+          fi
+          node --test scripts/verify-migration-ordering.test.mjs
       - name: Build pinned Module Standard contracts
         working-directory: modula-mod/modula-module-standard
         run: pnpm install --frozen-lockfile && pnpm build
