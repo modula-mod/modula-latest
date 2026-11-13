@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T12:47:22.393Z",
+  "capturedAt": "2026-11-13T13:26:53.558Z",
   "source": {
     "branch": "mosaic/gubic-p1-html5-engine",
-    "headAtCapture": "d2b43629f8d6a8621a0cc6c90e026add252ba6d0",
+    "headAtCapture": "f859f35684283daae3d2e9172de16926be3ddca7",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "2ab598fe459c61e43d3adee6abccbbf6d841d79c54a08154f27b96664928690d"
+    "apiSourceSha256": "3ea858f31fef4dbba04c099cf4cffc50082c3ed2f5e32b06f2c53faec529317b"
   },
   "runtimeRoutes": [
     {
