@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-13T12:26:57.833Z for branch `mosaic/gf-mod-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-13T12:33:10.928Z for branch `mosaic/gf-mod-01`; this does not claim deployment.
 
 - Runtime method routes: 896
 - Application routes: 631

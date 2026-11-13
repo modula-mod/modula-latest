@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T12:26:57.833Z",
+  "capturedAt": "2026-11-13T12:33:10.928Z",
   "source": {
     "branch": "mosaic/gf-mod-01",
-    "headAtCapture": "5330a58f301d2a0d1d7f489dd1265691cf45dca9",
-    "worktreeDirtyAtCapture": true,
+    "headAtCapture": "421ed1bd481a7c22fc5609dfb6d5a1ebbfb31189",
+    "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "8deea02f9d3ddbd70c8d3901ac464a10cc82026bec8298f6ec053dfc0f53d4e1"
   },
   "runtimeRoutes": [
