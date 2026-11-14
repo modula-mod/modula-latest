@@ -25,6 +25,12 @@ Critical module/distribution mappings are frozen as follows:
 | `ARTIFACT_DIGEST_MISMATCH` | 409 | Stored/downloaded bytes do not match registry truth. |
 | `RATE_LIMITED` | 429 | Bounded rejection; response includes `Retry-After`. |
 
+Authentication amendment (GF-AUTH resumable verification, additive code):
+
+| Code | HTTP | Meaning |
+|---|---:|---|
+| `EMAIL_VERIFICATION_REQUIRED` | 403 | Correct password for an account whose email is not yet verified; `details` carries a fresh `challengeId`, `expiresAt` and `delivery`. Previously this case returned `INVALID_CREDENTIALS` (401). |
+
 `NOTE_REVISION_CONFLICT` is the sole bounded compatibility alias and maps to
 canonical `REVISION_CONFLICT`. New code must emit the canonical value.
 
