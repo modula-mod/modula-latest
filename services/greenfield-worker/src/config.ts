@@ -12,6 +12,10 @@ const envSchema = z.object({
   MODULA_WORKER_EMPTY_POLL_BACKOFF_MS: z.coerce.number().int().positive().default(5_000),
   MODULA_WORKER_LEASE_DURATION_MS: z.coerce.number().int().positive().default(60_000),
   MODULA_WORKER_LEASE_REAP_INTERVAL_MS: z.coerce.number().int().positive().default(30_000),
+  // GF-OPS-01(c): renew a running job's lease on its own timer. Defaults to a third of the lease.
+  MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: z.coerce.number().int().positive().optional(),
+  // GF-OPS-01(c): liveness heartbeat on its own timer, independent of the job loop.
+  MODULA_WORKER_HEARTBEAT_INTERVAL_MS: z.coerce.number().int().min(1_000).max(60_000).default(15_000),
   MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS: z.coerce.number().int().positive().default(2_000),
   MODULA_WORKER_OUTBOX_BATCH_SIZE: z.coerce.number().int().positive().default(50),
   MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
@@ -91,6 +95,10 @@ export type WorkerConfig = {
   emptyPollBackoffMs: number
   leaseDurationMs: number
   leaseReapIntervalMs: number
+  /** How often a running job's lease is extended; always below leaseDurationMs. */
+  leaseRenewIntervalMs: number
+  /** How often the liveness heartbeat is written, independent of the job loop. */
+  heartbeatIntervalMs: number
   outboxDrainIntervalMs: number
   outboxBatchSize: number
   eventSubscriberTimeoutMs: number
@@ -154,6 +162,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     }
   }
 
+  const leaseRenewIntervalMs = raw.MODULA_WORKER_LEASE_RENEW_INTERVAL_MS ?? Math.max(1, Math.floor(raw.MODULA_WORKER_LEASE_DURATION_MS / 3))
+  if (leaseRenewIntervalMs >= raw.MODULA_WORKER_LEASE_DURATION_MS) {
+    refuse('MODULA_WORKER_LEASE_RENEW_INTERVAL_MS must be shorter than MODULA_WORKER_LEASE_DURATION_MS')
+  }
+
   const environment = raw.MODULA_ENVIRONMENT
   if (environment !== 'development' && raw.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES) {
     refuse('GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES is only valid in development')
@@ -212,6 +225,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     emptyPollBackoffMs: raw.MODULA_WORKER_EMPTY_POLL_BACKOFF_MS,
     leaseDurationMs: raw.MODULA_WORKER_LEASE_DURATION_MS,
     leaseReapIntervalMs: raw.MODULA_WORKER_LEASE_REAP_INTERVAL_MS,
+    leaseRenewIntervalMs,
+    heartbeatIntervalMs: raw.MODULA_WORKER_HEARTBEAT_INTERVAL_MS,
     outboxDrainIntervalMs: raw.MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS,
     outboxBatchSize: raw.MODULA_WORKER_OUTBOX_BATCH_SIZE,
     eventSubscriberTimeoutMs: raw.MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS,
