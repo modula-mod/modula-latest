@@ -1,8 +1,12 @@
 import {randomUUID} from 'node:crypto'
+import {sql} from 'kysely'
 import {resolveCanonicalModuleId, moduleIdFamily} from '@modula/greenfield-contracts'
 import type {
   CreatePublisherReleaseJobRequest,
   PublishPublisherReleaseJobRequest,
+  RequestPublisherReleaseSigningRequest,
+  PublisherOnlineSigningIdentityPublicView,
+  PublisherReleaseSigningStatus,
   PublisherGithubSourceRelease,
   PublisherModuleDetail,
   PublisherModuleSummary,
@@ -21,8 +25,10 @@ import {
   IN_FLIGHT_STATES,
   PublisherConsoleError,
   RELEASE_JOB_PUBLISH,
+  RELEASE_JOB_SIGN,
   RELEASE_JOB_VALIDATE,
   appendLog,
+  appendSigningAudit,
   consoleError,
   enqueueReleaseJobWork,
   isUniqueViolation,
@@ -32,11 +38,13 @@ import {
   transitionJob,
   type ReleaseJobRow,
 } from './release-job-core.js'
+import {PublisherOnlineSigningAuthority} from './signing-authority.js'
 
 type OwnedModule = {moduleId: string; publisherId: string; repositories: string[]; name: string | null; description: string | null}
 
-const VALIDATE_FROM: PublisherReleaseJobState[] = ['created', 'signature_missing', 'signature_invalid', 'validation_failed', 'failed']
+const VALIDATE_FROM: PublisherReleaseJobState[] = ['created', 'signature_missing', 'signature_invalid', 'signing_failed', 'validation_failed', 'failed']
 const RESUME_TO_FETCHING: PublisherReleaseJobState[] = ['created', 'fetching', 'validating', 'signature_verified']
+const RESUME_TO_SIGNING: PublisherReleaseJobState[] = ['ready_for_signing', 'signing']
 const RESUME_TO_REVIEW: PublisherReleaseJobState[] = ['ready_for_review', 'publishing']
 
 /**
@@ -48,8 +56,10 @@ const RESUME_TO_REVIEW: PublisherReleaseJobState[] = ['ready_for_review', 'publi
  */
 export class PublisherReleaseConsoleService {
   private readonly developers: DeveloperService
-  constructor(private readonly db: ModulaDb, config: AppConfig, private readonly github: GithubReleaseSource, private readonly options: {githubEnabled: boolean}) {
+  private readonly signingAuthority: PublisherOnlineSigningAuthority
+  constructor(private readonly db: ModulaDb, config: AppConfig, private readonly github: GithubReleaseSource, private readonly options: {githubEnabled: boolean; onlineSigningEnabled?: boolean}) {
     this.developers = new DeveloperService(db, config)
+    this.signingAuthority = new PublisherOnlineSigningAuthority(db, config)
   }
 
   // ---- authority -------------------------------------------------------
@@ -198,6 +208,22 @@ export class PublisherReleaseConsoleService {
     return this.dto(await this.requireOwnedJob(accountId, jobId))
   }
 
+  async signingIdentities(accountId: string, moduleId: string): Promise<PublisherOnlineSigningIdentityPublicView[]> {
+    const owned = await this.requireOwnedModule(accountId, moduleId)
+    if (!this.options.onlineSigningEnabled) consoleError('SIGNING_NOT_CONFIGURED', 'Online signing is not enabled in this environment')
+    if (!owned.repositories.length) consoleError('SIGNING_AUTHORIZATION_REQUIRED', 'The module has no active verified source repository')
+    return this.signingAuthority.listPermittedIdentities({
+      accountId,
+      publisherId: owned.publisherId,
+      moduleId: owned.moduleId,
+      sourceRepository: owned.repositories[0]!,
+    })
+  }
+
+  async signingStatus(accountId: string, jobId: string): Promise<PublisherReleaseSigningStatus> {
+    return this.signingAuthority.signingStatus(accountId, jobId)
+  }
+
   async logs(accountId: string, jobId: string, query: {after?: unknown; limit?: unknown}): Promise<PublisherReleaseJobLogPage> {
     const job = await this.requireOwnedJob(accountId, jobId)
     const after = query.after !== undefined && /^\d+$/.test(String(query.after)) ? Number(query.after) : undefined
@@ -276,6 +302,62 @@ export class PublisherReleaseConsoleService {
     return this.startFetching(accountId, job, VALIDATE_FROM, 'Validation requested; queued for the release runner')
   }
 
+  async requestSigning(accountId: string, jobId: string, body: Partial<RequestPublisherReleaseSigningRequest> | undefined, idempotencyKey: string | null): Promise<PublisherReleaseJob> {
+    if (!this.options.onlineSigningEnabled) consoleError('SIGNING_NOT_CONFIGURED', 'Online signing is not enabled in this environment')
+    const job = await this.requireOwnedJob(accountId, jobId)
+    if (idempotencyKey !== null && (idempotencyKey.length < 1 || idempotencyKey.length > 180)) consoleError('INVALID_REQUEST', 'Idempotency-Key must be 1-180 characters')
+    if (job.signing_request_id && ['signing', 'signature_verified', 'ready_for_review', 'publishing', 'published'].includes(job.state)) return this.dto(job)
+    if (job.state === 'signing_failed') consoleError('SIGNING_FAILED', 'Signing failed closed; revalidate the release before requesting a new signature', {jobId, state: job.state})
+    if (job.state !== 'ready_for_signing' || !job.approval_sha256 || !job.approved_at || !job.approved_facts) {
+      consoleError('INVALID_JOB_STATE', `Signing cannot start from ${job.state}; validate an unsigned immutable release first`, {jobId, state: job.state})
+    }
+    const delta = job.permission_delta as {reviewRequired?: boolean} | null
+    const acknowledged = body?.permissionChangeAcknowledged === true
+    if (delta?.reviewRequired && !acknowledged) {
+      consoleError('PERMISSION_EXPANSION_UNACKNOWLEDGED', 'Permission review must be acknowledged before signing', {jobId, permissionDelta: delta})
+    }
+    await this.signingAuthority.requireAuthorization({accountId, publisherId: job.publisher_id, moduleId: job.module_id, sourceRepository: job.source_repository})
+
+    if (idempotencyKey) {
+      const previous = await this.db.selectFrom('greenfield_publisher_release_jobs').selectAll()
+        .where('sign_requested_by_account_id', '=', accountId).where('signing_idempotency_key', '=', idempotencyKey).executeTakeFirst()
+      if (previous && previous.job_id !== jobId) consoleError('IDEMPOTENCY_KEY_CONFLICT', 'Signing Idempotency-Key was already used for another release job', {existingJobId: previous.job_id})
+      if (previous) return this.dto(previous as ReleaseJobRow)
+    }
+
+    const updated = await this.db.transaction().execute(async trx => {
+      await sql`SELECT pg_advisory_xact_lock(hashtext(${'publisher-online-signing:' + accountId}))`.execute(trx)
+      const fresh = await trx.selectFrom('greenfield_publisher_release_jobs').selectAll().where('job_id', '=', jobId).forUpdate().executeTakeFirst() as ReleaseJobRow | undefined
+      if (!fresh) return undefined
+      if (fresh.signing_request_id && ['signing', 'signature_verified', 'ready_for_review', 'publishing', 'published'].includes(fresh.state)) return fresh
+      if (fresh.state !== 'ready_for_signing' || fresh.approval_sha256 !== job.approval_sha256) return undefined
+      const recent = await trx.selectFrom('greenfield_publisher_signing_audit_events').select(({fn}) => fn.countAll().as('count'))
+        .where('actor_account_id', '=', accountId).where('event_type', '=', 'signing_requested')
+        .where('created_at', '>', new Date(Date.now() - 60 * 60_000)).executeTakeFirstOrThrow()
+      if (Number(recent.count) >= 10) consoleError('SIGNING_RATE_LIMITED', 'Online signing request limit exceeded; retry later', {retryAfterSeconds: 3600})
+      const requestId = `psr_${randomUUID()}`
+      const row = await transitionJob(trx, jobId, ['ready_for_signing'], 'signing', {
+        signing_request_id: requestId,
+        signing_idempotency_key: idempotencyKey,
+        sign_requested_by_account_id: accountId,
+        signing_identity_id: null,
+        signing_started_at: null,
+        signed_at: null,
+        signing_receipt: null,
+        permission_change_acknowledged: acknowledged,
+        error: null,
+      }, fresh.revision)
+      if (!row) return undefined
+      await appendSigningAudit(trx, {eventType: 'signing_requested', jobId, publisherId: job.publisher_id, moduleId: job.module_id,
+        actorAccountId: accountId, approvalSha256: job.approval_sha256, details: {requestId}})
+      await appendLog(trx, jobId, 'info', 'sign', 'Online release signing approved and queued; the server will resolve the publisher identity')
+      await enqueueReleaseJobWork(trx, {jobId, workType: RELEASE_JOB_SIGN, accountId, moduleId: job.module_id})
+      return row
+    })
+    if (!updated) consoleError('INVALID_JOB_STATE', 'The signing request lost a concurrent state change; reload the job', {jobId})
+    return this.dto(updated)
+  }
+
   async publish(accountId: string, jobId: string, body: Partial<PublishPublisherReleaseJobRequest> | undefined): Promise<PublisherReleaseJob> {
     const job = await this.requireOwnedJob(accountId, jobId)
     if (job.state === 'publishing' || job.state === 'published') return this.dto(job)
@@ -290,7 +372,7 @@ export class PublisherReleaseConsoleService {
     if (signature.state !== 'verified') consoleError('SIGNATURE_MISSING', 'A verified publisher signature is required before publication', {jobId})
     if (validation.passed !== true) consoleError('VALIDATION_FAILED', 'All validation checks must pass before publication', {jobId})
     const delta = job.permission_delta as {reviewRequired?: boolean} | null
-    const acknowledged = body?.permissionChangeAcknowledged === true
+    const acknowledged = body?.permissionChangeAcknowledged === true || job.permission_change_acknowledged
     if (delta?.reviewRequired && !acknowledged) {
       consoleError('PERMISSION_EXPANSION_UNACKNOWLEDGED', 'This version changes requested permissions; resend with permissionChangeAcknowledged: true after review', {jobId, permissionDelta: delta})
     }
@@ -326,13 +408,14 @@ export class PublisherReleaseConsoleService {
       // A publishing job can only be cancelled before the runner has started publication.
       let query = trx.selectFrom('greenfield_publisher_release_jobs').select(['job_id']).where('job_id', '=', job.job_id).where('state', '=', from)
       if (from === 'publishing') query = query.where('publish_started_at', 'is', null)
+      if (from === 'signing') query = query.where('signing_started_at', 'is', null)
       const lockable = await query.forUpdate().executeTakeFirst()
       if (!lockable) return null
       const updated = await transitionJob(trx, job.job_id, [from], 'cancelled', {cancelled_from_state: from})
       if (updated) await appendLog(trx, job.job_id, 'warn', 'cancel', `Cancelled from ${from}`)
       return updated
     })
-    if (!row) consoleError('CANCEL_NOT_ALLOWED', 'The job can no longer be cancelled (publication already started or state changed)', {jobId})
+    if (!row) consoleError('CANCEL_NOT_ALLOWED', 'The job can no longer be cancelled (signing/publication already started or state changed)', {jobId})
     return this.dto(row)
   }
 
@@ -341,7 +424,7 @@ export class PublisherReleaseConsoleService {
     if (job.state !== 'cancelled') consoleError('RESUME_NOT_ALLOWED', `Only cancelled jobs can be resumed (job is ${job.state})`, {state: job.state, jobId})
     if (job.published_at) consoleError('RESUME_NOT_ALLOWED', 'A published job cannot be resumed', {jobId})
     const from = job.cancelled_from_state as PublisherReleaseJobState | null
-    if (!from || (!RESUME_TO_FETCHING.includes(from) && !RESUME_TO_REVIEW.includes(from))) {
+    if (!from || (!RESUME_TO_FETCHING.includes(from) && !RESUME_TO_SIGNING.includes(from) && !RESUME_TO_REVIEW.includes(from))) {
       consoleError('RESUME_NOT_ALLOWED', `A job cancelled from ${from ?? 'unknown'} cannot be resumed; start validation on a new job`, {jobId})
     }
     if (job.version) {
@@ -359,6 +442,15 @@ export class PublisherReleaseConsoleService {
     }
     if (RESUME_TO_FETCHING.includes(from)) {
       return this.startFetching(accountId, job, ['cancelled'], `Resumed from ${from}; validation re-runs from fetching`)
+    }
+    if (RESUME_TO_SIGNING.includes(from)) {
+      const row = await transitionJob(this.db, job.job_id, ['cancelled'], 'ready_for_signing', {
+        cancelled_from_state: null, signing_request_id: null, signing_idempotency_key: null, sign_requested_by_account_id: null,
+        signing_identity_id: null, signing_started_at: null, signed_at: null, signing_receipt: null, error: null,
+      }, job.revision)
+      if (!row) consoleError('INVALID_JOB_STATE', 'The job changed concurrently; reload and retry', {jobId})
+      await appendLog(this.db, job.job_id, 'info', 'resume', `Resumed from ${from}; signing must be requested again`)
+      return this.dto(row)
     }
     // ready_for_review / publishing -> ready_for_review. Never auto-publishes; acknowledgement must be given again.
     let row: ReleaseJobRow | null | undefined
@@ -387,6 +479,8 @@ export class PublisherReleaseConsoleService {
         const updated = await transitionJob(trx, job.job_id, from, 'fetching', {
           cancelled_from_state: null, error: null, preview: {}, signature: {state: 'pending'}, validation: {passed: false, checks: []},
           permission_delta: null, permission_change_acknowledged: false, publish_requested_by_account_id: null, publish_started_at: null,
+          approved_facts: null, approval_sha256: null, approved_at: null, signing_request_id: null, signing_idempotency_key: null,
+          sign_requested_by_account_id: null, signing_identity_id: null, signing_started_at: null, signed_at: null, signing_receipt: null,
         }, job.revision)
         if (!updated) return undefined
         await appendLog(trx, job.job_id, 'info', 'validate', message)

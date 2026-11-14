@@ -14,8 +14,9 @@ import type {Database} from '../database/types.js'
 export const RELEASE_JOB_DISPATCH_MODE = 'PUBLISHER_RELEASE_RUNNER' as const
 export const RELEASE_JOB_SERVICE_ID = 'service.publisher-release-runner'
 export const RELEASE_JOB_VALIDATE = 'publisher.release-job.validate'
+export const RELEASE_JOB_SIGN = 'publisher.release-job.sign'
 export const RELEASE_JOB_PUBLISH = 'publisher.release-job.publish'
-export type ReleaseJobWorkType = typeof RELEASE_JOB_VALIDATE | typeof RELEASE_JOB_PUBLISH
+export type ReleaseJobWorkType = typeof RELEASE_JOB_VALIDATE | typeof RELEASE_JOB_SIGN | typeof RELEASE_JOB_PUBLISH
 
 export const IN_FLIGHT_STATES: readonly PublisherReleaseJobState[] = PUBLISHER_RELEASE_JOB_IN_FLIGHT_STATES
 
@@ -46,6 +47,36 @@ export async function appendLog(db: Executor, jobId: string, level: PublisherRel
     step,
     message: message.replace(/[\r\n\t]+/g, ' ').slice(0, 2000) || '(empty)',
   } as never).execute()
+}
+
+export async function appendSigningAudit(db: Executor, input: {
+  eventType: Database['greenfield_publisher_signing_audit_events']['event_type']
+  jobId?: string | null
+  identityId?: string | null
+  publisherId: string
+  moduleId?: string | null
+  actorAccountId?: string | null
+  approvalSha256?: string | null
+  statementSha256?: string | null
+  receipt?: Record<string, unknown>
+  details?: Record<string, unknown>
+}): Promise<string> {
+  const eventId = `psae_${randomUUID()}`
+  await db.insertInto('greenfield_publisher_signing_audit_events').values({
+    event_id: eventId,
+    event_type: input.eventType,
+    job_id: input.jobId ?? null,
+    identity_id: input.identityId ?? null,
+    publisher_id: input.publisherId,
+    module_id: input.moduleId ?? null,
+    actor_account_id: input.actorAccountId ?? null,
+    approval_sha256: input.approvalSha256 ?? null,
+    statement_sha256: input.statementSha256 ?? null,
+    receipt: input.receipt ?? {},
+    details: input.details ?? {},
+    created_at: new Date(),
+  } as never).execute()
+  return eventId
 }
 
 /** Enqueues runner work on the existing background_jobs queue. Never executes it. */
@@ -94,7 +125,7 @@ export async function transitionJob(
 ): Promise<ReleaseJobRow | undefined> {
   const now = new Date()
   const values: Record<string, unknown> = {...patch, state: to, updated_at: now, revision: sql`revision + 1`}
-  for (const key of ['preview', 'signature', 'validation', 'permission_delta', 'error'] as const) {
+  for (const key of ['preview', 'signature', 'validation', 'permission_delta', 'approved_facts', 'signing_receipt', 'error'] as const) {
     if (key in values && values[key] !== null && values[key] !== undefined && typeof values[key] === 'object' && !('toOperationNode' in (values[key] as object))) {
       values[key] = sql`${JSON.stringify(values[key])}::jsonb`
     }
@@ -157,14 +188,24 @@ export function toJobDto(row: ReleaseJobRow, logSummary: PublisherReleaseJobLogE
     validation,
     permissionDelta: (row.permission_delta ?? null) as PublisherReleaseJob['permissionDelta'],
     permissionChangeAcknowledged: Boolean(row.permission_change_acknowledged),
+    signing: {
+      approval: row.approval_sha256 && row.approved_at ? {sha256: row.approval_sha256, approvedAt: new Date(row.approved_at).toISOString()} : null,
+      requestId: row.signing_request_id,
+      requestedByAccountId: row.sign_requested_by_account_id,
+      identityId: row.signing_identity_id,
+      startedAt: row.signing_started_at ? new Date(row.signing_started_at).toISOString() : null,
+      signedAt: row.signed_at ? new Date(row.signed_at).toISOString() : null,
+      receipt: (row.signing_receipt ?? null) as PublisherReleaseJob['signing']['receipt'],
+    },
     error: (row.error ?? null) as PublisherReleaseJob['error'],
     cancelledFromState: state === 'cancelled' ? cancelledFrom : null,
     logSummary,
     actions: {
-      canValidate: ['created', 'signature_missing', 'signature_invalid', 'validation_failed', 'failed'].includes(state),
+      canValidate: ['created', 'signature_missing', 'signature_invalid', 'signing_failed', 'validation_failed', 'failed'].includes(state),
+      canRequestSigning: state === 'ready_for_signing' && Boolean(row.approval_sha256),
       canPublish: state === 'ready_for_review' && validation.passed === true && signature.state === 'verified',
-      canCancel: !['published', 'cancelled', 'conflicted'].includes(state) && !(state === 'publishing' && row.publish_started_at),
-      canResume: state === 'cancelled' && ['created', 'fetching', 'validating', 'signature_verified', 'ready_for_review', 'publishing'].includes(cancelledFrom ?? ''),
+      canCancel: !['published', 'cancelled', 'conflicted'].includes(state) && !(state === 'publishing' && row.publish_started_at) && !(state === 'signing' && row.signing_started_at),
+      canResume: state === 'cancelled' && ['created', 'fetching', 'validating', 'ready_for_signing', 'signing', 'signature_verified', 'ready_for_review', 'publishing'].includes(cancelledFrom ?? ''),
     },
     createdByAccountId: row.created_by_account_id,
     createdAt: new Date(row.created_at).toISOString(),

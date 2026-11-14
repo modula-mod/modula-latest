@@ -21,10 +21,13 @@
  *   GET  /v1/publisher/modules/:moduleId/versions                -> PublisherModuleVersion[]
  *   GET  /v1/publisher/modules/:moduleId/github-releases         -> PublisherGithubSourceRelease[]
  *   GET  /v1/publisher/modules/:moduleId/release-jobs            -> PublisherReleaseJob[]
+ *   GET  /v1/publisher/modules/:moduleId/signing-identities      -> PublisherOnlineSigningIdentityPublicView[]
  *   POST /v1/publisher/modules/:moduleId/release-jobs            CreatePublisherReleaseJobRequest -> 202 PublisherReleaseJob (200 on idempotent replay)
  *   GET  /v1/publisher/release-jobs/:jobId                       -> PublisherReleaseJob
  *   GET  /v1/publisher/release-jobs/:jobId/logs                  -> PublisherReleaseJobLogPage
+ *   GET  /v1/publisher/release-jobs/:jobId/signing               -> PublisherReleaseSigningStatus
  *   POST /v1/publisher/release-jobs/:jobId/validate              -> 202 PublisherReleaseJob
+ *   POST /v1/publisher/release-jobs/:jobId/sign                  -> 202 PublisherReleaseJob
  *   POST /v1/publisher/release-jobs/:jobId/publish               PublishPublisherReleaseJobRequest -> 202 PublisherReleaseJob
  *   POST /v1/publisher/release-jobs/:jobId/cancel                -> 200 PublisherReleaseJob
  *   POST /v1/publisher/release-jobs/:jobId/resume                -> 202 PublisherReleaseJob
@@ -36,7 +39,10 @@ export const PUBLISHER_RELEASE_JOB_STATES = [
   'validating',
   'signature_missing',
   'signature_invalid',
+  'ready_for_signing',
+  'signing',
   'signature_verified',
+  'signing_failed',
   'validation_failed',
   'ready_for_review',
   'publishing',
@@ -53,6 +59,8 @@ export const PUBLISHER_RELEASE_JOB_IN_FLIGHT_STATES = [
   'created',
   'fetching',
   'validating',
+  'ready_for_signing',
+  'signing',
   'signature_verified',
   'ready_for_review',
   'publishing',
@@ -72,6 +80,12 @@ export type PublisherConsoleErrorCode =
   | 'SIGNATURE_MISSING'
   | 'SIGNATURE_INVALID'
   | 'SIGNATURE_REVOKED'
+  | 'SIGNING_NOT_CONFIGURED'
+  | 'SIGNING_AUTHORIZATION_REQUIRED'
+  | 'SIGNING_IDENTITY_UNAVAILABLE'
+  | 'SIGNING_RATE_LIMITED'
+  | 'SIGNING_FAILED'
+  | 'RELEASE_APPROVAL_INVALIDATED'
   | 'PERMISSION_EXPANSION_UNACKNOWLEDGED'
   | 'IDEMPOTENCY_KEY_CONFLICT'
   | 'CANCEL_NOT_ALLOWED'
@@ -94,6 +108,12 @@ export const PUBLISHER_CONSOLE_ERROR_HTTP_STATUS: Readonly<Record<PublisherConso
   SIGNATURE_MISSING: 409,
   SIGNATURE_INVALID: 409,
   SIGNATURE_REVOKED: 409,
+  SIGNING_NOT_CONFIGURED: 503,
+  SIGNING_AUTHORIZATION_REQUIRED: 403,
+  SIGNING_IDENTITY_UNAVAILABLE: 409,
+  SIGNING_RATE_LIMITED: 429,
+  SIGNING_FAILED: 503,
+  RELEASE_APPROVAL_INVALIDATED: 409,
   PERMISSION_EXPANSION_UNACKNOWLEDGED: 409,
   IDEMPOTENCY_KEY_CONFLICT: 409,
   CANCEL_NOT_ALLOWED: 409,
@@ -122,6 +142,19 @@ export type PublisherSigningKeyPublicView = {
   validFrom: string
   validUntil: string | null
   revokedAt: string | null
+}
+
+export type PublisherOnlineSigningIdentityPublicView = {
+  identityId: string
+  publisherId: string
+  signingKeyId: string
+  provider: 'VAULT_TRANSIT' | 'DISPOSABLE_TEST'
+  purpose: 'PUBLISHER' | 'MODULA_FIRST_PARTY'
+  state: 'ACTIVE' | 'SUSPENDED' | 'REVOKED'
+  publicKeyFingerprint: string
+  validFrom: string
+  validUntil: string
+  firstPartyAuthorized: boolean
 }
 
 export type PublisherModuleSummary = {
@@ -193,6 +226,11 @@ export type PublishPublisherReleaseJobRequest = {
    * ONLY accepted body key; any other key (e.g. acknowledgePermissionExpansion)
    * is rejected with INVALID_REQUEST.
    */
+  permissionChangeAcknowledged?: boolean
+}
+
+/** The server resolves the identity and key. keyId, bytes and digests are never accepted. */
+export type RequestPublisherReleaseSigningRequest = {
   permissionChangeAcknowledged?: boolean
 }
 
@@ -280,9 +318,41 @@ export type PublisherReleaseJobLogPage = {
 
 export type PublisherReleaseJobActions = {
   canValidate: boolean
+  canRequestSigning: boolean
   canPublish: boolean
   canCancel: boolean
   canResume: boolean
+}
+
+export type PublisherReleaseSigningReceipt = {
+  receiptId: string
+  provider: 'VAULT_TRANSIT' | 'DISPOSABLE_TEST'
+  identityId: string
+  keyId: string
+  publicKeyFingerprint: string
+  providerKeyVersion: number | null
+  approvalSha256: string
+  statementSha256: string
+  verifiedAt: string
+}
+
+export type PublisherReleaseSigningAuditEntry = {
+  eventId: string
+  eventType: string
+  identityId: string | null
+  approvalSha256: string | null
+  statementSha256: string | null
+  receipt: Record<string, unknown>
+  details: Record<string, unknown>
+  at: string
+}
+
+export type PublisherReleaseSigningStatus = {
+  jobId: string
+  state: PublisherReleaseJobState
+  approval: {sha256: string; approvedAt: string} | null
+  receipt: PublisherReleaseSigningReceipt | null
+  auditHistory: PublisherReleaseSigningAuditEntry[]
 }
 
 export type PublisherReleaseJob = {
@@ -303,6 +373,15 @@ export type PublisherReleaseJob = {
   validation: {passed: boolean; checks: PublisherReleaseJobCheck[]}
   permissionDelta: PublisherReleaseJobPermissionDelta | null
   permissionChangeAcknowledged: boolean
+  signing: {
+    approval: {sha256: string; approvedAt: string} | null
+    requestId: string | null
+    requestedByAccountId: string | null
+    identityId: string | null
+    startedAt: string | null
+    signedAt: string | null
+    receipt: PublisherReleaseSigningReceipt | null
+  }
   error: PublisherReleaseJobError | null
   /** State the job was in when cancelled (null unless cancelled). */
   cancelledFromState: PublisherReleaseJobState | null
