@@ -832,6 +832,156 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       .rejects.toThrow(/append-only/)
   }, 120_000)
 
+  it('applies the GUBIC catalogue gate to update and rollback exactly like install', async () => {
+    // test.modula.* is owned by the seeded first-party fixture publisher `modula`.
+    const gameId = `test.modula.gubic-p2-${suffix}.reference-tap`
+    const owner = await registerAccount(app, `gubic-p2-owner-${suffix}@example.invalid`, `gubicp2owner${suffix}`, db)
+    const now = new Date()
+    await db.insertInto('greenfield_publisher_owners').values({
+      publisher_owner_id: randomUUID(), publisher_id: 'modula', owner_type: 'ACCOUNT',
+      account_id: owner.accountId, organisation_id: null, created_at: now,
+    }).execute()
+    const keys = generateKeyPairSync('ed25519')
+    const keyId = `gubic-p2-${suffix}`
+    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'">')
+    const build = (version: string) => {
+      const javascript = Buffer.from(`document.title="Reference Tap ${version}"`)
+      const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
+      const gameBytes = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', javascript), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
+      return buildRelease(gameId, version, {
+        sign: {keyId, privateKey: keys.privateKey},
+        mutateProduct: (mps) => {
+          mps.identity.kind = 'game'
+          mps.permissions = []
+          mps.gameRuntime = {
+            contractVersion: '1.0.0', type: 'web-mini-game', engine: 'phaser', engineVersion: '4.2.1',
+            entryPath: 'index.html', artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz'},
+            compressedSizeLimitBytes: 50 * 1024 * 1024, minimumHostVersion: '>=1.1.0', offline: true,
+            network: 'none', assetInventory: 'game.files.json', orientation: 'any', graphics: 'none', touchControls: 'pointer',
+          }
+          mps.distribution = {
+            schema: 'modula.package.1', category: 'game-content',
+            artifact: {path: 'game/game.tgz', sha256: sha256(gameBytes), mediaType: 'application/vnd.modula.game-web+tgz', compressedSizeBytes: gameBytes.length, installedSizeEstimateBytes: 4096},
+            minimumHostVersion: '>=1.1.0', platforms: ['ios'], dependencies: [], requiredCapabilities: [],
+            cachePolicy: 'retain-while-owned', sharing: 'public-immutable',
+          }
+        },
+        mutateFiles: files => { files['game/game.tgz'] = gameBytes },
+      })
+    }
+    const first = build('1.0.0')
+    const second = build('1.1.0')
+    const firstResult = await new GreenfieldGithubReleaseSyncService(db, first.source).sync({repository: REPOSITORY, releaseTag: first.tag, publish: true, dryRun: false}) as {releaseId: string}
+    const secondResult = await new GreenfieldGithubReleaseSyncService(db, second.source).sync({repository: REPOSITORY, releaseTag: second.tag, publish: true, dryRun: false}) as {releaseId: string}
+    const headers = {authorization: `Bearer ${owner.token}`}
+    // test.modula.* products are hidden from the beta Product Hub, so the admin
+    // review route (which requires a hub-visible trusted release) cannot publish
+    // them. Catalogue state is therefore set directly on the catalogue row; the
+    // gate under test reads exactly that row.
+    const review = async (publicationStatus: 'published' | 'retired', availability: 'available' | 'unavailable') => {
+      await db.updateTable('greenfield_game_catalogue_entries')
+        .set({publication_status: publicationStatus, availability, updated_at: new Date()} as never)
+        .where('game_id', '=', gameId).execute()
+    }
+    const register = await app.inject({
+      method: 'PUT', url: `/v1/developer/gubic/games/${gameId}`, headers,
+      payload: {publisherId: 'modula', origin: 'modula-developed', genre: 'arcade', categories: ['arcade'], runtimeCategory: 'phaser', ageClassification: {}, availability: 'available'},
+    })
+    expect(register.statusCode, register.body).toBe(200)
+    await review('published', 'available')
+    const lockFor = async (version: string) => {
+      const plan = await app.inject({
+        method: 'POST', url: `/v1/modules/${gameId}/package-install-plan`, headers,
+        payload: {version, hostVersion: '1.1.0', platform: 'ios', cachedPublicDigests: []},
+      })
+      expect(plan.statusCode, plan.body).toBe(200)
+      return plan.json().data.lockSha256 as string
+    }
+    const updateTo = (version: string, packageLockSha256: string, key: string) => app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/update`, headers: {...headers, 'idempotency-key': `gubic-p2-${key}-${suffix}`},
+      payload: {version, approvedPermissions: [], platform: 'ios', hostVersion: '1.1.0', packageLockSha256},
+    })
+    const install = await app.inject({
+      method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `gubic-p2-install-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: [], platform: 'ios', hostVersion: '1.1.0', packageLockSha256: await lockFor('1.0.0')},
+    })
+    expect(install.statusCode, install.body).toBe(202)
+    const installationId = install.json().data.installationId
+    const lockForSecond = await lockFor('1.1.0')
+    const workerDb = createWorkerDb(databaseUrl!)
+    try {
+      await handleModuleInstall(workerDb, loadWorkerConfig(), {
+        planId: install.json().data.planId, installationId, releaseId: firstResult.releaseId, moduleId: gameId, accountId: owner.accountId,
+      })
+
+      // Retired game: update is refused by the catalogue gate, not by a stale lock.
+      await review('retired', 'unavailable')
+      const retiredUpdate = await updateTo('1.1.0', lockForSecond, 'retired-update')
+      expect(retiredUpdate.statusCode, retiredUpdate.body).toBe(403)
+      expect(retiredUpdate.json().error).toMatchObject({code: 'FORBIDDEN', message: 'Game is not approved for catalogue installation'})
+
+      // Paid game without an entitlement: update refused.
+      await review('published', 'available')
+      const offerId = `offer:${gameId}`
+      await db.insertInto('greenfield_offers').values({
+        offer_id: offerId, product_id: gameId, kind: 'ONE_TIME', display_name: 'Owned reference game',
+        capabilities: sql`${JSON.stringify([])}::jsonb`, commercial_terms: sql`${JSON.stringify({})}::jsonb`,
+        trial_duration_seconds: null, state: 'ACTIVE', created_by_account_id: owner.accountId, created_at: now, updated_at: now,
+      }).execute()
+      const unentitledUpdate = await updateTo('1.1.0', lockForSecond, 'unentitled-update')
+      expect(unentitledUpdate.statusCode, unentitledUpdate.body).toBe(403)
+      expect(unentitledUpdate.json().error).toMatchObject({code: 'FORBIDDEN', message: 'An active game entitlement is required'})
+
+      // Entitled and published: update passes the catalogue gate. test.modula.*
+      // products are deliberately hidden from the beta registry, so the request
+      // then stops at the registry visibility policy (404), never at the gate.
+      const entitlementId = `entitlement:${gameId}:${owner.accountId}`
+      await db.insertInto('greenfield_entitlements').values({
+        entitlement_id: entitlementId, owner_type: 'ACCOUNT', owner_account_id: owner.accountId,
+        owner_organisation_id: null, product_id: gameId, offer_id: offerId, source: 'ADMIN', state: 'ACTIVE',
+        external_receipt_id: null, provenance_reference: 'isolated-gubic-p2-qa', started_at: now, expires_at: null,
+        created_at: now, updated_at: now,
+      }).execute()
+      const passedGate = (response: {statusCode: number, json: () => any, body: string}) => {
+        expect(response.statusCode, response.body).toBe(404)
+        expect(response.json().error).toMatchObject({code: 'NOT_FOUND', message: `Module ${gameId} not found`})
+      }
+      passedGate(await updateTo('1.1.0', await lockFor('1.1.0'), 'allowed-update'))
+
+      const rollback = (key: string) => app.inject({
+        method: 'POST', url: `/v1/modules/${gameId}/rollback`, headers: {...headers, 'idempotency-key': `gubic-p2-${key}-${suffix}`},
+        payload: {version: '1.0.0', expectedDescriptorRevision: 'unused-when-refused', platform: 'ios', hostVersion: '1.1.0'},
+      })
+
+      // Entitlement lost: rollback refused.
+      await db.updateTable('greenfield_entitlements').set({state: 'REVOKED', updated_at: new Date()}).where('entitlement_id', '=', entitlementId).execute()
+      const unentitledRollback = await rollback('unentitled-rollback')
+      expect(unentitledRollback.statusCode, unentitledRollback.body).toBe(403)
+      expect(unentitledRollback.json().error).toMatchObject({code: 'FORBIDDEN', message: 'An active game entitlement is required'})
+
+      // Entitled again but retired: rollback refused.
+      await db.updateTable('greenfield_entitlements').set({state: 'ACTIVE', updated_at: new Date()}).where('entitlement_id', '=', entitlementId).execute()
+      await review('retired', 'unavailable')
+      const retiredRollback = await rollback('retired-rollback')
+      expect(retiredRollback.statusCode, retiredRollback.body).toBe(403)
+      expect(retiredRollback.json().error).toMatchObject({code: 'FORBIDDEN', message: 'Game is not approved for catalogue installation'})
+
+      // Published, available and entitled: rollback passes the gate too.
+      await review('published', 'available')
+      const allowedRollback = await rollback('allowed-rollback')
+      expect(allowedRollback.statusCode, allowedRollback.body).not.toBe(403)
+      expect(allowedRollback.json().error?.code).not.toBe('FORBIDDEN')
+
+      // Only the original install plan exists: no refused call queued a release change.
+      const plans = await db.selectFrom('greenfield_module_install_plans').select(['release_id'])
+        .where('installation_id', '=', installationId).execute()
+      expect(plans.map(row => row.release_id)).toEqual([firstResult.releaseId])
+    } finally {
+      await workerDb.destroy()
+    }
+  }, 120_000)
+
   it('performs a governed rollback to the advertised trusted release', async () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `rollback-${suffix}`
