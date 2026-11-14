@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-14T23:10:44.968Z",
+  "capturedAt": "2026-11-14T23:30:53.691Z",
   "source": {
-    "branch": "forge/native-endpoints-01",
-    "headAtCapture": "2b0e7d2f18486284aee834799396941bec86d0b2",
+    "branch": "forge/gf-auth-resend-challenge-id",
+    "headAtCapture": "cc83a5ddcb60f78d47d43997a19eb4359ffefbb1",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "9db7b3f42b5d898cc488b228529cb95602868b68bfaf0e1ea6e78e59a92b434a"
+    "apiSourceSha256": "932afd40a389fb6d5099c5db411de0a1263820aff57b405f558263e1bc95de93"
   },
   "runtimeRoutes": [
     {
