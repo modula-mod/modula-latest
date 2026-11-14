@@ -23,17 +23,48 @@ import {handleExtensionEventDispatch} from '../modules/extension-event-handler.j
 import {handleNotificationCreate} from '../notifications/create.js'
 import {handleSocialNotification} from '../notifications/social.js'
 import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
-import {claimNextJob, completeJob, deadLetterJob, markJobRunning, scheduleRetry} from './claim.js'
+import {claimNextJob, completeJob, deadLetterJob, markJobRunning, renewJobLease, scheduleRetry} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
 import {computeNextAvailableAt} from './retry.js'
 import {metrics} from '../observability/metrics.js'
+import {startPeriodic, type PeriodicTask} from '../timers/periodic.js'
 
-export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): Promise<boolean> {
+/** Structured log sink for lease events; fields never include payloads or connection strings. */
+export type JobRunnerLog = {
+  warn(fields: Record<string, unknown>, message: string): void
+  error(fields: Record<string, unknown>, message: string): void
+}
+
+export type ProcessJobOptions = {log?: JobRunnerLog}
+
+export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, options: ProcessJobOptions = {}): Promise<boolean> {
   const job = await claimNextJob(db, config.workerId, config.leaseDurationMs)
   if (!job) return false
   metrics.increment('jobsClaimed')
+  const log = options.log
+  // GF-OPS-01(c): the lease is renewed on its own timer while the handler runs,
+  // so a job longer than leaseDurationMs is not reaped and re-claimed mid-run.
+  let leaseLost = false
+  let renewal: PeriodicTask | null = null
 
   try {
+    // Renewal starts at claim (status LEASED), not at RUNNING, so a delayed
+    // markJobRunning cannot leave a claimed job's lease unrenewed.
+    renewal = startPeriodic(async () => {
+      try {
+        if (await renewJobLease(db, job.id, config.workerId, config.leaseDurationMs)) {
+          metrics.increment('jobLeaseRenewals')
+          return
+        }
+        leaseLost = true
+        void renewal?.stop()
+        log?.warn({operation: 'job.lease.renew', jobId: job.id, jobType: job.job_type}, 'job lease lost while running; renewal stopped')
+      } catch (error) {
+        // A transient renewal failure is not a lost lease: keep the job and try
+        // again on the next tick. Only safe error fields are logged.
+        log?.error({operation: 'job.lease.renew', jobId: job.id, jobType: job.job_type, error: safeError(error)}, 'job lease renewal failed')
+      }
+    }, config.leaseRenewIntervalMs)
     await markJobRunning(db, job.id, config.workerId)
     await withTimeout((async () => {
       switch (job.job_type) {
@@ -190,9 +221,16 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
           })
       }
     })(), job.timeout_ms)
+    await renewal.stop()
+    if (leaseLost) return leaseLostOutcome(log, job.id, job.job_type)
     await completeJob(db, job.id, config.workerId)
     metrics.increment('jobsCompleted')
   } catch (error: unknown) {
+    await renewal?.stop()
+    // The job now belongs to the reaper or another worker. Recording an outcome
+    // here would double-complete it, and this worker must not retry it itself:
+    // the existing claim semantics (reap -> RETRYING -> re-claim) own it now.
+    if (leaseLost || errorCodeFor(error) === 'JOB_LEASE_LOST') return leaseLostOutcome(log, job.id, job.job_type)
     const code = errorCodeFor(error)
     const message = messageFor(error)
     const permanent = isPermanentFailure(error)
@@ -206,6 +244,18 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
     }
   }
   return true
+}
+
+function leaseLostOutcome(log: JobRunnerLog | undefined, jobId: string, jobType: string): true {
+  metrics.increment('jobLeasesLost')
+  log?.warn({operation: 'job.lease.lost', jobId, jobType}, 'job lease lost; outcome not recorded by this worker')
+  return true
+}
+
+function safeError(error: unknown): {name: string; code: string | null} {
+  const name = error instanceof Error ? error.name : 'UnknownError'
+  const code = error && typeof error === 'object' && typeof (error as {code?: unknown}).code === 'string' ? (error as {code: string}).code : null
+  return {name, code}
 }
 
 async function withTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise<T> {
