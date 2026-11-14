@@ -9,6 +9,7 @@ import type {
   GubicRuntimeCategory,
 } from '@modula/greenfield-module-registry-contracts'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {compareSemver} from '@modula/greenfield-module-manifest'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
@@ -16,6 +17,8 @@ import {GreenfieldModuleDistributionService, type DistributionHostContext} from 
 import {GreenfieldModuleInstallationService} from './installation-service.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModuleRegistryService} from './registry-service.js'
+import {GreenfieldModuleReleaseService} from './release-service.js'
+import {GreenfieldRegistryTrustService} from './registry-trust-service.js'
 
 export type GubicListFilters = {
   q?: string
@@ -45,11 +48,15 @@ export class GreenfieldGubicService {
   private readonly registry: GreenfieldModuleRegistryService
   private readonly distribution: GreenfieldModuleDistributionService
   private readonly installations: GreenfieldModuleInstallationService
+  private readonly releases: GreenfieldModuleReleaseService
+  private readonly trust: GreenfieldRegistryTrustService
 
   constructor(private readonly db: ModulaDb, private readonly config: AppConfig) {
     this.registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
     this.distribution = new GreenfieldModuleDistributionService(db, config)
     this.installations = new GreenfieldModuleInstallationService(db, config)
+    this.releases = new GreenfieldModuleReleaseService(db)
+    this.trust = new GreenfieldRegistryTrustService(db)
   }
 
   async listGames(filters: GubicListFilters = {}): Promise<{items: GubicGameSummary[]; nextCursor: null}> {
@@ -370,9 +377,8 @@ export class GreenfieldGubicService {
     if (featured && (!Number.isInteger(featuredRank) || featuredRank! < 1 || featuredRank! > 1000)) invalid('Featured rank must be between 1 and 1000')
     if (featured && (status !== 'published' || availability !== 'available')) invalid('Only available published games can be featured')
     if (status === 'published') {
-      const registryGame = (await this.registry.listModules({productKind: 'game', status: 'published', limit: 100})).items
-        .find(item => resolveCanonicalModuleId(item.moduleId) === gameId)
-      if (!registryGame || !(registryGame as any).trustSummary?.verified || registryGame.publisherId !== entry.publisher_id) {
+      const registryGame = await this.latestPublishedRegistryGame(gameId)
+      if (!registryGame || !registryGame.verified || registryGame.publisherId !== entry.publisher_id) {
         throw moduleError('FORBIDDEN', 'A trusted published registry release owned by this publisher is required')
       }
     }
@@ -392,6 +398,33 @@ export class GreenfieldGubicService {
       }).execute()
     })
     return this.catalogueEntry(gameId)
+  }
+
+  /**
+   * The release a catalogue publication is judged against: the newest published
+   * game release of exactly this module (stable channel preferred, as in the
+   * registry listing), looked up directly by module ID. Unlike the paged
+   * registry listing this neither caps at 100 products nor hides products the
+   * beta Product Hub classifies as test-only.
+   */
+  private async latestPublishedRegistryGame(gameId: string): Promise<{releaseId: string; publisherId: string; verified: boolean} | null> {
+    const rows = await this.db.selectFrom('greenfield_module_releases as release')
+      .innerJoin('greenfield_mps_ingestions as ingestion', 'ingestion.release_id', 'release.release_id')
+      .select(['release.release_id', 'release.version', 'release.release_channel', 'release.publisher_id'])
+      .where('release.module_id', '=', gameId)
+      .where('ingestion.registry_kind', '=', 'game')
+      .where('release.release_state', '=', 'published')
+      .execute()
+    const latest = [...rows].sort((left, right) => {
+      const channel = Number(right.release_channel === 'stable') - Number(left.release_channel === 'stable')
+      if (channel) return channel
+      try { return compareSemver(right.version, left.version) } catch { return 0 }
+    })[0]
+    if (!latest) return null
+    const release = await this.releases.getReleaseById(latest.release_id)
+    if (!release) return null
+    const trust = await this.trust.forRelease(release, {}, release.version)
+    return {releaseId: latest.release_id, publisherId: latest.publisher_id, verified: trust.verified}
   }
 
   async catalogueEntry(gameId: string) {

@@ -896,6 +896,9 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
+      // Same catalogue policy as install: a retired, unavailable or unentitled
+      // game that is already installed cannot be re-enabled.
+      await gubic.assertCatalogueInstallAllowed(auth.accountId, canonicalModuleParam(request))
       return reply.code(202).send(successEnvelope(await installations.enable(auth.accountId, canonicalModuleParam(request), idempotencyKey(request, request.body)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Enable failed')
