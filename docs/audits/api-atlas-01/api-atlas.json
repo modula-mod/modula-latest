@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gf-mod-01",
-      "sourceSha256": "401511a201ec7446cc3fab8d8c04fff95df02d61192cf7c500ab77142ac19207",
-      "capturedAt": "2026-11-14T22:24:52.751Z",
+      "branch": "mosaic/gubic-p1-html5-engine",
+      "sourceSha256": "ec259f1d20fa4ff097207faae65069d33b87881856267d04d4bde4f56460f225",
+      "capturedAt": "2026-11-14T22:55:50.656Z",
       "routeCount": 896
     },
     "status": "PASS"
@@ -12865,8 +12865,7 @@
           "greenfield_module_releases",
           "greenfield_module_versions",
           "greenfield_mps_ingestions",
-          "greenfield_release_frontends",
-          "the"
+          "greenfield_release_frontends"
         ],
         "writes": [
           "greenfield_module_release_signatures",
@@ -13104,8 +13103,7 @@
       ],
       "data": {
         "reads": [
-          "greenfield_accounts",
-          "the"
+          "greenfield_accounts"
         ],
         "writes": [
           "greenfield_module_releases",
