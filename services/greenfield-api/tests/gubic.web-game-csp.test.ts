@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto'
 import {gzipSync} from 'node:zlib'
 import {describe, expect, it} from 'vitest'
-import {assertWebGameDocumentPolicy, parseCspDirectives} from '../src/gubic/web-game-csp.js'
+import {assertStaticSvg, assertWebGameDocumentPolicy, isSvgMember, parseCspDirectives, WebGameContentPolicyError} from '../src/gubic/web-game-csp.js'
 import {verifyWebGameArchive} from '../src/modules/github-release-sync-service.js'
 
 // GUBIC-P1 / Sentinel §16.6: the web-game ingestion CSP gate must parse the
@@ -26,9 +26,9 @@ function tarEntry(path: string, bytes: Buffer): Buffer {
   return Buffer.concat([header, bytes, Buffer.alloc(Math.ceil(bytes.length / 512) * 512 - bytes.length)])
 }
 
-function gameArchive(html: string, members: Record<string, string> = {'main.js': 'document.title = "ok"'}): Buffer {
+function gameArchive(html: string, members: Record<string, string | Buffer> = {'main.js': 'document.title = "ok"'}): Buffer {
   const files: Record<string, Buffer> = {'index.html': Buffer.from(html)}
-  for (const [path, body] of Object.entries(members)) files[path] = Buffer.from(body)
+  for (const [path, body] of Object.entries(members)) files[path] = Buffer.isBuffer(body) ? body : Buffer.from(body)
   const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: Object.fromEntries(Object.entries(files).map(([path, bytes]) => [path, sha256(bytes)]))}))
   return gzipSync(Buffer.concat([...Object.entries(files).map(([path, bytes]) => tarEntry(path, bytes)), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
 }
@@ -119,5 +119,101 @@ describe('GUBIC web game CSP gate', () => {
     expect(() => assertWebGameDocumentPolicy(doc(meta("default-src 'none'; connect-src 'none'")), 'index.html')).toThrow(/script-src 'self'/)
     expect(() => assertWebGameDocumentPolicy(doc(meta(`${STRICT}, script-src *`)), 'index.html')).toThrow(/single policy/)
     expect(() => assertWebGameDocumentPolicy(doc(meta("default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'")), 'index.html')).toThrow(/wasm-unsafe-eval/)
+  })
+})
+
+// Prism blocker: SVG members are documents, not inert images, when they are
+// navigated to or embedded as <object>/<iframe>. Script-capable SVG is refused.
+describe('GUBIC web game SVG members', () => {
+  const STATIC_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+<!-- static artwork -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 10 10" width="10" height="10">
+  <defs><linearGradient id="g"><stop offset="0" stop-color="#f00"/><stop offset="1" stop-color="#00f"/></linearGradient></defs>
+  <style>.a { fill: url(#g); opacity: .5 }</style>
+  <rect class="a" width="10" height="10" style="stroke: url(#g)"/>
+  <use xlink:href="#g"/><use href="sprites.svg#coin"/><image href="coin.png" width="2" height="2"/>
+  <a href="#top"><text x="1" y="5" font-family="sans-serif">One more turn</text></a>
+</svg>`
+  const withSvg = (svg: string | Buffer, path = 'art/sprite.svg') =>
+    gameArchive(doc(meta(STRICT)), {'main.js': 'ok()', [path]: svg})
+  const svgDoc = (inner: string, root = '<svg xmlns="http://www.w3.org/2000/svg">') => `${root}${inner}</svg>`
+  const rejection = (svg: string | Buffer, path?: string) => {
+    try {
+      verifyWebGameArchive(withSvg(svg, path))
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error('expected the SVG to be rejected')
+  }
+
+  it('accepts benign static SVG, plain and gzip-compressed', () => {
+    expect(() => verifyWebGameArchive(withSvg(STATIC_SVG))).not.toThrow()
+    expect(() => verifyWebGameArchive(withSvg(gzipSync(Buffer.from(STATIC_SVG)), 'art/sprite.svgz'))).not.toThrow()
+    // Words like "onwards" or "javascript" in text content are not active content.
+    expect(() => verifyWebGameArchive(withSvg(svgDoc('<text>Onwards! Learn javascript later.</text>')))).not.toThrow()
+    expect(() => assertStaticSvg(Buffer.from(STATIC_SVG), 'x.svg')).not.toThrow()
+  })
+
+  it('rejects <script>, in any case, with a namespace prefix or whitespace', () => {
+    for (const inner of ['<script>alert(1)</script>', '<SCRIPT >alert(1)</SCRIPT>', '<svg:script href="a.js"/>', '< script>1</script>']) {
+      expect(rejection(svgDoc(inner)), inner).toMatch(/^\[GUBIC_SVG_ACTIVE_CONTENT\] .*<script> element/)
+    }
+  })
+
+  it('rejects on*= event-handler attributes', () => {
+    for (const root of ['<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)">', '<svg xmlns="http://www.w3.org/2000/svg" ONLOAD = \'x()\'>', '<svg xmlns="http://www.w3.org/2000/svg"\n\tonclick=x()>']) {
+      expect(rejection(svgDoc('', root)), root).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*event-handler attribute/)
+    }
+    expect(rejection(svgDoc('<rect width="1" height="1" onmouseover="steal()"/>'))).toMatch(/event-handler attribute \(onmouseover\)/)
+    expect(rejection(svgDoc('<set attributeName="fill" to="red" begin="0s" svg:onbegin="x()"/>'))).toMatch(/event-handler/)
+  })
+
+  it('rejects <foreignObject>', () => {
+    expect(rejection(svgDoc('<foreignObject width="10" height="10"><div xmlns="http://www.w3.org/1999/xhtml">hi</div></foreignObject>')))
+      .toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*<foreignObject>/)
+    expect(rejection(svgDoc('<FOREIGNOBJECT/>'))).toMatch(/foreignObject/)
+  })
+
+  it('rejects javascript: URLs, including encoded and whitespace-split forms', () => {
+    for (const href of ['javascript:alert(1)', 'JaVaScRiPt:alert(1)', ' java\tscript:alert(1)', 'java&#x09;script:alert(1)', '&#106;avascript:alert(1)', 'javascript&colon;alert(1)', 'java&Tab;script:x']) {
+      expect(rejection(svgDoc(`<a xlink:href="${href}"><text>x</text></a>`)), href).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*script URL/)
+    }
+    // SMIL can rewrite href to a script URL at runtime.
+    expect(rejection(svgDoc('<a><set attributeName="href" to="javascript:alert(1)"/></a>'))).toMatch(/script URL \(to\)/)
+  })
+
+  it('rejects external href / xlink:href references and remote stylesheets', () => {
+    for (const ref of ['https://evil.example/x.svg#a', 'http://evil.example/a.png', '//evil.example/a.png', 'HTTPS://evil.example/a']) {
+      expect(rejection(svgDoc(`<use href="${ref}"/>`)), ref).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*external reference/)
+      expect(rejection(svgDoc(`<image xlink:href="${ref}"/>`)), ref).toMatch(/external reference \(xlink:href=/)
+    }
+    expect(rejection(svgDoc('<rect style="fill:url(https://evil.example/p.svg#x)"/>'))).toMatch(/external url\(\) reference/)
+    expect(rejection(svgDoc('<style>@import "https://evil.example/a.css";</style>'))).toMatch(/external stylesheet/)
+    expect(rejection(svgDoc('<style>rect { fill: url( //evil.example/p#x ) }</style>'))).toMatch(/external stylesheet/)
+  })
+
+  it('rejects entity declarations and xml-stylesheet processing instructions', () => {
+    expect(rejection(`<!DOCTYPE svg [<!ENTITY x "&#60;script&#62;alert(1)&#60;/script&#62;">]>${svgDoc('&x;')}`)).toMatch(/XML entity declaration/)
+    expect(rejection(`<?xml-stylesheet type="text/xsl" href="evil.xsl"?>${svgDoc('')}`)).toMatch(/xml-stylesheet/)
+  })
+
+  it('finds SVG by content sniffing even without an .svg extension, but not in images or HTML', () => {
+    const evil = svgDoc('<script>alert(1)</script>')
+    expect(rejection(evil, 'art/sprite.png')).toMatch(/GUBIC_SVG_ACTIVE_CONTENT/)
+    expect(rejection(`<?xml version="1.0"?>\n<!-- c -->\n<!DOCTYPE svg>\n${evil}`, 'art/data.bin')).toMatch(/GUBIC_SVG_ACTIVE_CONTENT/)
+    expect(rejection(gzipSync(Buffer.from(evil)), 'art/sprite.dat')).toMatch(/GUBIC_SVG_ACTIVE_CONTENT/)
+    expect(isSvgMember('art/sprite.png', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]))).toBe(false)
+    expect(isSvgMember('notes.txt', Buffer.from('plain text mentioning <svg> later'))).toBe(false)
+    expect(isSvgMember('index.html', Buffer.from(evil))).toBe(false)
+  })
+
+  it('exposes the error code on the thrown error', () => {
+    try {
+      assertStaticSvg(Buffer.from(svgDoc('<script/>')), 'a.svg')
+      throw new Error('not rejected')
+    } catch (error) {
+      expect(error).toBeInstanceOf(WebGameContentPolicyError)
+      expect((error as WebGameContentPolicyError).code).toBe('GUBIC_SVG_ACTIVE_CONTENT')
+    }
   })
 })

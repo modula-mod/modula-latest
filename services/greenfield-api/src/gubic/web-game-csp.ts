@@ -12,9 +12,24 @@
  * checks) lives in the native player and is out of scope here.
  */
 
-export class WebGameContentPolicyError extends Error {}
+import {gunzipSync} from 'node:zlib'
+
+/** Machine-readable reasons. CSP rejections predating the codes use the generic one. */
+export type WebGameContentPolicyCode =
+  | 'GUBIC_CONTENT_POLICY'
+  | 'GUBIC_SVG_ACTIVE_CONTENT'
+
+export class WebGameContentPolicyError extends Error {
+  constructor(message: string, readonly code: WebGameContentPolicyCode = 'GUBIC_CONTENT_POLICY') {
+    super(message)
+  }
+}
 
 const fail = (message: string): never => { throw new WebGameContentPolicyError(message) }
+/** Fails with a code; the code is also prefixed to the message so it survives error mapping. */
+const failCode = (code: WebGameContentPolicyCode, message: string): never => {
+  throw new WebGameContentPolicyError(`[${code}] ${message}`, code)
+}
 
 /** Elements whose content is raw text / RCDATA: markup inside them is not markup. */
 const RAW_TEXT_ELEMENTS = ['script', 'style', 'title', 'textarea', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript', 'template']
@@ -170,6 +185,115 @@ export function assertWebGameDocumentPolicy(html: string, path: string): ParsedC
   return directives
 }
 
+/**
+ * Decodes XML/HTML character references for scanning purposes only. Unlike
+ * `decodeEntities` it never fails: unknown named references are left in place.
+ * The small named set covers the classic `java&Tab;script&colon;` bypasses.
+ */
+function decodeReferencesForScan(value: string): string {
+  const named: Record<string, string> = {
+    quot: '"', apos: "'", lt: '<', gt: '>', amp: '&', colon: ':', tab: '\t', newline: '\n', sol: '/', bsol: '\\',
+    lpar: '(', rpar: ')', period: '.', nbsp: ' ',
+  }
+  let previous: string
+  let out = value
+  // Decode repeatedly so that `&amp;#106;` style double encoding cannot hide a scheme.
+  do {
+    previous = out
+    out = out
+      .replace(/&#x0*([0-9a-f]{1,6});?/gi, (_, hex: string) => safeCodePoint(parseInt(hex, 16)))
+      .replace(/&#0*([0-9]{1,7});?/g, (_, dec: string) => safeCodePoint(parseInt(dec, 10)))
+      .replace(/&([a-z]+);/gi, (match, name: string) => named[name.toLowerCase()] ?? match)
+  } while (out !== previous)
+  return out
+}
+
+function safeCodePoint(point: number): string {
+  return Number.isInteger(point) && point >= 0 && point <= 0x10ffff ? String.fromCodePoint(point) : '\uFFFD'
+}
+
+/** URL-ish normalisation: browsers drop ASCII whitespace/control characters inside schemes. */
+function normaliseUrlForScan(value: string): string {
+  // eslint-disable-next-line no-control-regex
+  return decodeReferencesForScan(value).replace(/[\u0000-\u0020\u007f-\u009f]+/g, '').toLowerCase()
+}
+
+const REMOTE_REFERENCE = /^(?:https?:|\/\/|\\\\)/
+
+/** Every start tag in a markup string, with a lenient attribute parse (no entity failure). */
+function allStartTags(markup: string): Array<{name: string, attributes: Array<[string, string]>}> {
+  const tags: Array<{name: string, attributes: Array<[string, string]>}> = []
+  const tagPattern = /<([a-z][\w.:-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/gi
+  let tag: RegExpExecArray | null
+  while ((tag = tagPattern.exec(markup))) {
+    const attributes: Array<[string, string]> = []
+    const attributePattern = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
+    let attribute: RegExpExecArray | null
+    while ((attribute = attributePattern.exec(tag[2]!))) {
+      attributes.push([attribute[1]!.toLowerCase(), attribute[2] ?? attribute[3] ?? attribute[4] ?? ''])
+    }
+    tags.push({name: tag[1]!.toLowerCase(), attributes})
+  }
+  return tags
+}
+
+const localName = (qualified: string) => qualified.slice(qualified.lastIndexOf(':') + 1)
+
+/** True for `.svg`/`.svgz` members and for any member whose content sniffs as SVG (image/svg+xml). */
+export function isSvgMember(path: string, bytes: Buffer): boolean {
+  if (/\.svgz?$/i.test(path)) return true
+  if (/\.html?$/i.test(path)) return false
+  const text = svgText(bytes)?.slice(0, 64 * 1024) ?? null
+  return text !== null && /^(?:\uFEFF)?\s*(?:<\?xml\b[^>]*\?>\s*|<!--[\s\S]*?-->\s*|<!doctype\b[^>[]*(?:\[[\s\S]*?\])?\s*>\s*)*<(?:[\w.-]+:)?svg\b/i.test(text)
+}
+
+/**
+ * Text of a possibly gzip-compressed (svgz) member, or null when it is not
+ * text (contains NUL, e.g. a PNG; UTF-16 SVG is therefore treated as binary).
+ * Decompression is bounded by the archive's own 64 MiB expanded-size limit.
+ */
+function svgText(bytes: Buffer): string | null {
+  let raw = bytes
+  if (raw.length >= 2 && raw[0] === 0x1f && raw[1] === 0x8b) {
+    try { raw = gunzipSync(raw, {maxOutputLength: 64 * 1024 * 1024}) } catch { return null }
+  }
+  if (raw.includes(0)) return null
+  return raw.toString('utf8')
+}
+
+/**
+ * Rejects script-capable SVG. Plain static SVG (shapes, gradients, local
+ * `#fragment` or relative references, inline styles) passes. Matching is
+ * case-insensitive, namespace-prefix tolerant and whitespace tolerant.
+ */
+export function assertStaticSvg(bytes: Buffer, path: string): void {
+  const text = svgText(bytes)
+  if (text === null) failCode('GUBIC_SVG_ACTIVE_CONTENT', `Web game SVG ${path} is not a text document`)
+  const svg = stripHtmlComments(text!)
+  const reject = (what: string) => failCode('GUBIC_SVG_ACTIVE_CONTENT', `Web game SVG ${path} contains ${what}`)
+  if (/<\s*(?:[\w.-]+:)?script\b/i.test(svg)) reject('a <script> element')
+  if (/<\s*(?:[\w.-]+:)?foreignobject\b/i.test(svg)) reject('a <foreignObject> element')
+  // Entity declarations can smuggle markup past a scan; external stylesheets/XSLT can run code.
+  if (/<!entity\b/i.test(svg)) reject('an XML entity declaration')
+  if (/<\?xml-stylesheet\b/i.test(svg)) reject('an xml-stylesheet processing instruction')
+  for (const {attributes} of allStartTags(svg)) {
+    for (const [name, value] of attributes) {
+      const local = localName(name)
+      if (/^on/.test(local)) reject(`an event-handler attribute (${name})`)
+      const normalised = normaliseUrlForScan(value)
+      if (/(?:java|vb)script:/.test(normalised)) reject(`a script URL (${name})`)
+      if ((local === 'href' || local === 'src') && REMOTE_REFERENCE.test(normalised)) reject(`an external reference (${name}="${value.trim()}")`)
+      if (/url\(\s*['"]?(?:https?:|\/\/)/.test(normalised)) reject(`an external url() reference (${name})`)
+    }
+  }
+  // <style> element bodies: external url()/@import and script URLs.
+  for (const match of svg.matchAll(/<\s*(?:[\w.-]+:)?style\b[^>]*>([\s\S]*?)(?:<\/\s*(?:[\w.-]+:)?style\s*>|$)/gi)) {
+    const css = normaliseUrlForScan(match[1]!)
+    if (/url\(['"]?(?:https?:|\/\/)/.test(css) || /@import(?:url\()?['"]?(?:https?:|\/\/)/.test(css)) reject('an external stylesheet reference')
+    if (/(?:java|vb)script:/.test(css)) reject('a script URL in a <style> element')
+  }
+}
+
 /** Rejects dynamic code evaluation in a JavaScript source. Matches inside comments and strings too, by design. */
 export function assertNoDynamicCode(source: string, path: string): void {
   if (/(?<![\w$])eval\s*\(/.test(source)) fail(`Web game script ${path} uses eval()`)
@@ -190,6 +314,8 @@ export function assertWebGameContentPolicy(files: ReadonlyMap<string, Buffer>, e
       }
     } else if (/\.(?:m?js|cjs)$/i.test(path)) {
       assertNoDynamicCode(bytes.toString('utf8'), path)
+    } else if (isSvgMember(path, bytes)) {
+      assertStaticSvg(bytes, path)
     }
   }
 }
