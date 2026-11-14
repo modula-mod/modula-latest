@@ -241,9 +241,11 @@ describe('GUBIC web game HTML hardening', () => {
   })
 
   it('rejects inline on* event-handler attributes', () => {
-    for (const body of ['<img src="a.png" onerror="alert(1)">', '<body ONLOAD = x()>', '<canvas\n\tonclick=go()></canvas>', '<img/onerror=alert(1) src=x>', '<svg><rect onmouseover="x()"/></svg>']) {
+    for (const body of ['<img src="a.png" onerror="alert(1)">', '<body ONLOAD = x()>', '<canvas\n\tonclick=go()></canvas>', '<div><span onmouseover="x()"></span></div>']) {
       expect(htmlRejection(html(body)), body).toMatch(/^\[GUBIC_HTML_ACTIVE_CONTENT\] .*inline event-handler attribute/)
     }
+    // A stray "/" before the handler is a parse error the browser recovers from (the handler still applies): refused as malformed.
+    expect(htmlRejection(html('<img/onerror=alert(1) src=x>'))).toMatch(/^\[GUBIC_HTML_MALFORMED\] .*stray "\/"/)
     // Text that merely mentions handlers, and handler-like words inside scripts, are fine.
     expect(() => verifyWebGameArchive(html('<p>Press on to continue; set onload later.</p><script src="main.js"></script>'))).not.toThrow()
     expect(() => verifyWebGameArchive(html('<script>window.addEventListener("load", () => { document.body.setAttribute("data-x", "<img onerror=1>") })</script>'))).not.toThrow()
@@ -282,6 +284,104 @@ describe('GUBIC web game HTML hardening', () => {
     // Local workers are not "remote" (worker-src 'none' still stops them at runtime).
     for (const code of ['new Worker("worker.js")', "new Worker(new URL('./worker.js', import.meta.url))", 'navigator.serviceWorker.register("/sw.js")', 'importScripts("lib.js")']) {
       expect(() => assertNoRemoteWorkers(code, 'main.js'), code).not.toThrow()
+    }
+  })
+})
+
+// Sentinel §33 (#188): every probe that the regex scanner accepted. The scanner now
+// tokenizes like a browser and fails closed, so each of these must be refused.
+describe('GUBIC web game HTML tokenizer (Sentinel §33 probes)', () => {
+  const BODY = '<canvas></canvas><script src="main.js"></script>'
+  const csp = meta(STRICT)
+  const reason = (html: string) => {
+    try {
+      verifyWebGameArchive(gameArchive(html))
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error(`expected the document to be rejected: ${html}`)
+  }
+
+  it('rejects a remote script hidden by an empty <!--> comment before the CSP meta', () => {
+    const probe = '<!--><script src="https://evil.example/x.js"></script>-->'
+    expect(reason(`<!doctype html><html><head>${probe}${csp}</head><body>${BODY}</body></html>`)).toMatch(/before any other content|non-local script/)
+    expect(reason(`${probe}${csp}${BODY}`)).toMatch(/before any other content|non-local script/)
+  })
+
+  it('rejects a remote script between meta attributes that look like a comment, before the CSP meta', () => {
+    const probe = '<meta name=a content="<!--"><script src=https://evil.example/x.js></script><meta name=b content="-->">'
+    expect(reason(`<head>${probe}${csp}</head>${BODY}`)).toMatch(/before any other content|non-local script/)
+  })
+
+  it('rejects on* handlers after <!-->, <!---> and <!-- --!> comments', () => {
+    for (const probe of ['<!--><img src=x onerror=alert(1)>-->', '<!---><img src=x onerror=alert(1)>-->', '<!-- --!><img src=x onerror=alert(1)>-->']) {
+      expect(reason(doc(csp, probe)), probe).toMatch(/GUBIC_HTML_ACTIVE_CONTENT.*inline event-handler attribute \(onerror on <img>\)/)
+    }
+  })
+
+  it('does not start a comment inside an attribute value', () => {
+    expect(reason(doc(csp, '<p title="<!--"><img src=x onerror=alert(1)><p title="-->">'))).toMatch(/inline event-handler attribute \(onerror on <img>\)/)
+  })
+
+  it('does not start a comment inside script text', () => {
+    // The literal probe uses "<!--" inside the script, which is refused outright (escape states are not modelled)...
+    expect(reason(doc(csp, '<script>var a="<!--";</script><img src=x onerror=alert(1)><script>"-->"</script>'))).toMatch(/GUBIC_HTML_MALFORMED.*"<!--" inside an inline <script>/)
+    // ...and without it, the markup between the scripts is still seen.
+    expect(reason(doc(csp, '<script>var a="<!-" + "-";</script><img src=x onerror=alert(1)><script>"-->"</script>'))).toMatch(/inline event-handler attribute \(onerror on <img>\)/)
+  })
+
+  it('ends a <? bogus comment at the first >', () => {
+    expect(reason(doc(csp, '<?x <!-- ><img src=x onerror=alert(1)> -->'))).toMatch(/inline event-handler attribute \(onerror on <img>\)/)
+    expect(reason(doc(csp, '<!x <!-- ><img src=x onerror=alert(1)> -->'))).toMatch(/inline event-handler attribute \(onerror on <img>\)/)
+  })
+
+  it('ends script data at </script followed by whitespace or /', () => {
+    for (const probe of ['<script>/* </script x><img src=x onerror=alert(1)> */</script>', '<script>/* </script/><img src=x onerror=alert(1)> */</script>',
+      '<script>/* </SCRIPT\t><img src=x onerror=alert(1)> */</script>']) {
+      expect(reason(doc(csp, probe)), probe).toMatch(/GUBIC_HTML_(?:MALFORMED|ACTIVE_CONTENT)/)
+    }
+    // A plain "</script>" variant: tokenized like the browser, the handler is found.
+    expect(reason(doc(csp, '<script>/* </SCRIPT ><img src=x onerror=alert(1)> */</script>'))).toMatch(/onerror on <img>/)
+    // "</scripts" is not an end tag: still script text, so nothing is found and the document passes.
+    expect(() => verifyWebGameArchive(gameArchive(doc(csp, '<script>var s = "</scripts>"; ok()</script><script src="main.js"></script>')))).not.toThrow()
+  })
+
+  it('fails closed on a stray quote in an unquoted value or attribute name', () => {
+    expect(reason(doc(csp, "<img src=x' onerror=alert(1)>"))).toMatch(/GUBIC_HTML_MALFORMED.*unexpected ' in the unquoted value of src/)
+    expect(reason(doc(csp, "<img a'b src=x onerror=alert(1)>"))).toMatch(/GUBIC_HTML_MALFORMED.*unexpected ' in an attribute name/)
+  })
+
+  it('fails closed on other tags that cannot be tokenized unambiguously', () => {
+    for (const probe of ['<img src="a"onerror=x>', '<img =x>', '<img src=>', '<img src="x', '<img src=a<b>', '<a href=x`y>', '<img src=x src=y>',
+      '</ x>', '</3>', '</p x>', '<plaintext>', '<![CDATA[ x ]]>', '<script>x', '<style>a{}', 'a\u0000b', '<img a"b=1>', '<i<b>x</i>']) {
+      expect(reason(doc(csp, probe)), JSON.stringify(probe)).toMatch(/GUBIC_HTML_MALFORMED/)
+    }
+  })
+
+  it('only allows whitespace, a DOCTYPE, <html>, <head> and <meta charset> before the CSP meta', () => {
+    expect(() => verifyWebGameArchive(gameArchive(`\uFEFF<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  ${csp}\n  <title>Game</title>\n</head><body>${BODY}</body></html>`))).not.toThrow()
+    for (const before of ['<!-- note -->', '<!---->', '<?xml version="1.0"?>', '<title></title>', '<base href="/">', '<meta name="viewport" content="width=device-width">',
+      '<meta charset="utf-8" name="x">', '<link rel="stylesheet" href="a.css">', '<style></style>', 'x', '<body>', '</head>', '<noscript></noscript>']) {
+      expect(reason(`<!doctype html><html><head>${before}${csp}</head>${BODY}`), before).toMatch(/before any other content/)
+    }
+  })
+
+  it('re-scans raw text whose meaning depends on parser context', () => {
+    // e.g. <style> in <select> is not raw text in every parser mode.
+    expect(reason(doc(csp, '<select><style><img src=x onerror=alert(1)></style></select>'))).toMatch(/onerror on <img>/)
+    expect(reason(doc(csp, '<noscript><img src=x onerror=alert(1)></noscript>'))).toMatch(/onerror on <img>/)
+    expect(reason(doc(csp, '<textarea><script src=https://evil.example/x.js></script></textarea>'))).toMatch(/non-local script/)
+    expect(() => verifyWebGameArchive(gameArchive(doc(csp, '<style>canvas > p { color: red }</style><textarea>a < b</textarea>' + BODY)))).not.toThrow()
+  })
+
+  it('refuses inline <svg> and <math>, whose foreign-content parsing differs', () => {
+    expect(reason(doc(csp, '<svg><style><img src=x onerror=alert(1)></style></svg>'))).toMatch(/inline <svg> foreign content/)
+    expect(reason(doc(csp, '<math><mi>x</mi></math>'))).toMatch(/inline <math> foreign content/)
+  })
+
+  it('normalises script src URLs like a browser before the locality check', () => {
+    for (const src of ['ht\ttps://evil.example/x.js', ' //evil.example/x.js', '/\\evil.example/x.js', '&#104;ttps://evil.example/x.js', '\\\\evil.example\\x.js']) {
+      expect(reason(doc(csp, `<script src="${src}"></script>`)), src).toMatch(/non-local script/)
     }
   })
 })

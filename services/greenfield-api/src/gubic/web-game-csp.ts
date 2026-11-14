@@ -2,8 +2,11 @@
  * Ingestion-time content policy for GUBIC web games (`web-mini-game`).
  *
  * The signed game archive must carry its own restrictive Content-Security-Policy
- * in a real `<meta http-equiv="Content-Security-Policy">` element. This module
- * parses that element and its directives instead of looking for substrings,
+ * in a real `<meta http-equiv="Content-Security-Policy">` element. Documents are
+ * tokenized the way a browser tokenizes them (`html-tokenizer.ts`, WHATWG
+ * states, no regex scanning of markup) and anything the tokenizer cannot read
+ * unambiguously is refused. This module parses the CSP element and its
+ * directives instead of looking for substrings,
  * and also rejects remote script tags, inline event handlers, `javascript:`
  * URLs, `srcdoc`, import maps, script-capable SVG, remote worker registrations
  * and dynamic code evaluation in bundled JavaScript. It is dependency-free on
@@ -22,12 +25,15 @@
 
 import {gunzipSync} from 'node:zlib'
 
+import {HtmlTokenizeError, tokenizeHtml, type HtmlToken} from './html-tokenizer.js'
+
 /** Machine-readable reasons. CSP rejections predating the codes use the generic one. */
 export type WebGameContentPolicyCode =
   | 'GUBIC_CONTENT_POLICY'
   | 'GUBIC_SVG_ACTIVE_CONTENT'
   | 'GUBIC_HTML_ACTIVE_CONTENT'
   | 'GUBIC_REMOTE_WORKER'
+  | 'GUBIC_HTML_MALFORMED'
 
 export class WebGameContentPolicyError extends Error {
   constructor(message: string, readonly code: WebGameContentPolicyCode = 'GUBIC_CONTENT_POLICY') {
@@ -40,9 +46,6 @@ const fail = (message: string): never => { throw new WebGameContentPolicyError(m
 const failCode = (code: WebGameContentPolicyCode, message: string): never => {
   throw new WebGameContentPolicyError(`[${code}] ${message}`, code)
 }
-
-/** Elements whose content is raw text / RCDATA: markup inside them is not markup. */
-const RAW_TEXT_ELEMENTS = ['script', 'style', 'title', 'textarea', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript', 'template']
 
 /** Directives a game document may declare. Anything else is refused. */
 const ALLOWED_DIRECTIVES = new Set([
@@ -57,26 +60,11 @@ const CODE_DIRECTIVES = new Set(['script-src', 'script-src-elem', 'script-src-at
 /** Directives whose value must be exactly `'none'`. All but object-src are mandatory. */
 const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'connect-src', 'object-src', 'base-uri', 'worker-src'])
 
-/**
- * Markup permitted before the CSP meta. Anything else (text, a loading element,
- * `</head>`, `<body>`) would either run before the policy applies or move the
- * meta out of `<head>`, where browsers ignore it.
- */
-const PRE_CSP_ALLOWED_MARKUP = /<!doctype\b[^>]*>|<html\b[^>]*>|<head\b[^>]*>|<title\b[^>]*><\/title>|<meta\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi
-
 export type ParsedCsp = Map<string, string[]>
 
 /** Removes HTML comments. An unterminated comment swallows the rest of the document, as in a browser. */
 export function stripHtmlComments(html: string): string {
   return html.replace(/<!--[\s\S]*?(?:-->|$)/g, ' ')
-}
-
-function stripRawTextElements(html: string): string {
-  let out = html
-  for (const name of RAW_TEXT_ELEMENTS) {
-    out = out.replace(new RegExp(`(<${name}\\b(?:[^>"']|"[^"]*"|'[^']*')*>)[\\s\\S]*?(?:</${name}\\s*>|$)`, 'gi'), '$1</' + name + '>')
-  }
-  return out
 }
 
 function decodeEntities(value: string): string {
@@ -86,28 +74,6 @@ function decodeEntities(value: string): string {
     .replace(/&(quot|apos|lt|gt|amp);/gi, (_, name: string) => ({quot: '"', apos: "'", lt: '<', gt: '>', amp: '&'} as Record<string, string>)[name.toLowerCase()]!)
   if (/&[a-z0-9#]+;/i.test(decoded)) fail('Web game CSP uses an unsupported character reference')
   return decoded
-}
-
-/** Parses the attributes of a single start tag (`<tag ...>`). Duplicate attributes keep the first, as in HTML. */
-export function parseTagAttributes(tag: string): Map<string, string> {
-  const attributes = new Map<string, string>()
-  const body = tag.replace(/^<[a-z0-9-]+/i, '').replace(/\/?>$/, '')
-  const pattern = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
-  let match: RegExpExecArray | null
-  while ((match = pattern.exec(body))) {
-    const name = match[1]!.toLowerCase()
-    if (attributes.has(name)) continue
-    attributes.set(name, decodeEntities(match[2] ?? match[3] ?? match[4] ?? ''))
-  }
-  return attributes
-}
-
-function startTags(html: string, name: string): Array<{tag: string, index: number}> {
-  const tags: Array<{tag: string, index: number}> = []
-  const pattern = new RegExp(`<${name}\\b(?:[^>"']|"[^"]*"|'[^']*')*>`, 'gi')
-  let match: RegExpExecArray | null
-  while ((match = pattern.exec(html))) tags.push({tag: match[0], index: match.index})
-  return tags
 }
 
 /** Parses a serialized policy into directives. Duplicate directives are refused rather than ignored. */
@@ -160,64 +126,117 @@ export function assertRestrictiveGameCsp(directives: ParsedCsp): void {
   if (!script || script.length !== 1 || script[0]!.toLowerCase() !== "'self'") fail("Web game CSP must set script-src 'self'")
 }
 
+type StartTag = Extract<HtmlToken, {type: 'startTag'}>
+
+const attributeValue = (tag: StartTag, name: string) => tag.attributes.find((attribute) => attribute.name === name)?.value
+
+/** Tokenizes like a browser (see html-tokenizer.ts); anything it cannot tokenize unambiguously is refused. */
+function tokenizeDocument(html: string, path: string): HtmlToken[] {
+  try {
+    return tokenizeHtml(html.replace(/^\uFEFF/, ''))
+  } catch (error) {
+    if (error instanceof HtmlTokenizeError) failCode('GUBIC_HTML_MALFORMED', `Web game document ${path} ${error.message}`)
+    throw error
+  }
+}
+
 /**
- * Extracts, parses and validates the document's CSP. Requires exactly one
- * effective `<meta http-equiv="Content-Security-Policy">` outside comments
- * and raw-text elements, placed before anything that loads or runs content.
+ * The only tokens allowed before the CSP meta: whitespace, a DOCTYPE, `<html>`,
+ * `<head>` and `<meta charset>`. No comments, processing instructions,
+ * scripts, `<base>`, `<title>` or anything else, so nothing can load, run or
+ * hide before the policy applies, and the meta stays inside `<head>`.
+ */
+function allowedBeforeCsp(token: HtmlToken): boolean {
+  switch (token.type) {
+    case 'text': return /^[\t\n\f ]*$/.test(token.data)
+    case 'doctype': return true
+    case 'startTag':
+      if (token.name === 'html' || token.name === 'head') return true
+      return token.name === 'meta' && token.attributes.length === 1 && token.attributes[0]!.name === 'charset'
+    default: return false
+  }
+}
+
+/** True when the http-equiv value is exactly Content-Security-Policy (ASCII case-insensitive, no trimming, as browsers match it). */
+function isCspMeta(token: HtmlToken): token is StartTag {
+  if (token.type !== 'startTag' || token.name !== 'meta') return false
+  const httpEquiv = attributeValue(token, 'http-equiv')
+  return httpEquiv !== undefined && decodeReferencesForScan(httpEquiv).toLowerCase() === 'content-security-policy'
+}
+
+/**
+ * Extracts, parses and validates the document's CSP, then checks the whole
+ * token stream. Requires exactly one effective `<meta http-equiv="Content-Security-Policy">`
+ * preceded only by whitespace, a DOCTYPE, `<html>`, `<head>` and `<meta charset>`.
  */
 export function assertWebGameDocumentPolicy(html: string, path: string): ParsedCsp {
-  const uncommented = stripHtmlComments(html)
-  const markup = stripRawTextElements(uncommented)
-  const cspMetas = startTags(markup, 'meta').filter(({tag}) =>
-    (parseTagAttributes(tag).get('http-equiv') ?? '').trim().toLowerCase() === 'content-security-policy')
+  const tokens = tokenizeDocument(html, path)
+  const cspMetas = tokens.filter(isCspMeta)
   if (cspMetas.length === 0) {
     fail(/content-security-policy/i.test(html)
       ? `Web game document ${path} has no effective CSP meta element (a policy inside a comment or raw text is ignored)`
       : `Web game document ${path} lacks the required restrictive CSP`)
   }
   if (cspMetas.length > 1) fail(`Web game document ${path} must declare exactly one CSP meta element`)
-  const [meta] = cspMetas
-  if (markup.slice(0, meta!.index).replace(/^\uFEFF/, '').replace(PRE_CSP_ALLOWED_MARKUP, '').trim()) {
-    fail(`Web game document ${path} must declare its CSP in <head> before any other content`)
+  const meta = cspMetas[0]!
+  if (!tokens.slice(0, tokens.indexOf(meta)).every(allowedBeforeCsp)) {
+    fail(`Web game document ${path} must declare its CSP in <head> before any other content (only a DOCTYPE, <html>, <head> and <meta charset> may precede it)`)
   }
-  const content = parseTagAttributes(meta!.tag).get('content')
+  const content = attributeValue(meta, 'content')
   if (!content?.trim()) fail(`Web game document ${path} has an empty CSP`)
-  const directives = parseCspDirectives(content!)
+  const directives = parseCspDirectives(decodeEntities(content!))
   assertRestrictiveGameCsp(directives)
-  for (const {tag} of startTags(uncommented, 'script')) {
-    const src = parseTagAttributes(tag).get('src')
-    if (src === undefined) continue
-    const trimmed = src.trim()
-    if (!trimmed || /^[a-z][a-z0-9+.-]*:/i.test(trimmed) || trimmed.startsWith('//') || trimmed.startsWith('\\')) {
-      fail(`Web game document ${path} loads a non-local script: ${trimmed || '(empty)'}`)
-    }
-  }
-  assertNoActiveHtmlMarkup(uncommented, path)
+  assertNoActiveHtmlMarkup(tokens, path, 0)
   return directives
 }
 
 /**
- * Rejects inline-code vectors in a game document: `on*` event-handler
- * attributes, `javascript:`/`vbscript:` URLs, `srcdoc` documents and
- * `<script type=importmap>`. The CSP already blocks inline handlers and
+ * Rejects inline-code vectors in a game document's tokens: non-local
+ * `<script src>`, `on*` event-handler attributes, `javascript:`/`vbscript:`
+ * URLs, `srcdoc` documents, `<script type=importmap>`, inline `<svg>`/`<math>`
+ * (foreign content changes how a browser tokenizes `<script>`/`<style>`), and
+ * dynamic code in inline scripts. The CSP already blocks inline handlers and
  * script URLs at runtime; refusing them at ingestion makes the failure
  * explicit and does not rely on every host honouring the meta policy.
+ *
+ * Non-script raw text (style, title, textarea, iframe, noscript, xmp, noembed,
+ * noframes) is also re-tokenized as markup and held to the same rules, because
+ * whether a browser treats it as raw text depends on tree-construction context.
  */
-function assertNoActiveHtmlMarkup(uncommented: string, path: string): void {
+function assertNoActiveHtmlMarkup(tokens: HtmlToken[], path: string, depth: number): void {
   const reject = (what: string) => failCode('GUBIC_HTML_ACTIVE_CONTENT', `Web game document ${path} contains ${what}`)
-  // Raw-text bodies (script/style/textarea...) are not markup; their start tags still are.
-  for (const {name, attributes} of allStartTags(stripRawTextElements(uncommented))) {
-    for (const [attribute, value] of attributes) {
+  for (const token of tokens) {
+    if (token.type === 'rawText') {
+      if (token.element === 'script') {
+        assertNoDynamicCode(token.data, `${path} (inline script)`)
+      } else if (depth < 4 && token.data.includes('<')) {
+        assertNoActiveHtmlMarkup(tokenizeDocument(token.data, `${path} (<${token.element}> content)`), path, depth + 1)
+      }
+      continue
+    }
+    if (token.type !== 'startTag') continue
+    const {name, attributes} = token
+    if (name === 'svg' || name === 'math') reject(`inline <${name}> foreign content (ship artwork as a separate .svg member)`)
+    if (name === 'script') {
+      const type = attributeValue(token, 'type')
+      if (type !== undefined && decodeReferencesForScan(type).trim().toLowerCase() === 'importmap') reject('a <script type=importmap> import map')
+      const src = attributeValue(token, 'src')
+      if (src !== undefined) {
+        // Browsers strip surrounding C0/space and drop tab/newline inside a URL before parsing its scheme.
+        const trimmed = decodeReferencesForScan(src).trim()
+        const normalised = normaliseUrlForScan(src)
+        if (!normalised || /^[a-z][a-z0-9+.-]*:/.test(normalised) || /^[\/\\]{2}/.test(normalised)) {
+          fail(`Web game document ${path} loads a non-local script: ${trimmed || '(empty)'}`)
+        }
+      }
+    }
+    for (const {name: attribute, value} of attributes) {
       if (/^on/.test(localName(attribute))) reject(`an inline event-handler attribute (${attribute} on <${name}>)`)
       if (attribute === 'srcdoc') reject(`a srcdoc attribute (on <${name}>)`)
       const normalised = normaliseUrlForScan(value)
       if (/^(?:java|vb)script:/.test(normalised) || (attribute === 'srcset' && /(?:^|,)(?:java|vb)script:/.test(normalised))) {
         reject(`a script URL (${attribute} on <${name}>)`)
       }
-    }
-    if (name === 'script') {
-      const type = attributes.find(([attribute]) => attribute === 'type')?.[1]
-      if (type !== undefined && decodeReferencesForScan(type).trim().toLowerCase() === 'importmap') reject('a <script type=importmap> import map')
     }
   }
 }
@@ -371,13 +390,8 @@ export function assertWebGameContentPolicy(files: ReadonlyMap<string, Buffer>, e
   if (!files.has(entryPath)) fail('Web game archive lacks its entry document')
   for (const [path, bytes] of files) {
     if (/\.html?$/i.test(path)) {
-      const html = bytes.toString('utf8')
-      assertWebGameDocumentPolicy(html, path)
-      for (const {tag, index} of startTags(stripHtmlComments(html), 'script')) {
-        const rest = stripHtmlComments(html).slice(index + tag.length)
-        const close = rest.search(/<\/script\s*>/i)
-        assertNoDynamicCode(close >= 0 ? rest.slice(0, close) : rest, `${path} (inline script)`)
-      }
+      // Also scans inline scripts for dynamic code (assertNoActiveHtmlMarkup).
+      assertWebGameDocumentPolicy(bytes.toString('utf8'), path)
     } else if (/\.(?:m?js|cjs)$/i.test(path)) {
       assertNoDynamicCode(bytes.toString('utf8'), path)
     } else if (isSvgMember(path, bytes)) {
