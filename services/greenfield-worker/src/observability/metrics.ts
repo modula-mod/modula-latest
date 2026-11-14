@@ -8,6 +8,8 @@ export interface MetricsSnapshot {
   jobsCompleted: number
   jobsRetried: number
   jobsDeadLettered: number
+  jobLeaseRenewals: number
+  jobLeasesLost: number
   outboxDrained: number
   ingestRuns: number
   ingestErrors: number
@@ -24,6 +26,8 @@ class WorkerMetrics {
     jobsCompleted: 0,
     jobsRetried: 0,
     jobsDeadLettered: 0,
+    jobLeaseRenewals: 0,
+    jobLeasesLost: 0,
     outboxDrained: 0,
     ingestRuns: 0,
     ingestErrors: 0,
