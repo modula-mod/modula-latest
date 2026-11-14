@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-14T21:50:56.257Z",
+  "capturedAt": "2026-11-14T22:24:52.751Z",
   "source": {
-    "branch": "mosaic/gubic-catalogue-review-lookup",
-    "headAtCapture": "f97e2648a94f05c81367ac4eb81589b16d92680c",
+    "branch": "mosaic/gf-mod-01",
+    "headAtCapture": "7d8421f461f0ffeb781cac640bb58cf13b8e2fd7",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "6264a6f8dba1bc247222c0870d56faf143fe27bcf0f5aaf10aaf91d31f084a1f"
+    "apiSourceSha256": "401511a201ec7446cc3fab8d8c04fff95df02d61192cf7c500ab77142ac19207"
   },
   "runtimeRoutes": [
     {
