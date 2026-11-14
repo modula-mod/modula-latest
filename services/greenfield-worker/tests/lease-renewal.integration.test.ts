@@ -18,7 +18,7 @@ import {metrics} from '../src/observability/metrics.js'
 
 const slowJob = vi.hoisted(() => ({durationMs: 0, during: null as null | ((elapsedMs: number) => Promise<void>)}))
 // Delays markJobRunning to model a large claim -> RUNNING gap (job sits LEASED).
-const slowMark = vi.hoisted(() => ({delayMs: 0, during: null as null | (() => Promise<void>), handlerRuns: 0}))
+const slowMark = vi.hoisted(() => ({delayMs: 0, during: null as null | (() => Promise<void>), handlerRuns: 0, throwBefore: null as null | Error}))
 vi.mock('../src/jobs/claim.js', async importOriginal => {
   const actual = await importOriginal<typeof import('../src/jobs/claim.js')>()
   return {
@@ -28,6 +28,7 @@ vi.mock('../src/jobs/claim.js', async importOriginal => {
         await new Promise(resolve => setTimeout(resolve, slowMark.delayMs))
         if (slowMark.during) await slowMark.during()
       }
+      if (slowMark.throwBefore) throw slowMark.throwBefore
       return actual.markJobRunning(...args)
     },
   }
@@ -115,6 +116,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     slowMark.delayMs = 0
     slowMark.during = null
     slowMark.handlerRuns = 0
+    slowMark.throwBefore = null
   })
 
   afterAll(async () => {
@@ -278,6 +280,65 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     expect(slowMark.handlerRuns).toBe(0)
     expect(await jobRow(jobId)).toMatchObject({status: 'LEASED', lease_owner: other, attempt_count: 2})
     expect(log.warn.mock.calls.map(([fields]) => (fields as {operation: string}).operation)).toContain('job.lease.lost')
+    expect(await db.selectFrom('job_failures').select('id').where('job_id', '=', jobId).execute()).toHaveLength(0)
+    await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
+  })
+
+  // GF-OPS-01(c) residual: a throw after claim and before markJobRunning used to
+  // call scheduleRetry on a LEASED row, whose RUNNING-only guard hid the original
+  // error behind JOB_LEASE_LOST. The job must be retried with the real error.
+  it('retries a LEASED job with the original error when a failure occurs before markJobRunning', async () => {
+    const cfg = config(`gf-ops-01c-leased-prerun-${suffix}`)
+    const jobId = await enqueue()
+    slowMark.throwBefore = Object.assign(new Error('injected pre-run failure'), {code: 'INJECTED_PRE_RUN_FAILURE'})
+    const log = {warn: vi.fn(), error: vi.fn()}
+    const retriedBefore = metrics.read().jobsRetried
+    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    expect(slowMark.handlerRuns).toBe(0)
+    const row = await db
+      .selectFrom('background_jobs')
+      .select(['status', 'lease_owner', 'lease_expires_at', 'attempt_count', 'last_error', 'error_code', 'error_class'])
+      .where('id', '=', jobId)
+      .executeTakeFirstOrThrow()
+    expect(row).toMatchObject({
+      status: 'RETRYING',
+      lease_owner: null,
+      lease_expires_at: null,
+      attempt_count: 1,
+      error_code: 'INJECTED_PRE_RUN_FAILURE',
+      error_class: 'INJECTED_PRE_RUN_FAILURE',
+    })
+    expect(row.last_error).toContain('injected pre-run failure')
+    expect(metrics.read().jobsRetried - retriedBefore).toBe(1)
+    const failed = log.error.mock.calls.map(([fields]) => fields as {operation?: string; error?: {code?: string | null}})
+    expect(failed.some(fields => fields.operation === 'job.run.failed' && fields.error?.code === 'INJECTED_PRE_RUN_FAILURE')).toBe(true)
+    expect(JSON.stringify(log.warn.mock.calls)).not.toMatch(/job\.lease\.lost/)
+    expect(JSON.stringify(log.error.mock.calls)).not.toMatch(/JOB_LEASE_LOST/)
+    expect(JSON.stringify(log.error.mock.calls)).not.toMatch(/postgres(ql)?:\/\//)
+    expect(await db.selectFrom('job_failures').select('id').where('job_id', '=', jobId).execute()).toHaveLength(0)
+    await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
+  })
+
+  it('still reports a lease loss when a LEASED job is reclaimed before a pre-run failure is recorded', async () => {
+    const cfg = config(`gf-ops-01c-leased-prerun-lost-${suffix}`)
+    const jobId = await enqueue()
+    const other = `gf-ops-01c-leased-prerun-owner-${suffix}`
+    slowMark.delayMs = 1
+    slowMark.during = async () => {
+      await db.updateTable('background_jobs')
+        .set({status: 'LEASED', lease_owner: other, lease_expires_at: new Date(Date.now() + 60_000), attempt_count: 2})
+        .where('id', '=', jobId).execute()
+    }
+    slowMark.throwBefore = Object.assign(new Error('injected pre-run failure'), {code: 'INJECTED_PRE_RUN_FAILURE'})
+    const lostBefore = metrics.read().jobLeasesLost
+    const log = {warn: vi.fn(), error: vi.fn()}
+    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    expect(slowMark.handlerRuns).toBe(0)
+    expect(await jobRow(jobId)).toMatchObject({status: 'LEASED', lease_owner: other, attempt_count: 2})
+    expect(metrics.read().jobLeasesLost - lostBefore).toBe(1)
+    expect(log.warn.mock.calls.map(([fields]) => (fields as {operation: string}).operation)).toContain('job.lease.lost')
+    const failed = log.error.mock.calls.map(([fields]) => fields as {operation?: string; error?: {code?: string | null}})
+    expect(failed.some(fields => fields.operation === 'job.run.failed' && fields.error?.code === 'INJECTED_PRE_RUN_FAILURE')).toBe(true)
     expect(await db.selectFrom('job_failures').select('id').where('job_id', '=', jobId).execute()).toHaveLength(0)
     await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
   })
