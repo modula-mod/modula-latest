@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-13T13:26:53.558Z for branch `mosaic/gubic-p1-html5-engine`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-13T12:34:17.748Z for branch `mosaic/gf-mod-02`; this does not claim deployment.
 
 - Runtime method routes: 896
 - Application routes: 631
@@ -4815,7 +4815,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `scripts/verify-greenfield-mps-v1.mjs`
+- Tests: `scripts/verify-greenfield-mps-v1.mjs`, `services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -5207,7 +5207,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -5690,7 +5690,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_accounts`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_release_frontends`
+- Database reads: `greenfield_accounts`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_release_frontends`, `the`
 - Database writes: `greenfield_module_release_signatures`, `greenfield_module_releases`
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`, `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
@@ -5788,7 +5788,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_accounts`
+- Database reads: `greenfield_accounts`, `the`
 - Database writes: `greenfield_module_releases`, `greenfield_module_sync_failures`, `greenfield_module_sync_runs`, `greenfield_release_artifacts`, `greenfield_release_asset_blobs`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
@@ -29070,7 +29070,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Tests: `services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
@@ -29119,7 +29119,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Tests: `services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (404)
 - Status: candidate-registered-not-production-probed
@@ -29168,7 +29168,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
+- Tests: `services/greenfield-api/tests/gf-mod-02.presentation-blobs.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed

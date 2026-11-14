@@ -420,7 +420,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Dependencies: deployment config
 - Verification: Stopping worker progress must transition container/status health within the documented window.
 
-## API-ATLAS-GAP-034 — P2 — 83 application routes have no statically matched automated test
+## API-ATLAS-GAP-034 — P2 — 82 application routes have no statically matched automated test
 
 - Domain/type: `testing` / `untested endpoint`
 - Remediation status: **OPEN**
