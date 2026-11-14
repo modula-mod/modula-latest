@@ -10,6 +10,7 @@ const AUTH_ERROR_MESSAGES: Partial<Record<ApiErrorCode, string>> = {
   PASSKEY_NOT_FOUND: 'Passkey not found',
   AUTH_METHOD_UNAVAILABLE: 'Authentication method unavailable',
   ACCOUNT_SUSPENDED: 'Account suspended',
+  EMAIL_VERIFICATION_REQUIRED: 'Email verification required',
 }
 
 export class AuthDomainError extends Error {

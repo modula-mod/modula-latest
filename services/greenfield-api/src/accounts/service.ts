@@ -14,6 +14,11 @@ import {SecurityEventService} from '../auth/security-events/service.js'
 import {ChallengeService} from '../auth/challenges/service.js'
 import {authError} from '../auth/errors.js'
 import {assertHandleAvailable, canonicalHandle, validateHandle} from './handle.js'
+import {
+  issueDecoyEmailVerification,
+  issuePendingEmailVerification,
+  type EmailVerificationChallengeIssue,
+} from './verification-challenge.js'
 
 const tokenHash = (token: string) => createHash('sha256').update(token).digest('hex')
 
@@ -434,7 +439,10 @@ export class AccountService {
       .execute()
   }
 
-  async resendVerification(email: string, options: {correlationId?: string; ipHash?: string | null} = {}): Promise<{resent: boolean}> {
+  async resendVerification(
+    email: string,
+    options: {correlationId?: string; ipHash?: string | null} = {},
+  ): Promise<{resent: true} & EmailVerificationChallengeIssue> {
     const normalizedEmail = email.trim().toLowerCase()
     const identity = await this.db
       .selectFrom('greenfield_auth_identities')
@@ -448,41 +456,27 @@ export class AccountService {
       .where('kind', '=', 'email')
       .where('identifier', '=', normalizedEmail)
       .executeTakeFirst()
-    if (!identity || identity.status !== 'pendingVerification') {
-      // Do not leak account existence.
-      return {resent: true}
-    }
-    await this.db.transaction().execute(async trx => {
-      const verificationChallenge = await this.challenges.forDb(trx).create({
-        purpose: 'email_verification',
-        accountId: identity.account_id,
-        methodId: `email-otp-${identity.account_id}`,
-        subjectIdentifier: normalizedEmail,
-        deliveryChannel: 'email',
-        ttlSeconds: Math.max(10 * 60, this.config.emailVerificationTtlHours * 3_600),
-        attemptLimit: 5,
-        rateLimitKeys: [
-          `account:${identity.account_id}`,
-          `email:${normalizedEmail}`,
-          ...(options.ipHash ? [`ip:${options.ipHash}`] : []),
-        ],
-        supersedeExisting: true,
-        metadata: {
+    const deps = {challenges: this.challenges, mail: this.mail, config: this.config}
+    const issued = await this.db.transaction().execute(async trx => {
+      if (!identity || identity.status !== 'pendingVerification') {
+        // Do not leak account existence: return a same-shape, undeliverable decoy.
+        return issueDecoyEmailVerification(trx, deps, {
+          email: normalizedEmail,
+          ipHash: options.ipHash,
           issuedFor: 'registration_verification_resend',
-          recipient: maskEmail(normalizedEmail),
-        },
-      })
-      await this.mail?.queueVerification(trx, {
+        })
+      }
+      return issuePendingEmailVerification(trx, deps, {
         accountId: identity.account_id,
         email: normalizedEmail,
-        displayName: displayNameFromIdentityMetadata(identity.metadata, identity.primary_handle),
         handle: identity.primary_handle,
-        code: verificationChallenge.code,
-        expiresAt: verificationChallenge.expiresAt,
+        identityMetadata: identity.metadata,
+        ipHash: options.ipHash,
         correlationId: options.correlationId,
+        issuedFor: 'registration_verification_resend',
       })
     })
-    return {resent: true}
+    return {resent: true, ...issued}
   }
 
   async changePassword(
