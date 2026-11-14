@@ -23972,7 +23972,7 @@
         "query": [],
         "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,

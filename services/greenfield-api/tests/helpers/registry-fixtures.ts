@@ -166,3 +166,22 @@ async function registerAccountInner(app: any, email: string, handle: string) {
   expect(session.statusCode, session.body).toBe(200)
   return {accountId: register.json().data.accountId as string, token: session.json().data.accessToken as string}
 }
+
+/**
+ * Stores the immutable module-package bytes that evidenceFor() digests by
+ * default, so a fixture release has the package artifact install requires
+ * (GF-MOD-01). Pass `bytes` when the evidence used a different digest.
+ */
+export async function storeFixturePackageArtifact(db: any, release: {releaseId: string; moduleId: string; version: string}, bytes: Buffer = Buffer.from(`artifact:${release.moduleId}:${release.version}`)) {
+  const digest = sha256(bytes)
+  const now = new Date()
+  await db.insertInto('greenfield_release_asset_blobs')
+    .values({sha256: digest, media_type: 'application/gzip', byte_size: bytes.length, bytes, created_at: now})
+    .onConflict((oc: any) => oc.column('sha256').doNothing()).execute()
+  await db.insertInto('greenfield_release_artifacts').values({
+    artifact_id: `release:${release.releaseId}:module-package`, release_id: release.releaseId, kind: 'module-package',
+    sha256: digest, filename: `${release.moduleId}-${release.version}.tgz`, access_class: 'installation',
+    required_for_offline_launch: true, created_at: now,
+  }).onConflict((oc: any) => oc.column('artifact_id').doNothing()).execute()
+  return digest
+}
