@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-14T21:40:59.911Z",
+  "capturedAt": "2026-11-14T21:53:42.620Z",
   "source": {
     "branch": "forge/native-endpoints-01",
-    "headAtCapture": "9af1028a4acbcd16a3c79a22797a3aadfc7bbf5b",
+    "headAtCapture": "3cc463b073db8cee8248bdaa755aae619c386818",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "90c9673a659e569ba72a6df81ac41ce400ed23403cddb540f046bb12afeeda3c"
+    "apiSourceSha256": "6e3ab17e6cbfe4ca0d69e932d59c04a37c8c87b7ac34ea7238e940a517bddc30"
   },
   "runtimeRoutes": [
     {
