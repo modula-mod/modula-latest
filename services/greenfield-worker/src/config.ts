@@ -13,9 +13,11 @@ const envSchema = z.object({
   MODULA_WORKER_LEASE_DURATION_MS: z.coerce.number().int().positive().default(60_000),
   MODULA_WORKER_LEASE_REAP_INTERVAL_MS: z.coerce.number().int().positive().default(30_000),
   // GF-OPS-01(c): renew a running job's lease on its own timer. Defaults to a third of the lease.
-  MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: z.coerce.number().int().positive().optional(),
+  // Parsed value must be >= 1000 ms and <= half the lease; fail closed, no clamping.
+  MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: z.coerce.number().int().min(1_000).optional(),
   // GF-OPS-01(c): liveness heartbeat on its own timer, independent of the job loop.
-  MODULA_WORKER_HEARTBEAT_INTERVAL_MS: z.coerce.number().int().min(1_000).max(60_000).default(15_000),
+  // Capped at 30 s so a configured interval cannot exceed the <=30 s heartbeat-age criterion.
+  MODULA_WORKER_HEARTBEAT_INTERVAL_MS: z.coerce.number().int().min(1_000).max(30_000).default(15_000),
   MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS: z.coerce.number().int().positive().default(2_000),
   MODULA_WORKER_OUTBOX_BATCH_SIZE: z.coerce.number().int().positive().default(50),
   MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
@@ -95,7 +97,7 @@ export type WorkerConfig = {
   emptyPollBackoffMs: number
   leaseDurationMs: number
   leaseReapIntervalMs: number
-  /** How often a running job's lease is extended; always below leaseDurationMs. */
+  /** How often a running job's lease is extended; at most half of leaseDurationMs, default lease/3. */
   leaseRenewIntervalMs: number
   /** How often the liveness heartbeat is written, independent of the job loop. */
   heartbeatIntervalMs: number
@@ -163,8 +165,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
   }
 
   const leaseRenewIntervalMs = raw.MODULA_WORKER_LEASE_RENEW_INTERVAL_MS ?? Math.max(1, Math.floor(raw.MODULA_WORKER_LEASE_DURATION_MS / 3))
-  if (leaseRenewIntervalMs >= raw.MODULA_WORKER_LEASE_DURATION_MS) {
-    refuse('MODULA_WORKER_LEASE_RENEW_INTERVAL_MS must be shorter than MODULA_WORKER_LEASE_DURATION_MS')
+  if (leaseRenewIntervalMs < 1_000) {
+    refuse('MODULA_WORKER_LEASE_RENEW_INTERVAL_MS must be at least 1000')
+  }
+  if (leaseRenewIntervalMs * 2 > raw.MODULA_WORKER_LEASE_DURATION_MS) {
+    refuse('MODULA_WORKER_LEASE_RENEW_INTERVAL_MS must be at most half of MODULA_WORKER_LEASE_DURATION_MS')
   }
 
   const environment = raw.MODULA_ENVIRONMENT
