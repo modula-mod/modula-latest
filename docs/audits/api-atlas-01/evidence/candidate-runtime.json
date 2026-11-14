@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T12:55:43.001Z",
+  "capturedAt": "2026-11-13T12:34:17.748Z",
   "source": {
-    "branch": "mosaic/gubic-p2-catalogue-gate-update-rollback",
-    "headAtCapture": "02e9d99f2c5703ae937201927479248e412f8aab",
+    "branch": "mosaic/gf-mod-02",
+    "headAtCapture": "45c68f27cfb07d0cca6b86259c5abf79ab19ad10",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "96487d7364704f9362a1f85c40bbcacea8a846839ef4807a0f73df6f9764a4d7"
+    "apiSourceSha256": "47c766610ee104db9c849b2903d1f71921f9e5db2fb560cf1b77f2998b841d89"
   },
   "runtimeRoutes": [
     {
