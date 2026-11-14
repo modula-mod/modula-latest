@@ -260,6 +260,8 @@ function workerConfig(): WorkerConfig {
     emptyPollBackoffMs: 1,
     leaseDurationMs: 60_000,
     leaseReapIntervalMs: 30_000,
+    leaseRenewIntervalMs: 20_000,
+    heartbeatIntervalMs: 15_000,
     outboxDrainIntervalMs: 1000,
     outboxBatchSize: 10,
     eventSubscriberTimeoutMs: 1000,
