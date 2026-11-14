@@ -53,12 +53,12 @@ services:
         modula-module-standard: /root/modula-mod/modula-module-standard
       labels:
         org.opencontainers.image.source: /root/modula-latest
-        org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
-        org.opencontainers.image.created: ${SOURCE_BUILT_AT}
+        org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+        org.opencontainers.image.created: ${SOURCE_BUILT_AT:?SOURCE_BUILT_AT must be set to the image build timestamp}
         org.opencontainers.image.version: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:-076_greenfield_premium_entitlements}
+        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:?SOURCE_EXPECTED_MIGRATION must be set to the exact target migration id}
         org.opencontainers.image.title: modula-greenfield-api
-    image: modula-greenfield-api:${SOURCE_RELEASE_SHA}
+    image: modula-greenfield-api:${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
     restart: unless-stopped
     init: true
     stop_grace_period: 45s
@@ -73,12 +73,12 @@ services:
       - /etc/modula/greenfield-api.env
       - /etc/modula/backend-fabric.env
     environment:
-      MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
-      MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT}
+      MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+      MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT:?SOURCE_BUILT_AT must be set to the image build timestamp}
       MODULA_RELEASE_ID: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-076_greenfield_premium_entitlements}
-      MODULA_WORKER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
-      MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
+      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:?SOURCE_EXPECTED_MIGRATION must be set to the exact target migration id}
+      MODULA_WORKER_RELEASE_SHA: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+      MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
     volumes:
       - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
     ports:
@@ -106,12 +106,12 @@ services:
         modula-module-standard: /root/modula-mod/modula-module-standard
       labels:
         org.opencontainers.image.source: /root/modula-latest
-        org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
-        org.opencontainers.image.created: ${SOURCE_BUILT_AT}
+        org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+        org.opencontainers.image.created: ${SOURCE_BUILT_AT:?SOURCE_BUILT_AT must be set to the image build timestamp}
         org.opencontainers.image.version: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:-076_greenfield_premium_entitlements}
+        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:?SOURCE_EXPECTED_MIGRATION must be set to the exact target migration id}
         org.opencontainers.image.title: modula-greenfield-worker
-    image: modula-greenfield-worker:${SOURCE_RELEASE_SHA}
+    image: modula-greenfield-worker:${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
     restart: unless-stopped
     init: true
     stop_grace_period: 45s
@@ -126,13 +126,20 @@ services:
       - /etc/modula/greenfield-worker.env
       - /etc/modula/backend-fabric.env
     environment:
-      MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
-      MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT}
+      MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+      MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT:?SOURCE_BUILT_AT must be set to the image build timestamp}
       MODULA_RELEASE_ID: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-076_greenfield_premium_entitlements}
-      MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
+      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:?SOURCE_EXPECTED_MIGRATION must be set to the exact target migration id}
+      MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
+      # Fixed, release-scoped worker identity (heartbeat row key and job lease
+      # owner). Without it the worker falls back to worker-<pid>, and the
+      # healthcheck could not tell this container's heartbeat from another
+      # process's. Single-instance service: do not scale it or `compose run` a
+      # second copy without overriding MODULA_WORKER_ID.
+      MODULA_WORKER_ID: greenfield-worker-${SOURCE_RELEASE_SHA:?SOURCE_RELEASE_SHA must be set to the exact 40-hex release SHA}
     volumes:
       - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
+      - ./greenfield-worker-heartbeat-healthcheck.cjs:/opt/modula/healthcheck/worker-heartbeat.cjs:ro
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     depends_on:
@@ -144,6 +151,14 @@ services:
         condition: service_healthy
     networks:
       - greenfield_internal
+    # G033: heartbeat freshness from greenfield_worker_heartbeats (the same
+    # source /v1/status uses); no new port and no worker code change.
+    healthcheck:
+      test: ['CMD', 'node', '/opt/modula/healthcheck/worker-heartbeat.cjs']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     security_opt:
       - no-new-privileges:true
 
