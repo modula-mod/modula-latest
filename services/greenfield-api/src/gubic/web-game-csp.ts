@@ -4,9 +4,17 @@
  * The signed game archive must carry its own restrictive Content-Security-Policy
  * in a real `<meta http-equiv="Content-Security-Policy">` element. This module
  * parses that element and its directives instead of looking for substrings,
- * and also rejects remote script tags and dynamic code evaluation in bundled
- * JavaScript. It is dependency-free on purpose and errs on the side of refusal:
- * anything it cannot interpret unambiguously is rejected.
+ * and also rejects remote script tags, inline event handlers, `javascript:`
+ * URLs, `srcdoc`, import maps, script-capable SVG, remote worker registrations
+ * and dynamic code evaluation in bundled JavaScript. It is dependency-free on
+ * purpose and errs on the side of refusal: anything it cannot interpret
+ * unambiguously is rejected.
+ *
+ * The JavaScript scans (eval / new Function / remote workers) are BEST-EFFORT
+ * static checks on source text: they catch direct and lightly obfuscated use,
+ * not determined obfuscation (e.g. `window['ev'+'al']`). The enforcing control
+ * is the CSP itself (no 'unsafe-eval', worker-src 'none') together with the
+ * native player's sandbox; these scans are an early, explainable refusal.
  *
  * Host-side isolation (iframe sandbox, origin isolation, postMessage origin
  * checks) lives in the native player and is out of scope here.
@@ -18,6 +26,8 @@ import {gunzipSync} from 'node:zlib'
 export type WebGameContentPolicyCode =
   | 'GUBIC_CONTENT_POLICY'
   | 'GUBIC_SVG_ACTIVE_CONTENT'
+  | 'GUBIC_HTML_ACTIVE_CONTENT'
+  | 'GUBIC_REMOTE_WORKER'
 
 export class WebGameContentPolicyError extends Error {
   constructor(message: string, readonly code: WebGameContentPolicyCode = 'GUBIC_CONTENT_POLICY') {
@@ -44,8 +54,8 @@ const ALLOWED_DIRECTIVES = new Set([
 /** Directives that govern executable code: only `'self'` (or `'none'`) is acceptable. */
 const CODE_DIRECTIVES = new Set(['script-src', 'script-src-elem', 'script-src-attr', 'worker-src', 'child-src', 'frame-src', 'object-src'])
 
-/** Directives whose value must be exactly `'none'`. */
-const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'connect-src', 'object-src'])
+/** Directives whose value must be exactly `'none'`. All but object-src are mandatory. */
+const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'connect-src', 'object-src', 'base-uri', 'worker-src'])
 
 /**
  * Markup permitted before the CSP meta. Anything else (text, a loading element,
@@ -64,7 +74,7 @@ export function stripHtmlComments(html: string): string {
 function stripRawTextElements(html: string): string {
   let out = html
   for (const name of RAW_TEXT_ELEMENTS) {
-    out = out.replace(new RegExp(`(<${name}\\b[^>]*>)[\\s\\S]*?(?:</${name}\\s*>|$)`, 'gi'), '$1</' + name + '>')
+    out = out.replace(new RegExp(`(<${name}\\b(?:[^>"']|"[^"]*"|'[^']*')*>)[\\s\\S]*?(?:</${name}\\s*>|$)`, 'gi'), '$1</' + name + '>')
   }
   return out
 }
@@ -182,7 +192,34 @@ export function assertWebGameDocumentPolicy(html: string, path: string): ParsedC
       fail(`Web game document ${path} loads a non-local script: ${trimmed || '(empty)'}`)
     }
   }
+  assertNoActiveHtmlMarkup(uncommented, path)
   return directives
+}
+
+/**
+ * Rejects inline-code vectors in a game document: `on*` event-handler
+ * attributes, `javascript:`/`vbscript:` URLs, `srcdoc` documents and
+ * `<script type=importmap>`. The CSP already blocks inline handlers and
+ * script URLs at runtime; refusing them at ingestion makes the failure
+ * explicit and does not rely on every host honouring the meta policy.
+ */
+function assertNoActiveHtmlMarkup(uncommented: string, path: string): void {
+  const reject = (what: string) => failCode('GUBIC_HTML_ACTIVE_CONTENT', `Web game document ${path} contains ${what}`)
+  // Raw-text bodies (script/style/textarea...) are not markup; their start tags still are.
+  for (const {name, attributes} of allStartTags(stripRawTextElements(uncommented))) {
+    for (const [attribute, value] of attributes) {
+      if (/^on/.test(localName(attribute))) reject(`an inline event-handler attribute (${attribute} on <${name}>)`)
+      if (attribute === 'srcdoc') reject(`a srcdoc attribute (on <${name}>)`)
+      const normalised = normaliseUrlForScan(value)
+      if (/^(?:java|vb)script:/.test(normalised) || (attribute === 'srcset' && /(?:^|,)(?:java|vb)script:/.test(normalised))) {
+        reject(`a script URL (${attribute} on <${name}>)`)
+      }
+    }
+    if (name === 'script') {
+      const type = attributes.find(([attribute]) => attribute === 'type')?.[1]
+      if (type !== undefined && decodeReferencesForScan(type).trim().toLowerCase() === 'importmap') reject('a <script type=importmap> import map')
+    }
+  }
 }
 
 /**
@@ -294,10 +331,39 @@ export function assertStaticSvg(bytes: Buffer, path: string): void {
   }
 }
 
-/** Rejects dynamic code evaluation in a JavaScript source. Matches inside comments and strings too, by design. */
+/**
+ * Rejects dynamic code evaluation in a JavaScript source. Matches inside
+ * comments and strings too, by design. BEST-EFFORT: this is a text scan, not a
+ * parser, so obfuscated access (`window['ev'+'al']`, `Function.prototype.constructor`)
+ * is not detected. The CSP (no 'unsafe-eval') is what actually blocks evaluation.
+ */
 export function assertNoDynamicCode(source: string, path: string): void {
   if (/(?<![\w$])eval\s*\(/.test(source)) fail(`Web game script ${path} uses eval()`)
   if (/\bnew\s+Function\s*\(/.test(source)) fail(`Web game script ${path} uses new Function()`)
+  assertNoRemoteWorkers(source, path)
+}
+
+/** A string/template literal whose value starts with a URL scheme (http:, data:, blob:...), `//` or `\\`. */
+const NON_LOCAL_LITERAL = String.raw`['"\x60]\s*(?:[a-zA-Z][a-zA-Z0-9+.-]*:|//|\\\\)`
+const REMOTE_WORKER_PATTERNS: Array<[RegExp, string]> = [
+  // new Worker('https://…'), new SharedWorker(new URL('//cdn/…', import.meta.url))
+  [new RegExp(String.raw`\bnew\s+(?:Shared)?Worker\s*\(\s*(?:new\s+URL\s*\(\s*)?` + NON_LOCAL_LITERAL), 'Worker/SharedWorker'],
+  // navigator.serviceWorker.register('https://…'), also ?. and ['register'] access
+  [new RegExp(String.raw`\bserviceWorker\s*(?:\??\.\s*register|\??\.?\s*\[\s*['"\x60]register['"\x60]\s*\])\s*\(\s*(?:new\s+URL\s*\(\s*)?` + NON_LOCAL_LITERAL), 'serviceWorker'],
+  // importScripts('https://…') inside a worker
+  [new RegExp(String.raw`\bimportScripts\s*\(\s*` + NON_LOCAL_LITERAL), 'importScripts'],
+]
+
+/**
+ * Rejects Worker / SharedWorker / serviceWorker registrations (and worker
+ * importScripts) whose script is a remote, data: or blob: URL literal.
+ * BEST-EFFORT like the eval scan: URLs built at runtime are not seen; the
+ * required `worker-src 'none'` is the enforcing control.
+ */
+export function assertNoRemoteWorkers(source: string, path: string): void {
+  for (const [pattern, what] of REMOTE_WORKER_PATTERNS) {
+    if (pattern.test(source)) failCode('GUBIC_REMOTE_WORKER', `Web game script ${path} registers a non-local ${what} script`)
+  }
 }
 
 /** Validates every document and script member of a web game archive. */

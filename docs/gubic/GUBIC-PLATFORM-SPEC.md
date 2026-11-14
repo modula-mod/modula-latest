@@ -122,6 +122,24 @@ Rules (enforced by `validateGubicManifest`, unit-tested):
 * `ageRating` ∈ `4+ | 9+ | 12+ | 17+`; `monetisation` ∈ `free | paid | in-game-purchases`.
 * The normalised manifest is stored with a canonical SHA-256 digest.
 
+### 3.1 Ingestion content policy (`web-game-csp.ts`)
+
+Every HTML document in the package must declare exactly one `<meta http-equiv="Content-Security-Policy">`
+in `<head>`, before other content, with `default-src 'none'`, `script-src 'self'`, `connect-src 'none'`,
+`base-uri 'none'` and `worker-src 'none'` (no `unsafe-*`, wildcards, remote, `data:` or `blob:` code sources).
+Ingestion also refuses, with a machine-readable code:
+
+* `GUBIC_HTML_ACTIVE_CONTENT`: inline `on*` handlers, `javascript:`/`vbscript:` URLs, `srcdoc`, `<script type=importmap>`.
+* `GUBIC_SVG_ACTIVE_CONTENT`: SVG members (`.svg`/`.svgz` or sniffed `image/svg+xml`) containing `<script>`,
+  `on*` handlers, `<foreignObject>`, script URLs, external `href`/`xlink:href`/`url()`/`@import` references,
+  entity declarations or `xml-stylesheet`. Plain static SVG is accepted.
+* `GUBIC_REMOTE_WORKER`: `Worker`/`SharedWorker`/`serviceWorker.register`/`importScripts` with a remote, `data:` or `blob:` URL literal.
+* Remote `<script src>`, `eval(` and `new Function(`.
+
+The JavaScript scans (`eval`, `new Function`, remote workers) are **best-effort** text scans, not a parser:
+they miss deliberately obfuscated or runtime-built calls. The enforcing controls are the CSP (no
+`'unsafe-eval'`, `worker-src 'none'`) and the native player's isolation in section 4.
+
 ## 4. HTML5/Phaser runtime (native)
 
 `GubicPlayerView` hosts one `WKWebView` per play:
