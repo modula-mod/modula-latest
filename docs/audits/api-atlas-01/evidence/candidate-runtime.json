@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-13T11:42:47.858Z",
+  "capturedAt": "2026-11-13T12:34:17.748Z",
   "source": {
-    "branch": "synapse/gf-sign-01",
-    "headAtCapture": "df59ac738f214007c6d8c5b149cba0db9cf01457",
+    "branch": "mosaic/gf-mod-02",
+    "headAtCapture": "45c68f27cfb07d0cca6b86259c5abf79ab19ad10",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "98826bbec44409a9fc89dd922cbbb70f71770f3a87e6726101df7d095a880012"
+    "apiSourceSha256": "47c766610ee104db9c849b2903d1f71921f9e5db2fb560cf1b77f2998b841d89"
   },
   "runtimeRoutes": [
     {
