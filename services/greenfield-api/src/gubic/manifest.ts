@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto'
+import {GUBIC_ENGINES, GUBIC_LATER_ENGINES, isGubicEngine, isGubicLaterEngine, type GubicEngine} from '@modula/greenfield-module-registry-contracts'
 
 /**
  * GUBIC game package manifest (`gubic.game.json`), schema `modula.gubic.game.v1`.
@@ -12,15 +13,15 @@ export const GUBIC_MANIFEST_SCHEMA = 'modula.gubic.game.v1'
 export const GUBIC_BRIDGE_CAPABILITIES = [
   'lifecycle', 'score', 'achievements', 'lobby', 'player.profile', 'moliboo.avatar', 'storage.namespaced',
 ] as const
-export const GUBIC_ENGINES = ['html5', 'phaser', 'playcanvas'] as const
-export const GUBIC_LATER_ENGINES = ['mmorpg-client', 'retro-emulation'] as const
+// Engine lists come from the one shared GUBIC definition; re-exported for existing callers.
+export {GUBIC_ENGINES, GUBIC_LATER_ENGINES}
 export const GUBIC_MAX_ACHIEVEMENTS = 100
 export const GUBIC_MAX_ACHIEVEMENT_POINTS = 1000
 export const GUBIC_MAX_PACKAGE_BYTES = 64 * 1024 * 1024
 export const GUBIC_MAX_LOBBY_PLAYERS = 16
 
 export type GubicBridgeCapability = typeof GUBIC_BRIDGE_CAPABILITIES[number]
-export type GubicEngine = typeof GUBIC_ENGINES[number]
+export type {GubicEngine}
 export type GubicMonetisation = 'free' | 'paid' | 'in-game-purchases'
 
 export type GubicAchievementDeclaration = {
@@ -80,9 +81,9 @@ export function validateGubicManifest(input: unknown): GubicGameManifest {
 
   const runtime = isRecord(m.runtime) ? m.runtime : {}
   const engine = str(runtime.engine)
-  if ((GUBIC_LATER_ENGINES as readonly string[]).includes(engine ?? '')) {
+  if (isGubicLaterEngine(engine)) {
     issues.push(`runtime.engine ${engine} is planned for a later phase and is not accepted yet`)
-  } else if (!(GUBIC_ENGINES as readonly string[]).includes(engine ?? '')) {
+  } else if (!isGubicEngine(engine)) {
     issues.push(`runtime.engine must be one of ${GUBIC_ENGINES.join(', ')}`)
   }
   if ((runtime.entry ?? 'index.html') !== 'index.html') issues.push('runtime.entry must be index.html')

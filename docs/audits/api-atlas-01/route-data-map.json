@@ -1666,8 +1666,7 @@
       "greenfield_module_releases",
       "greenfield_module_versions",
       "greenfield_mps_ingestions",
-      "greenfield_release_frontends",
-      "the"
+      "greenfield_release_frontends"
     ],
     "writes": [
       "greenfield_module_release_signatures",
@@ -1713,8 +1712,7 @@
   },
   "POST /v1/admin/registry/sync": {
     "reads": [
-      "greenfield_accounts",
-      "the"
+      "greenfield_accounts"
     ],
     "writes": [
       "greenfield_module_releases",
