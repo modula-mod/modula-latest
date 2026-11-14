@@ -334,6 +334,10 @@ Jobs record owner, product, installation, action, service, attempt, timeout,
 idempotency key, trace, lifecycle timestamps, result reference and error class.
 Ordinary logs exclude input payloads and secret material.
 
+Delivery is at-least-once. If a worker loses its lease (`JOB_LEASE_LOST`), its
+handler may already have produced side effects, and the next owner re-runs the
+job. Job handlers must stay idempotent.
+
 ## Builds, releases and private distribution
 
 ```mermaid

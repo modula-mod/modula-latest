@@ -144,9 +144,31 @@ describe('liveness config', () => {
     expect(loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '10000'}).leaseRenewIntervalMs).toBe(10_000)
   })
 
-  it('refuses a renewal interval that is not shorter than the lease and an out-of-range heartbeat', () => {
+  it('accepts the heartbeat cap and renew-interval min and half-lease boundaries', () => {
+    expect(loadConfig({...base, MODULA_WORKER_HEARTBEAT_INTERVAL_MS: '1000'}).heartbeatIntervalMs).toBe(1_000)
+    expect(loadConfig({...base, MODULA_WORKER_HEARTBEAT_INTERVAL_MS: '30000'}).heartbeatIntervalMs).toBe(30_000)
+    expect(loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '1000'}).leaseRenewIntervalMs).toBe(1_000)
+    // Exact half of the default 60 s lease is accepted; default renew is lease/3.
+    expect(loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '30000'}).leaseRenewIntervalMs).toBe(30_000)
+    expect(loadConfig({
+      ...base,
+      MODULA_WORKER_LEASE_DURATION_MS: '90000',
+      MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '45000',
+    }).leaseRenewIntervalMs).toBe(45_000)
+  })
+
+  it('refuses a renewal interval outside min or half-lease bounds and an out-of-range heartbeat', () => {
     expect(() => loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '60000'})).toThrow(/LEASE_RENEW_INTERVAL/)
+    expect(() => loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '59999'})).toThrow(/LEASE_RENEW_INTERVAL/)
+    expect(() => loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '30001'})).toThrow(/LEASE_RENEW_INTERVAL/)
+    expect(() => loadConfig({...base, MODULA_WORKER_LEASE_RENEW_INTERVAL_MS: '999'})).toThrow(/LEASE_RENEW_INTERVAL/)
+    expect(() => loadConfig({
+      ...base,
+      MODULA_WORKER_LEASE_DURATION_MS: '2000',
+    })).toThrow(/LEASE_RENEW_INTERVAL/)
     expect(() => loadConfig({...base, MODULA_WORKER_HEARTBEAT_INTERVAL_MS: '500'})).toThrow(/HEARTBEAT_INTERVAL/)
+    expect(() => loadConfig({...base, MODULA_WORKER_HEARTBEAT_INTERVAL_MS: '30001'})).toThrow(/HEARTBEAT_INTERVAL/)
+    expect(() => loadConfig({...base, MODULA_WORKER_HEARTBEAT_INTERVAL_MS: '60000'})).toThrow(/HEARTBEAT_INTERVAL/)
     expect(() => loadConfig({...base, MODULA_WORKER_HEARTBEAT_INTERVAL_MS: '90000'})).toThrow(/HEARTBEAT_INTERVAL/)
   })
 })

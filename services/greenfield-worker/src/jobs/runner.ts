@@ -69,6 +69,9 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, op
       }
     }, config.leaseRenewIntervalMs)
     await markJobRunning(db, job.id, config.workerId)
+    // Delivery is at-least-once. After a lease loss (JOB_LEASE_LOST / job.lease.lost)
+    // this worker may already have produced side effects, and the next owner re-runs
+    // the job. Handlers must be idempotent.
     await withTimeout((async () => {
       switch (job.job_type) {
       case 'notification.create':
