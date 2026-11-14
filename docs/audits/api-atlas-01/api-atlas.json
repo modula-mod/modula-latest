@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "mosaic/gubic-catalogue-review-lookup",
       "sourceSha256": "89f5c9f2f8f938df8ddb5b74b29e45492c7b115e519093741fa4650731e7506a",
-      "capturedAt": "2026-11-14T21:40:28.468Z",
+      "capturedAt": "2026-11-14T21:44:46.428Z",
       "routeCount": 896
     },
     "status": "PASS"

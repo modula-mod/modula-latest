@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-14T21:40:28.468Z",
+  "capturedAt": "2026-11-14T21:44:46.428Z",
   "source": {
     "branch": "mosaic/gubic-catalogue-review-lookup",
-    "headAtCapture": "4c78aa9c75fa9f29e5cf913b021d19dc2e0ccac4",
+    "headAtCapture": "89eb72c343a05d3bf61e22c1d6eaa791914ade4b",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "89f5c9f2f8f938df8ddb5b74b29e45492c7b115e519093741fa4650731e7506a"
   },
