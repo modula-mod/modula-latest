@@ -75,6 +75,7 @@
     "api:atlas:probe": "node tools/api-atlas/probe.mjs && node tools/api-atlas/generate.mjs",
     "api:functional-parity:reconcile": "node tools/api-atlas/reconcile-functional-parity.mjs",
     "verify:module-distribution-nginx": "node scripts/verify-module-distribution-nginx.mjs",
+    "verify:greenfield-v1-offhost-backup": "node --test scripts/greenfield-v1-offhost.test.mjs",
     "verify:api-atlas": "node tools/api-atlas/verify.mjs",
     "start": "EXPO_UNSTABLE_MCP_SERVER=1 expo start --web",
     "start:clear": "EXPO_UNSTABLE_MCP_SERVER=1 expo start --web --clear",
