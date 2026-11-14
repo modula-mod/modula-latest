@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gubic-p2-catalogue-gate-update-rollback",
-      "sourceSha256": "17da06b53066d68e30968c33e541e5c19ade454f569119a09837363475cc733d",
-      "capturedAt": "2026-11-14T21:25:46.330Z",
+      "branch": "mosaic/gubic-p1-html5-engine",
+      "sourceSha256": "596953a872adf991ed36d6b4984b422f5e36ea0e82af0c1902c747efd910c8fd",
+      "capturedAt": "2026-11-14T21:56:42.526Z",
       "routeCount": 896
     },
     "status": "PASS"
@@ -12862,8 +12862,7 @@
           "greenfield_module_releases",
           "greenfield_module_versions",
           "greenfield_mps_ingestions",
-          "greenfield_release_frontends",
-          "the"
+          "greenfield_release_frontends"
         ],
         "writes": [
           "greenfield_module_release_signatures",
@@ -13101,8 +13100,7 @@
       ],
       "data": {
         "reads": [
-          "greenfield_accounts",
-          "the"
+          "greenfield_accounts"
         ],
         "writes": [
           "greenfield_module_releases",
