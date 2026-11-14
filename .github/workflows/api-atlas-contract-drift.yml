@@ -418,6 +418,7 @@ jobs:
           tests/module-settings-permissions.test.ts
           tests/registry-trust.assets.test.ts
           tests/registry-trust.github-sync.test.ts
+          tests/registry-listing.compatibility.test.ts
           tests/registry-trust.identity-aliases.test.ts
           tests/registry-trust.install-descriptor.test.ts
           tests/registry-trust.installed-state.test.ts
@@ -436,6 +437,7 @@ jobs:
           tests/module-settings-permissions.test.ts
           tests/registry-trust.assets.test.ts
           tests/registry-trust.github-sync.test.ts
+          tests/registry-listing.compatibility.test.ts
           tests/registry-trust.identity-aliases.test.ts
           tests/registry-trust.install-descriptor.test.ts
           tests/registry-trust.installed-state.test.ts

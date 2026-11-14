@@ -1,11 +1,12 @@
 # GF-TEST-DB-01 — DB-gated Vitest suites in CI
 
 Mission GF-TEST-DB-01 (GF-RECON-01 queue). Base: `modula-latest` main
-`5d00c7d321a0fab190c2b6c7d06a66996ad9ea0b` (after #180). No migration and no
-new dependencies. Production claim semantics are unchanged; the only product
-edit is an optional test-only filter on `claimNextJob` / `processOneJob` so
-suites sharing CI's disposable database cannot claim one another's leftover
-QUEUED jobs. Suites that failed under CI's restricted roles, or that need
+`396597159782edcf7a7a9fbd7230fb0a11b1ae96` (after #190). No migration and no
+new dependencies. Product edits are: an optional test-only filter on
+`claimNextJob` / `processOneJob` so suites sharing CI's disposable database
+cannot claim one another's leftover QUEUED jobs; and `listModules` skipping
+published releases that have no `manifest.compatibility` so the product
+listing cannot 500 the whole catalogue. Suites that failed under CI's restricted roles, or that need
 something the `migration-validation` job does not provide, are listed below
 and were left out.
 
@@ -29,9 +30,9 @@ fails the job.
 | GF-TEST-DB-01 worker leftover database integration | 4 | 11 | 6.77 s |
 | GF-TEST-DB-01 accounts, social and messaging database integration | 15 | 88 | 36.79 s |
 | GF-TEST-DB-01 backend v1 ledger and fabric database integration | 10 | 31 | 11.95 s |
-| GF-TEST-DB-01 module, registry and product database integration | 14 | 134 | 28.49 s |
+| GF-TEST-DB-01 module, registry and product database integration | 15 | 135 | 28.49 s |
 | GF-TEST-DB-01 phase 7, premium, GUBIC and API integration | 18 | 113 | 31.85 s |
-| **Total added** | **61** | **377** | **~116 s** |
+| **Total added** | **62** | **378** | **~116 s** |
 
 Local evidence: disposable PostgreSQL on `127.0.0.1:55533` with the CI dummy
 role passwords from `ops/docker/postgres/init-roles.sh`, fresh database
@@ -77,7 +78,7 @@ Worker: `phase7e.notifications.test.ts`, `media-cleanup.test.ts`,
 `module-trust-guard.test.ts` are already listed in the job; they are not all
 `describe.skip` without a DB URL.)
 
-### Added by this PR (61 files, 377 tests)
+### Added by this PR (62 files, 378 tests)
 
 Worker leftovers: `lease.test.ts`, `outbox-atomicity.test.ts`,
 `phase7e.event-delivery.test.ts`, `phase7e.search-projector.test.ts`.
@@ -105,6 +106,7 @@ Backend v1 ledgers and fabrics: `greenfield-backend-v1.ai-engine.test.ts`,
 
 Module, registry and product: `module-settings-permissions.test.ts`,
 `registry-trust.assets.test.ts`, `registry-trust.github-sync.test.ts`,
+`registry-listing.compatibility.test.ts`,
 `registry-trust.identity-aliases.test.ts`,
 `registry-trust.install-descriptor.test.ts`,
 `registry-trust.installed-state.test.ts`,
@@ -180,8 +182,30 @@ Test scopes:
 `worker-liveness.acceptance.test.ts` still starts the real worker
 (unfiltered production claim). It is opt-in and not in this job.
 
+## Listing incomplete published releases (product fix)
+
+`GET /v1/registry/products` (and `GET /v1/registry/modules`) walks every
+published release and used to throw at
+`manifest.compatibility.platforms` when a release had no
+`compatibility` field. That 500'd the whole list. Sentinel reproduced
+this on a shared CI database after earlier steps left incomplete
+published rows (for example `audit.module.alpha-*`; some
+`test.modula.*` fixtures are already hidden by beta catalogue policy
+and do not reach that line).
+
+`listModules` now skips a release with a missing or non-object
+`manifest.compatibility`, the same `continue` path already used for
+entries the catalogue cannot show, and writes a structured warning
+(`moduleId`, `releaseId`, `version`,
+`reason: missing_manifest_compatibility`) with no secrets or manifest
+payload. The rest of the list still returns 200. Covered by
+`registry-listing.compatibility.test.ts`. Production claim and
+install/publish behaviour are unchanged.
+
 ## Scope
 
-No migrations, no new dependencies, no SYNAPSE-owned files, and no
-production claim-behaviour change. Not merged and not deployed; merging
-stays with ATLAS after Sentinel certifies.
+No migrations, no new dependencies, and no SYNAPSE-owned files. Production
+claim semantics are unchanged. The listing skip is the narrow product fix
+for incomplete published releases; install and publish behaviour is
+unchanged. Not merged and not deployed; merging stays with ATLAS after
+Sentinel certifies.
