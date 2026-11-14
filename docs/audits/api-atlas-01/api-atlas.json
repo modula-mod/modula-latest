@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "forge/gf-auth-resend-challenge-id",
-      "sourceSha256": "932afd40a389fb6d5099c5db411de0a1263820aff57b405f558263e1bc95de93",
-      "capturedAt": "2026-11-14T23:30:53.691Z",
+      "branch": "mosaic/gubic-p1-hardening",
+      "sourceSha256": "1f12d2867b6098a19f6d2770539866a76dc425a270d478801e83e643f9e3c26d",
+      "capturedAt": "2026-11-14T23:54:59.491Z",
       "routeCount": 900
     },
     "status": "PASS"
