@@ -187,6 +187,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build API workspace dependencies
         run: pnpm --filter @modula/greenfield-api... build
+      - name: GF-TEST-DB-01 zero-skip guard unit tests
+        run: node --test scripts/assert-vitest-db-suites-ran.test.mjs
       - name: Create restricted database roles
         env:
           PGHOST: 127.0.0.1

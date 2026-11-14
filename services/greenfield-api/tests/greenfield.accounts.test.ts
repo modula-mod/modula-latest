@@ -239,9 +239,21 @@ function mailWorkerConfig(): WorkerConfig {
   }
 }
 
+async function mailJobIdsForAccount(db: any, accountId: string): Promise<string[]> {
+  const requests = await db
+    .selectFrom('greenfield_mail_identity_requests')
+    .select('request_id')
+    .where('account_id', '=', accountId)
+    .execute()
+  return requests.flatMap((request: {request_id: string}) => [
+    `job-mail-identity-${request.request_id}`,
+    `job-mail-forward-${request.request_id}`,
+  ])
+}
+
 async function processMailIdentityUntil(db: any, accountId: string, state: string): Promise<void> {
   for (let attempt = 0; attempt < 200; attempt += 1) {
-    await processOneJob(db as any, mailWorkerConfig())
+    await processOneJob(db as any, mailWorkerConfig(), {jobIds: await mailJobIdsForAccount(db, accountId)})
     const identity = await db
       .selectFrom('greenfield_mail_identities')
       .select(['state'])
@@ -255,7 +267,7 @@ async function processMailIdentityUntil(db: any, accountId: string, state: strin
 
 async function processMailEventUntil(db: any, accountId: string, eventType: string): Promise<void> {
   for (let attempt = 0; attempt < 25; attempt += 1) {
-    await processOneJob(db as any, mailWorkerConfig())
+    await processOneJob(db as any, mailWorkerConfig(), {jobIds: await mailJobIdsForAccount(db, accountId)})
     const event = await db
       .selectFrom('greenfield_mail_identity_events')
       .select(['event_id'])

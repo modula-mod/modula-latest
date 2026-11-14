@@ -1,10 +1,13 @@
 # GF-TEST-DB-01 — DB-gated Vitest suites in CI
 
 Mission GF-TEST-DB-01 (GF-RECON-01 queue). Base: `modula-latest` main
-`5d00c7d321a0fab190c2b6c7d06a66996ad9ea0b` (after #180). No migration, no new
-dependencies, and no product-code change. Suites that failed under CI's
-restricted roles, or that need something the `migration-validation` job does
-not provide, are listed below and were left out.
+`5d00c7d321a0fab190c2b6c7d06a66996ad9ea0b` (after #180). No migration and no
+new dependencies. Production claim semantics are unchanged; the only product
+edit is an optional test-only filter on `claimNextJob` / `processOneJob` so
+suites sharing CI's disposable database cannot claim one another's leftover
+QUEUED jobs. Suites that failed under CI's restricted roles, or that need
+something the `migration-validation` job does not provide, are listed below
+and were left out.
 
 ## Change
 
@@ -39,7 +42,9 @@ Group C and D/E wall-clock times include one excluded failing file each
 
 `greenfield.accounts.test.ts` was re-run after the other new groups on the
 same database (734 leftover `QUEUED` worker jobs) and still passed 13/13,
-including mail-identity provisioning.
+including mail-identity provisioning (priority luck). That path is now
+scoped to the account's own mail-identity job ids, so leftovers can no
+longer starve `processMailIdentityUntil`.
 
 ## Inventory
 
@@ -144,8 +149,39 @@ Product code was not changed; the files stay out of the job.
 | `services/greenfield-api/tests/greenfield-mps-v1.ingest.test.ts` | 9 passed / 1 failed | `lets the API runtime role ingest and read family, relationship, asset, privacy, and alias rows` failed with `permission denied to set role "modula_api"`. The test connects as the migrator and `SET ROLE modula_api`; `init-roles.sh` does not grant `modula_api` to `modula_migrator`. |
 | `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts` | 5 passed / 1 failed | `rolls the Standard 2 runtime migration down and back up on an isolated database` (gated on `MODULA_TEST_ADMIN_DATABASE_URL`) creates a new database as `postgres`, then runs `migrateUp` as `modula_migrator` on that database. `CREATE TABLE schema_migrations` fails with `permission denied for schema public` (the new database's `public` schema is not owned by the migrator). |
 
+## Job isolation (shared-database flake)
+
+On a shared database, leftover `QUEUED` jobs from another suite can be
+claimed by tests that call `claimNextJob` or `processOneJob` without a
+scope. The flake on main `5d00c7d3`: `lease.test` `reclaims a crashed
+worker lease` sometimes claimed a leftover `gf-ops-01c-*` job from
+`lease-renewal.integration` (priority `-1_000_000_000` beats the lease
+test's `-1_000`). Under concurrent load this failed locally (1/3 in the
+pre-fix repro; Sentinel reported 2/3). More generally, `processMailIdentityUntil`
+capped at 200 unscoped claims, so a polluted queue can starve the accounts
+mail-identity test.
+
+The fix is an optional `ClaimJobFilter` (`idPrefix` and/or `jobIds`) on
+`claimNextJob` and `processOneJob`. Production callers omit it, so the
+claim SQL and semantics are unchanged. An explicit empty `jobIds` list
+matches nothing (`AND false`) and does not fall back to an unscoped claim.
+
+Test scopes:
+
+- `lease.test.ts` — `idPrefix: 'test-lease-'` (crash-reclaim ids unified to
+  that prefix); `afterAll` deletes the file's jobs and `job_failures`.
+- `lease-renewal.integration.test.ts` — `idPrefix: 'gf-ops-01c-${suffix}-'`.
+- `phase6.security.test.ts` SKIP LOCKED case — `idPrefix: 'test-phase6-lease-'`.
+- `greenfield.accounts.test.ts` `processMailIdentityUntil` /
+  `processMailEventUntil` — `jobIds` for that account's
+  `job-mail-identity-*` / `job-mail-forward-*` rows, looked up from
+  `greenfield_mail_identity_requests`.
+
+`worker-liveness.acceptance.test.ts` still starts the real worker
+(unfiltered production claim). It is opt-in and not in this job.
+
 ## Scope
 
-No migrations, no new dependencies, no SYNAPSE-owned files, and no product
-behaviour change. Not merged and not deployed; merging stays with ATLAS after
-Sentinel certifies.
+No migrations, no new dependencies, no SYNAPSE-owned files, and no
+production claim-behaviour change. Not merged and not deployed; merging
+stays with ATLAS after Sentinel certifies.
