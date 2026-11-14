@@ -50,7 +50,7 @@ flowchart TD
 - Registry release assets: separate immutable-cache location.
 - `/v1/stories`: 25 MiB and 300s timeouts.
 - attachment byte upload: 101 MiB, proxy buffering disabled, 300s timeouts.
-- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 0/631 application routes carry Fastify rate-limit configuration.
+- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 0/633 application routes carry Fastify rate-limit configuration.
 - Every registered route is transport-reachable through the catch-all; feature flags and handler authorization still determine application availability. `/v1/internal/ssrf-check` is handler-hidden in production.
 
 ## Versions and migration truth
