@@ -13,9 +13,11 @@ import type {WorkerConfig} from '../config.js'
  *
  * This resolves the interval *before* a job is claimed:
  * - unset: the same default loadConfig() uses, a third of the lease;
- * - set but not a positive integer below leaseDurationMs: refuse (RangeError)
- *   without claiming anything, so a bad config can never strand a claimed job
- *   or run a handler without lease renewal. No clamping.
+ * - set but not a positive integer of at most half the lease (the same margin
+ *   loadConfig() enforces): refuse (RangeError) without claiming anything, so a
+ *   bad config can never strand a claimed job or run a handler whose lease can
+ *   lapse between renewals. No clamping. The 1000 ms env minimum stays a
+ *   loadConfig() rule so scaled in-process tests can use shorter leases.
  */
 export function resolveLeaseRenewIntervalMs(config: Pick<WorkerConfig, 'leaseDurationMs' | 'leaseRenewIntervalMs'>): number {
   const leaseMs = config.leaseDurationMs
@@ -24,8 +26,8 @@ export function resolveLeaseRenewIntervalMs(config: Pick<WorkerConfig, 'leaseDur
   }
   const configured = (config as {leaseRenewIntervalMs?: unknown}).leaseRenewIntervalMs
   if (configured === undefined) return Math.max(1, Math.floor(leaseMs / 3))
-  if (typeof configured !== 'number' || !Number.isSafeInteger(configured) || configured <= 0 || configured >= leaseMs) {
-    throw new RangeError('leaseRenewIntervalMs must be a positive integer shorter than leaseDurationMs')
+  if (typeof configured !== 'number' || !Number.isSafeInteger(configured) || configured <= 0 || configured * 2 > leaseMs) {
+    throw new RangeError('leaseRenewIntervalMs must be a positive integer of at most half of leaseDurationMs')
   }
   return configured
 }

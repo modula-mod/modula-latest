@@ -305,7 +305,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
 
   it('refuses an invalid leaseRenewIntervalMs before claiming, leaving the job untouched', async () => {
     const jobId = await enqueue()
-    for (const leaseRenewIntervalMs of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5, LEASE_MS, LEASE_MS + 1, '200' as unknown as number, null as unknown as number]) {
+    for (const leaseRenewIntervalMs of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5, LEASE_MS / 2 + 1, LEASE_MS, LEASE_MS + 1, '200' as unknown as number, null as unknown as number]) {
       const cfg = {...config(`gf-ops-01c-bad-renew-cfg-${suffix}`), leaseRenewIntervalMs}
       await expect(processOneJob(db, cfg)).rejects.toThrow(RangeError)
     }

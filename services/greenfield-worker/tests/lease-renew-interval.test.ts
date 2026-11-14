@@ -19,11 +19,11 @@ describe('resolveLeaseRenewIntervalMs', () => {
   it('keeps a valid configured interval unchanged (no clamping)', () => {
     expect(resolveLeaseRenewIntervalMs({leaseDurationMs: 60_000, leaseRenewIntervalMs: 10_000})).toBe(10_000)
     expect(resolveLeaseRenewIntervalMs({leaseDurationMs: 600, leaseRenewIntervalMs: 200})).toBe(200)
-    expect(resolveLeaseRenewIntervalMs({leaseDurationMs: 60_000, leaseRenewIntervalMs: 59_999})).toBe(59_999)
+    expect(resolveLeaseRenewIntervalMs({leaseDurationMs: 60_000, leaseRenewIntervalMs: 30_000})).toBe(30_000)
   })
 
-  it('refuses a configured interval that is not a positive integer below the lease', () => {
-    for (const leaseRenewIntervalMs of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 60_000, 60_001, '1000', null]) {
+  it('refuses a configured interval that is not a positive integer of at most half the lease', () => {
+    for (const leaseRenewIntervalMs of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 30_001, 59_999, 60_000, 60_001, '1000', null]) {
       expect(() => resolveLeaseRenewIntervalMs({leaseDurationMs: 60_000, leaseRenewIntervalMs} as never)).toThrow(RangeError)
     }
   })
