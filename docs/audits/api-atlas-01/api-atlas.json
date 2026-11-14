@@ -10,7 +10,7 @@
       "kind": "local-candidate-runtime",
       "branch": "forge/native-endpoints-01",
       "sourceSha256": "9db7b3f42b5d898cc488b228529cb95602868b68bfaf0e1ea6e78e59a92b434a",
-      "capturedAt": "2026-11-14T23:09:41.580Z",
+      "capturedAt": "2026-11-14T23:10:44.968Z",
       "routeCount": 900
     },
     "status": "PASS"
