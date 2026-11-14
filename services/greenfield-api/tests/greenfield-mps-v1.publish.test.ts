@@ -52,7 +52,7 @@ describeIfDb('generic MPS release publication', () => {
 
   it('rejects an unverified publisher claiming the reserved namespace', async () => {
     const manifest = manifestFor(`digital.modula.untrusted-${suffix()}`, 'attacker.publisher', false)
-    await expect(releases.importPendingReview(manifest, evidenceFor(manifest))).rejects.toMatchObject({code: 'CONFLICT'})
+    await expect(releases.importPendingReview(manifest, evidenceFor(manifest))).rejects.toMatchObject({code: 'FORBIDDEN'})
   })
 
   it('rejects a second publisher claiming an owned namespace', async () => {
@@ -64,7 +64,7 @@ describeIfDb('generic MPS release publication', () => {
   })
 })
 
-function manifestFor(moduleId: string, publisherId: string, firstParty = true): GreenfieldModuleManifest {
+function manifestFor(moduleId: string, publisherId: string, firstParty = false): GreenfieldModuleManifest {
   const manifest = structuredClone(JSON.parse(readFileSync(fixturePath, 'utf8'))) as GreenfieldModuleManifest
   manifest.moduleId = moduleId
   manifest.version = '1.0.0'

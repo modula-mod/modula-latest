@@ -1,6 +1,6 @@
 import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
-import {RELEASE_JOB_DISPATCH_MODE, RELEASE_JOB_PUBLISH, RELEASE_JOB_VALIDATE} from './release-job-core.js'
+import {RELEASE_JOB_DISPATCH_MODE, RELEASE_JOB_PUBLISH, RELEASE_JOB_SIGN, RELEASE_JOB_VALIDATE} from './release-job-core.js'
 import type {PublisherReleaseJobProcessor} from './release-job-processor.js'
 
 type ClaimedRow = {id: string; job_type: string; payload: unknown; attempt_count: number; maximum_attempts: number}
@@ -42,6 +42,7 @@ export class PublisherReleaseJobRunner {
     const releaseJobId = String((claimed.payload as {releaseJobId?: unknown})?.releaseJobId ?? '')
     try {
       if (claimed.job_type === RELEASE_JOB_VALIDATE) await this.processor.validate(releaseJobId)
+      else if (claimed.job_type === RELEASE_JOB_SIGN) await this.processor.sign(releaseJobId)
       else if (claimed.job_type === RELEASE_JOB_PUBLISH) await this.processor.publish(releaseJobId)
       else throw Object.assign(new Error(`Unknown publisher release work ${claimed.job_type}`), {permanent: true})
       await this.settle(claimed.id, 'SUCCEEDED', null)

@@ -4,6 +4,7 @@ import {createDb} from '../database/client.js'
 import {HttpGithubReleaseSource} from '../modules/github-release-sync-service.js'
 import {PublisherReleaseJobProcessor} from './release-job-processor.js'
 import {PublisherReleaseJobRunner} from './release-job-runner.js'
+import {vaultTransitProviderFromEnvironment} from './signing-provider.js'
 
 /**
  * Publisher release console runner process (built into the API image:
@@ -13,10 +14,12 @@ import {PublisherReleaseJobRunner} from './release-job-runner.js'
 async function main() {
   const config = loadConfig()
   const db = createDb(config.databaseUrl)
+  const signingProvider = vaultTransitProviderFromEnvironment()
   const processor = new PublisherReleaseJobProcessor(db, {
     source: new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}),
     config,
     githubEnabled: config.moduleGithubSyncEnabled,
+    signingProvider: signingProvider ?? undefined,
   })
   const runner = new PublisherReleaseJobRunner(db, processor, {workerId: `publisher-release-runner:${hostname()}:${process.pid}`})
   let stopping = false

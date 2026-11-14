@@ -299,6 +299,39 @@ describeIfDb('Calls v1: lifecycle, policy, TURN, VoIP registration and ticket-au
     expect(JSON.stringify(events)).not.toMatch(/v=0|candidate|192\.0\.2\.1/)
   })
 
+  it('rejects expired, superseded and terminal-call signalling tickets (GF-CALL-01)', async () => {
+    const [a, b] = [await user('stxa'), await user('stxb')]
+    const convo = await directChat(a, b)
+    const call = (await authed(a.accessToken, 'POST', `/v1/conversations/${convo}/calls`, {mediaKind: 'audio'}, idem())).json().data.call
+    const path = `/v1/calls/${call.id}/signalling`
+    const issue = async () => (await authed(a.accessToken, 'POST', `/v1/calls/${call.id}/signalling-ticket`, {})).json().data
+    const hashes = async () => db.selectFrom('greenfield_call_signalling_tickets')
+      .select(['ticket_hash', 'expires_at', 'consumed_at', 'revoked_at']).where('call_id', '=', call.id).orderBy('created_at').execute()
+
+    // Expiry: a ticket is short-lived (60 s) and a ticket past expires_at never upgrades.
+    const expiring = await issue()
+    const ttlMs = new Date(expiring.expiresAt).getTime() - Date.now()
+    expect(ttlMs).toBeGreaterThan(50_000)
+    expect(ttlMs).toBeLessThanOrEqual(60_000)
+    await db.updateTable('greenfield_call_signalling_tickets').set({expires_at: new Date(Date.now() - 1000)})
+      .where('call_id', '=', call.id).where('consumed_at', 'is', null).where('revoked_at', 'is', null).execute()
+    expect(await upgrade(path, expiring.ticket)).toBe(401)
+    expect((await hashes()).every(t => t.consumed_at === null)).toBe(true)
+
+    // Superseded: issuing again on the same session revokes every older unconsumed ticket
+    // (the expired one when `older` is issued, then `older` when `newer` is issued).
+    const older = await issue()
+    const newer = await issue()
+    expect(await upgrade(path, older.ticket)).toBe(401)
+    expect((await hashes()).map(t => t.revoked_at !== null)).toEqual([true, true, false])
+
+    // Terminal call: ending the call revokes outstanding tickets, and no new ticket is issued.
+    await authed(a.accessToken, 'POST', `/v1/calls/${call.id}/cancel`, {}, idem())
+    expect(await upgrade(path, newer.ticket)).toBe(401)
+    expect((await authed(a.accessToken, 'POST', `/v1/calls/${call.id}/signalling-ticket`, {})).statusCode).toBe(409)
+    expect((await hashes()).every(t => t.consumed_at === null)).toBe(true)
+  })
+
   it('tells foreground devices about calls over the messaging socket', async () => {
     const [a, b] = [await user('msa'), await user('msb')]
     const convo = await directChat(a, b)

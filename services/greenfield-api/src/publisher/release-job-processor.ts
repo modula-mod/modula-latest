@@ -1,3 +1,4 @@
+import {randomUUID} from 'node:crypto'
 import {resolveCanonicalModuleId, moduleIdFamily} from '@modula/greenfield-contracts'
 import {classifyPermissionRisk, getNamespacePrefix, usesReservedNamespace, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import type {
@@ -19,8 +20,11 @@ import type {GreenfieldModuleReleaseRecord} from '../modules/module-domain.js'
 import {ModuleDomainError} from '../modules/module-errors.js'
 import {GreenfieldModulePermissionService} from '../modules/permission-service.js'
 import {GreenfieldModuleReleaseService} from '../modules/release-service.js'
-import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, normalizeSignatureInput} from '../modules/release-signing.js'
-import {appendLog, isUniqueViolation, loadJob, transitionJob, type ReleaseJobRow} from './release-job-core.js'
+import {GreenfieldPublisherSigningKeyService, approvalFactsSha256, buildPublisherReleaseApprovalFacts, buildPublisherReleaseStatement, normalizeSignatureInput, statementBytes, type PublisherReleaseApprovalFacts} from '../modules/release-signing.js'
+import {appendLog, appendSigningAudit, isUniqueViolation, loadJob, transitionJob, type ReleaseJobRow} from './release-job-core.js'
+import {PublisherConsoleError} from './release-job-core.js'
+import {PublisherOnlineSigningAuthority} from './signing-authority.js'
+import {SigningProviderError, type PublisherSigningProvider} from './signing-provider.js'
 
 /**
  * Publication seam. Production uses the registry's own publishRelease. The
@@ -34,6 +38,7 @@ export type ReleaseJobProcessorDeps = {
   config?: AppConfig
   githubEnabled?: boolean
   publish?: ReleasePublisher
+  signingProvider?: PublisherSigningProvider
 }
 
 type CheckMap = Map<PublisherReleaseJobCheckId, PublisherReleaseJobCheck>
@@ -118,7 +123,7 @@ export class PublisherReleaseJobProcessor {
     // 1. ownership — publisher + module specific, independent of the manifest's own claims.
     const manifest = verified.manifest
     const canonical = resolveCanonicalModuleId(verified.productId)
-    const namespace = await this.db.selectFrom('greenfield_publisher_namespaces').select(['publisher_id', 'revoked_at'])
+    const namespace = await this.db.selectFrom('greenfield_publisher_namespaces').select(['publisher_id', 'verified_at', 'revoked_at'])
       .where('namespace', '=', getNamespacePrefix(canonical)).executeTakeFirst()
     const ownershipProblems: string[] = []
     if (canonical !== job.module_id || manifest.moduleId !== verified.productId) ownershipProblems.push(`release identity ${verified.productId} is not module ${job.module_id}`)
@@ -173,7 +178,7 @@ export class PublisherReleaseJobProcessor {
     if (!publisher) policyProblems.push('publisher not registered')
     const claimsFirstParty = manifest.trust.requestedLevel === 'firstParty' || manifest.license.status === 'firstParty'
     if (claimsFirstParty && (publisher?.trust_level !== 'firstParty' || publisher?.status !== 'verified')) policyProblems.push('first-party trust can only be requested by a verified first-party publisher')
-    if (usesReservedNamespace(canonical) && publisher?.trust_level !== 'firstParty') policyProblems.push('reserved namespace')
+    if (usesReservedNamespace(canonical) && (publisher?.trust_level !== 'firstParty' || publisher.status !== 'verified' || !namespace?.verified_at)) policyProblems.push('reserved namespace lacks authoritative registry policy')
     set('policy', policyProblems.length ? 'failed' : 'passed', policyProblems.join('; ') || undefined)
 
     // 9. permissions (existing permission service) + delta vs current published baseline
@@ -196,16 +201,34 @@ export class PublisherReleaseJobProcessor {
       set('packaging', 'skipped')
       return this.finish(validating, ['validating'], 'conflicted', {validation: record(false), signature, permission_delta: permissionDelta, error: {code: 'VERSION_CONFLICT', message: checks.get('version_uniqueness')!.message ?? 'Version conflict'}}, 'error', 'validate', 'Version conflict: releases are immutable')
     }
+    if (preImportFailed.length) {
+      set('packaging', 'skipped', 'not imported: validation failed')
+      return this.finish(validating, ['validating'], 'validation_failed', {validation: record(false), signature, permission_delta: permissionDelta,
+        error: {code: 'VALIDATION_FAILED', message: preImportFailed.map(check => `${check.id}: ${check.message ?? 'failed'}`).join('; ').slice(0, 1000)}}, 'error', 'validate', `Validation failed: ${preImportFailed.map(check => check.id).join(', ')}`)
+    }
+    const onlineIdentity = this.deps.signingProvider ? await this.db.selectFrom('greenfield_publisher_online_signing_identities')
+      .select(['identity_id']).where('publisher_id', '=', job.publisher_id).where('state', '=', 'ACTIVE')
+      .where('valid_from', '<=', new Date()).where('valid_until', '>', new Date()).executeTakeFirst() : null
+    if (signature.state === 'missing' && this.deps.signingProvider && onlineIdentity) {
+      checks.set('signature', {id: 'signature', status: 'pending', message: 'Awaiting publisher-scoped online signing'})
+      checks.set('packaging', {id: 'packaging', status: 'pending', message: 'Runs only after independent signature verification'})
+      const approvedFacts = approvalFactsForVerified(verified)
+      const approvalSha256 = approvalFactsSha256(approvedFacts)
+      return this.finish(validating, ['validating'], 'ready_for_signing', {
+        validation: record(false),
+        signature: {state: 'pending', detail: 'Validated release is approved for publisher-scoped online signing'},
+        permission_delta: permissionDelta,
+        approved_facts: approvedFacts,
+        approval_sha256: approvalSha256,
+        approved_at: new Date(),
+        error: null,
+      }, 'info', 'approve', `Immutable release facts approved for online signing (${approvalSha256})`)
+    }
     if (signature.state !== 'verified') {
       set('packaging', 'skipped', 'not imported: signature not verified')
       const to: PublisherReleaseJobState = signature.state === 'missing' ? 'signature_missing' : 'signature_invalid'
       const code = signature.state === 'missing' ? 'SIGNATURE_MISSING' : signature.state === 'revokedKey' ? 'SIGNATURE_REVOKED' : 'SIGNATURE_INVALID'
       return this.finish(validating, ['validating'], to, {validation: record(false), signature, permission_delta: permissionDelta, error: {code, message: signature.detail ?? code}}, 'error', 'signature', `Signature ${signature.state}: ${signature.detail}`)
-    }
-    if (preImportFailed.length) {
-      set('packaging', 'skipped', 'not imported: validation failed')
-      return this.finish(validating, ['validating'], 'validation_failed', {validation: record(false), signature, permission_delta: permissionDelta,
-        error: {code: 'VALIDATION_FAILED', message: preImportFailed.map(check => `${check.id}: ${check.message ?? 'failed'}`).join('; ').slice(0, 1000)}}, 'error', 'validate', `Validation failed: ${preImportFailed.map(check => check.id).join(', ')}`)
     }
 
     const signed = await transitionJob(this.db, jobId, ['validating'], 'signature_verified', {signature, permission_delta: permissionDelta, validation: record(false)})
@@ -231,6 +254,154 @@ export class PublisherReleaseJobProcessor {
       `All checks passed; ready for publication review${permissionDelta.reviewRequired ? ' (permission change acknowledgement required)' : ''}`)
   }
 
+  // ---- online sign -------------------------------------------------------
+
+  async sign(jobId: string): Promise<PublisherReleaseJobState | null> {
+    const provider = this.deps.signingProvider
+    const existingJob = await loadJob(this.db, jobId)
+    if (!existingJob) return null
+    if (!provider) {
+      return this.finish(existingJob, ['signing'], 'signing_failed', {error: {code: 'SIGNING_NOT_CONFIGURED', message: 'Online signing provider is not configured'}},
+        'error', 'sign', 'Signing failed closed: online signing provider is not configured')
+    }
+    const claimed = await this.db.updateTable('greenfield_publisher_release_jobs')
+      .set({signing_started_at: new Date(), updated_at: new Date()} as never)
+      .where('job_id', '=', jobId).where('state', '=', 'signing').where('signing_started_at', 'is', null)
+      .returningAll().executeTakeFirst() as ReleaseJobRow | undefined
+    if (!claimed) {
+      const job = await loadJob(this.db, jobId)
+      if (job) await appendLog(this.db, jobId, 'warn', 'sign', `Signing work skipped: job is ${job.state}`)
+      return (job?.state ?? null) as PublisherReleaseJobState | null
+    }
+    const job = claimed
+    const approvalSha256 = job.approval_sha256
+    const actorAccountId = job.sign_requested_by_account_id
+    if (!approvalSha256 || !job.approved_facts || !actorAccountId) {
+      return this.finish(job, ['signing'], 'signing_failed', {error: {code: 'INVALID_JOB_STATE', message: 'Signing approval facts are incomplete'}},
+        'error', 'sign', 'Signing failed closed: approval facts are incomplete')
+    }
+
+    const failClosed = async (code: string, message: string, identityId: string | null = null) => {
+      await appendSigningAudit(this.db, {eventType: 'signing_failed', jobId, identityId, publisherId: job.publisher_id, moduleId: job.module_id,
+        actorAccountId, approvalSha256, details: {code, message: message.slice(0, 500)}})
+      return this.finish(job, ['signing'], 'signing_failed', {error: {code, message: message.slice(0, 1000)}}, 'error', 'sign', `Signing failed closed: ${message}`)
+    }
+
+    if (approvalFactsSha256(job.approved_facts as PublisherReleaseApprovalFacts) !== approvalSha256) {
+      return failClosed('RELEASE_APPROVAL_INVALIDATED', 'Stored release approval facts do not match their immutable digest')
+    }
+
+    try {
+      const authorization = await new PublisherOnlineSigningAuthority(this.db, this.deps.config as AppConfig).requireAuthorization({
+        accountId: actorAccountId,
+        publisherId: job.publisher_id,
+        moduleId: job.module_id,
+        sourceRepository: job.source_repository,
+      })
+      await appendSigningAudit(this.db, {eventType: 'signing_started', jobId, publisherId: job.publisher_id, moduleId: job.module_id,
+        actorAccountId, approvalSha256, details: {requestId: job.signing_request_id}})
+
+      // Fetch again at execution time. A mutable tag, artifact, manifest or
+      // frontend produces a different approval digest and invalidates consent.
+      const verified = await this.sync.fetchVerified({repository: job.source_repository, releaseTag: job.release_tag})
+      const freshFacts = approvalFactsForVerified(verified)
+      const freshApprovalSha256 = approvalFactsSha256(freshFacts)
+      if (freshApprovalSha256 !== approvalSha256) {
+        await appendSigningAudit(this.db, {eventType: 'release_invalidated', jobId, publisherId: job.publisher_id, moduleId: job.module_id,
+          actorAccountId, approvalSha256, details: {observedApprovalSha256: freshApprovalSha256}})
+        return this.finish(job, ['signing'], 'validation_failed', {
+          approved_facts: null, approval_sha256: null, approved_at: null, signing_started_at: null,
+          error: {code: 'RELEASE_APPROVAL_INVALIDATED', message: 'Release contents changed after signing approval; revalidation is required'},
+        }, 'error', 'sign', 'Release contents changed after approval; signing authorization invalidated')
+      }
+
+      const identity = await provider.resolveAuthorizedIdentity({
+        publisherId: job.publisher_id,
+        firstParty: authorization.firstParty,
+        identities: authorization.identities,
+        observedAt: new Date(),
+      })
+      const [providerPublicKey, registeredKey] = await Promise.all([
+        provider.getPublicKey(identity),
+        new GreenfieldPublisherSigningKeyService(this.db).get(identity.signingKeyId),
+      ])
+      if (registeredKey.publisherId !== job.publisher_id || registeredKey.state !== 'ACTIVE'
+        || registeredKey.fingerprint !== providerPublicKey.fingerprint || registeredKey.publicKeyPem !== providerPublicKey.publicKeyPem) {
+        return failClosed('SIGNING_IDENTITY_UNAVAILABLE', 'Provider public key does not match the active publisher key registration', identity.identityId)
+      }
+
+      const statement = {...freshFacts, signingKeyId: identity.signingKeyId}
+      const canonical = statementBytes(statement)
+      const signed = await provider.signPublisherRelease(identity, canonical)
+      await appendSigningAudit(this.db, {eventType: 'signature_created', jobId, identityId: identity.identityId, publisherId: job.publisher_id,
+        moduleId: job.module_id, actorAccountId, approvalSha256, details: {provider: provider.kind, providerKeyVersion: signed.providerKeyVersion}})
+      if (signed.algorithm !== 'Ed25519' || !await provider.verifyPublisherRelease(identity, canonical, signed.signature)) {
+        return failClosed('SIGNING_FAILED', 'Signing provider result failed independent Ed25519 verification', identity.identityId)
+      }
+      const signatureInput = {algorithm: 'Ed25519' as const, keyId: identity.signingKeyId, value: signed.signature}
+      const registryVerification = await new GreenfieldPublisherSigningKeyService(this.db).verify(statement, signatureInput, new Date(), true)
+      if (registryVerification.state !== 'verified') {
+        return failClosed(registryVerification.state === 'revokedKey' ? 'SIGNATURE_REVOKED' : 'SIGNING_FAILED', registryVerification.detail, identity.identityId)
+      }
+
+      const signedVerified: VerifiedGithubRelease = {...verified, evidence: {...verified.evidence, signature: signatureInput}}
+      const existing = await this.releases.getRelease(verified.productId, verified.version)
+      const release = (await this.sync.applyVerified(signedVerified, existing ?? null)).release
+      if (release.releaseState !== 'verified') return failClosed('SIGNING_FAILED', `Registry release is ${release.releaseState}, expected verified`, identity.identityId)
+      const signatureRows = await this.db.selectFrom('greenfield_module_release_signatures').select(['verification_state'])
+        .where('release_id', '=', release.releaseId).execute()
+      if (!signatureRows.length || signatureRows.some(row => row.verification_state !== 'verified')) {
+        return failClosed('SIGNING_FAILED', 'Registry did not retain independently verified signature evidence', identity.identityId)
+      }
+
+      const verifiedAt = new Date()
+      const receipt = {
+        receiptId: `psrc_${randomUUID()}`,
+        provider: provider.kind,
+        identityId: identity.identityId,
+        keyId: identity.signingKeyId,
+        publicKeyFingerprint: providerPublicKey.fingerprint,
+        providerKeyVersion: signed.providerKeyVersion,
+        approvalSha256,
+        statementSha256: registryVerification.statementSha256,
+        verifiedAt: verifiedAt.toISOString(),
+      }
+      const validation = job.validation as {passed?: boolean; checks?: PublisherReleaseJobCheck[]}
+      const checks = (validation.checks ?? []).map(check => check.id === 'signature'
+        ? {...check, status: 'passed' as const, code: undefined, message: `Ed25519 key ${identity.signingKeyId}`}
+        : check.id === 'packaging' ? {...check, status: 'passed' as const, message: `imported ${release.releaseId}; package blob stored; MPS ingested`} : check)
+      const transitioned = await transitionJob(this.db, jobId, ['signing'], 'ready_for_review', {
+        signing_identity_id: identity.identityId,
+        signed_at: verifiedAt,
+        signing_receipt: receipt,
+        signature: {
+          state: 'verified', keyId: identity.signingKeyId, algorithm: 'Ed25519', publicKeyFingerprint: providerPublicKey.fingerprint,
+          statementSha256: registryVerification.statementSha256, verifiedAt: verifiedAt.toISOString(), detail: registryVerification.detail,
+        },
+        validation: {passed: true, checks},
+        release_id: release.releaseId,
+        error: null,
+      })
+      if (!transitioned) return this.stopped(jobId, 'sign')
+      await appendSigningAudit(this.db, {eventType: 'signature_verified', jobId, identityId: identity.identityId, publisherId: job.publisher_id,
+        moduleId: job.module_id, actorAccountId, approvalSha256, statementSha256: registryVerification.statementSha256, receipt})
+      await appendLog(this.db, jobId, 'info', 'sign', `Online signature independently verified with publisher key ${identity.signingKeyId}; ready for publication review`)
+      return 'ready_for_review'
+    } catch (error) {
+      if (error instanceof SigningProviderError && error.code === 'PROVIDER_FAILURE') {
+        await this.db.updateTable('greenfield_publisher_release_jobs').set({signing_started_at: null, updated_at: new Date()} as never)
+          .where('job_id', '=', jobId).where('state', '=', 'signing').execute()
+        await appendSigningAudit(this.db, {eventType: 'signing_failed', jobId, publisherId: job.publisher_id, moduleId: job.module_id,
+          actorAccountId, approvalSha256, details: {code: error.code, retryable: true}})
+        throw error
+      }
+      if (error instanceof SigningProviderError) return failClosed('SIGNING_IDENTITY_UNAVAILABLE', error.message)
+      if (error instanceof PublisherConsoleError) return failClosed(error.code, error.message)
+      if (error instanceof ModuleDomainError) return failClosed('RELEASE_APPROVAL_INVALIDATED', error.message)
+      throw error
+    }
+  }
+
   // ---- publish -----------------------------------------------------------
 
   async publish(jobId: string): Promise<PublisherReleaseJobState | null> {
@@ -252,6 +423,18 @@ export class PublisherReleaseJobProcessor {
       // Ownership re-checked against the account that requested publication.
       try { await new DeveloperService(this.db, this.deps.config as AppConfig).requirePublisherAccess(job.publish_requested_by_account_id ?? '', job.publisher_id) }
       catch { return fail('failed', 'FORBIDDEN_NOT_PUBLISHER', 'requesting account no longer has publisher access') }
+      if (job.signing_receipt) {
+        try {
+          const authorization = await new PublisherOnlineSigningAuthority(this.db, this.deps.config as AppConfig).requireAuthorization({
+            accountId: job.publish_requested_by_account_id ?? '', publisherId: job.publisher_id, moduleId: job.module_id, sourceRepository: job.source_repository,
+          })
+          if (!job.signing_identity_id || !authorization.identities.some(identity => identity.identityId === job.signing_identity_id)) {
+            return fail('signature_invalid', 'SIGNATURE_REVOKED', 'online signing identity is no longer active for this publisher')
+          }
+        } catch {
+          return fail('failed', 'SIGNING_AUTHORIZATION_REQUIRED', 'requesting builder no longer has online publication authority')
+        }
+      }
       if ((job.validation as {passed?: boolean})?.passed !== true) return fail('validation_failed', 'VALIDATION_FAILED', 'validation did not pass')
       if ((job.signature as {state?: string})?.state !== 'verified') return fail('signature_missing', 'SIGNATURE_MISSING', 'no verified publisher signature')
       if (!job.release_id || !job.version || !job.artifact_sha256 || !job.source_commit) return fail('failed', 'INVALID_JOB_STATE', 'job is missing verified release facts')
@@ -294,6 +477,9 @@ export class PublisherReleaseJobProcessor {
       if (blocking.length) return fail('validation_failed', 'VALIDATION_FAILED', `compatibility/policy: ${blocking.join(', ')}`)
 
       await appendLog(this.db, jobId, 'info', 'publish', `Publishing ${job.module_id}@${job.version} via registry publishRelease`)
+      if (job.signing_receipt) await appendSigningAudit(this.db, {eventType: 'publication_authorized', jobId, identityId: job.signing_identity_id,
+        publisherId: job.publisher_id, moduleId: job.module_id, actorAccountId: job.publish_requested_by_account_id,
+        approvalSha256: job.approval_sha256, statementSha256: (job.signature as {statementSha256?: string})?.statementSha256 ?? null})
       const published = await this.publishFn(job.module_id, job.version)
       if (published.releaseState !== 'published') return fail('failed', 'INTERNAL_ERROR', `registry reported ${published.releaseState}`)
       return this.finish(job, ['publishing'], 'published', {published_at: published.publishedAt ?? new Date(), error: null}, 'info', 'publish', `Published ${job.module_id}@${job.version}`)
@@ -306,8 +492,9 @@ export class PublisherReleaseJobProcessor {
   /** Called by the runner when transient retries are exhausted. */
   async markExhausted(jobId: string, message: string) {
     const job = await loadJob(this.db, jobId)
-    if (!job || !['fetching', 'validating', 'signature_verified', 'publishing'].includes(job.state)) return
-    await this.finish(job, [job.state], 'failed', {error: {code: 'INTERNAL_ERROR', message: message.slice(0, 500)}}, 'error', 'runner', `Runner gave up after retries: ${message}`)
+    if (!job || !['fetching', 'validating', 'signing', 'signature_verified', 'publishing'].includes(job.state)) return
+    const state = job.state === 'signing' ? 'signing_failed' : 'failed'
+    await this.finish(job, [job.state], state, {error: {code: job.state === 'signing' ? 'SIGNING_FAILED' : 'INTERNAL_ERROR', message: message.slice(0, 500)}}, 'error', 'runner', `Runner gave up after retries: ${message}`)
   }
 
   // ---- helpers -----------------------------------------------------------
@@ -387,4 +574,14 @@ export class PublisherReleaseJobProcessor {
 
 function toPermission(permission: {permission: string; reason?: string; risk?: string}): PublisherReleaseJobPermission {
   return {permission: permission.permission, reason: permission.reason ?? null, risk: permission.risk ?? classifyPermissionRisk(permission.permission)}
+}
+
+function approvalFactsForVerified(verified: VerifiedGithubRelease) {
+  return buildPublisherReleaseApprovalFacts({
+    manifest: verified.manifest,
+    sourceSha: verified.releaseCommit,
+    artifactSha256: verified.packageSha256,
+    productManifestSha256: verified.evidence.productManifestSha256 ?? null,
+    frontendSha256: verified.evidence.frontendSha256 ?? null,
+  })
 }
