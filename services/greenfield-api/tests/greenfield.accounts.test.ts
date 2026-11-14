@@ -1241,6 +1241,213 @@ describeIf('Greenfield native accounts integration', () => {
     )
   })
 
+  describe('resumable email verification (resend challenge id + pending login)', () => {
+    let ipCounter = 0
+    const ipBase = Date.now() % 100
+    const freshIp = () => `198.51.100.${ipBase + ++ipCounter}`
+    const unique = (prefix: string) => `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`.slice(0, 20)
+    const password = 'secure-pass-word-1'
+
+    async function registerPending(prefix: string, remoteAddress: string) {
+      const handle = unique(prefix).replace(/[^a-z0-9-]/g, '')
+      const email = `${handle}@example.com`
+      const register = await app.inject({
+        method: 'POST',
+        url: '/v1/accounts/register',
+        remoteAddress,
+        payload: {email, password, handle, displayName: `${prefix} User`, acceptedTerms: true, inviteCode: 'test-invite'},
+      })
+      expect(register.statusCode).toBe(201)
+      const data = register.json().data
+      return {email, handle, accountId: data.accountId as string, challengeId: data.verificationChallengeId as string}
+    }
+    async function mailCount(accountId: string | null) {
+      let query = db.selectFrom('greenfield_mail_jobs').select(db.fn.countAll().as('n'))
+      if (accountId) query = query.where('recipient_account_id', '=', accountId)
+      return Number((await query.executeTakeFirstOrThrow()).n)
+    }
+    async function challengeState(challengeId: string) {
+      return db
+        .selectFrom('greenfield_auth_challenges')
+        .select(['state', 'account_id', 'method_id', 'purpose'])
+        .where('challenge_id', '=', challengeId)
+        .executeTakeFirstOrThrow()
+    }
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+
+    it('resend returns the new challenge id; the new id + new code verifies and the old id fails', async () => {
+      const ip = freshIp()
+      const pending = await registerPending('rsnd', ip)
+      const firstCode = await latestMailCode(db, pending.accountId, 'verification-code')
+      const resend = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: pending.email}})
+      expect(resend.statusCode).toBe(200)
+      const data = resend.json().data
+      expect(Object.keys(data).sort()).toEqual(['challengeId', 'delivery', 'expiresAt', 'resent'])
+      expect(data.resent).toBe(true)
+      expect(data.challengeId).toMatch(uuidPattern)
+      expect(data.challengeId).not.toBe(pending.challengeId)
+      expect(Number.isNaN(Date.parse(data.expiresAt))).toBe(false)
+      expect(Date.parse(data.expiresAt)).toBeGreaterThan(Date.now() + 10 * 60_000 - 5_000)
+      expect(data.delivery).toEqual({channel: 'email', recipient: expect.stringMatching(/^[^@]+@example\.com$/)})
+      expect(data.delivery.recipient).not.toContain(pending.handle)
+      expect(await challengeState(pending.challengeId)).toMatchObject({state: 'superseded'})
+      expect(await challengeState(data.challengeId)).toMatchObject({state: 'pending', account_id: pending.accountId, purpose: 'email_verification'})
+      const secondCode = await latestMailCode(db, pending.accountId, 'verification-code')
+
+      const oldWithOldCode = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', remoteAddress: ip, payload: {challengeId: pending.challengeId, code: firstCode}})
+      expect(oldWithOldCode.statusCode).toBe(401)
+      expect(oldWithOldCode.json().error.code).toBe('CHALLENGE_INVALID')
+      const oldWithNewCode = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', remoteAddress: ip, payload: {challengeId: pending.challengeId, code: secondCode}})
+      expect(oldWithNewCode.statusCode).toBe(401)
+      expect(oldWithNewCode.json().error.code).toBe('CHALLENGE_INVALID')
+
+      const verify = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', remoteAddress: ip, payload: {challengeId: data.challengeId, code: secondCode}})
+      expect(verify.statusCode).toBe(200)
+      expect(verify.json().data.verified).toBe(true)
+      const login = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password}})
+      expect(login.statusCode).toBe(200)
+    })
+
+    it('resend for unknown or non-pending emails returns a same-shape decoy that sends nothing and can never verify', async () => {
+      const ip = freshIp()
+      const pending = await registerPending('dcyr', ip)
+      const real = (await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: pending.email}})).json()
+
+      const mailBefore = await mailCount(null)
+      const unknownEmail = `${unique('nobody')}@example.com`
+      const decoyResponse = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: unknownEmail}})
+      expect(decoyResponse.statusCode).toBe(200)
+      const decoy = decoyResponse.json()
+      expect(Object.keys(decoy).sort()).toEqual(Object.keys(real).sort())
+      expect(Object.keys(decoy.data).sort()).toEqual(Object.keys(real.data).sort())
+      expect(Object.keys(decoy.data.delivery).sort()).toEqual(Object.keys(real.data.delivery).sort())
+      expect(decoy.data.resent).toBe(true)
+      expect(decoy.data.challengeId).toMatch(uuidPattern)
+      expect(decoy.data.delivery).toEqual({channel: 'email', recipient: expect.stringMatching(/^n•+@example\.com$/)})
+      const ttl = (iso: string) => Date.parse(iso) - Date.now()
+      expect(Math.abs(ttl(decoy.data.expiresAt) - ttl(real.data.expiresAt))).toBeLessThan(60_000)
+      expect(await mailCount(null)).toBe(mailBefore)
+      expect(await challengeState(decoy.data.challengeId)).toMatchObject({state: 'pending', account_id: null, method_id: null, purpose: 'email_verification'})
+
+      // Even the exact decoy code (recovered offline from the verifier digest) cannot verify anything.
+      const challengeHasher = new ChallengeService(db, loadConfig()) as any
+      const row = await db.selectFrom('greenfield_auth_challenges').select(['verifier_hash']).where('challenge_id', '=', decoy.data.challengeId).executeTakeFirstOrThrow()
+      let decoyCode = ''
+      for (let candidate = 0; candidate < 1_000_000; candidate += 1) {
+        const code = candidate.toString().padStart(6, '0')
+        if (challengeHasher.hashVerifier(decoy.data.challengeId, code) === row.verifier_hash) {
+          decoyCode = code
+          break
+        }
+      }
+      expect(decoyCode).toMatch(/^\d{6}$/)
+      const decoyVerify = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', remoteAddress: ip, payload: {challengeId: decoy.data.challengeId, code: decoyCode}})
+      expect(decoyVerify.statusCode).toBe(401)
+      expect(decoyVerify.json().error.code).toBe('CHALLENGE_INVALID')
+      const unknownAccount = await db.selectFrom('greenfield_auth_identities').select('identity_id').where('identifier', '=', unknownEmail).executeTakeFirst()
+      expect(unknownAccount).toBeUndefined()
+
+      // A verified (non-pending) account also gets a decoy: no mail, no account-bound challenge.
+      const verified = await createVerifiedAccountWithSession(app, db, {prefix: 'dcyv'})
+      const verifiedMailBefore = await mailCount(verified.accountId)
+      const verifiedDecoy = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: verified.email}})
+      expect(verifiedDecoy.statusCode).toBe(200)
+      expect(Object.keys(verifiedDecoy.json().data).sort()).toEqual(Object.keys(real.data).sort())
+      expect(await challengeState(verifiedDecoy.json().data.challengeId)).toMatchObject({account_id: null})
+      expect(await mailCount(verified.accountId)).toBe(verifiedMailBefore)
+    })
+
+    it('pending login with the correct password returns 403 with a fresh challenge that resumes verification', async () => {
+      const ip = freshIp()
+      const pending = await registerPending('pndl', ip)
+      const registrationCode = await latestMailCode(db, pending.accountId, 'verification-code')
+      expect(await mailCount(pending.accountId)).toBe(1)
+
+      const wrong = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password: 'wrong-pass-word-9'}})
+      expect(wrong.statusCode).toBe(401)
+      expect(wrong.json().error.code).toBe('INVALID_CREDENTIALS')
+      expect(wrong.json().error.details).toBeUndefined()
+      expect(await mailCount(pending.accountId)).toBe(1)
+      expect(await challengeState(pending.challengeId)).toMatchObject({state: 'pending'})
+      const unknown = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: `${unique('ghost')}@example.com`, password}})
+      expect(unknown.statusCode).toBe(401)
+      expect(unknown.json().error.code).toBe('INVALID_CREDENTIALS')
+
+      const pendingLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password}})
+      expect(pendingLogin.statusCode).toBe(403)
+      const body = pendingLogin.json()
+      expect(body.ok).toBe(false)
+      expect(body.data).toBeUndefined()
+      expect(body.error).toMatchObject({code: 'EMAIL_VERIFICATION_REQUIRED', message: 'Email verification required', retryable: false})
+      expect(Object.keys(body.error.details).sort()).toEqual(['challengeId', 'delivery', 'expiresAt'])
+      expect(body.error.details.challengeId).toMatch(uuidPattern)
+      expect(body.error.details.challengeId).not.toBe(pending.challengeId)
+      expect(body.error.details.delivery).toEqual({channel: 'email', recipient: expect.stringMatching(/^p•+@example\.com$/)})
+      expect(JSON.stringify(body)).not.toMatch(/accessToken|refreshToken|sessionId/)
+      expect(await mailCount(pending.accountId)).toBe(2)
+      expect(await challengeState(pending.challengeId)).toMatchObject({state: 'superseded'})
+      const sessions = await db.selectFrom('greenfield_sessions').select('session_id').where('account_id', '=', pending.accountId).execute()
+      expect(sessions).toHaveLength(0)
+
+      const oldVerify = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', remoteAddress: ip, payload: {challengeId: pending.challengeId, code: registrationCode}})
+      expect(oldVerify.statusCode).toBe(401)
+      expect(oldVerify.json().error.code).toBe('CHALLENGE_INVALID')
+      const freshCode = await latestMailCode(db, pending.accountId, 'verification-code')
+      const verify = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', remoteAddress: ip, payload: {challengeId: body.error.details.challengeId, code: freshCode}})
+      expect(verify.statusCode).toBe(200)
+      const login = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password}})
+      expect(login.statusCode).toBe(200)
+      expect(login.json().data.accessToken).toBeTruthy()
+    })
+
+    it('register, resend and pending login share one verification-send budget per IP with no bypass', async () => {
+      const verified = await createVerifiedAccountWithSession(app, db, {prefix: 'rlok'})
+      const ip = freshIp()
+      const pending = await registerPending('rlsh', ip) // send 1 (account, email, ip)
+      const resend = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: pending.email}}) // 2
+      expect(resend.statusCode).toBe(200)
+      const pendingLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password}}) // 3
+      expect(pendingLogin.statusCode).toBe(403)
+      const decoy = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: `${unique('rlnb')}@example.com`}}) // 4 (ip)
+      expect(decoy.statusCode).toBe(200)
+      const other = await registerPending('rlot', ip) // 5 (ip)
+      const lastChallenge = pendingLogin.json().error.details.challengeId
+      const mailBefore = await mailCount(pending.accountId)
+
+      const limitedLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password}})
+      expect(limitedLogin.statusCode).toBe(429)
+      expect(limitedLogin.json().error.code).toBe('RATE_LIMITED')
+      expect(limitedLogin.json().error.details).toBeUndefined()
+      expect(await mailCount(pending.accountId)).toBe(mailBefore)
+      expect(await challengeState(lastChallenge)).toMatchObject({state: 'pending'})
+
+      const limitedOtherLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: other.email, password}})
+      expect(limitedOtherLogin.statusCode).toBe(429)
+      const limitedResend = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: other.email}})
+      expect(limitedResend.statusCode).toBe(429)
+      const limitedDecoy = await app.inject({method: 'POST', url: '/v1/accounts/resend-verification', remoteAddress: ip, payload: {email: `${unique('rlnc')}@example.com`}})
+      expect(limitedDecoy.statusCode).toBe(429)
+      const limitedRegister = await app.inject({
+        method: 'POST',
+        url: '/v1/accounts/register',
+        remoteAddress: ip,
+        payload: {email: `${unique('rlrg')}@example.com`, password, handle: unique('rlrg'), displayName: 'Limited User', acceptedTerms: true, inviteCode: 'test-invite'},
+      })
+      expect(limitedRegister.statusCode).toBe(429)
+
+      // The limiter never blocks wrong passwords' 401 or a verified account's sign-in.
+      const wrong = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: pending.email, password: 'wrong-pass-word-9'}})
+      expect(wrong.statusCode).toBe(401)
+      expect(wrong.json().error.code).toBe('INVALID_CREDENTIALS')
+      const verifiedLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: ip, payload: {email: verified.email, password: verified.password}})
+      expect(verifiedLogin.statusCode).toBe(200)
+
+      // A fresh IP still hits the per-account budget for the pending account.
+      const otherIpLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: freshIp(), payload: {email: pending.email, password}})
+      expect(otherIpLogin.statusCode).toBe(403) // account key: register, resend, login = 3; this is 4
+    })
+  })
+
   it('Greenfield meta works with AT disabled', async () => {
     const res = await app.inject({method: 'GET', url: '/v1/meta'})
     expect(res.statusCode).toBe(200)

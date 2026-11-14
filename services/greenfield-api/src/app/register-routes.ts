@@ -100,6 +100,9 @@ function sendError(reply: any, code: any, message: string, requestId: string) {
 
 function mapDomainError(reply: any, error: any, requestId: string, fallback: string) {
   const code = error?.code
+  if (code === 'EMAIL_VERIFICATION_REQUIRED') {
+    return reply.code(statusForError(code)).send(failureEnvelope(code, error.message ?? fallback, requestId, {details: error.details}))
+  }
   if (
     code === 'VALIDATION_FAILED' ||
     code === 'NOT_FOUND' ||
@@ -855,7 +858,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const issued = await authentication.login(bodyString(request.body, 'email'), bodyString(request.body, 'password'), {
         userAgent: request.headers['user-agent'],
         correlationId: request.id,
-      })
+      }, {ipHash: requestIpHash(request, config)})
       return reply.send(
         successEnvelope(
           {
