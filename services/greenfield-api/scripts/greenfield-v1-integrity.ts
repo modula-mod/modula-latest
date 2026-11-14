@@ -19,6 +19,10 @@ try {
     LEFT JOIN greenfield_accounts a ON a.account_id=i.account_id
     LEFT JOIN greenfield_extension_versions v ON v.extension_version_id=i.extension_version_id
     WHERE a.account_id IS NULL OR v.extension_version_id IS NULL`, 'critical', 'installation has no account or extension version')
+  await count('presentation_assets_missing_blob', `
+    SELECT count(*) FROM greenfield_release_presentation_assets a
+    LEFT JOIN greenfield_release_asset_blobs b ON b.sha256=a.sha256
+    WHERE b.sha256 IS NULL`, 'informational', 'presentation metadata has no stored bytes (GF-MOD-02 / G004; backfill out of scope)')
   await count('orphan_permission_reviews', `
     SELECT count(*) FROM greenfield_module_permission_reviews r
     LEFT JOIN greenfield_extension_installations i ON i.installation_id=r.installation_id

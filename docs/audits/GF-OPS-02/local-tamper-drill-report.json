@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "operation": "restore-drill",
+  "checks": [
+    {
+      "name": "drill",
+      "ok": false,
+      "detail": "payload checksum mismatch: payloads/database-greenfield-core.dump.age"
+    }
+  ]
+}
