@@ -282,6 +282,38 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
   })
 
+  // GF-OPS-01(c) regression (greenfield.accounts mail identity): processOneJob is
+  // also driven with hand-built WorkerConfig objects that predate #181 and omit
+  // leaseRenewIntervalMs. An undefined interval used to throw after the claim and
+  // surface as a false "Job lease is no longer owned by worker" from scheduleRetry.
+  it('runs and renews with the default lease/3 interval when a hand-built config omits leaseRenewIntervalMs', async () => {
+    const cfg: Partial<WorkerConfig> = config(`gf-ops-01c-no-renew-cfg-${suffix}`)
+    delete cfg.leaseRenewIntervalMs
+    delete cfg.heartbeatIntervalMs
+    const jobId = await enqueue()
+    slowJob.durationMs = JOB_MS // longer than the lease: only the default renewal keeps it
+    const renewalsBefore = metrics.read().jobLeaseRenewals
+    const log = {warn: vi.fn(), error: vi.fn()}
+    await expect(processOneJob(db, cfg as WorkerConfig, {log})).resolves.toBe(true)
+    expect(slowMark.handlerRuns).toBe(1)
+    expect(await jobRow(jobId)).toMatchObject({status: 'SUCCEEDED', lease_owner: null, attempt_count: 1})
+    expect(metrics.read().jobLeaseRenewals - renewalsBefore).toBeGreaterThanOrEqual(2)
+    expect(log.warn).not.toHaveBeenCalled()
+    expect(log.error).not.toHaveBeenCalled()
+    expect(await db.selectFrom('job_failures').select('id').where('job_id', '=', jobId).execute()).toHaveLength(0)
+  })
+
+  it('refuses an invalid leaseRenewIntervalMs before claiming, leaving the job untouched', async () => {
+    const jobId = await enqueue()
+    for (const leaseRenewIntervalMs of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5, LEASE_MS, LEASE_MS + 1, '200' as unknown as number, null as unknown as number]) {
+      const cfg = {...config(`gf-ops-01c-bad-renew-cfg-${suffix}`), leaseRenewIntervalMs}
+      await expect(processOneJob(db, cfg)).rejects.toThrow(RangeError)
+    }
+    expect(slowMark.handlerRuns).toBe(0)
+    expect(await jobRow(jobId)).toMatchObject({status: 'QUEUED', lease_owner: null, lease_expires_at: null, attempt_count: 0})
+    await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
+  })
+
   it('stops the renewal timer when the job finishes and the heartbeat timer on shutdown', async () => {
     const cfg = config(`gf-ops-01c-stop-${suffix}`)
     const jobId = await enqueue()
