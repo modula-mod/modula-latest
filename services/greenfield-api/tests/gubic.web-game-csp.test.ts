@@ -26,8 +26,8 @@ function tarEntry(path: string, bytes: Buffer): Buffer {
   return Buffer.concat([header, bytes, Buffer.alloc(Math.ceil(bytes.length / 512) * 512 - bytes.length)])
 }
 
-function gameArchive(html: string, members: Record<string, string | Buffer> = {'main.js': 'document.title = "ok"'}): Buffer {
-  const files: Record<string, Buffer> = {'index.html': Buffer.from(html)}
+function gameArchive(html: string | Buffer, members: Record<string, string | Buffer> = {'main.js': 'document.title = "ok"'}): Buffer {
+  const files: Record<string, Buffer> = {'index.html': Buffer.isBuffer(html) ? html : Buffer.from(html)}
   for (const [path, body] of Object.entries(members)) files[path] = Buffer.isBuffer(body) ? body : Buffer.from(body)
   const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: Object.fromEntries(Object.entries(files).map(([path, bytes]) => [path, sha256(bytes)]))}))
   return gzipSync(Buffer.concat([...Object.entries(files).map(([path, bytes]) => tarEntry(path, bytes)), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
@@ -162,7 +162,8 @@ describe('GUBIC web game SVG members', () => {
 
   it('rejects on*= event-handler attributes', () => {
     for (const root of ['<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)">', '<svg xmlns="http://www.w3.org/2000/svg" ONLOAD = \'x()\'>', '<svg xmlns="http://www.w3.org/2000/svg"\n\tonclick=x()>']) {
-      expect(rejection(svgDoc('', root)), root).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*event-handler attribute/)
+      // (unquoted values are not XML, so the last one is refused as an unparseable tag)
+      expect(rejection(svgDoc('', root)), root).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*(?:event-handler attribute|cannot be parsed)/)
     }
     expect(rejection(svgDoc('<rect width="1" height="1" onmouseover="steal()"/>'))).toMatch(/event-handler attribute \(onmouseover\)/)
     expect(rejection(svgDoc('<set attributeName="fill" to="red" begin="0s" svg:onbegin="x()"/>'))).toMatch(/event-handler/)
@@ -184,10 +185,10 @@ describe('GUBIC web game SVG members', () => {
 
   it('rejects external href / xlink:href references and remote stylesheets', () => {
     for (const ref of ['https://evil.example/x.svg#a', 'http://evil.example/a.png', '//evil.example/a.png', 'HTTPS://evil.example/a']) {
-      expect(rejection(svgDoc(`<use href="${ref}"/>`)), ref).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*external reference/)
-      expect(rejection(svgDoc(`<image xlink:href="${ref}"/>`)), ref).toMatch(/external reference \(xlink:href=/)
+      expect(rejection(svgDoc(`<use href="${ref}"/>`)), ref).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*external or data: reference/)
+      expect(rejection(svgDoc(`<image xlink:href="${ref}"/>`)), ref).toMatch(/external or data: reference \(xlink:href=/)
     }
-    expect(rejection(svgDoc('<rect style="fill:url(https://evil.example/p.svg#x)"/>'))).toMatch(/external url\(\) reference/)
+    expect(rejection(svgDoc('<rect style="fill:url(https://evil.example/p.svg#x)"/>'))).toMatch(/external stylesheet or url\(\) reference \(style\)/)
     expect(rejection(svgDoc('<style>@import "https://evil.example/a.css";</style>'))).toMatch(/external stylesheet/)
     expect(rejection(svgDoc('<style>rect { fill: url( //evil.example/p#x ) }</style>'))).toMatch(/external stylesheet/)
   })
@@ -383,5 +384,113 @@ describe('GUBIC web game HTML tokenizer (Sentinel §33 probes)', () => {
     for (const src of ['ht\ttps://evil.example/x.js', ' //evil.example/x.js', '/\\evil.example/x.js', '&#104;ttps://evil.example/x.js', '\\\\evil.example\\x.js']) {
       expect(reason(doc(csp, `<script src="${src}"></script>`)), src).toMatch(/non-local script/)
     }
+  })
+})
+
+// Sentinel §33 (#188) residuals.
+describe('GUBIC web game content policy (Sentinel §33 residuals)', () => {
+  const csp = meta(STRICT)
+  const fails = (archive: Buffer) => {
+    try {
+      verifyWebGameArchive(archive)
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error('expected the archive to be rejected')
+  }
+  const withMember = (path: string, body: string | Buffer) => gameArchive(doc(csp), {'main.js': 'ok()', [path]: body})
+  const utf16le = (text: string, bom = true) => Buffer.concat([bom ? Buffer.from([0xff, 0xfe]) : Buffer.alloc(0), Buffer.from(text, 'utf16le')])
+  const utf16be = (text: string) => { const le = Buffer.from(text, 'utf16le'); return Buffer.concat([Buffer.from([0xfe, 0xff]), Buffer.from(le).swap16()]) }
+  const EVIL_SVG = '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
+
+  it('matches http-equiv exactly: a padded CSP http-equiv is no CSP', () => {
+    for (const equiv of ['Content-Security-Policy ', ' Content-Security-Policy', 'Content-Security-Policy\t']) {
+      const padded = `<meta http-equiv="${equiv}" content="${STRICT}">`
+      expect(fails(gameArchive(doc(padded))), JSON.stringify(equiv)).toMatch(/no effective CSP meta element/)
+      expect(fails(gameArchive(doc(csp + padded))), JSON.stringify(equiv)).toMatch(/GUBIC_HTML_ACTIVE_CONTENT.*http-equiv is padded/)
+    }
+    // ASCII case-insensitive and character references are still the same keyword.
+    expect(() => verifyWebGameArchive(gameArchive(doc(`<meta http-equiv="content-security-POLICY" content="${STRICT}">`)))).not.toThrow()
+    expect(() => verifyWebGameArchive(gameArchive(doc(`<meta http-equiv="Content&#45;Security-Policy" content="${STRICT}">`)))).not.toThrow()
+  })
+
+  it('rejects <meta http-equiv=refresh> anywhere', () => {
+    const refresh = '<meta http-equiv="refresh" content="0;url=https://evil.example/">'
+    expect(fails(gameArchive(doc(csp + refresh)))).toMatch(/GUBIC_HTML_ACTIVE_CONTENT.*http-equiv=refresh/)
+    expect(fails(gameArchive(doc(csp, `<p>${refresh.replace('https://evil.example/', 'javascript:alert(1)')}</p>`)))).toMatch(/http-equiv=refresh|script URL/)
+    expect(fails(gameArchive(doc(csp, '<meta http-equiv=" Refresh " content="5">')))).toMatch(/http-equiv=refresh/)
+    expect(fails(gameArchive(doc(csp, `<noscript>${refresh}</noscript>`)))).toMatch(/http-equiv=refresh/)
+    expect(fails(gameArchive(`<head>${refresh}${csp}</head>`))).toMatch(/before any other content|http-equiv=refresh/)
+  })
+
+  it('refuses documents that are not UTF-8 or declare another encoding', () => {
+    expect(fails(gameArchive(doc(csp + '<meta name="x" content="y">').replace('<meta charset="utf-8">', '<meta charset="iso-2022-jp">')))).toMatch(/GUBIC_HTML_MALFORMED.*non-UTF-8 encoding \(iso-2022-jp\)/)
+    expect(fails(gameArchive(doc(csp, '<meta http-equiv="Content-Type" content="text/html; charset=shift_jis">')))).toMatch(/non-UTF-8 encoding/)
+    expect(fails(gameArchive(doc(csp, '<title><meta charset=utf-7></title>')))).toMatch(/non-UTF-8 encoding \(utf-7\)/)
+    expect(fails(gameArchive(doc(csp, 'a\u001b$Bb')))).toMatch(/ESC byte/)
+    const invalid = Buffer.concat([Buffer.from(doc(csp, '<p>')), Buffer.from([0xc3, 0x28]), Buffer.from('</p>')])
+    expect(fails(gameArchive(invalid))).toMatch(/GUBIC_HTML_MALFORMED.*not valid UTF-8/)
+    expect(() => verifyWebGameArchive(gameArchive(doc(csp + '<meta name="x" content="y">').replace('<meta charset="utf-8">', '<meta charset=" UTF-8 ">')))).not.toThrow()
+  })
+
+  it('refuses .xhtml/.xht members and holds .xml members to an inert-data policy', () => {
+    const xhtml = '<html xmlns="http://www.w3.org/1999/xhtml"><body><script>fetch("https://evil.example")</script></body></html>'
+    expect(fails(withMember('evil.xhtml', xhtml))).toMatch(/GUBIC_XML_DOCUMENT.*evil\.xhtml is XHTML/)
+    expect(fails(withMember('evil.XHT', xhtml))).toMatch(/GUBIC_XML_DOCUMENT/)
+    expect(fails(withMember('data/evil.xml', xhtml))).toMatch(/GUBIC_XML_DOCUMENT.*1999\/xhtml namespace/)
+    expect(fails(withMember('data/evil.xml', '<x:root xmlns:x="http&#58;//www.w3.org/1999/xhtml"/>'))).toMatch(/xhtml namespace/)
+    expect(fails(withMember('data/evil.xml', '<?xml-stylesheet type="text/xsl" href="x.xsl"?><font/>'))).toMatch(/xml-stylesheet/)
+    expect(fails(withMember('data/evil.xml', '<!DOCTYPE font [<!ENTITY x "y">]><font>&x;</font>'))).toMatch(/entity declaration/)
+    expect(fails(withMember('data/evil.xml', utf16le('<?xml version="1.0" encoding="UTF-16"?><font/>')))).toMatch(/GUBIC_(?:XML_DOCUMENT|SVG_ACTIVE_CONTENT).*UTF-16LE, not UTF-8/)
+    const font = '<?xml version="1.0"?>\n<font><info face="Arial" size="32"/><common lineHeight="32"/><pages><page id="0" file="font.png"/></pages><chars count="1"><char id="32" x="0" y="0"/></chars></font>'
+    expect(() => verifyWebGameArchive(withMember('assets/font.xml', font))).not.toThrow()
+  })
+
+  it('detects UTF-16/32 SVG by BOM and NUL patterns and refuses non-UTF-8 SVG', () => {
+    for (const [path, bytes] of [
+      ['a.xml', utf16le(EVIL_SVG)], ['a.svg', utf16le(EVIL_SVG)], ['art/a.dat', utf16le(EVIL_SVG)], ['art/b.dat', utf16be(EVIL_SVG)],
+      ['art/c.dat', utf16le(EVIL_SVG, false)], ['art/d.png', gzipSync(utf16le(EVIL_SVG))],
+      ['art/e.dat', Buffer.concat([Buffer.from([0xff, 0xfe, 0, 0]), Buffer.from([0x3c, 0, 0, 0])])],
+      ['art/f.dat', Buffer.from([0, 0, 0, 0x3c, 0, 0, 0, 0x73])],
+    ] as const) {
+      expect(fails(withMember(path, bytes)), path).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*(?:UTF-16|UTF-32)/)
+    }
+    // Non-markup UTF-16 text (a localisation file) and binary images are not SVG candidates.
+    expect(() => verifyWebGameArchive(withMember('lang/en.txt', utf16le('hello = Hello')))).not.toThrow()
+    expect(() => verifyWebGameArchive(withMember('art/a.png', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d])))).not.toThrow()
+  })
+
+  it('rejects DOCTYPE internal subsets, <!ATTLIST> and <!ENTITY> in SVG', () => {
+    const body = '<svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>'
+    expect(fails(withMember('a.svg', `<!DOCTYPE svg [<!ATTLIST svg onload CDATA "alert(1)">]>${body}`))).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*<!ATTLIST> declaration/)
+    expect(fails(withMember('a.svg', `<!DOCTYPE svg [<!ATTLIST a href CDATA "javascript:alert(1)">]>${body}`))).toMatch(/<!ATTLIST>|script URL/)
+    expect(fails(withMember('a.svg', `<!DOCTYPE svg [<!ENTITY e "x">]>${body}`))).toMatch(/entity declaration/)
+    expect(fails(withMember('a.svg', `<!DOCTYPE svg [ ]>${body}`))).toMatch(/internal subset/)
+    expect(fails(withMember('a.svg', `<!DOCTYPE svg PUBLIC "a>[" "b">${body}`))).toMatch(/internal subset or unsupported form/)
+    expect(fails(withMember('a.svg', `<!ELEMENT svg ANY>${body}`))).toMatch(/<!ELEMENT> declaration/)
+    expect(() => verifyWebGameArchive(withMember('a.svg', `<?xml version="1.0"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n${body}`))).not.toThrow()
+  })
+
+  it('decodes CSS escapes and comments before the remote and script-URL checks', () => {
+    const svg = (inner: string) => `<svg xmlns="http://www.w3.org/2000/svg">${inner}</svg>`
+    for (const inner of ['<style>@import "\\68ttps://evil.example/a.css";</style>', '<style>@\\69mport url(//evil.example/a.css);</style>',
+      '<style>@import/**/"https://evil.example/a.css";</style>', '<rect style="fill:url(\\68ttps://evil.example/p.svg#x)"/>',
+      '<rect style="fill:url(\\2f\\2f evil.example/p.svg#x)"/>', '<rect fill="url(&#x5c;68ttps://evil.example/p#x)"/>',
+      '<style><![CDATA[ rect { fill: url( "\\000068ttps://evil.example/p#x" ) } ]]></style>']) {
+      expect(fails(withMember('a.svg', svg(inner))), inner).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*external stylesheet or url\(\) reference/)
+    }
+    expect(fails(withMember('a.svg', svg('<rect style="background:url(java\\73 cript:alert(1))"/>')))).toMatch(/script URL/)
+    expect(fails(withMember('a.svg', svg('<style>a { background: url("j\\61vascript:x") }</style>')))).toMatch(/script URL in CSS/)
+    expect(() => verifyWebGameArchive(withMember('a.svg', svg('<style>.a { fill: url(#g); content: "\\2014" }</style><rect class="a" style="fill:url(\\23 g)"/>')))).not.toThrow()
+  })
+
+  it('rejects data: URLs in SVG href / xlink:href (use, a, image and any other element)', () => {
+    const svg = (inner: string) => `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">${inner}</svg>`
+    for (const inner of ['<use href="data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9YWxlcnQoMSk+"/>', '<a href="data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;"><text>x</text></a>',
+      '<image xlink:href="data:image/png;base64,iVBORw0KGgo="/>', '<feImage href=" DATA:image/svg+xml,x"/>', '<pattern xlink:href="da&#x09;ta:x"/>',
+      '<a><set attributeName="href" to="data:text/html,x"/></a>', '<a><animate attributeName="href" values="#a;data:text/html,x"/></a>']) {
+      expect(fails(withMember('a.svg', svg(inner))), inner).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*data: reference/)
+    }
+    expect(() => verifyWebGameArchive(withMember('a.svg', svg('<use href="#coin"/><image href="coin.png"/><a href="help.html"><text>?</text></a>')))).not.toThrow()
   })
 })

@@ -8,8 +8,9 @@
  * unambiguously is refused. This module parses the CSP element and its
  * directives instead of looking for substrings,
  * and also rejects remote script tags, inline event handlers, `javascript:`
- * URLs, `srcdoc`, import maps, script-capable SVG, remote worker registrations
- * and dynamic code evaluation in bundled JavaScript. It is dependency-free on
+ * URLs, `srcdoc`, import maps, meta refresh, non-UTF-8 documents, XHTML and
+ * active XML, script-capable SVG, remote worker registrations and dynamic
+ * code evaluation in bundled JavaScript. It is dependency-free on
  * purpose and errs on the side of refusal: anything it cannot interpret
  * unambiguously is rejected.
  *
@@ -34,6 +35,7 @@ export type WebGameContentPolicyCode =
   | 'GUBIC_HTML_ACTIVE_CONTENT'
   | 'GUBIC_REMOTE_WORKER'
   | 'GUBIC_HTML_MALFORMED'
+  | 'GUBIC_XML_DOCUMENT'
 
 export class WebGameContentPolicyError extends Error {
   constructor(message: string, readonly code: WebGameContentPolicyCode = 'GUBIC_CONTENT_POLICY') {
@@ -61,11 +63,6 @@ const CODE_DIRECTIVES = new Set(['script-src', 'script-src-elem', 'script-src-at
 const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'connect-src', 'object-src', 'base-uri', 'worker-src'])
 
 export type ParsedCsp = Map<string, string[]>
-
-/** Removes HTML comments. An unterminated comment swallows the rest of the document, as in a browser. */
-export function stripHtmlComments(html: string): string {
-  return html.replace(/<!--[\s\S]*?(?:-->|$)/g, ' ')
-}
 
 function decodeEntities(value: string): string {
   const decoded = value
@@ -190,6 +187,31 @@ export function assertWebGameDocumentPolicy(html: string, path: string): ParsedC
   return directives
 }
 
+const UTF8_LABELS = new Set(['utf-8', 'utf8', 'unicode-1-1-utf-8', 'unicode11utf8', 'unicode20utf8', 'x-unicode20utf8'])
+
+/** Game documents must be UTF-8: another declared encoding (e.g. ISO-2022-JP) would change how a browser reads the bytes we scanned. */
+function assertUtf8Label(label: string, path: string): void {
+  if (!UTF8_LABELS.has(label.trim().toLowerCase())) failCode('GUBIC_HTML_MALFORMED', `Web game document ${path} declares a non-UTF-8 encoding (${label.trim()})`)
+}
+
+/**
+ * Decodes an HTML member as strict UTF-8. Invalid UTF-8, an ESC byte
+ * (ISO-2022 shift sequences) or a charset declaration anywhere in the raw text
+ * (the encoding prescan ignores element context) naming another encoding is
+ * refused, so the text we scan is the text the browser renders.
+ */
+function decodeHtmlMember(bytes: Buffer, path: string): string {
+  let text: string
+  try {
+    text = new TextDecoder('utf-8', {fatal: true}).decode(bytes)
+  } catch {
+    return failCode('GUBIC_HTML_MALFORMED', `Web game document ${path} is not valid UTF-8`)
+  }
+  if (text.includes('\u001b')) failCode('GUBIC_HTML_MALFORMED', `Web game document ${path} contains an ESC byte`)
+  for (const match of text.matchAll(/charset\s*=\s*["']?\s*([a-z0-9_:.-]+)/gi)) assertUtf8Label(match[1]!, path)
+  return text
+}
+
 /**
  * Rejects inline-code vectors in a game document's tokens: non-local
  * `<script src>`, `on*` event-handler attributes, `javascript:`/`vbscript:`
@@ -217,6 +239,17 @@ function assertNoActiveHtmlMarkup(tokens: HtmlToken[], path: string, depth: numb
     if (token.type !== 'startTag') continue
     const {name, attributes} = token
     if (name === 'svg' || name === 'math') reject(`inline <${name}> foreign content (ship artwork as a separate .svg member)`)
+    if (name === 'meta') {
+      const httpEquiv = attributeValue(token, 'http-equiv')
+      const keyword = httpEquiv === undefined ? undefined : decodeReferencesForScan(httpEquiv).trim().toLowerCase()
+      // A padded value is ignored by browsers (no policy applies) while it reads like one: refuse it.
+      if (keyword === 'content-security-policy' && !isCspMeta(token)) reject(`a CSP meta whose http-equiv is padded (${JSON.stringify(httpEquiv)}), which browsers ignore`)
+      // Meta refresh navigates without being governed by the CSP.
+      if (keyword === 'refresh') reject('a <meta http-equiv=refresh>')
+      if (keyword === 'content-type') assertUtf8Label(/charset\s*=\s*["']?\s*([^\s"';]+)/i.exec(decodeReferencesForScan(attributeValue(token, 'content') ?? ''))?.[1] ?? 'utf-8', path)
+      const charset = attributeValue(token, 'charset')
+      if (charset !== undefined) assertUtf8Label(decodeReferencesForScan(charset), path)
+    }
     if (name === 'script') {
       const type = attributeValue(token, 'type')
       if (type !== undefined && decodeReferencesForScan(type).trim().toLowerCase() === 'importmap') reject('a <script type=importmap> import map')
@@ -274,80 +307,188 @@ function normaliseUrlForScan(value: string): string {
   return decodeReferencesForScan(value).replace(/[\u0000-\u0020\u007f-\u009f]+/g, '').toLowerCase()
 }
 
-const REMOTE_REFERENCE = /^(?:https?:|\/\/|\\\\)/
+/** Remote (`http:`, `https:`, `//`, `\\`) or `data:` URL after browser normalisation. */
+const REMOTE_OR_DATA_REFERENCE = /^(?:https?:|\/\/|\\\\|\/\\|data:)/
 
-/** Every start tag in a markup string, with a lenient attribute parse (no entity failure). */
-function allStartTags(markup: string): Array<{name: string, attributes: Array<[string, string]>}> {
-  const tags: Array<{name: string, attributes: Array<[string, string]>}> = []
-  const tagPattern = /<([a-z][\w.:-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/gi
+/** Every start tag in an XML/SVG string (lenient attribute parse, no entity failure) with its offset. */
+function allStartTags(markup: string): Array<{name: string, attributes: Array<[string, string]>, index: number}> {
+  const tags: Array<{name: string, attributes: Array<[string, string]>, index: number}> = []
+  const tagPattern = /<([a-z_][\w.:-]*)((?:\s+[^\s"'<>/=]+\s*=\s*(?:"[^"<]*"|'[^'<]*'))*)\s*\/?>/gi
   let tag: RegExpExecArray | null
   while ((tag = tagPattern.exec(markup))) {
     const attributes: Array<[string, string]> = []
-    const attributePattern = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
+    const attributePattern = /([^\s"'<>/=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g
     let attribute: RegExpExecArray | null
     while ((attribute = attributePattern.exec(tag[2]!))) {
-      attributes.push([attribute[1]!.toLowerCase(), attribute[2] ?? attribute[3] ?? attribute[4] ?? ''])
+      attributes.push([attribute[1]!.toLowerCase(), attribute[2] ?? attribute[3] ?? ''])
     }
-    tags.push({name: tag[1]!.toLowerCase(), attributes})
+    tags.push({name: tag[1]!.toLowerCase(), attributes, index: tag.index})
   }
   return tags
 }
 
 const localName = (qualified: string) => qualified.slice(qualified.lastIndexOf(':') + 1)
 
-/** True for `.svg`/`.svgz` members and for any member whose content sniffs as SVG (image/svg+xml). */
+/** Decodes CSS escapes (`\68`, `\h`, escaped newline) and drops comments, for scanning only. */
+function decodeCssForScan(value: string): string {
+  return decodeReferencesForScan(value)
+    .replace(/\/\*[\s\S]*?(?:\*\/|$)/g, '')
+    .replace(/\\([0-9a-f]{1,6})[ \t\n\r\f]?/gi, (_, hex: string) => safeCodePoint(parseInt(hex, 16)))
+    .replace(/\\\r?\n/g, '')
+    .replace(/\\([\s\S])/g, '$1')
+}
+
+/** CSS that references a remote resource (url(), image-set(), @import) or a script URL, after escape decoding. */
+function cssProblem(value: string): string | null {
+  const css = normaliseUrlForScan(decodeCssForScan(value))
+  if (/(?:\(|@import)['"]?(?:https?:|\/\/|\\\\|\/\\)/.test(css)) return 'an external stylesheet or url() reference'
+  if (/(?:java|vb)script:/.test(css)) return 'a script URL in CSS'
+  return null
+}
+
+type TextEncoding = 'utf-8' | 'utf-16le' | 'utf-16be' | 'utf-32'
+
+/** XML encoding autodetection (BOM, then the NUL patterns of a leading "<"). */
+function detectEncoding(raw: Buffer): TextEncoding {
+  const b = raw
+  if (b.length >= 4 && ((b[0] === 0x00 && b[1] === 0x00 && b[2] === 0xfe && b[3] === 0xff) || (b[0] === 0xff && b[1] === 0xfe && b[2] === 0x00 && b[3] === 0x00))) return 'utf-32'
+  if (b.length >= 4 && ((b[0] === 0 && b[1] === 0 && b[2] === 0 && b[3] === 0x3c) || (b[0] === 0x3c && b[1] === 0 && b[2] === 0 && b[3] === 0))) return 'utf-32'
+  if (b.length >= 2 && b[0] === 0xff && b[1] === 0xfe) return 'utf-16le'
+  if (b.length >= 2 && b[0] === 0xfe && b[1] === 0xff) return 'utf-16be'
+  if (b.length >= 2 && b[0] !== 0 && b[1] === 0) return 'utf-16le'
+  if (b.length >= 2 && b[0] === 0 && b[1] !== 0) return 'utf-16be'
+  return 'utf-8'
+}
+
+const gunzipMember = (bytes: Buffer): Buffer | null => {
+  if (!(bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b)) return bytes
+  // Bounded by the archive's own 64 MiB expanded-size limit.
+  try { return gunzipSync(bytes, {maxOutputLength: 64 * 1024 * 1024}) } catch { return null }
+}
+
+/** True when a non-UTF-8 (UTF-16/32) text starts with markup: an XML/SVG candidate we cannot scan. */
+function isNonUtf8Markup(raw: Buffer): boolean {
+  const encoding = detectEncoding(raw)
+  if (encoding === 'utf-8') return false
+  if (encoding === 'utf-32') return true
+  const head = Buffer.from(raw.subarray(0, Math.min(raw.length, 4096) & ~1))
+  if (encoding === 'utf-16be') head.swap16()
+  return /^\uFEFF?\s*</.test(head.toString('utf16le'))
+}
+
+/** True for `.svg`/`.svgz` members and for any member whose content sniffs as SVG (image/svg+xml), including UTF-16/32 markup. */
 export function isSvgMember(path: string, bytes: Buffer): boolean {
   if (/\.svgz?$/i.test(path)) return true
   if (/\.html?$/i.test(path)) return false
-  const text = svgText(bytes)?.slice(0, 64 * 1024) ?? null
-  return text !== null && /^(?:\uFEFF)?\s*(?:<\?xml\b[^>]*\?>\s*|<!--[\s\S]*?-->\s*|<!doctype\b[^>[]*(?:\[[\s\S]*?\])?\s*>\s*)*<(?:[\w.-]+:)?svg\b/i.test(text)
+  const raw = gunzipMember(bytes)
+  if (raw === null) return false
+  if (isNonUtf8Markup(raw)) return true
+  if (raw.includes(0)) return false
+  const text = raw.subarray(0, 64 * 1024).toString('utf8')
+  return /^(?:\uFEFF)?\s*(?:<\?xml\b[^>]*\?>\s*|<!--[\s\S]*?-->\s*|<!doctype\b[^>[]*(?:\[[\s\S]*?\])?\s*>\s*)*<(?:[\w.-]+:)?svg\b/i.test(text)
 }
 
 /**
- * Text of a possibly gzip-compressed (svgz) member, or null when it is not
- * text (contains NUL, e.g. a PNG; UTF-16 SVG is therefore treated as binary).
- * Decompression is bounded by the archive's own 64 MiB expanded-size limit.
+ * Text of a possibly gzip-compressed (svgz) member as strict UTF-8, or the
+ * reason it cannot be scanned (UTF-16/32, NUL bytes, invalid UTF-8).
  */
-function svgText(bytes: Buffer): string | null {
-  let raw = bytes
-  if (raw.length >= 2 && raw[0] === 0x1f && raw[1] === 0x8b) {
-    try { raw = gunzipSync(raw, {maxOutputLength: 64 * 1024 * 1024}) } catch { return null }
+function xmlText(bytes: Buffer): {text: string} | {problem: string} {
+  const raw = gunzipMember(bytes)
+  if (raw === null) return {problem: 'is not a readable gzip stream'}
+  const encoding = detectEncoding(raw)
+  if (encoding !== 'utf-8') return {problem: `is ${encoding.toUpperCase()}, not UTF-8`}
+  if (raw.includes(0)) return {problem: 'is not a text document (contains NUL bytes)'}
+  try {
+    return {text: new TextDecoder('utf-8', {fatal: true}).decode(raw)}
+  } catch {
+    return {problem: 'is not valid UTF-8'}
   }
-  if (raw.includes(0)) return null
-  return raw.toString('utf8')
+}
+
+/** The only DOCTYPE forms accepted in XML members: no internal subset, no odd quoting. */
+const SIMPLE_DOCTYPE = /^<!doctype\s+[\w:.-]+(?:\s+(?:public\s+(?:"[^"<>[\]]*"|'[^'<>[\]]*')|system)(?:\s+(?:"[^"<>[\]]*"|'[^'<>[\]]*'))?)?\s*>/i
+
+/** Shared XML prolog checks: declarations (ENTITY/ATTLIST/ELEMENT/NOTATION), internal subsets and xml-stylesheet. */
+function xmlPrologProblem(text: string): string | null {
+  const declarations = [...text.matchAll(/<!(?!--|\[CDATA\[)([a-z]*)/gi)]
+  for (const match of declarations) {
+    const keyword = match[1]!.toUpperCase()
+    if (keyword === 'DOCTYPE') continue
+    return keyword === 'ENTITY' ? 'an XML entity declaration' : keyword === 'ATTLIST' ? 'an <!ATTLIST> declaration' : `an XML <!${keyword || '…'}> declaration`
+  }
+  for (const match of declarations) {
+    if (!SIMPLE_DOCTYPE.test(text.slice(match.index))) return 'a DOCTYPE with an internal subset or unsupported form'
+  }
+  if (/<\?xml-stylesheet\b/i.test(text)) return 'an xml-stylesheet processing instruction'
+  return null
 }
 
 /**
  * Rejects script-capable SVG. Plain static SVG (shapes, gradients, local
  * `#fragment` or relative references, inline styles) passes. Matching is
- * case-insensitive, namespace-prefix tolerant and whitespace tolerant.
+ * case-insensitive, namespace-prefix tolerant and whitespace tolerant, and
+ * runs over the raw text (comments and CDATA included) so neither can hide
+ * markup from the scan.
  */
 export function assertStaticSvg(bytes: Buffer, path: string): void {
-  const text = svgText(bytes)
-  if (text === null) failCode('GUBIC_SVG_ACTIVE_CONTENT', `Web game SVG ${path} is not a text document`)
-  const svg = stripHtmlComments(text!)
+  const decoded = xmlText(bytes)
+  if ('problem' in decoded) failCode('GUBIC_SVG_ACTIVE_CONTENT', `Web game SVG ${path} ${decoded.problem}`)
+  const svg = (decoded as {text: string}).text
   const reject = (what: string) => failCode('GUBIC_SVG_ACTIVE_CONTENT', `Web game SVG ${path} contains ${what}`)
   if (/<\s*(?:[\w.-]+:)?script\b/i.test(svg)) reject('a <script> element')
   if (/<\s*(?:[\w.-]+:)?foreignobject\b/i.test(svg)) reject('a <foreignObject> element')
-  // Entity declarations can smuggle markup past a scan; external stylesheets/XSLT can run code.
-  if (/<!entity\b/i.test(svg)) reject('an XML entity declaration')
-  if (/<\?xml-stylesheet\b/i.test(svg)) reject('an xml-stylesheet processing instruction')
-  for (const {attributes} of allStartTags(svg)) {
+  // Declarations can smuggle markup or default attributes past a scan; external stylesheets/XSLT can run code.
+  const prolog = xmlPrologProblem(svg)
+  if (prolog) reject(prolog)
+  const tags = allStartTags(svg)
+  // Fail closed: every "<name" must be a start tag the scanner could parse.
+  const parsed = new Set(tags.map((tag) => tag.index))
+  for (const match of svg.matchAll(/<[a-z_]/gi)) {
+    if (!parsed.has(match.index)) reject(`a tag that cannot be parsed unambiguously (${JSON.stringify(svg.slice(match.index, match.index + 40))})`)
+  }
+  for (const {name: element, attributes} of tags) {
+    const elementLocal = localName(element)
     for (const [name, value] of attributes) {
       const local = localName(name)
       if (/^on/.test(local)) reject(`an event-handler attribute (${name})`)
       const normalised = normaliseUrlForScan(value)
       if (/(?:java|vb)script:/.test(normalised)) reject(`a script URL (${name})`)
-      if ((local === 'href' || local === 'src') && REMOTE_REFERENCE.test(normalised)) reject(`an external reference (${name}="${value.trim()}")`)
-      if (/url\(\s*['"]?(?:https?:|\/\/)/.test(normalised)) reject(`an external url() reference (${name})`)
+      if ((local === 'href' || local === 'src') && REMOTE_OR_DATA_REFERENCE.test(normalised)) {
+        reject(`an external or data: reference (${name}="${value.trim().slice(0, 60)}" on <${element}>)`)
+      }
+      // SMIL can set href to a data:/remote URL at runtime.
+      if ((elementLocal === 'set' || elementLocal.startsWith('animate')) && ['to', 'from', 'by', 'values'].includes(local)
+        && normalised.split(';').some((part) => REMOTE_OR_DATA_REFERENCE.test(part))) {
+        reject(`an animated external or data: reference (${name} on <${element}>)`)
+      }
+      const css = cssProblem(value)
+      if (css) reject(`${css} (${name})`)
     }
   }
-  // <style> element bodies: external url()/@import and script URLs.
+  // <style> element bodies: external url()/@import and script URLs, after CSS escape decoding.
   for (const match of svg.matchAll(/<\s*(?:[\w.-]+:)?style\b[^>]*>([\s\S]*?)(?:<\/\s*(?:[\w.-]+:)?style\s*>|$)/gi)) {
-    const css = normaliseUrlForScan(match[1]!)
-    if (/url\(['"]?(?:https?:|\/\/)/.test(css) || /@import(?:url\()?['"]?(?:https?:|\/\/)/.test(css)) reject('an external stylesheet reference')
-    if (/(?:java|vb)script:/.test(css)) reject('a script URL in a <style> element')
+    const css = cssProblem(match[1]!.replace(/<!\[CDATA\[|\]\]>/g, ''))
+    if (css) reject(`${css} in a <style> element`)
   }
+}
+
+const XML_ACTIVE_NAMESPACES = ['http://www.w3.org/1999/xhtml', 'http://www.w3.org/2000/svg', 'http://www.w3.org/1998/math/mathml']
+
+/**
+ * `.xml` members (e.g. bitmap-font or atlas data) are allowed only as inert
+ * data: UTF-8, no declarations or internal subset, no xml-stylesheet, and no
+ * XHTML, SVG or MathML namespace that would make a browser render active content.
+ */
+function assertInertXml(bytes: Buffer, path: string): void {
+  const reject = (what: string) => failCode('GUBIC_XML_DOCUMENT', `Web game XML ${path} ${what}`)
+  const decoded = xmlText(bytes)
+  if ('problem' in decoded) reject(decoded.problem)
+  const text = (decoded as {text: string}).text
+  const prolog = xmlPrologProblem(text)
+  if (prolog) reject(`contains ${prolog}`)
+  const scan = normaliseUrlForScan(text)
+  for (const namespace of XML_ACTIVE_NAMESPACES) if (scan.includes(namespace)) reject(`uses the ${namespace} namespace`)
+  if (/<\s*(?:[\w.-]+:)?(?:script|svg|html|foreignobject)\b/i.test(text)) reject('contains renderable markup')
 }
 
 /**
@@ -391,7 +532,12 @@ export function assertWebGameContentPolicy(files: ReadonlyMap<string, Buffer>, e
   for (const [path, bytes] of files) {
     if (/\.html?$/i.test(path)) {
       // Also scans inline scripts for dynamic code (assertNoActiveHtmlMarkup).
-      assertWebGameDocumentPolicy(bytes.toString('utf8'), path)
+      assertWebGameDocumentPolicy(decodeHtmlMember(bytes, path), path)
+    } else if (/\.(?:xhtml|xht)$/i.test(path)) {
+      // XHTML is parsed as XML, outside the HTML tokenizer's model: not accepted in game packages.
+      failCode('GUBIC_XML_DOCUMENT', `Web game member ${path} is XHTML; ship documents as .html`)
+    } else if (/\.xml$/i.test(path) && !isSvgMember(path, bytes)) {
+      assertInertXml(bytes, path)
     } else if (/\.(?:m?js|cjs)$/i.test(path)) {
       assertNoDynamicCode(bytes.toString('utf8'), path)
     } else if (isSvgMember(path, bytes)) {
