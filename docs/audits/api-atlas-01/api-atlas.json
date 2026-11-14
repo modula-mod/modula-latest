@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "forge/native-endpoints-01",
-      "sourceSha256": "9db7b3f42b5d898cc488b228529cb95602868b68bfaf0e1ea6e78e59a92b434a",
-      "capturedAt": "2026-11-14T23:10:44.968Z",
+      "branch": "mosaic/gubic-p1-hardening",
+      "sourceSha256": "25026784aeb357cf845509b527a138b6e52f75cc06aa4712aab3ccb8c73a4551",
+      "capturedAt": "2026-11-14T23:50:02.786Z",
       "routeCount": 900
     },
     "status": "PASS"

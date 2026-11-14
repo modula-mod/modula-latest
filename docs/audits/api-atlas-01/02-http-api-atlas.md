@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-14T23:10:44.968Z for branch `forge/native-endpoints-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-14T23:50:02.786Z for branch `mosaic/gubic-p1-hardening`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633
