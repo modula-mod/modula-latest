@@ -26,6 +26,7 @@ import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
 import {claimNextJob, completeJob, deadLetterJob, markJobRunning, renewJobLease, scheduleRetry} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
 import {computeNextAvailableAt} from './retry.js'
+import {resolveLeaseRenewIntervalMs} from './lease-renew-interval.js'
 import {metrics} from '../observability/metrics.js'
 import {startPeriodic, type PeriodicTask} from '../timers/periodic.js'
 
@@ -38,6 +39,8 @@ export type JobRunnerLog = {
 export type ProcessJobOptions = {log?: JobRunnerLog}
 
 export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, options: ProcessJobOptions = {}): Promise<boolean> {
+  // Resolved before claiming: an invalid interval refuses here, with no job claimed.
+  config = {...config, leaseRenewIntervalMs: resolveLeaseRenewIntervalMs(config)}
   const job = await claimNextJob(db, config.workerId, config.leaseDurationMs)
   if (!job) return false
   metrics.increment('jobsClaimed')
@@ -66,6 +69,9 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, op
       }
     }, config.leaseRenewIntervalMs)
     await markJobRunning(db, job.id, config.workerId)
+    // Delivery is at-least-once. After a lease loss (JOB_LEASE_LOST / job.lease.lost)
+    // this worker may already have produced side effects, and the next owner re-runs
+    // the job. Handlers must be idempotent.
     await withTimeout((async () => {
       switch (job.job_type) {
       case 'notification.create':
