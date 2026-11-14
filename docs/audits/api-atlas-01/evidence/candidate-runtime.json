@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-14T22:55:50.656Z",
+  "capturedAt": "2026-11-14T23:27:20.959Z",
   "source": {
-    "branch": "mosaic/gubic-p1-html5-engine",
-    "headAtCapture": "4e66cdb60912a71a0b8299c0a21dd24064bd20a3",
+    "branch": "forge/gf-auth-resend-challenge-id",
+    "headAtCapture": "a823f595a45be2c53c38125e5bad3a6409f6883a",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "ec259f1d20fa4ff097207faae65069d33b87881856267d04d4bde4f56460f225"
+    "apiSourceSha256": "0840a30303d7aea0a093ac945d119d600d4e3d2dde3dd3fa9b1b048546be66e4"
   },
   "runtimeRoutes": [
     {
