@@ -69,7 +69,7 @@ describeIfDb('Messaging: conversations, requests and In-Mail', () => {
     const inMail = await authed(solo.accessToken, 'GET', '/v1/in-mail?limit=30')
     expect(inMail.json().data.items).toEqual([])
     const unread = await authed(solo.accessToken, 'GET', '/v1/conversations/unread')
-    expect(unread.json().data).toEqual({unreadCount: 0})
+    expect(unread.json().data).toEqual({unreadCount: 0, markedUnreadCount: 0})
   })
 
   it('runs a request -> accept -> chat -> read flow', async () => {
