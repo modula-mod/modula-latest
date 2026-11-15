@@ -122,6 +122,38 @@ Rules (enforced by `validateGubicManifest`, unit-tested):
 * `ageRating` ∈ `4+ | 9+ | 12+ | 17+`; `monetisation` ∈ `free | paid | in-game-purchases`.
 * The normalised manifest is stored with a canonical SHA-256 digest.
 
+### 3.1 Ingestion content policy (`web-game-csp.ts`, `html-tokenizer.ts`)
+
+HTML members are decoded as strict UTF-8 (no other declared charset, no ESC bytes) and tokenized the way a
+browser does: a hand-written tokenizer follows the WHATWG data, tag, attribute, comment, bogus-comment,
+RCDATA/RAWTEXT and script-data states. Anything it cannot tokenize unambiguously (stray quotes, `<` or `=`
+in attribute names or unquoted values, unterminated tags, malformed end tags, CDATA, `<plaintext>`, NUL,
+`<!--` inside inline scripts) is refused with `GUBIC_HTML_MALFORMED`.
+
+Every HTML document must declare exactly one `<meta http-equiv="Content-Security-Policy">` (matched exactly,
+ASCII case-insensitive, no padding; any `&` in an `http-equiv` value is refused, and attribute values used for
+acceptance decisions such as the CSP content are decoded exactly once, as a browser does), preceded only by whitespace, a DOCTYPE, `<html>`, `<head>` and
+`<meta charset>`. The policy must set `default-src 'none'`, `script-src 'self'`, `connect-src 'none'`,
+`base-uri 'none'` and `worker-src 'none'` (no `unsafe-*`, wildcards, remote, `data:` or `blob:` code sources).
+Ingestion also refuses, with a machine-readable code:
+
+* `GUBIC_HTML_ACTIVE_CONTENT`: inline `on*` handlers, `javascript:`/`vbscript:` URLs, `srcdoc`,
+  `<script type=importmap>`, `<meta http-equiv=refresh>`, padded CSP `http-equiv` values, and inline
+  `<svg>`/`<math>` (foreign content changes tokenization). Non-script raw text is re-scanned as markup, and nesting beyond 4 raw-text levels is refused.
+* `GUBIC_SVG_ACTIVE_CONTENT`: SVG members (`.svg`/`.svgz`, sniffed `image/svg+xml`, or UTF-16/32 markup)
+  that are not UTF-8, or contain `<script>`, `on*` handlers, `<foreignObject>`, script URLs, external or
+  `data:` `href`/`xlink:href`/`src`, remote `url()`/`@import` (after CSS escape decoding), DOCTYPE internal
+  subsets, `<!ENTITY>`/`<!ATTLIST>` declarations, `xml-stylesheet`, or tags that cannot be parsed.
+  Plain static SVG is accepted.
+* `GUBIC_XML_DOCUMENT`: `.xhtml`/`.xht` members, and `.xml` members that are not inert UTF-8 data (XHTML,
+  SVG or MathML namespaces, declarations, `xml-stylesheet`).
+* `GUBIC_REMOTE_WORKER`: `Worker`/`SharedWorker`/`serviceWorker.register`/`importScripts` with a remote, `data:` or `blob:` URL literal.
+* Remote `<script src>`, `eval(` and `new Function(`.
+
+The JavaScript scans (`eval`, `new Function`, remote workers) are **best-effort** text scans, not a parser:
+they miss deliberately obfuscated or runtime-built calls. The enforcing controls are the CSP (no
+`'unsafe-eval'`, `worker-src 'none'`) and the native player's isolation in section 4.
+
 ## 4. HTML5/Phaser runtime (native)
 
 `GubicPlayerView` hosts one `WKWebView` per play:
