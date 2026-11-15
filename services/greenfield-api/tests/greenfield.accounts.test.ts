@@ -1,10 +1,17 @@
-import {describe, expect, it} from 'vitest'
+import {describe, expect, it, vi} from 'vitest'
 import {afterAll, beforeAll, beforeEach} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {validateHandle} from '../src/accounts/handle.js'
-import {hashPassword, verifyPassword} from '../src/lib/password.js'
+import {
+  DUMMY_PASSWORD_HASH,
+  hashPassword,
+  passwordHashForVerification,
+  PASSWORD_OPTIONS,
+  verifyPassword,
+} from '../src/lib/password.js'
+import * as passwordLib from '../src/lib/password.js'
 import {createCheckpointSigner} from '../src/checkpoints/service.js'
 import {canonicalJsonStringify} from '@modula/greenfield-protocol'
 import {generate} from 'otplib'
@@ -110,6 +117,22 @@ describe('Greenfield unit primitives', () => {
     expect(encoded.toLowerCase()).toContain('argon2id')
     expect(await verifyPassword('correct-horse-battery', encoded)).toBe(true)
     expect(await verifyPassword('wrong-password-value', encoded)).toBe(false)
+  })
+
+  it('unknown-email verification uses a dummy Argon2id hash with the same parameters as real accounts', async () => {
+    expect(passwordHashForVerification(undefined)).toBe(DUMMY_PASSWORD_HASH)
+    expect(passwordHashForVerification(null)).toBe(DUMMY_PASSWORD_HASH)
+    const real = await hashPassword('correct-horse-battery')
+    expect(passwordHashForVerification(real)).toBe(real)
+    expect(DUMMY_PASSWORD_HASH).toMatch(/^\$argon2id\$v=19\$m=19456,t=2,p=1\$/)
+    expect(PASSWORD_OPTIONS).toMatchObject({memoryCost: 19_456, timeCost: 2, parallelism: 1, outputLen: 32})
+    const spy = vi.spyOn(passwordLib, 'verifyPassword')
+    try {
+      expect(await passwordLib.verifyPassword('not-the-dummy-secret', passwordHashForVerification(undefined))).toBe(false)
+      expect(spy).toHaveBeenCalledWith('not-the-dummy-secret', DUMMY_PASSWORD_HASH)
+    } finally {
+      spy.mockRestore()
+    }
   })
 
   it('signs and verifies checkpoints with Ed25519', () => {
@@ -1243,8 +1266,10 @@ describeIf('Greenfield native accounts integration', () => {
 
   describe('resumable email verification (resend challenge id + pending login)', () => {
     let ipCounter = 0
-    const ipBase = Date.now() % 100
-    const freshIp = () => `198.51.100.${ipBase + ++ipCounter}`
+    const freshIp = () => {
+      const n = ++ipCounter
+      return `198.51.${100 + Math.floor((n - 1) / 200)}.${1 + ((n - 1) % 200)}`
+    }
     const unique = (prefix: string) => `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`.slice(0, 20)
     const password = 'secure-pass-word-1'
 
@@ -1445,6 +1470,109 @@ describeIf('Greenfield native accounts integration', () => {
       // A fresh IP still hits the per-account budget for the pending account.
       const otherIpLogin = await app.inject({method: 'POST', url: '/v1/sessions', remoteAddress: freshIp(), payload: {email: pending.email, password}})
       expect(otherIpLogin.statusCode).toBe(403) // account key: register, resend, login = 3; this is 4
+    })
+
+    function expectVerificationSendLimited(response: Awaited<ReturnType<typeof app.inject>>) {
+      expect(response.statusCode).toBe(429)
+      expect(response.json().error.code).toBe('RATE_LIMITED')
+      expect(response.json().error.message).toBe('Too many attempts')
+      expect(response.json().error.details).toBeUndefined()
+      expect(response.headers['retry-after']).toMatch(/^[1-9][0-9]*$/)
+      const seconds = Number(response.headers['retry-after'])
+      expect(seconds).toBeGreaterThan(0)
+      expect(seconds).toBeLessThanOrEqual(10 * 60)
+    }
+
+    it('per-email verification-send limit is enforced with a fresh IP per request on the real and decoy paths', async () => {
+      // Decoy path: a new IP every time, so only the email key can accumulate.
+      const decoyEmail = `${unique('emdc')}@example.com`
+      for (let i = 0; i < 5; i += 1) {
+        const resend = await app.inject({
+          method: 'POST',
+          url: '/v1/accounts/resend-verification',
+          remoteAddress: freshIp(),
+          payload: {email: decoyEmail},
+        })
+        expect(resend.statusCode).toBe(200)
+      }
+      const limitedDecoy = await app.inject({
+        method: 'POST',
+        url: '/v1/accounts/resend-verification',
+        remoteAddress: freshIp(),
+        payload: {email: decoyEmail},
+      })
+      expectVerificationSendLimited(limitedDecoy)
+      // Registering the same address is also stopped by the email key alone.
+      const decoyHandle = unique('emrg').replace(/[^a-z0-9-]/g, '')
+      const limitedRegister = await app.inject({
+        method: 'POST',
+        url: '/v1/accounts/register',
+        remoteAddress: freshIp(),
+        payload: {
+          email: decoyEmail,
+          password,
+          handle: decoyHandle,
+          displayName: 'Limited User',
+          acceptedTerms: true,
+          inviteCode: 'test-invite',
+        },
+      })
+      expectVerificationSendLimited(limitedRegister)
+
+      // Real resend path: four decoys plus register exhaust the email key
+      // (count 5) while the new account key is only 1. The next resend from a
+      // fresh IP must 429; dropping the email key on the real resend path
+      // would let it through.
+      const realHandle = unique('emrl').replace(/[^a-z0-9-]/g, '')
+      const realEmail = `${realHandle}@example.com`
+      for (let i = 0; i < 4; i += 1) {
+        const resend = await app.inject({
+          method: 'POST',
+          url: '/v1/accounts/resend-verification',
+          remoteAddress: freshIp(),
+          payload: {email: realEmail},
+        })
+        expect(resend.statusCode).toBe(200)
+      }
+      const register = await app.inject({
+        method: 'POST',
+        url: '/v1/accounts/register',
+        remoteAddress: freshIp(),
+        payload: {
+          email: realEmail,
+          password,
+          handle: realHandle,
+          displayName: 'Real User',
+          acceptedTerms: true,
+          inviteCode: 'test-invite',
+        },
+      })
+      expect(register.statusCode).toBe(201)
+      const limitedResend = await app.inject({
+        method: 'POST',
+        url: '/v1/accounts/resend-verification',
+        remoteAddress: freshIp(),
+        payload: {email: realEmail},
+      })
+      expectVerificationSendLimited(limitedResend)
+    })
+
+    it('unknown-email login verifies a dummy password hash and still returns 401 INVALID_CREDENTIALS', async () => {
+      const spy = vi.spyOn(passwordLib, 'verifyPassword')
+      try {
+        const response = await app.inject({
+          method: 'POST',
+          url: '/v1/sessions',
+          remoteAddress: freshIp(),
+          payload: {email: `${unique('ghost')}@example.com`, password},
+        })
+        expect(response.statusCode).toBe(401)
+        expect(response.json().error.code).toBe('INVALID_CREDENTIALS')
+        const dummyCalls = spy.mock.calls.filter(call => call[0] === password && call[1] === DUMMY_PASSWORD_HASH)
+        expect(dummyCalls.length).toBeGreaterThanOrEqual(1)
+      } finally {
+        spy.mockRestore()
+      }
     })
   })
 
