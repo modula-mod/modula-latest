@@ -172,6 +172,8 @@ export class GreenfieldAccountDataService {
         await trx.updateTable('profiles').set({display_name: 'Deleted account', bio: '', avatar_url: null, cover_url: null, location_label: null, website_label: null, website_url: null, website_domain: null, deleted_at: now, updated_at: now}).where('actor_id', 'in', actorIds).execute()
         await trx.updateTable('greenfield_comments').set({text: '', deleted_at: now, deletion_kind: 'user', updated_at: now}).where('author_actor_id', 'in', actorIds).execute()
         await trx.updateTable('greenfield_story_groups').set({deleted_at: now, updated_at: now}).where('owner_actor_id', 'in', actorIds).execute()
+        await trx.updateTable('greenfield_story_highlights').set({deleted_at: now, updated_at: now}).where('owner_actor_id', 'in', actorIds).where('deleted_at', 'is', null).execute()
+        await trx.deleteFrom('greenfield_story_reactions').where('actor_id', 'in', actorIds).execute()
         await trx.updateTable('actors').set({deleted_at: now, updated_at: now}).where('id', 'in', actorIds).execute()
       }
       const connectionIds = (await trx.selectFrom('greenfield_connections').select('connection_id').where('account_id', '=', accountId).execute()).map(row => row.connection_id)
