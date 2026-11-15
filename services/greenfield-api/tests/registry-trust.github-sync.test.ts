@@ -46,7 +46,7 @@ function tgz(files: Record<string, Buffer>): Buffer {
 }
 
 it('accepts only fully inventoried offline web game archives', () => {
-  const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'">')
+  const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'">')
   const js = Buffer.from('document.title="Game"')
   const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(js)}}))
   const game = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', js), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
@@ -661,7 +661,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()},
       owner.accountId,
     )
-    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'">')
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'">')
     const javascript = Buffer.from('document.title="Asteroid Run"')
     const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
     const gameBytes = gzipSync(Buffer.concat([
@@ -838,7 +838,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-p1-${suffix}`
     await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
-    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'"><canvas></canvas><script src="main.js"></script>')
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'"><canvas></canvas><script src="main.js"></script>')
     const javascript = Buffer.from('document.querySelector("canvas").getContext("2d").fillRect(0,0,1,1)')
     const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
     const gameBytes = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('main.js', javascript), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
@@ -877,7 +877,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-p2-${suffix}`
     await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
-    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'">')
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'">')
     const build = (version: string) => {
       const javascript = Buffer.from(`document.title="Reference Tap ${version}"`)
       const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
@@ -1116,7 +1116,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-${label}-${suffix}`
     await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
-    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'">')
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'">')
     const sync = async (gameId: string, version: string, publish = true) => {
       const javascript = Buffer.from(`document.title="${gameId} ${version}"`)
       const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
