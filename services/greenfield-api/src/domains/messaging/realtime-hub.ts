@@ -16,7 +16,13 @@ export type MessagingRealtimeEvent =
   | {type: 'reaction.changed'; conversationId: string; messageId: string}
   | {type: 'typing'; conversationId: string; actorId: string; expiresAt: string}
   | {type: 'read'; conversationId: string; actorId: string; readAt: string}
-  | {type: 'conversation.updated'; conversationId: string; reason: 'group-info' | 'members' | 'membership' | 'mute' | 'archive'}
+  | {type: 'conversation.updated'; conversationId: string; reason: 'group-info' | 'members' | 'membership' | 'mute' | 'archive' | 'pin' | 'notifications' | 'theme' | 'disappearing'}
+  | {type: 'message.pinned'; conversationId: string; messageId: string; pinned: boolean; actorId: string; at: string}
+  | {type: 'message.saved'; conversationId: string; messageId: string; saved: boolean; at: string}
+  | {type: 'message.expired'; conversationId: string; messageIds: string[]}
+  | {type: 'scheduled.updated'; conversationId: string; scheduledId: string; state: string; messageId: string | null}
+  | {type: 'messaging.folders.updated'; at: string}
+  | {type: 'messaging.quick-replies.updated'; at: string}
   | {type: 'presence'; actorId: string; status: 'online' | 'offline'; lastActiveAt: string}
   | {type: 'conversation.unread'; conversationId: string; actorId: string; markedUnread: boolean; at: string}
   | {type: 'story.reaction'; itemId: string; groupId: string; actorId: string; emoji: string | null; at: string}

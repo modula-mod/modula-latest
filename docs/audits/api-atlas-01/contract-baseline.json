@@ -13265,6 +13265,65 @@
       "sourceContractSha256": "0fee18c79c034457eb7ca428ee1ea6cd30624063e2cefb904cce8f69e438d061"
     },
     {
+      "id": "POST /v1/conversations/:id/disappearing",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "1916543d5bd0034dec2709238a1c38474d4d5665d6fc640906ab221bc80e2296"
+    },
+    {
       "id": "GET /v1/conversations/:id/messages",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -13501,6 +13560,234 @@
       },
       "contract": null,
       "sourceContractSha256": "fe690c8d767d7b9a3fb3776b61282c336ac3670144de4b3b0855d5d53483da01"
+    },
+    {
+      "id": "GET /v1/conversations/:id/messages/:messageId/edits",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "c5aea8756835791b24f237eae7ff046ed3a894e4a02319b4f407153e1b8e4d6d"
+    },
+    {
+      "id": "POST /v1/conversations/:id/messages/:messageId/forward",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "151f39008b979a7582dfece09638040a06bf2b5b6b589c31c11b885cb113e5ca"
+    },
+    {
+      "id": "DELETE /v1/conversations/:id/messages/:messageId/pin",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/conversations/:id/messages/:messageId/pin",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
       "id": "DELETE /v1/conversations/:id/messages/:messageId/reactions",
@@ -13741,6 +14028,116 @@
       "sourceContractSha256": "5aa07fc98c42350244d8825e99ef402cc1af571efa89bab7ab37d058879491a9"
     },
     {
+      "id": "DELETE /v1/conversations/:id/messages/:messageId/saved",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "PUT /v1/conversations/:id/messages/:messageId/saved",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
       "id": "POST /v1/conversations/:id/mute",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -13800,6 +14197,183 @@
       "sourceContractSha256": "35629e66d6123de18f91dcc5bc00e7430134773bbbc51886d006eb98aebb26a8"
     },
     {
+      "id": "POST /v1/conversations/:id/notifications",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "00b913cb5d2694790dc4fc75e3690bb1e33db3e9202eb3bc400904fa38de9274"
+    },
+    {
+      "id": "POST /v1/conversations/:id/pin",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "a238a5ba5790dbfa240636b8567524aaff115774739c9210ee2f12d8b3f820b0"
+    },
+    {
+      "id": "GET /v1/conversations/:id/pins",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}).id), request.id))"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "911a9cd6e9c5e95c793311f8948e770d7473a8c26c13e700581618fb358fb63a"
+    },
+    {
       "id": "POST /v1/conversations/:id/read",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -13857,6 +14431,352 @@
       },
       "contract": null,
       "sourceContractSha256": "f8b1b3972c5e0010edf08d37daceb66fcb1f007dd3aa00d70de191a2d5cab9db"
+    },
+    {
+      "id": "GET /v1/conversations/:id/scheduled",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}).id), request.id))"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "5ad8e28cef8a97b04634522ff74bdc747a8c8d6313b8f6d205d43cac0a20253b"
+    },
+    {
+      "id": "POST /v1/conversations/:id/scheduled",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [
+          "{id: string}).id, body(request)), 'Unable to schedule message', 201)"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "47332b48c8b4df0959095aad5392d549fc82eb1481a52261b8050ce1f67759e8"
+    },
+    {
+      "id": "DELETE /v1/conversations/:id/scheduled/:scheduledId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [
+          "{scheduledId: string}).scheduledId), 'Unable to cancel scheduled message')"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "c2a9558f9ed4e3bd92ed245aae8e4d7d62dbc9c156f89e39f5a1cb9d0d9ae33a"
+    },
+    {
+      "id": "PATCH /v1/conversations/:id/scheduled/:scheduledId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [
+          "{scheduledId: string}).scheduledId, body(request)), 'Unable to update scheduled message')"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "3e7d1704813c7256d4ebc5302480c0e2ecdbb05d2c227581bdbf4dd9336fdd0b"
+    },
+    {
+      "id": "POST /v1/conversations/:id/scheduled/:scheduledId/send-now",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [
+          "{scheduledId: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "a002361c7543fc4a5f87deb1c80d2c2cd24fe6131a5dddec6625b87bb221a2a0"
+    },
+    {
+      "id": "POST /v1/conversations/:id/theme",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "post:engage"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{id: string}"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "bcb33f469fa0c7d5c74ab149153df8926346b2df684b08700d86222c7d638853"
     },
     {
       "id": "GET /v1/conversations/:id/typing",
@@ -22625,6 +23545,122 @@
       "sourceContractSha256": "f8b1b3972c5e0010edf08d37daceb66fcb1f007dd3aa00d70de191a2d5cab9db"
     },
     {
+      "id": "GET /v1/messages/saved",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [
+          "{cursor?: string"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "766c84f1a3d5ed2ba6b6757e02bc0fd4972b66310b9691d69bf9a601baa7b556"
+    },
+    {
+      "id": "GET /v1/messages/scheduled",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [
+          "social:read"
+        ],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated actor id is passed into the service/repository scope",
+          "accountScoped": false,
+          "actorScoped": true,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated actor id is passed into the service/repository scope",
+        "accountScoped": false,
+        "actorScoped": true,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "dffcdd4b322e1e7fda98a2be548b0d5a59686b090327904a024b0a519d2f2129"
+    },
+    {
       "id": "GET /v1/messages/search",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -22737,6 +23773,226 @@
       },
       "contract": null,
       "sourceContractSha256": "fe341687ae40d8e00de98d33aa899d3b327c71db9aa880f894d8678e07eecf85"
+    },
+    {
+      "id": "GET /v1/messaging/folders",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/messaging/folders",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "DELETE /v1/messaging/folders/:folderId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "143d616fc28f448cbcc7ec08a990d7ce027f0d9d568e0345e1c928e63f8f3c77"
+    },
+    {
+      "id": "PATCH /v1/messaging/folders/:folderId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4e5433e2d920321a035d1f10364f20b4f0de49e46fdb7d4e5f74ef090c2628c5"
     },
     {
       "id": "GET /v1/messaging/privacy",
@@ -22853,6 +24109,226 @@
       },
       "contract": null,
       "sourceContractSha256": "74512728fe43f41ff8938eccda0995bc6d11cfe72efeabd531aaac90a1726bb7"
+    },
+    {
+      "id": "GET /v1/messaging/quick-replies",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "POST /v1/messaging/quick-replies",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "id": "DELETE /v1/messaging/quick-replies/:replyId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "e6c45bf3bb991b1efcc2a1e029a27d3364ab5fe10e677ddbb9ccd10819f11d52"
+    },
+    {
+      "id": "PATCH /v1/messaging/quick-replies/:replyId",
+      "authorization": {
+        "visibility": "PUBLIC",
+        "anonymousAllowed": true,
+        "optionalSession": false,
+        "sessionRequired": false,
+        "sessionKind": "none",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+          "accountScoped": false,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "downstream-or-none"
+        }
+      },
+      "ownership": {
+        "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
+        "accountScoped": false,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "downstream-or-none"
+      },
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "246036b52fded17dbc15004ac53d5d53e7219e802c89561bd20c00085fab2754"
     },
     {
       "id": "GET /v1/messaging/socket",

@@ -4,7 +4,9 @@ import websocket from '@fastify/websocket'
 import type {ModulaDb} from '../database/client.js'
 import {CommentService} from '../domains/comments/service.js'
 import {MessagingRealtimeHub, POST_TOPICS_MAX_PER_SOCKET, type MessagingRealtimeEvent, type MessagingSubscriber} from '../domains/messaging/realtime-hub.js'
-import {SOCIAL_FEATURES_ALL_ON, type SocialFeaturesConfig} from '../config/env.js'
+import {MESSAGING_FEATURES_ALL_ON, SOCIAL_FEATURES_ALL_ON, type MessagingFeaturesConfig, type SocialFeaturesConfig} from '../config/env.js'
+import {MessagingFeaturesService} from '../domains/messaging/features4.js'
+import {messagingFeaturesCapabilities, registerMessagingFeaturesRoutes, type MessagingFeaturesHooks} from './register-messaging-features-routes.js'
 import {
   GROUP_MAX_MEMBERS,
   MESSAGE_ATTACHMENTS_MAX,
@@ -71,9 +73,12 @@ export async function registerMessagingRoutes(
     callsCapabilities?: Record<string, unknown>
     /** Additive social feature switches (mark unread, live comments). */
     features?: Partial<SocialFeaturesConfig>
+    /** Messaging features 4 switches (pins, saved, scheduled, disappearing, folders, ...). */
+    messagingFeatures?: Partial<MessagingFeaturesConfig>
   },
-): Promise<{hub: MessagingRealtimeHub; messaging: MessagingService}> {
-  const messaging = new MessagingService(db, {publicApiUrl: options.publicApiUrl})
+): Promise<{hub: MessagingRealtimeHub; messaging: MessagingService; featureHooks: MessagingFeaturesHooks}> {
+  const messaging = new MessagingFeaturesService(db, {publicApiUrl: options.publicApiUrl})
+  const messagingFeatures: MessagingFeaturesConfig = {...MESSAGING_FEATURES_ALL_ON, ...(options.messagingFeatures ?? {})}
   const hub = options.hub ?? new MessagingRealtimeHub()
   const mediaEnabled = options.mediaEnabled === true
   const features: SocialFeaturesConfig = {...SOCIAL_FEATURES_ALL_ON, ...(options.features ?? {})}
@@ -88,6 +93,10 @@ export async function registerMessagingRoutes(
     publish(request, messaging.realtimeRecipients(conversationId, actorId, {includeActor}), event)
   const read = (extra: Record<string, any> = {}) => ({...feedConfig, ...extra})
   const write = (extra: Record<string, any> = {}) => ({...writeConfig, ...extra})
+  const featureHooks = registerMessagingFeaturesRoutes(app, db, {
+    messaging, hub, features: messagingFeatures, mediaEnabled, read, write, toMembers,
+    notify: (sender, conversationId, message, mentioned) => notifyConversationMembers(db, messaging, sender, conversationId, message, mentioned),
+  })
 
   app.get('/v1/conversations', read(), async (request, reply) => {
     const auth = requireCapability(request, reply, 'social:read')
@@ -147,7 +156,7 @@ export async function registerMessagingRoutes(
     const {id} = request.params as {id: string}
     const body = (request.body ?? {}) as {text?: unknown; replyToMessageId?: unknown; clientMessageId?: unknown; kind?: unknown; attachments?: unknown}
     try {
-      const result = await messaging.sendDetailed(auth.actorId, id, body, {accountId: auth.accountId, mediaEnabled})
+      const result = await messaging.sendDetailed(auth.actorId, id, body, {accountId: auth.accountId, mediaEnabled, disappearingEnabled: messagingFeatures.disappearingMessages})
       if (!result.created) return reply.code(200).send(successEnvelope({message: result.message, duplicate: true}, request.id))
       await notifyConversationMembers(db, messaging, auth.actorId, id, result.message, result.mentionedActorIds)
         .catch(error => request.log.warn({error: error?.message}, 'message push enqueue failed'))
@@ -357,6 +366,7 @@ export async function registerMessagingRoutes(
       liveComments: features.liveComments
         ? {enabled: true, subscribeFrame: 'post.subscribe', unsubscribeFrame: 'post.unsubscribe', maxPostsPerSocket: POST_TOPICS_MAX_PER_SOCKET}
         : {enabled: false},
+      ...messagingFeaturesCapabilities(messagingFeatures),
     }, request.id))
   })
 
@@ -694,7 +704,7 @@ export async function registerMessagingRoutes(
     }
   })
 
-  return {hub, messaging}
+  return {hub, messaging, featureHooks}
 }
 
 /**
