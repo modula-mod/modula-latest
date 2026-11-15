@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-15T12:52:23.341Z for branch `andy/backend-gaps-1`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-15T13:15:23.461Z for branch `andy/messaging-features-4`; this does not claim deployment.
 
-- Runtime method routes: 918
-- Application routes: 645
-- Automatically generated HEAD routes: 272
+- Runtime method routes: 951
+- Application routes: 671
+- Automatically generated HEAD routes: 279
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `918 = 645 application + 273 framework-derived`
+- Reconciliation: `951 = 671 application + 280 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,10 +17,10 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 645 |
+| yes | yes | not yet | candidate-registered | 671 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 273 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 280 |
 
 ## Error contract
 
@@ -260,24 +260,40 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Connectors | GET | `/v1/connectors` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1314` | candidate-registered-not-production-probed |
 | Connectors | GET | `/v1/connectors/:providerId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1317` | candidate-registered-not-production-probed |
 | Connectors | POST | `/v1/connectors/:providerId/authorise` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1322` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:92` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:113` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:308` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:101` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:122` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:317` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/conversations/:id/calls` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:144` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:132` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:144` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:231` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:218` | candidate-registered-not-production-probed |
-| Reactions | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:257` | candidate-registered-not-production-probed |
-| Reactions | GET | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:475` | candidate-registered-not-production-probed |
-| Reactions | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:244` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/messages/:messageId/receipts` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:486` | candidate-registered-not-production-probed |
-| Social | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:297` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:164` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:286` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:271` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:185` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:103` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/disappearing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:251` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:141` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:153` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:240` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:227` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/messages/:messageId/edits` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:148` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/messages/:messageId/forward` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:347` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId/pin` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:108` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/messages/:messageId/pin` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:107` | candidate-registered-not-production-probed |
+| Reactions | DELETE | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:266` | candidate-registered-not-production-probed |
+| Reactions | GET | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:485` | candidate-registered-not-production-probed |
+| Reactions | PUT | `/v1/conversations/:id/messages/:messageId/reactions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:253` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/messages/:messageId/receipts` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:496` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/conversations/:id/messages/:messageId/saved` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:134` | candidate-registered-not-production-probed |
+| Platform | PUT | `/v1/conversations/:id/messages/:messageId/saved` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:133` | candidate-registered-not-production-probed |
+| Social | POST | `/v1/conversations/:id/mute` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:306` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/notifications` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:296` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:282` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/pins` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:109` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/read` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:173` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/scheduled` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:219` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/scheduled` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:217` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/conversations/:id/scheduled/:scheduledId` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:239` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/conversations/:id/scheduled/:scheduledId` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:237` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/scheduled/:scheduledId/send-now` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:241` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/theme` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:265` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:295` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:280` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:194` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:112` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/insights` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:44` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/creator/payouts` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
@@ -332,13 +348,13 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/gifs/search` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:36` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/status` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:21` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/trending` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:26` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/groups` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:384` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/groups/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:396` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/groups/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:407` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/groups/:id/leave` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:461` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/groups/:id/members` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:420` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/groups/:id/members/:actorId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:434` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/groups/:id/members/:actorId/role` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:448` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/groups` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:394` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/groups/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:406` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/groups/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:417` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/groups/:id/leave` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:471` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/groups/:id/members` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:430` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/groups/:id/members/:actorId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:444` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/groups/:id/members/:actorId/role` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:458` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/capabilities` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:51` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/categories` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:217` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/featured` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:199` | candidate-registered-not-production-probed |
@@ -371,10 +387,10 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:84` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/live` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:284` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/ready` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:288` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:650` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:661` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:673` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:684` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:660` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/in-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:671` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/in-mail/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:683` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/in-mail/:id/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:694` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:25` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:16` | candidate-registered-not-production-probed |
 | Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:31` | candidate-registered-not-production-probed |
@@ -423,14 +439,24 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/me/verification/applications/:applicationId/appeals` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:172` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2182` | candidate-registered-not-production-probed |
 | Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | none | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:352` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:616` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:626` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:638` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/messages/search` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:497` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/messaging/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:333` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/messaging/privacy` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:363` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/messaging/privacy` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:373` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/messaging/socket` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-routes.ts:537` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/message-requests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:626` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/message-requests/:id/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:636` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/message-requests/:id/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:648` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messages/saved` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:135` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messages/scheduled` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:228` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messages/search` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:507` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messaging/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:342` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messaging/folders` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:322` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/messaging/folders` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:323` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/messaging/folders/:folderId` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:325` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/messaging/folders/:folderId` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:324` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messaging/privacy` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:373` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/messaging/privacy` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:383` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messaging/quick-replies` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:340` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/messaging/quick-replies` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:341` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/messaging/quick-replies/:replyId` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:343` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/messaging/quick-replies/:replyId` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-features-routes.ts:342` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messaging/socket` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-routes.ts:547` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/meta` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:300` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:516` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1634` | candidate-registered-not-production-probed |
@@ -557,8 +583,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/premium/apple/notifications` | PUBLIC | none | `services/greenfield-api/src/premium/routes.ts:105` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/premium/apple/transactions` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:93` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/premium/tiers` | AUTHENTICATED | none | `services/greenfield-api/src/premium/routes.ts:43` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/presence` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:518` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/presence/heartbeat` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:507` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/presence` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:528` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/presence/heartbeat` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:517` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:323` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:335` | candidate-registered-not-production-probed |
 | Profile | GET | `/v1/profiles/:handle` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1673` | candidate-registered-not-production-probed |
@@ -1154,7 +1180,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/LocalApiServer.ts`, `src/api/local/routes/appearanceRoutes.ts`, `src/api/local/routes/authRoutes.ts`, `src/api/local/routes/notificationRoutes.ts`, `src/data/repositories/api/ApiActivityRepository.ts`, `src/data/repositories/api/ApiAppearanceRepository.ts`, `src/data/repositories/api/ApiAuthRepository.ts`, `src/features/settings/screens/ModulaMailSettingsScreen.tsx`
-- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-founder-alpha.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-founder-alpha.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/settings-v2.integration.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -2281,7 +2307,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (400)
 - Status: candidate-registered-not-production-probed
@@ -2428,7 +2454,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11764,7 +11790,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations`
 - Public URL: `https://api.modula.digital/v1/conversations`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:92`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:101`
 - Handler: inline
 - Controller/service calls: `messaging.listConversations`
 - Authentication: legacy or bridged bearer session
@@ -11780,14 +11806,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11813,7 +11839,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations`
 - Public URL: `https://api.modula.digital/v1/conversations`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:113`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:122`
 - Handler: inline
 - Controller/service calls: `messaging.startConversation`
 - Authentication: legacy or bridged bearer session
@@ -11829,14 +11855,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`, `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `follows`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11862,7 +11888,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/archive`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/archive`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:308`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:317`
 - Handler: inline
 - Controller/service calls: `messaging.setArchived`
 - Authentication: legacy or bridged bearer session
@@ -11878,14 +11904,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversations`
-- Database writes: `archive`, `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: `archive`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11934,7 +11960,56 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/disappearing</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/disappearing`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/disappearing`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:251`
+- Handler: inline
+- Controller/service calls: `messaging.setDisappearing`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `post:engage`
+- Rate limit: none registered
+- Request params: `{id: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `disappearing`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -11960,7 +12035,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:132`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:141`
 - Handler: inline
 - Controller/service calls: `messaging.listMessages`
 - Authentication: legacy or bridged bearer session
@@ -11976,14 +12051,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `an`, `attachments`, `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_domain_events`, `greenfield_message_attachments`, `greenfield_message_mentions`, `greenfield_message_reactions`, `greenfield_messaging_privacy`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12009,7 +12084,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:144`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:153`
 - Handler: inline
 - Controller/service calls: `log.warn`, `messaging.sendDetailed`
 - Authentication: legacy or bridged bearer session
@@ -12025,14 +12100,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`, `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `attachments`, `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_attachments`, `greenfield_message_mentions`, `greenfield_message_reactions`, `profiles`
-- Database writes: `attachments`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_attachments`, `greenfield_message_mentions`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: `host bind mount: /var/lib/modula/greenfield-media`
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12058,7 +12133,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:231`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:240`
 - Handler: inline
 - Controller/service calls: `messaging.unsendMessage`
 - Authentication: legacy or bridged bearer session
@@ -12074,14 +12149,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
-- Database writes: `greenfield_conversation_messages`, `greenfield_message_reactions`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12107,7 +12182,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:218`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:227`
 - Handler: inline
 - Controller/service calls: `messaging.editMessage`
 - Authentication: legacy or bridged bearer session
@@ -12123,14 +12198,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `attachments`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_attachments`, `greenfield_message_mentions`, `greenfield_message_reactions`, `profiles`
-- Database writes: `greenfield_conversation_messages`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12149,6 +12224,202 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/conversations/:id/messages/:messageId/edits</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/conversations/:id/messages/:messageId/edits`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/edits`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:148`
+- Handler: inline
+- Controller/service calls: `messaging.editHistory`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: `{id: string`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/messages/:messageId/forward</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/messages/:messageId/forward`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/forward`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:347`
+- Handler: inline
+- Controller/service calls: `log.warn`, `messaging.assertForwardAllowed`, `messaging.forwardSource`, `messaging.parseTargets`, `messaging.sendDetailed`, `results.push`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `post:engage`
+- Rate limit: none registered
+- Request params: `{id: string`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>DELETE /v1/conversations/:id/messages/:messageId/pin</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/conversations/:id/messages/:messageId/pin`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/pin`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:108`
+- Handler: inline
+- Controller/service calls: none observed
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/messages/:messageId/pin</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/messages/:messageId/pin`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/pin`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:107`
+- Handler: inline
+- Controller/service calls: none observed
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
 <summary><code>DELETE /v1/conversations/:id/messages/:messageId/reactions</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Reactions
@@ -12156,7 +12427,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:257`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:266`
 - Handler: inline
 - Controller/service calls: `messaging.react`
 - Authentication: legacy or bridged bearer session
@@ -12172,14 +12443,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `attachments`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_attachments`, `greenfield_message_mentions`, `greenfield_message_reactions`, `profiles`
-- Database writes: `greenfield_message_reactions`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12205,7 +12476,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:475`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:485`
 - Handler: inline
 - Controller/service calls: `messaging.reactionDetails`
 - Authentication: legacy or bridged bearer session
@@ -12221,14 +12492,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_reactions`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12254,7 +12525,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/reactions`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:244`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:253`
 - Handler: inline
 - Controller/service calls: `messaging.react`
 - Authentication: legacy or bridged bearer session
@@ -12270,14 +12541,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `attachments`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_attachments`, `greenfield_message_mentions`, `greenfield_message_reactions`, `profiles`
-- Database writes: `greenfield_message_reactions`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12303,7 +12574,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/messages/:messageId/receipts`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/receipts`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:486`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:496`
 - Handler: inline
 - Controller/service calls: `messaging.messageReceipts`
 - Authentication: legacy or bridged bearer session
@@ -12319,14 +12590,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_messaging_privacy`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12345,6 +12616,104 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>DELETE /v1/conversations/:id/messages/:messageId/saved</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/conversations/:id/messages/:messageId/saved`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/saved`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:134`
+- Handler: inline
+- Controller/service calls: none observed
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>PUT /v1/conversations/:id/messages/:messageId/saved</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PUT
+- Effective route: `/v1/conversations/:id/messages/:messageId/saved`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/messages/:messageId/saved`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:133`
+- Handler: inline
+- Controller/service calls: none observed
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
 <summary><code>POST /v1/conversations/:id/mute</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Social
@@ -12352,7 +12721,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/mute`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/mute`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:297`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:306`
 - Handler: inline
 - Controller/service calls: `messaging.setMuted`
 - Authentication: legacy or bridged bearer session
@@ -12368,14 +12737,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversations`
-- Database writes: `greenfield_conversation_members`, `mute`
+- Database reads: none observed
+- Database writes: `mute`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12394,6 +12763,153 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>POST /v1/conversations/:id/notifications</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/notifications`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/notifications`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:296`
+- Handler: inline
+- Controller/service calls: `hub.publish`, `messaging.setNotificationLevel`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: `{id: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `notifications`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/pin</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/pin`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/pin`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:282`
+- Handler: inline
+- Controller/service calls: `hub.publish`, `messaging.pinChat`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: `{id: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/conversations/:id/pins</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/conversations/:id/pins`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/pins`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:109`
+- Handler: inline
+- Controller/service calls: `messaging.listPins`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: `{id: string}).id), request.id))`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
 <summary><code>POST /v1/conversations/:id/read</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -12401,7 +12917,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/read`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/read`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:164`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:173`
 - Handler: inline
 - Controller/service calls: `hub.publish`, `messaging.markRead`, `messaging.receiptRecipients`
 - Authentication: legacy or bridged bearer session
@@ -12417,14 +12933,308 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `greenfield_messaging_privacy`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>GET /v1/conversations/:id/scheduled</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/conversations/:id/scheduled`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/scheduled`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:219`
+- Handler: inline
+- Controller/service calls: `messaging.listScheduled`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: `{id: string}).id), request.id))`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/scheduled</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/scheduled`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/scheduled`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:217`
+- Handler: inline
+- Controller/service calls: `messaging.schedule`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{id: string}).id, body(request)), 'Unable to schedule message', 201)`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>DELETE /v1/conversations/:id/scheduled/:scheduledId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/conversations/:id/scheduled/:scheduledId`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/scheduled/:scheduledId`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:239`
+- Handler: inline
+- Controller/service calls: `messaging.cancelScheduled`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{scheduledId: string}).scheduledId), 'Unable to cancel scheduled message')`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>PATCH /v1/conversations/:id/scheduled/:scheduledId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PATCH
+- Effective route: `/v1/conversations/:id/scheduled/:scheduledId`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/scheduled/:scheduledId`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:237`
+- Handler: inline
+- Controller/service calls: `messaging.updateScheduled`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{scheduledId: string}).scheduledId, body(request)), 'Unable to update scheduled message')`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `scheduled`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/scheduled/:scheduledId/send-now</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/scheduled/:scheduledId/send-now`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/scheduled/:scheduledId/send-now`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:241`
+- Handler: inline
+- Controller/service calls: `messaging.getScheduled`, `messaging.makeDueNow`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{scheduledId: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/conversations/:id/theme</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/conversations/:id/theme`
+- Public URL: `https://api.modula.digital/v1/conversations/:id/theme`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:265`
+- Handler: inline
+- Controller/service calls: `messaging.setTheme`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `post:engage`
+- Rate limit: none registered
+- Request params: `{id: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `theme`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12450,7 +13260,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/typing`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/typing`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:286`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:295`
 - Handler: inline
 - Controller/service calls: `messaging.typing`
 - Authentication: legacy or bridged bearer session
@@ -12466,14 +13276,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `greenfield_messaging_privacy`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12499,7 +13309,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/typing`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/typing`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:271`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:280`
 - Handler: inline
 - Controller/service calls: `messaging.setTyping`
 - Authentication: legacy or bridged bearer session
@@ -12515,14 +13325,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversations`, `greenfield_messaging_privacy`
-- Database writes: `greenfield_conversation_members`, `typing`
+- Database reads: none observed
+- Database writes: `typing`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12548,7 +13358,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/unread`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/unread`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:185`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:194`
 - Handler: inline
 - Controller/service calls: `hub.publish`, `messaging.setMarkedUnread`
 - Authentication: legacy or bridged bearer session
@@ -12564,14 +13374,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversations`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -12597,7 +13407,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/unread`
 - Public URL: `https://api.modula.digital/v1/conversations/unread`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:103`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:112`
 - Handler: inline
 - Controller/service calls: `messaging.unreadSummary`
 - Authentication: legacy or bridged bearer session
@@ -12613,7 +13423,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -15292,7 +16102,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups`
 - Public URL: `https://api.modula.digital/v1/groups`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:384`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:394`
 - Handler: inline
 - Controller/service calls: `messaging.createGroup`
 - Authentication: legacy or bridged bearer session
@@ -15308,14 +16118,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `follows`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`, `greenfield_conversations`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15341,7 +16151,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups/:id`
 - Public URL: `https://api.modula.digital/v1/groups/:id`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:396`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:406`
 - Handler: inline
 - Controller/service calls: `messaging.getGroup`
 - Authentication: legacy or bridged bearer session
@@ -15357,14 +16167,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15390,7 +16200,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups/:id`
 - Public URL: `https://api.modula.digital/v1/groups/:id`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:407`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:417`
 - Handler: inline
 - Controller/service calls: `messaging.updateGroup`
 - Authentication: legacy or bridged bearer session
@@ -15406,14 +16216,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversations`, `group`
+- Database reads: none observed
+- Database writes: `group`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15439,7 +16249,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups/:id/leave`
 - Public URL: `https://api.modula.digital/v1/groups/:id/leave`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:461`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:471`
 - Handler: inline
 - Controller/service calls: `hub.publish`, `messaging.leaveGroup`
 - Authentication: legacy or bridged bearer session
@@ -15455,14 +16265,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversations`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15488,7 +16298,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups/:id/members`
 - Public URL: `https://api.modula.digital/v1/groups/:id/members`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:420`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:430`
 - Handler: inline
 - Controller/service calls: `hub.publish`, `messaging.addGroupMembers`
 - Authentication: legacy or bridged bearer session
@@ -15504,14 +16314,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `follows`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15537,7 +16347,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups/:id/members/:actorId`
 - Public URL: `https://api.modula.digital/v1/groups/:id/members/:actorId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:434`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:444`
 - Handler: inline
 - Controller/service calls: `hub.publish`, `messaging.removeGroupMember`
 - Authentication: legacy or bridged bearer session
@@ -15553,14 +16363,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15586,7 +16396,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/groups/:id/members/:actorId/role`
 - Public URL: `https://api.modula.digital/v1/groups/:id/members/:actorId/role`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:448`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:458`
 - Handler: inline
 - Controller/service calls: `messaging.setGroupRole`
 - Authentication: legacy or bridged bearer session
@@ -15602,14 +16412,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -17203,7 +18013,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail`
 - Public URL: `https://api.modula.digital/v1/in-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:650`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:660`
 - Handler: inline
 - Controller/service calls: `messaging.listInMail`
 - Authentication: legacy or bridged bearer session
@@ -17219,7 +18029,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -17252,7 +18062,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail`
 - Public URL: `https://api.modula.digital/v1/in-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:661`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:671`
 - Handler: inline
 - Controller/service calls: `messaging.composeInMail`
 - Authentication: legacy or bridged bearer session
@@ -17268,8 +18078,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -17301,7 +18111,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail/:id`
 - Public URL: `https://api.modula.digital/v1/in-mail/:id`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:673`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:683`
 - Handler: inline
 - Controller/service calls: `messaging.getInMail`
 - Authentication: legacy or bridged bearer session
@@ -17317,8 +18127,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -17350,7 +18160,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/in-mail/:id/replies`
 - Public URL: `https://api.modula.digital/v1/in-mail/:id/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:684`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:694`
 - Handler: inline
 - Controller/service calls: `messaging.replyInMail`
 - Authentication: legacy or bridged bearer session
@@ -17366,8 +18176,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
-- Database writes: `attachments`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `greenfield_message_attachments`, `greenfield_message_mentions`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -19751,7 +20561,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests`
 - Public URL: `https://api.modula.digital/v1/message-requests`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:616`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:626`
 - Handler: inline
 - Controller/service calls: `messaging.listRequests`
 - Authentication: legacy or bridged bearer session
@@ -19767,7 +20577,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -19800,7 +20610,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests/:id/accept`
 - Public URL: `https://api.modula.digital/v1/message-requests/:id/accept`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:626`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:636`
 - Handler: inline
 - Controller/service calls: `messaging.acceptRequest`
 - Authentication: legacy or bridged bearer session
@@ -19816,8 +20626,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -19849,7 +20659,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/message-requests/:id/decline`
 - Public URL: `https://api.modula.digital/v1/message-requests/:id/decline`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:638`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:648`
 - Handler: inline
 - Controller/service calls: `messaging.declineRequest`
 - Authentication: legacy or bridged bearer session
@@ -19865,8 +20675,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_conversation_members`, `greenfield_conversations`
-- Database writes: `greenfield_conversation_members`
+- Database reads: none observed
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -19891,6 +20701,104 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/messages/saved</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/messages/saved`
+- Public URL: `https://api.modula.digital/v1/messages/saved`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:135`
+- Handler: inline
+- Controller/service calls: `messaging.listSaved`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: `{cursor?: string`
+- Request body: none observed
+- Pagination: cursor
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: cursor
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/messages/scheduled</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/messages/scheduled`
+- Public URL: `https://api.modula.digital/v1/messages/scheduled`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:228`
+- Handler: inline
+- Controller/service calls: `messaging.listScheduled`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/messages/search</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -19898,7 +20806,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/messages/search`
 - Public URL: `https://api.modula.digital/v1/messages/search`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:497`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:507`
 - Handler: inline
 - Controller/service calls: `messaging.searchMessages`
 - Authentication: legacy or bridged bearer session
@@ -19914,7 +20822,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversation_messages`, `greenfield_conversations`, `profiles`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -19947,7 +20855,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/messaging/capabilities`
 - Public URL: `https://api.modula.digital/v1/messaging/capabilities`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:333`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:342`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: legacy or bridged bearer session
@@ -19970,7 +20878,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -19989,6 +20897,202 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/messaging/folders</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/messaging/folders`
+- Public URL: `https://api.modula.digital/v1/messaging/folders`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:322`
+- Handler: inline
+- Controller/service calls: `messaging.listFolders`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/messaging/folders</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/messaging/folders`
+- Public URL: `https://api.modula.digital/v1/messaging/folders`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:323`
+- Handler: inline
+- Controller/service calls: `messaging.createFolder`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>DELETE /v1/messaging/folders/:folderId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/messaging/folders/:folderId`
+- Public URL: `https://api.modula.digital/v1/messaging/folders/:folderId`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:325`
+- Handler: inline
+- Controller/service calls: `messaging.deleteFolder`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>PATCH /v1/messaging/folders/:folderId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PATCH
+- Effective route: `/v1/messaging/folders/:folderId`
+- Public URL: `https://api.modula.digital/v1/messaging/folders/:folderId`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:324`
+- Handler: inline
+- Controller/service calls: `messaging.updateFolder`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `folder`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
 <summary><code>GET /v1/messaging/privacy</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -19996,7 +21100,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/messaging/privacy`
 - Public URL: `https://api.modula.digital/v1/messaging/privacy`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:363`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:373`
 - Handler: inline
 - Controller/service calls: `messaging.getPrivacy`
 - Authentication: legacy or bridged bearer session
@@ -20012,7 +21116,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_messaging_privacy`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -20045,7 +21149,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/messaging/privacy`
 - Public URL: `https://api.modula.digital/v1/messaging/privacy`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:373`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:383`
 - Handler: inline
 - Controller/service calls: `messaging.updatePrivacy`
 - Authentication: legacy or bridged bearer session
@@ -20061,8 +21165,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `greenfield_messaging_privacy`
-- Database writes: `greenfield_conversation_members`, `greenfield_messaging_privacy`, `messaging`
+- Database reads: none observed
+- Database writes: `messaging`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -20087,6 +21191,202 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 </details>
 
 <details>
+<summary><code>GET /v1/messaging/quick-replies</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/messaging/quick-replies`
+- Public URL: `https://api.modula.digital/v1/messaging/quick-replies`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:340`
+- Handler: inline
+- Controller/service calls: `messaging.listQuickReplies`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/messaging/quick-replies</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/messaging/quick-replies`
+- Public URL: `https://api.modula.digital/v1/messaging/quick-replies`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:341`
+- Handler: inline
+- Controller/service calls: `messaging.createQuickReply`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>DELETE /v1/messaging/quick-replies/:replyId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/messaging/quick-replies/:replyId`
+- Public URL: `https://api.modula.digital/v1/messaging/quick-replies/:replyId`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:343`
+- Handler: inline
+- Controller/service calls: `messaging.deleteQuickReply`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>PATCH /v1/messaging/quick-replies/:replyId</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: PATCH
+- Effective route: `/v1/messaging/quick-replies/:replyId`
+- Public URL: `https://api.modula.digital/v1/messaging/quick-replies/:replyId`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-messaging-features-routes.ts:342`
+- Handler: inline
+- Controller/service calls: `messaging.updateQuickReply`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `quick`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/messaging-features-4.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: none
+- Contract authorization: PUBLIC
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
 <summary><code>GET /v1/messaging/socket</code> — candidate-registered-not-production-probed</summary>
 
 - Domain: Platform
@@ -20094,7 +21394,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/messaging/socket`
 - Public URL: `https://api.modula.digital/v1/messaging/socket`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:537`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:547`
 - Handler: inline
 - Controller/service calls: `at.toISOString`, `comments.canFollowPost`, `hub.connectionCount`, `hub.followPost`, `hub.isOnline`, `hub.subscribe`, `hub.unfollowAllPosts`, `hub.unfollowPost`, `messaging.presenceRecipients`, `messaging.setTyping`, `messaging.touchPresence`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`, `socketAuth.get`
 - Authentication: none
@@ -20110,14 +21410,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
-- Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `greenfield_messaging_privacy`, `posts`
-- Database writes: `greenfield_actor_presence`, `greenfield_conversation_members`
+- Database reads: `posts`
+- Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -26317,7 +27617,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/presence`
 - Public URL: `https://api.modula.digital/v1/presence`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:518`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:528`
 - Handler: inline
 - Controller/service calls: `hub.isOnline`, `messaging.presence`
 - Authentication: legacy or bridged bearer session
@@ -26333,7 +27633,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `blocks`, `greenfield_actor_presence`, `greenfield_conversation_members`, `greenfield_conversations`, `greenfield_messaging_privacy`
+- Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -26366,7 +27666,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/presence/heartbeat`
 - Public URL: `https://api.modula.digital/v1/presence/heartbeat`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:507`
+- Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:517`
 - Handler: inline
 - Controller/service calls: `messaging.touchPresence`
 - Authentication: legacy or bridged bearer session
@@ -26383,7 +27683,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: none observed
-- Database writes: `greenfield_actor_presence`, `presence`
+- Database writes: `presence`
 - Storage: none observed
 - Events produced: none observed
 - Jobs produced: none observed
@@ -30407,7 +31707,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: `src/api/local/LocalApiServer.ts`, `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -30456,7 +31756,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/api/local/LocalApiServer.ts`, `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
-- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
+- Tests: `scripts/verify-greenfield-backend-v1-auth.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7l-b-session.mjs`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts`, `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/collections-drafts.integration.test.ts`, `services/greenfield-api/tests/communities.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/gubic.play.integration.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/messaging-features-4.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`, `services/greenfield-api/tests/messaging.integration.test.ts`, `services/greenfield-api/tests/module-platform-02.records.test.ts`, `services/greenfield-api/tests/module-platform-02b.functions-actions.test.ts`, `services/greenfield-api/tests/module-platform-02b.media-sharing.test.ts`, `services/greenfield-api/tests/moliboo-game.integration.test.ts`, `services/greenfield-api/tests/moliboo-signed-packs.integration.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/premium.apple-sandbox.integration.test.ts`, `services/greenfield-api/tests/premium.integration.test.ts`, `services/greenfield-api/tests/push.routes.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/social-gaps-v1.integration.test.ts`, `services/greenfield-api/tests/story-dm-replies.integration.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
