@@ -108,7 +108,7 @@ describe('GUBIC shared engine definition', () => {
   })
 
   it('keeps the WebAssembly ban for html5 game archives', () => {
-    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; object-src \'none\'">')
+    const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'">')
     const wasm = Buffer.from([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00])
     const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'canvaskit.wasm': sha256(wasm)}}))
     const archive = gzipSync(Buffer.concat([tarEntry('index.html', html), tarEntry('canvaskit.wasm', wasm), tarEntry('game.files.json', inventory), Buffer.alloc(1024)]))
