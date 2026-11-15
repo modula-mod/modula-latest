@@ -99,6 +99,8 @@
       "greenfield_session_tokens",
       "greenfield_sessions",
       "greenfield_story_groups",
+      "greenfield_story_highlights",
+      "greenfield_story_reactions",
       "greenfield_totp_credentials",
       "posts",
       "profiles"
@@ -2021,6 +2023,8 @@
       "greenfield_quote_posts",
       "greenfield_reactions",
       "greenfield_story_groups",
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
       "greenfield_story_items",
       "post_content",
       "post_media",
@@ -2049,6 +2053,7 @@
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
       "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
+      "services/greenfield-api/src/domains/stories/social.ts#canViewHighlightedMedia",
       "services/greenfield-api/src/modules/runtime-access.ts#enforceCapability",
       "services/greenfield-api/src/modules/runtime-access.ts#resolve"
     ]
@@ -3248,11 +3253,13 @@
     "reads": [
       "actors",
       "attachments",
+      "blocks",
       "greenfield_comment_poll_votes",
       "greenfield_comment_reactions",
       "greenfield_comments",
       "greenfield_handles",
       "greenfield_mentions",
+      "mutes",
       "posts",
       "profiles"
     ],
@@ -3266,6 +3273,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/comments/service.ts#create",
       "services/greenfield-api/src/domains/comments/service.ts#createReply",
       "services/greenfield-api/src/domains/comments/service.ts#withAuthors",
@@ -4339,6 +4348,22 @@
       "services/greenfield-api/src/domains/messaging/service.ts#membership",
       "services/greenfield-api/src/domains/messaging/service.ts#privacyFor",
       "services/greenfield-api/src/domains/messaging/service.ts#setTyping"
+    ]
+  },
+  "POST /v1/conversations/:id/unread": {
+    "reads": [
+      "greenfield_conversation_members",
+      "greenfield_conversations"
+    ],
+    "writes": [
+      "greenfield_conversation_members"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/messaging/service.ts#membership",
+      "services/greenfield-api/src/domains/messaging/service.ts#setMarkedUnread"
     ]
   },
   "GET /v1/conversations/unread": {
@@ -6754,6 +6779,8 @@
       "blocks",
       "follows",
       "greenfield_story_groups",
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
       "greenfield_story_items"
     ],
     "writes": [],
@@ -6763,7 +6790,8 @@
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
+      "services/greenfield-api/src/domains/stories/social.ts#canViewHighlightedMedia"
     ]
   },
   "GET /v1/message-requests": {
@@ -6893,7 +6921,8 @@
       "blocks",
       "greenfield_conversation_members",
       "greenfield_conversations",
-      "greenfield_messaging_privacy"
+      "greenfield_messaging_privacy",
+      "posts"
     ],
     "writes": [
       "greenfield_actor_presence",
@@ -6903,6 +6932,7 @@
     "jobs": [],
     "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#canFollowPost",
       "services/greenfield-api/src/domains/messaging/service.ts#blockedSet",
       "services/greenfield-api/src/domains/messaging/service.ts#contactsOf",
       "services/greenfield-api/src/domains/messaging/service.ts#getPrivacy",
@@ -9191,11 +9221,13 @@
     "reads": [
       "actors",
       "attachments",
+      "blocks",
       "greenfield_comment_poll_votes",
       "greenfield_comment_reactions",
       "greenfield_comments",
       "greenfield_handles",
       "greenfield_mentions",
+      "mutes",
       "posts",
       "profiles"
     ],
@@ -9209,6 +9241,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/comments/service.ts#create",
       "services/greenfield-api/src/domains/comments/service.ts#createComment",
       "services/greenfield-api/src/domains/comments/service.ts#resolveQuote",
@@ -9220,8 +9254,10 @@
   "DELETE /v1/posts/:postId/like": {
     "reads": [
       "attachments",
+      "blocks",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "mutes",
       "post_content",
       "post_media",
       "post_reposts",
@@ -9234,8 +9270,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
@@ -9247,8 +9285,10 @@
   "POST /v1/posts/:postId/like": {
     "reads": [
       "attachments",
+      "blocks",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "mutes",
       "post_content",
       "post_media",
       "post_reposts",
@@ -9261,8 +9301,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
@@ -9295,7 +9337,9 @@
   },
   "DELETE /v1/posts/:postId/reaction": {
     "reads": [
+      "blocks",
       "greenfield_reactions",
+      "mutes",
       "posts"
     ],
     "writes": [
@@ -9306,6 +9350,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
       "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
       "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
@@ -9313,7 +9359,9 @@
   },
   "PUT /v1/posts/:postId/reaction": {
     "reads": [
+      "blocks",
       "greenfield_reactions",
+      "mutes",
       "posts"
     ],
     "writes": [
@@ -9324,6 +9372,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
       "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
       "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
@@ -9346,8 +9396,10 @@
   "DELETE /v1/posts/:postId/repost": {
     "reads": [
       "attachments",
+      "blocks",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "mutes",
       "post_content",
       "post_media",
       "post_reposts",
@@ -9360,8 +9412,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
@@ -9373,8 +9427,10 @@
   "POST /v1/posts/:postId/repost": {
     "reads": [
       "attachments",
+      "blocks",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "mutes",
       "post_content",
       "post_media",
       "post_reposts",
@@ -9387,8 +9443,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
@@ -9400,8 +9458,10 @@
   "DELETE /v1/posts/:postId/save": {
     "reads": [
       "attachments",
+      "blocks",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "mutes",
       "post_content",
       "post_media",
       "post_reposts",
@@ -9414,8 +9474,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
@@ -9427,8 +9489,10 @@
   "POST /v1/posts/:postId/save": {
     "reads": [
       "attachments",
+      "blocks",
       "greenfield_quote_posts",
       "greenfield_reactions",
+      "mutes",
       "post_content",
       "post_media",
       "post_reposts",
@@ -9441,8 +9505,10 @@
     ],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/domains/comments/live.ts#excludedFollowers",
+      "services/greenfield-api/src/domains/comments/live.ts#publish",
       "services/greenfield-api/src/domains/posts/repository.ts#getById",
       "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
       "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
@@ -9668,6 +9734,26 @@
       "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
       "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
       "services/greenfield-api/src/domains/profiles/repository.ts#listFollowing"
+    ]
+  },
+  "GET /v1/profiles/:handle/highlights": {
+    "reads": [
+      "blocks",
+      "greenfield_story_groups",
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
+      "greenfield_story_items",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#blockedSet",
+      "services/greenfield-api/src/domains/stories/social.ts#listForProfile",
+      "services/greenfield-api/src/domains/stories/social.ts#summarize",
+      "services/greenfield-api/src/domains/stories/social.ts#visibleItems"
     ]
   },
   "GET /v1/profiles/:handle/posts": {
@@ -11110,6 +11196,7 @@
       "follows",
       "greenfield_story_groups",
       "greenfield_story_items",
+      "greenfield_story_reactions",
       "greenfield_story_views",
       "profiles"
     ],
@@ -11121,7 +11208,8 @@
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
       "services/greenfield-api/src/domains/stories/service.ts#getGroup",
-      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith"
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
+      "services/greenfield-api/src/domains/stories/social.ts#viewerReactions"
     ]
   },
   "POST /v1/stories/:storyId/replies": {
@@ -11145,6 +11233,117 @@
       "services/greenfield-api/src/domains/stories/service.ts#reply"
     ]
   },
+  "GET /v1/stories/archive": {
+    "reads": [
+      "greenfield_story_groups",
+      "greenfield_story_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#listArchive"
+    ]
+  },
+  "GET /v1/stories/capabilities": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "POST /v1/stories/highlights": {
+    "reads": [
+      "blocks",
+      "greenfield_story_groups",
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
+      "greenfield_story_items",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#assertOwnItems",
+      "services/greenfield-api/src/domains/stories/social.ts#blockedSet",
+      "services/greenfield-api/src/domains/stories/social.ts#createHighlight",
+      "services/greenfield-api/src/domains/stories/social.ts#getHighlight",
+      "services/greenfield-api/src/domains/stories/social.ts#normalizeItemIds",
+      "services/greenfield-api/src/domains/stories/social.ts#normalizeTitle",
+      "services/greenfield-api/src/domains/stories/social.ts#summarize",
+      "services/greenfield-api/src/domains/stories/social.ts#validCover",
+      "services/greenfield-api/src/domains/stories/social.ts#visibleItems"
+    ]
+  },
+  "DELETE /v1/stories/highlights/:highlightId": {
+    "reads": [],
+    "writes": [
+      "greenfield_story_highlights"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#deleteHighlight"
+    ]
+  },
+  "GET /v1/stories/highlights/:highlightId": {
+    "reads": [
+      "blocks",
+      "greenfield_story_groups",
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
+      "greenfield_story_items",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#blockedSet",
+      "services/greenfield-api/src/domains/stories/social.ts#getHighlight",
+      "services/greenfield-api/src/domains/stories/social.ts#summarize",
+      "services/greenfield-api/src/domains/stories/social.ts#visibleItems"
+    ]
+  },
+  "PATCH /v1/stories/highlights/:highlightId": {
+    "reads": [
+      "blocks",
+      "greenfield_story_groups",
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
+      "greenfield_story_items",
+      "profiles",
+      "the"
+    ],
+    "writes": [
+      "greenfield_story_highlight_items",
+      "greenfield_story_highlights",
+      "highlight"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#assertOwnItems",
+      "services/greenfield-api/src/domains/stories/social.ts#blockedSet",
+      "services/greenfield-api/src/domains/stories/social.ts#getHighlight",
+      "services/greenfield-api/src/domains/stories/social.ts#normalizeItemIds",
+      "services/greenfield-api/src/domains/stories/social.ts#normalizeTitle",
+      "services/greenfield-api/src/domains/stories/social.ts#summarize",
+      "services/greenfield-api/src/domains/stories/social.ts#updateHighlight",
+      "services/greenfield-api/src/domains/stories/social.ts#validCover",
+      "services/greenfield-api/src/domains/stories/social.ts#visibleItems"
+    ]
+  },
   "DELETE /v1/stories/items/:itemId": {
     "reads": [
       "attachments",
@@ -11161,6 +11360,59 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/stories/service.ts#deleteItem"
+    ]
+  },
+  "DELETE /v1/stories/items/:itemId/reaction": {
+    "reads": [
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_reactions"
+    ],
+    "writes": [
+      "greenfield_story_reactions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#removeReaction"
+    ]
+  },
+  "PUT /v1/stories/items/:itemId/reaction": {
+    "reads": [
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_reactions"
+    ],
+    "writes": [
+      "greenfield_story_reactions",
+      "greenfield_story_views"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#react",
+      "services/greenfield-api/src/domains/stories/social.ts#reactableItem"
+    ]
+  },
+  "GET /v1/stories/items/:itemId/reactions": {
+    "reads": [
+      "blocks",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_reactions",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#blockedSet",
+      "services/greenfield-api/src/domains/stories/social.ts#listReactions",
+      "services/greenfield-api/src/domains/stories/social.ts#ownedItem",
+      "services/greenfield-api/src/domains/stories/social.ts#people"
     ]
   },
   "POST /v1/stories/items/:itemId/viewed": {
@@ -11181,6 +11433,26 @@
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroupWith",
       "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirectionWith",
       "services/greenfield-api/src/domains/stories/service.ts#markViewed"
+    ]
+  },
+  "GET /v1/stories/items/:itemId/viewers": {
+    "reads": [
+      "blocks",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_reactions",
+      "greenfield_story_views",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/social.ts#blockedSet",
+      "services/greenfield-api/src/domains/stories/social.ts#listViewers",
+      "services/greenfield-api/src/domains/stories/social.ts#ownedItem",
+      "services/greenfield-api/src/domains/stories/social.ts#people"
     ]
   },
   "GET /v1/stories/rail": {
