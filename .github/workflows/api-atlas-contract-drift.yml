@@ -260,7 +260,7 @@ jobs:
           --maxWorkers=1 --no-file-parallelism
       # GF-CALL-01: these suites are describe.skip without MODULA_TEST_DATABASE_URL,
       # so the JSON report is checked to prove every test ran (none skipped).
-      - name: Messaging v3 and calls v1 database integration
+      - name: Messaging v3, calls v1 and social gaps v1 database integration
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
@@ -269,12 +269,14 @@ jobs:
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/messaging-v3.integration.test.ts
           tests/calls.integration.test.ts
+          tests/social-gaps-v1.integration.test.ts
           --maxWorkers=1 --no-file-parallelism
           --reporter=default --reporter=json
           --outputFile.json=/tmp/gf-call-01-api-vitest.json
           && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-call-01-api-vitest.json
           tests/messaging-v3.integration.test.ts
           tests/calls.integration.test.ts
+          tests/social-gaps-v1.integration.test.ts
       # GF native endpoints: GET /v1/reels/:id visibility rules need Postgres;
       # the report check proves the suite ran rather than silently skipping.
       - name: GF native endpoints database integration

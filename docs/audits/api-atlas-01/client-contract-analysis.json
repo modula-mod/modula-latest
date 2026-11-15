@@ -1346,6 +1346,9 @@
       "normalized": "/v1/stories/:param",
       "matchedRoutes": [
         "GET /v1/stories/:groupId",
+        "GET /v1/stories/archive",
+        "GET /v1/stories/capabilities",
+        "POST /v1/stories/highlights",
         "GET /v1/stories/rail"
       ],
       "status": "matched"

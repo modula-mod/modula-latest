@@ -5,7 +5,10 @@ import type {FastifyInstance} from 'fastify'
 
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
+import {SOCIAL_FEATURES_ALL_ON, type SocialFeaturesConfig} from '../config/env.js'
+import type {MessagingRealtimeHub} from '../domains/messaging/realtime-hub.js'
 import {StoryService, storyItemLiveCutoff} from '../domains/stories/service.js'
+import {HIGHLIGHT_ITEMS_MAX, HIGHLIGHT_TITLE_MAX, HIGHLIGHTS_MAX_PER_OWNER, StorySocialService} from '../domains/stories/social.js'
 import {requireCapability} from '../security/auth-context.js'
 import type {SessionService} from '../security/session.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
@@ -24,6 +27,9 @@ function mapDomainError(reply: any, error: any, requestId: string, fallback: str
     code === 'CONFLICT' ||
     code === 'UNAUTHENTICATED'
   ) {
+    if (error?.details?.reason) {
+      return reply.code(statusForError(code)).send(failureEnvelope(code, error.message ?? fallback, requestId, {details: {reason: error.details.reason}}))
+    }
     return sendError(reply, code, error.message ?? fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)
@@ -76,10 +82,171 @@ export async function registerPhase7fStoriesRoutes(
     sessions: SessionService
     feedConfig: Record<string, unknown>
     writeConfig: Record<string, unknown>
+    /** Delivers story reactions to the owner's open sockets. */
+    hub?: MessagingRealtimeHub
+    features?: Partial<SocialFeaturesConfig>
   },
 ): Promise<void> {
   const stories = new StoryService(db, config)
+  const social = new StorySocialService(db, stories)
   const {feedConfig, writeConfig} = options
+  const features: SocialFeaturesConfig = {...SOCIAL_FEATURES_ALL_ON, ...(options.features ?? {})}
+  const disabled = (reply: any, request: any, what: string) =>
+    sendError(reply, 'CAPABILITY_DISABLED', `${what} is not available`, request.id)
+
+  /** Server-declared story capabilities so the client never guesses. */
+  app.get('/v1/stories/capabilities', feedConfig, async (request, reply) => {
+    if (rejectUnresolvedAuthorization(request, reply)) return reply
+    return reply.send(successEnvelope({
+      version: 2,
+      viewers: features.storyViewers,
+      reactions: features.storyReactions ? {enabled: true, kind: 'emoji', singleEmoji: true} : {enabled: false},
+      highlights: features.storyHighlights
+        ? {enabled: true, maxPerProfile: HIGHLIGHTS_MAX_PER_OWNER, maxItems: HIGHLIGHT_ITEMS_MAX, titleMaxLength: HIGHLIGHT_TITLE_MAX}
+        : {enabled: false},
+      archive: features.storyHighlights,
+    }, request.id))
+  })
+
+  app.get('/v1/stories/archive', feedConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    if (!features.storyHighlights) return disabled(reply, request, 'Story archive')
+    const q = request.query as {cursor?: string; limit?: string}
+    try {
+      return reply.send(successEnvelope(await social.listArchive(auth.actorId, q.cursor, q.limit), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to load story archive')
+    }
+  })
+
+  app.get('/v1/stories/items/:itemId/viewers', feedConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    if (!features.storyViewers) return disabled(reply, request, 'Story viewers')
+    const {itemId} = request.params as {itemId: string}
+    const q = request.query as {cursor?: string; limit?: string}
+    try {
+      return reply.send(successEnvelope(await social.listViewers(auth.actorId, itemId, q.cursor, q.limit), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to load story viewers')
+    }
+  })
+
+  app.get('/v1/stories/items/:itemId/reactions', feedConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    if (!features.storyReactions) return disabled(reply, request, 'Story reactions')
+    const {itemId} = request.params as {itemId: string}
+    try {
+      return reply.send(successEnvelope(await social.listReactions(auth.actorId, itemId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to load story reactions')
+    }
+  })
+
+  app.put('/v1/stories/items/:itemId/reaction', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    if (!features.storyReactions) return disabled(reply, request, 'Story reactions')
+    const {itemId} = request.params as {itemId: string}
+    const body = (request.body ?? {}) as {emoji?: unknown}
+    if (typeof body !== 'object' || Object.keys(body).some(key => key !== 'emoji')) {
+      return sendError(reply, 'VALIDATION_FAILED', 'Invalid story reaction', request.id)
+    }
+    try {
+      const result = await social.react(auth.actorId, itemId, body.emoji, request.id)
+      if (result.changed) {
+        options.hub?.publish([result.ownerActorId], {type: 'story.reaction', itemId, groupId: result.groupId, actorId: auth.actorId, emoji: result.emoji, at: result.reactedAt})
+      }
+      return reply.send(successEnvelope({itemId, emoji: result.emoji, changed: result.changed, reactedAt: result.reactedAt}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to react to story')
+    }
+  })
+
+  app.delete('/v1/stories/items/:itemId/reaction', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    if (!features.storyReactions) return disabled(reply, request, 'Story reactions')
+    const {itemId} = request.params as {itemId: string}
+    try {
+      const result = await social.removeReaction(auth.actorId, itemId)
+      if (result.removed && result.ownerActorId && result.groupId) {
+        options.hub?.publish([result.ownerActorId], {type: 'story.reaction', itemId, groupId: result.groupId, actorId: auth.actorId, emoji: null, at: new Date().toISOString()})
+      }
+      return reply.send(successEnvelope({itemId, removed: result.removed}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to remove story reaction')
+    }
+  })
+
+  const highlightBody = (body: unknown) => {
+    const value = (body ?? {}) as Record<string, unknown>
+    if (typeof value !== 'object' || Array.isArray(value)) return null
+    if (Object.keys(value).some(key => key !== 'title' && key !== 'itemIds' && key !== 'coverItemId')) return null
+    return value as {title?: unknown; itemIds?: unknown; coverItemId?: unknown}
+  }
+
+  app.post('/v1/stories/highlights', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:create')
+    if (!auth) return
+    if (!features.storyHighlights) return disabled(reply, request, 'Story highlights')
+    const body = highlightBody(request.body)
+    if (!body) return sendError(reply, 'VALIDATION_FAILED', 'Invalid highlight request', request.id)
+    try {
+      return reply.code(201).send(successEnvelope(await social.createHighlight(auth.actorId, body), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to create highlight')
+    }
+  })
+
+  app.get('/v1/stories/highlights/:highlightId', feedConfig, async (request, reply) => {
+    if (rejectUnresolvedAuthorization(request, reply)) return reply
+    if (!features.storyHighlights) return disabled(reply, request, 'Story highlights')
+    const {highlightId} = request.params as {highlightId: string}
+    const highlight = await social.getHighlight(request.auth?.actorId ?? null, highlightId)
+    if (!highlight) return sendError(reply, 'NOT_FOUND', 'Highlight not found', request.id)
+    return reply.send(successEnvelope(highlight, request.id))
+  })
+
+  app.patch('/v1/stories/highlights/:highlightId', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:create')
+    if (!auth) return
+    if (!features.storyHighlights) return disabled(reply, request, 'Story highlights')
+    const {highlightId} = request.params as {highlightId: string}
+    const body = highlightBody(request.body)
+    if (!body) return sendError(reply, 'VALIDATION_FAILED', 'Invalid highlight request', request.id)
+    try {
+      return reply.send(successEnvelope(await social.updateHighlight(auth.actorId, highlightId, body), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to update highlight')
+    }
+  })
+
+  app.delete('/v1/stories/highlights/:highlightId', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:create')
+    if (!auth) return
+    if (!features.storyHighlights) return disabled(reply, request, 'Story highlights')
+    const {highlightId} = request.params as {highlightId: string}
+    try {
+      return reply.send(successEnvelope(await social.deleteHighlight(auth.actorId, highlightId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to delete highlight')
+    }
+  })
+
+  app.get('/v1/profiles/:handle/highlights', feedConfig, async (request, reply) => {
+    if (rejectUnresolvedAuthorization(request, reply)) return reply
+    if (!features.storyHighlights) return disabled(reply, request, 'Story highlights')
+    const {handle} = request.params as {handle: string}
+    if (typeof handle !== 'string' || handle.length < 1 || handle.length > 64) {
+      return sendError(reply, 'VALIDATION_FAILED', 'Invalid handle', request.id)
+    }
+    const result = await social.listForProfile(request.auth?.actorId ?? null, handle)
+    if (!result) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+    return reply.send(successEnvelope(result, request.id))
+  })
 
   app.get('/v1/stories/rail', feedConfig, async (request, reply) => {
     if (rejectUnresolvedAuthorization(request, reply)) return reply
@@ -94,8 +261,14 @@ export async function registerPhase7fStoriesRoutes(
     if (!groupId || groupId.startsWith('add:')) {
       return sendError(reply, 'NOT_FOUND', 'Story group not found', request.id)
     }
-    const group = await stories.getGroup(groupId, request.auth?.actorId ?? null)
+    const viewer = request.auth?.actorId ?? null
+    const group = await stories.getGroup(groupId, viewer)
     if (!group) return sendError(reply, 'NOT_FOUND', 'Story group not found', request.id)
+    if (viewer && !group.isOwner && features.storyReactions) {
+      // Additive field: the viewer's own reaction per item (null when none).
+      const mine = await social.viewerReactions(viewer, group.items.map(item => item.itemId))
+      return reply.send(successEnvelope({...group, items: group.items.map(item => ({...item, viewerReaction: mine.get(item.itemId) ?? null}))}, request.id))
+    }
     return reply.send(successEnvelope(group, request.id))
   })
 
@@ -189,13 +362,19 @@ export async function registerPhase7fStoriesRoutes(
       .where('i.deleted_at', 'is', null)
       .where('i.created_at', '>', storyItemLiveCutoff())
       .executeTakeFirst()
-    if (!item || item.deleted_at || item.expires_at <= new Date() || item.status !== 'ready') {
+    const live = Boolean(item && !item.deleted_at && item.expires_at > new Date() && item.status === 'ready')
+    // Items kept by an active highlight stay viewable after 24h under the
+    // original group's visibility and block policy.
+    const highlighted = !live && features.storyHighlights
+      ? await social.canViewHighlightedMedia(request.auth?.actorId ?? null, {mediaFileName: mediaFile})
+      : false
+    if (!live && !highlighted) {
       return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
     }
-    const canView = await stories.canViewGroup(
+    const canView = highlighted || await stories.canViewGroup(
       request.auth?.actorId ?? null,
-      item.owner_actor_id,
-      item.visibility,
+      item!.owner_actor_id,
+      item!.visibility,
     )
     if (!canView) {
       return sendError(reply, 'FORBIDDEN', 'Media unavailable', request.id)

@@ -1,12 +1,13 @@
 # coturn for Modula 1:1 calls (TURN REST / ephemeral credentials).
 #
-# Render on the VPS, never commit the rendered file:
-#   set -a; . /etc/modula/coturn.env; set +a
-#   envsubst '${TURN_REALM} ${TURN_EXTERNAL_IP} ${TURN_STATIC_AUTH_SECRET} ${TURN_CERT} ${TURN_PKEY}' \
-#     < ops/coturn/turnserver.conf.template > /etc/modula/turnserver.conf
-#   chmod 0600 /etc/modula/turnserver.conf
+# Render on the VPS with the command in docs/ops/calls-coturn.md (section 2),
+# never commit the rendered file. That command strips comment lines before
+# envsubst runs, and these comments deliberately contain no dollar-brace
+# placeholders, so the shared secret can never be copied into a comment.
 #
-# TURN_STATIC_AUTH_SECRET must equal the API's MODULA_CALLS_TURN_SECRET.
+# Substituted variables: TURN_REALM, TURN_EXTERNAL_IP, TURN_STATIC_AUTH_SECRET,
+# TURN_CERT, TURN_PKEY. TURN_STATIC_AUTH_SECRET must equal the API's
+# MODULA_CALLS_TURN_SECRET.
 
 realm=${TURN_REALM}
 server-name=${TURN_REALM}
