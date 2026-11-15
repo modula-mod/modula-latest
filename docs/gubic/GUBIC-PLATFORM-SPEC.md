@@ -131,14 +131,15 @@ in attribute names or unquoted values, unterminated tags, malformed end tags, CD
 `<!--` inside inline scripts) is refused with `GUBIC_HTML_MALFORMED`.
 
 Every HTML document must declare exactly one `<meta http-equiv="Content-Security-Policy">` (matched exactly,
-ASCII case-insensitive, no padding), preceded only by whitespace, a DOCTYPE, `<html>`, `<head>` and
+ASCII case-insensitive, no padding; any `&` in an `http-equiv` value is refused, and attribute values used for
+acceptance decisions such as the CSP content are decoded exactly once, as a browser does), preceded only by whitespace, a DOCTYPE, `<html>`, `<head>` and
 `<meta charset>`. The policy must set `default-src 'none'`, `script-src 'self'`, `connect-src 'none'`,
 `base-uri 'none'` and `worker-src 'none'` (no `unsafe-*`, wildcards, remote, `data:` or `blob:` code sources).
 Ingestion also refuses, with a machine-readable code:
 
 * `GUBIC_HTML_ACTIVE_CONTENT`: inline `on*` handlers, `javascript:`/`vbscript:` URLs, `srcdoc`,
   `<script type=importmap>`, `<meta http-equiv=refresh>`, padded CSP `http-equiv` values, and inline
-  `<svg>`/`<math>` (foreign content changes tokenization). Non-script raw text is re-scanned as markup.
+  `<svg>`/`<math>` (foreign content changes tokenization). Non-script raw text is re-scanned as markup, and nesting beyond 4 raw-text levels is refused.
 * `GUBIC_SVG_ACTIVE_CONTENT`: SVG members (`.svg`/`.svgz`, sniffed `image/svg+xml`, or UTF-16/32 markup)
   that are not UTF-8, or contain `<script>`, `on*` handlers, `<foreignObject>`, script URLs, external or
   `data:` `href`/`xlink:href`/`src`, remote `url()`/`@import` (after CSS escape decoding), DOCTYPE internal

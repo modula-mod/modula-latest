@@ -64,13 +64,27 @@ const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'connect-src', 'object-src'
 
 export type ParsedCsp = Map<string, string[]>
 
+/** The character references the value-identity decoder understands: numeric, and the five XML names. */
+const KNOWN_REFERENCE = /&(?:#x([0-9a-f]+)|#([0-9]+)|(quot|apos|lt|gt|amp));/gi
+const NAMED_REFERENCES: Record<string, string> = {quot: '"', apos: "'", lt: '<', gt: '>', amp: '&'}
+
+/**
+ * Decodes an attribute value EXACTLY ONCE, as a browser does: one left-to-right
+ * pass, so `&amp;#45;` becomes the literal text `&#45;`, never `-`. This is
+ * the single decoder for every acceptance decision (CSP content, charset
+ * labels). With `strict`, any `&` that is not one of the understood references
+ * is refused, because a browser might decode it differently (legacy names,
+ * missing semicolons). The refusal-direction scans use the more aggressive
+ * `decodeReferencesForScan` instead, which can only find more.
+ */
+export function decodeAttributeValueOnce(value: string, strict: boolean): string {
+  if (strict && value.replace(KNOWN_REFERENCE, '').includes('&')) fail('Web game CSP uses an unsupported character reference')
+  return value.replace(KNOWN_REFERENCE, (_, hex: string | undefined, dec: string | undefined, name: string | undefined) =>
+    hex !== undefined ? safeCodePoint(parseInt(hex, 16)) : dec !== undefined ? safeCodePoint(parseInt(dec, 10)) : NAMED_REFERENCES[name!.toLowerCase()]!)
+}
+
 function decodeEntities(value: string): string {
-  const decoded = value
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)))
-    .replace(/&#([0-9]+);/g, (_, dec: string) => String.fromCodePoint(parseInt(dec, 10)))
-    .replace(/&(quot|apos|lt|gt|amp);/gi, (_, name: string) => ({quot: '"', apos: "'", lt: '<', gt: '>', amp: '&'} as Record<string, string>)[name.toLowerCase()]!)
-  if (/&[a-z0-9#]+;/i.test(decoded)) fail('Web game CSP uses an unsupported character reference')
-  return decoded
+  return decodeAttributeValueOnce(value, true)
 }
 
 /** Parses a serialized policy into directives. Duplicate directives are refused rather than ignored. */
@@ -154,11 +168,25 @@ function allowedBeforeCsp(token: HtmlToken): boolean {
   }
 }
 
+/**
+ * Refuses any character reference in an http-equiv value. A browser decodes
+ * the value once; refusing `&` entirely means ingestion never has to agree
+ * with it on how (`Content&amp;#45;Security-Policy` is no CSP in a browser).
+ */
+function assertPlainHttpEquiv(token: HtmlToken, path: string): void {
+  if (token.type !== 'startTag') return
+  const httpEquiv = attributeValue(token, 'http-equiv')
+  if (httpEquiv?.includes('&')) {
+    failCode('GUBIC_HTML_MALFORMED', `Web game document ${path} has a character reference in an http-equiv value (${JSON.stringify(httpEquiv.slice(0, 80))} on <${token.name}>)`)
+  }
+}
+
 /** True when the http-equiv value is exactly Content-Security-Policy (ASCII case-insensitive, no trimming, as browsers match it). */
 function isCspMeta(token: HtmlToken): token is StartTag {
   if (token.type !== 'startTag' || token.name !== 'meta') return false
   const httpEquiv = attributeValue(token, 'http-equiv')
-  return httpEquiv !== undefined && decodeReferencesForScan(httpEquiv).toLowerCase() === 'content-security-policy'
+  // No decoding at all: http-equiv values containing "&" are refused outright (assertPlainHttpEquiv).
+  return httpEquiv !== undefined && !httpEquiv.includes('&') && httpEquiv.toLowerCase() === 'content-security-policy'
 }
 
 /**
@@ -168,6 +196,7 @@ function isCspMeta(token: HtmlToken): token is StartTag {
  */
 export function assertWebGameDocumentPolicy(html: string, path: string): ParsedCsp {
   const tokens = tokenizeDocument(html, path)
+  for (const token of tokens) assertPlainHttpEquiv(token, path)
   const cspMetas = tokens.filter(isCspMeta)
   if (cspMetas.length === 0) {
     fail(/content-security-policy/i.test(html)
@@ -225,13 +254,17 @@ function decodeHtmlMember(bytes: Buffer, path: string): string {
  * noframes) is also re-tokenized as markup and held to the same rules, because
  * whether a browser treats it as raw text depends on tree-construction context.
  */
+const MAX_RAW_TEXT_DEPTH = 4
+
 function assertNoActiveHtmlMarkup(tokens: HtmlToken[], path: string, depth: number): void {
   const reject = (what: string) => failCode('GUBIC_HTML_ACTIVE_CONTENT', `Web game document ${path} contains ${what}`)
   for (const token of tokens) {
     if (token.type === 'rawText') {
       if (token.element === 'script') {
         assertNoDynamicCode(token.data, `${path} (inline script)`)
-      } else if (depth < 4 && token.data.includes('<')) {
+      } else if (token.data.includes('<')) {
+        // Fail closed at the nesting cap instead of leaving deeper content unchecked.
+        if (depth >= MAX_RAW_TEXT_DEPTH) failCode('GUBIC_HTML_MALFORMED', `Web game document ${path} nests raw-text markup deeper than ${MAX_RAW_TEXT_DEPTH} levels (<${token.element}>)`)
         assertNoActiveHtmlMarkup(tokenizeDocument(token.data, `${path} (<${token.element}> content)`), path, depth + 1)
       }
       continue
@@ -239,6 +272,7 @@ function assertNoActiveHtmlMarkup(tokens: HtmlToken[], path: string, depth: numb
     if (token.type !== 'startTag') continue
     const {name, attributes} = token
     if (name === 'svg' || name === 'math') reject(`inline <${name}> foreign content (ship artwork as a separate .svg member)`)
+    assertPlainHttpEquiv(token, path)
     if (name === 'meta') {
       const httpEquiv = attributeValue(token, 'http-equiv')
       const keyword = httpEquiv === undefined ? undefined : decodeReferencesForScan(httpEquiv).trim().toLowerCase()
@@ -246,9 +280,9 @@ function assertNoActiveHtmlMarkup(tokens: HtmlToken[], path: string, depth: numb
       if (keyword === 'content-security-policy' && !isCspMeta(token)) reject(`a CSP meta whose http-equiv is padded (${JSON.stringify(httpEquiv)}), which browsers ignore`)
       // Meta refresh navigates without being governed by the CSP.
       if (keyword === 'refresh') reject('a <meta http-equiv=refresh>')
-      if (keyword === 'content-type') assertUtf8Label(/charset\s*=\s*["']?\s*([^\s"';]+)/i.exec(decodeReferencesForScan(attributeValue(token, 'content') ?? ''))?.[1] ?? 'utf-8', path)
+      if (keyword === 'content-type') assertUtf8Label(/charset\s*=\s*["']?\s*([^\s"';]+)/i.exec(decodeAttributeValueOnce(attributeValue(token, 'content') ?? '', false))?.[1] ?? 'utf-8', path)
       const charset = attributeValue(token, 'charset')
-      if (charset !== undefined) assertUtf8Label(decodeReferencesForScan(charset), path)
+      if (charset !== undefined) assertUtf8Label(decodeAttributeValueOnce(charset, false), path)
     }
     if (name === 'script') {
       const type = attributeValue(token, 'type')

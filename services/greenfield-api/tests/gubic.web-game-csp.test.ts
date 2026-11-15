@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto'
 import {gzipSync} from 'node:zlib'
 import {describe, expect, it} from 'vitest'
-import {assertNoRemoteWorkers, assertStaticSvg, assertWebGameDocumentPolicy, isSvgMember, parseCspDirectives, WebGameContentPolicyError} from '../src/gubic/web-game-csp.js'
+import {assertNoRemoteWorkers, decodeAttributeValueOnce, assertStaticSvg, assertWebGameDocumentPolicy, isSvgMember, parseCspDirectives, WebGameContentPolicyError} from '../src/gubic/web-game-csp.js'
 import {verifyWebGameArchive} from '../src/modules/github-release-sync-service.js'
 
 // GUBIC-P1 / Sentinel §16.6: the web-game ingestion CSP gate must parse the
@@ -411,7 +411,8 @@ describe('GUBIC web game content policy (Sentinel §33 residuals)', () => {
     }
     // ASCII case-insensitive and character references are still the same keyword.
     expect(() => verifyWebGameArchive(gameArchive(doc(`<meta http-equiv="content-security-POLICY" content="${STRICT}">`)))).not.toThrow()
-    expect(() => verifyWebGameArchive(gameArchive(doc(`<meta http-equiv="Content&#45;Security-Policy" content="${STRICT}">`)))).not.toThrow()
+    // Any character reference in http-equiv is refused (Sentinel §37 B1), even one a browser would decode to the keyword.
+    expect(fails(gameArchive(doc(`<meta http-equiv="Content&#45;Security-Policy" content="${STRICT}">`)))).toMatch(/GUBIC_HTML_MALFORMED.*character reference in an http-equiv value/)
   })
 
   it('rejects <meta http-equiv=refresh> anywhere', () => {
@@ -492,5 +493,72 @@ describe('GUBIC web game content policy (Sentinel §33 residuals)', () => {
       expect(fails(withMember('a.svg', svg(inner))), inner).toMatch(/GUBIC_SVG_ACTIVE_CONTENT.*data: reference/)
     }
     expect(() => verifyWebGameArchive(withMember('a.svg', svg('<use href="#coin"/><image href="coin.png"/><a href="help.html"><text>?</text></a>')))).not.toThrow()
+  })
+})
+
+// Sentinel §37 (#188 re-cert).
+describe('GUBIC web game content policy (Sentinel §37)', () => {
+  const csp = meta(STRICT)
+  const fails = (archive: Buffer) => {
+    try {
+      verifyWebGameArchive(archive)
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error('expected the archive to be rejected')
+  }
+
+  it('B1: refuses double-encoded http-equiv values that a browser decodes once to no CSP', () => {
+    for (const equiv of ['Content&amp;#45;Security-Policy', 'Content&#38;#45;Security-Policy', 'Content&#x26;#45;Security-Policy', 'Content&amp;#x2d;Security&amp;#x2d;Policy']) {
+      const html = doc(`<meta http-equiv="${equiv}" content="${STRICT}">`, '<script>fetch("https://evil.example")</script>')
+      expect(fails(gameArchive(html)), equiv).toMatch(/GUBIC_HTML_MALFORMED.*character reference in an http-equiv value/)
+      // Also when a real CSP is present, and on non-meta elements or inside raw text.
+      expect(fails(gameArchive(doc(csp, `<p http-equiv="${equiv}"></p>`))), equiv).toMatch(/character reference in an http-equiv value/)
+      expect(fails(gameArchive(doc(csp, `<noscript><meta http-equiv="${equiv}"></noscript>`))), equiv).toMatch(/character reference in an http-equiv value/)
+    }
+  })
+
+  it('R3: decodes the CSP content exactly once', () => {
+    expect(decodeAttributeValueOnce('&amp;#45;', true)).toBe('&#45;')
+    expect(decodeAttributeValueOnce('&#x26;#59;', true)).toBe('&#59;')
+    expect(decodeAttributeValueOnce('&#39;self&#39;&lt;', true)).toBe("'self'<")
+    expect(() => decodeAttributeValueOnce('a&nbsp;b', true)).toThrow(/unsupported character reference/)
+    expect(() => decodeAttributeValueOnce('a &amp b', true)).toThrow(/unsupported character reference/)
+    // "&#x26;#59;" must not become a ";" directive separator; it stays the literal "&#59;" and the policy fails.
+    const doubled = STRICT.replace("connect-src 'none'; ", "connect-src 'none'&#x26;#59; ")
+    expect(fails(gameArchive(doc(meta(doubled))))).toMatch(/connect-src|Web game CSP/)
+    expect(() => verifyWebGameArchive(gameArchive(doc(meta(STRICT.replace(/;/g, '&#59;')))))).not.toThrow()
+  })
+
+  it('R1: refuses raw-text nesting at the depth cap instead of leaving it unchecked', () => {
+    const nest = (inner: string) => `<select><style><xmp><noembed><noframes><iframe><input>${inner}</iframe></noframes></noembed></xmp></style></select>`
+    for (const payload of ['<img src=x onerror=alert(1)>', '<script src="https://evil.example/x.js"></script>', '<meta http-equiv="refresh" content="0;url=https://evil.example">',
+      '<a href="javascript:alert(1)">x</a>', '<iframe srcdoc="<script>alert(1)</script>"></iframe>']) {
+      expect(fails(gameArchive(doc(csp, nest(payload)))), payload).toMatch(/GUBIC_HTML_MALFORMED.*nests raw-text markup deeper than 4 levels/)
+    }
+    // Within the cap the payload is found by the re-scan itself.
+    expect(fails(gameArchive(doc(csp, '<select><style><xmp><img src=x onerror=alert(1)></xmp></style></select>')))).toMatch(/onerror on <img>/)
+    // Deep raw text without markup is fine.
+    expect(() => verifyWebGameArchive(gameArchive(doc(csp, '<style>canvas { color: red }</style><script src="main.js"></script>')))).not.toThrow()
+  })
+
+  it('M18: treats <noscript> as raw text and re-checks it', () => {
+    expect(fails(gameArchive(doc(csp, '<noscript><p title="</noscript><img src=x onerror=alert(1)>"></noscript>')))).toMatch(/GUBIC_HTML_/)
+    expect(fails(gameArchive(doc(csp, '<noscript></noscript><img src=x onerror=alert(1)>')))).toMatch(/onerror on <img>/)
+  })
+
+  it('M7: refuses junk on a raw-text end tag such as </script x>', () => {
+    for (const end of ['</script x>', '</script/>', '</script x=1>', '</style junk>', '</title/>']) {
+      const element = /<\/(\w+)/.exec(end)![1]!
+      const body = `<${element}>ok</${end.slice(2)}<p>benign</p><script src="main.js"></script>`
+      expect(fails(gameArchive(doc(csp, body))), end).toMatch(new RegExp(`GUBIC_HTML_MALFORMED.*malformed </${element}> end tag`))
+    }
+    expect(() => verifyWebGameArchive(gameArchive(doc(csp, '<script src="main.js"></script \t><p>benign</p>')))).not.toThrow()
+  })
+
+  it('M26: the raw-text charset scan catches declarations the tag check cannot see', () => {
+    // The encoding prescan ignores element context, so a charset inside script text still counts.
+    expect(fails(gameArchive(doc(csp, '<script>/* <meta charset="iso-2022-jp"> */</script><script src="main.js"></script>')))).toMatch(/non-UTF-8 encoding \(iso-2022-jp\)/)
+    expect(fails(gameArchive(doc(csp, '<script>var x = "text/html; charset=shift_jis"</script>')))).toMatch(/non-UTF-8 encoding \(shift_jis\)/)
   })
 })
