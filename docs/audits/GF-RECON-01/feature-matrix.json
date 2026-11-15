@@ -1,0 +1,1048 @@
+{
+  "mission": "GF-RECON-01",
+  "auditDate": "2026-11-13",
+  "repos": {
+    "modula-latest": "a91d490e61ebfff38069378ddf757429eb000449",
+    "modula-native": "5db0f027dd29c6a877b04aa98e0b457ee2b82e2d",
+    "modula-vault-notes": "15bf535785cb544fed40fb440499b7081fa89e93"
+  },
+  "runtime": {
+    "liveVpsRevision": "UNKNOWN",
+    "migrationLedger": "UNKNOWN",
+    "backupState": "UNKNOWN",
+    "flags": "UNKNOWN",
+    "workerImage": "UNKNOWN"
+  },
+  "masterPlanAvailable": false,
+  "nextFreeMigration": "091",
+  "sourceMigrationTip": "090_calls_v1",
+  "statusVocabulary": [
+    "NOT FOUND",
+    "SOURCE PRESENT",
+    "PR ONLY",
+    "CI VERIFIED",
+    "STAGING VERIFIED",
+    "DEVICE VERIFIED",
+    "RELEASE READY",
+    "RELEASED",
+    "INTENTIONALLY DISABLED",
+    "HISTORIC CLAIM NEEDS RECHECK"
+  ],
+  "features": [
+    {
+      "id": "F01",
+      "feature": "Core identity, sessions, MFA, passkeys, Apple auth",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/auth",
+        "services/greenfield-api/src/authentication",
+        "services/greenfield-api/src/accounts",
+        "services/greenfield-api/src/sessions"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "CI: api:test (non-DB) + typecheck green on a91d490e; DB-gated auth suites not individually confirmed in CI log (UNVERIFIED)",
+      "missingAcceptance": "Sign-up\u2192recover\u2192deletion/export across restarts; revoked-session denial on staging; current deployed flags (UNKNOWN)",
+      "dependency": "GF-OPS-01 runtime snapshot",
+      "owner": "Synapse",
+      "notes": ""
+    },
+    {
+      "id": "F02",
+      "feature": "Profiles, posts, feed, comments, follows, reactions, reports",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/domains",
+        "services/greenfield-api/src/app/register-routes.ts:1482",
+        "services/greenfield-api/src/app/register-phase6s-routes.ts:199"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "CI: api-fix-01.follow-privacy, api-baseline-02.security-acceptance, phase7e.notifications run with Postgres in migration-validation job",
+      "missingAcceptance": "Cross-user object authz, follower-only visibility on staging, stable pagination (discover still fixed-limit, see G023), feed mode validation (G020), link/poll persistence (G012)",
+      "dependency": "GF-EDGE-01",
+      "owner": "Forge",
+      "notes": ""
+    },
+    {
+      "id": "F03",
+      "feature": "Messaging v3 (backend)",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-messaging-routes.ts",
+        "services/greenfield-api/src/domains/messaging/realtime-hub.ts:6",
+        "services/greenfield-api/migrations/089_messaging_v3.sql",
+        "services/greenfield-api/tests/messaging-v3.integration.test.ts"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "Migration 089 applied in CI full-chain test (api-fix-01.migration.test.ts:126-143). messaging-v3.integration.test.ts is DB-gated (describe.skip without MODULA_TEST_DATABASE_URL) and is NOT in the migration-validation job list \u2192 not CI-executed (UNVERIFIED)",
+      "missingAcceptance": "Run messaging-v3 integration in disposable Postgres; cross-account E2E with receipts/groups/attachments/presence/reconnect; single-instance fan-out (realtime-hub.ts:6, capabilities singleInstance:true at register-messaging-routes.ts:320) forbids >1 API replica",
+      "dependency": "GF-MSG-01",
+      "owner": "Forge",
+      "notes": ""
+    },
+    {
+      "id": "F04",
+      "feature": "Messaging v3 native wiring",
+      "repo": "modula-mod/modula-native",
+      "paths": [
+        "ios/Modula/Features/Messages/MessageModels.swift:268-283",
+        "ios/Modula/Features/Messages/MessagingRealtime.swift"
+      ],
+      "ref": "PR #296 head 72c0a368",
+      "status": "PR ONLY",
+      "severity": "P1",
+      "testEvidence": "PR body: MessagingV3ContractTests 86 passed (Mac-local, focused). All 13 new v3 paths match backend routes (path-level scan)",
+      "missingAcceptance": "Live-server behaviour unverified (PR body); stacked on #295\u2192#294\u2192#293; Prism certification of cumulative stack",
+      "dependency": "GF-REG-01, GF-MSG-01",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F05",
+      "feature": "Inbox UX & folders (local archive, hidden chats, folders, timed mute)",
+      "repo": "modula-mod/modula-native",
+      "paths": [
+        "ios/Modula/Features/Messages (MessagingInboxTools)"
+      ],
+      "ref": "PR #295 head 8805174a",
+      "status": "PR ONLY",
+      "severity": "P2",
+      "testEvidence": "PR body: focused unit tests 86/0 on simulator; no UI or network tests",
+      "missingAcceptance": "Separate local-privacy folders from server-synced semantics; biometric hidden chats + cache isolation tests",
+      "dependency": "GF-REG-01",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F06",
+      "feature": "1:1 calls (backend)",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-calls-routes.ts:144-286",
+        "services/greenfield-api/src/domains/calls/{service,policy,signalling-hub}.ts",
+        "services/greenfield-worker/src/push/voip.ts",
+        "services/greenfield-api/migrations/090_calls_v1.sql",
+        "services/greenfield-api/src/config/env.ts:148"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "INTENTIONALLY DISABLED",
+      "severity": "P1",
+      "testEvidence": "Migration 090 applied in CI full chain (migration-ledger test expects 090_calls_v1). calls.unit.test.ts runs in api:test; calls.integration.test.ts DB-gated (describeIfDb) and NOT in the CI DB job list \u2192 UNVERIFIED",
+      "missingAcceptance": "MODULA_CALLS_ENABLED defaults off (env.ts:148, disabled reason env.ts:615). Coturn/APNs provisioning, wss nginx, two-device media + PushKit/CallKit; multi-replica signalling not implemented (signalling-hub.ts:15 requires Redis pub/sub)",
+      "dependency": "GF-CALL-01, GF-CALL-02",
+      "owner": "Forge",
+      "notes": "Source present but off by default; not a bug."
+    },
+    {
+      "id": "F07",
+      "feature": "Coturn / TURN deployment",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "ops/docker/compose.calls.yml",
+        "ops/coturn/turnserver.conf.template",
+        "docs/ops/calls-coturn.md:3"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "None \u2014 runbook states \"documented, not deployed\" (calls-coturn.md:3)",
+      "missingAcceptance": "Isolated staging Coturn DNS/TLS/UDP/TCP relay, external TURN relay test; compose.calls.yml not in automated deploy",
+      "dependency": "GF-CALL-02",
+      "owner": "Mosaic",
+      "notes": ""
+    },
+    {
+      "id": "F08",
+      "feature": "Native call UX / WebRTC transport / CallKit+PushKit",
+      "repo": "modula-mod/modula-native",
+      "paths": [
+        "ios/Modula/Features/Calls/CallManager.swift",
+        "CallMediaEngine.swift",
+        "CallModels.swift:295",
+        "CallRepository.swift:13-27",
+        "CallSignallingClient.swift",
+        "CallViews.swift",
+        "ios/ModulaTests/CallTests.swift"
+      ],
+      "ref": "PR #297 head c379ee21",
+      "status": "PR ONLY",
+      "severity": "P1",
+      "testEvidence": "PR body: CallTests pass (86/0 overall) Mac-local; all 9 call paths match backend routes",
+      "missingAcceptance": "\"A real call has not been placed: VoIP push delivery and media are unverified\" (PR body); new SPM dependency stasel/WebRTC 156.0.0 needs fresh dependency approval",
+      "dependency": "GF-CALL-03, GF-CALL-04",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F09",
+      "feature": "Group voice/video calls",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-calls-routes.ts:38 (maxParticipants: 2)"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "NOT FOUND",
+      "severity": "P3",
+      "testEvidence": "n/a",
+      "missingAcceptance": "Separate multiparty/SFU design + cost/privacy gate; defer until 1:1 DEVICE VERIFIED",
+      "dependency": "F06, F08",
+      "owner": "Forge",
+      "notes": "Not in 1:1 contract by design."
+    },
+    {
+      "id": "F10",
+      "feature": "Stories and DM replies",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-phase7f-stories-routes.ts",
+        "services/greenfield-api/src/app/register-messaging-routes.ts"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P2",
+      "testEvidence": "phase7i.f5-stories.test.ts (historic G018 evidence); native #298 adds /v1/stories/:id/replies and DELETE /v1/stories/items/:id (both match backend)",
+      "missingAcceptance": "Offline, blocked user, expiry, deleted story, duplicate reply, push and native journey checks",
+      "dependency": "GF-MSG-01",
+      "owner": "Forge",
+      "notes": ""
+    },
+    {
+      "id": "F11",
+      "feature": "Communities",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-communities-routes.ts",
+        "services/greenfield-api/migrations/086_greenfield_communities.sql"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P2",
+      "testEvidence": "Migration in CI chain; native community client paths match backend (contracts scan); native NATIVE-03 adoption only in codex PR #264 (unmerged)",
+      "missingAcceptance": "Native member/moderation lifecycle E2E; server authority across sessions",
+      "dependency": "codex chain disposition",
+      "owner": "Forge",
+      "notes": ""
+    },
+    {
+      "id": "F12",
+      "feature": "Collections / drafts",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-collections-drafts-routes.ts",
+        "services/greenfield-api/migrations/087_greenfield_collections_and_drafts.sql"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P2",
+      "testEvidence": "Migration in CI chain; native sync only in codex PR #265 (unmerged)",
+      "missingAcceptance": "Cross-device sync, idempotency/owner enforcement, offline drafts, publish exactly once",
+      "dependency": "codex chain disposition",
+      "owner": "Forge",
+      "notes": ""
+    },
+    {
+      "id": "F13",
+      "feature": "Moliboo content/packs/game",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/app/register-moliboo-routes.ts",
+        "services/greenfield-api/src/app/register-moliboo-game-routes.ts",
+        "services/greenfield-api/migrations/084_moliboo_signed_packs.sql"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P2",
+      "testEvidence": "Native: Prism cert3 97 MOL unit cases 0 failed on trial merges (Mac-local, pre-#289 merge); MOL01\u2013MOL03 UI tests 20 FAILED/INCOMPLETE (20-min cap) \u2014 no baseline",
+      "missingAcceptance": "Verified content/art digest, wardrobe sync, native 2D visual regression (Moliboo unchanged not yet confirmed), rollback",
+      "dependency": "GF-REG-01",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F14",
+      "feature": "Premium / StoreKit",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/premium/apple-service.ts",
+        "services/greenfield-api/src/premium/apple-verifier.ts",
+        "services/greenfield-api/migrations/088_greenfield_premium_apple_sandbox.sql"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "Migration in CI chain; native StoreKit sandbox flow only in codex PR #267 (unmerged, \"Apple gate blocked\")",
+      "missingAcceptance": "Real Apple sandbox purchase, server notification, restore/revoke/expiry; no live proof",
+      "dependency": "GF-PREM-01",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F15",
+      "feature": "Module install / publisher / MPS / registry",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/modules",
+        "services/greenfield-api/src/publisher",
+        "services/greenfield-api/src/modules/github-release-sync-service.ts:260,284"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "registry-trust.trust-block, registry-trust.signing, module-version-switch run with Postgres in CI",
+      "missingAcceptance": "Public artifact + presentation bytes coverage (G003/G004 runtime UNKNOWN), legacy descriptors (G028), Vault special-casing (G027)",
+      "dependency": "GF-MOD-01",
+      "owner": "Mosaic",
+      "notes": ""
+    },
+    {
+      "id": "F16",
+      "feature": "Online signing (Vault Transit signer)",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/migrations/089_greenfield_online_signing_authority.sql (PR only)",
+        "services/greenfield-api/src/publisher/signing-provider.ts (PR only)"
+      ],
+      "ref": "PR #165 head 1bfdde97 base 0840c736",
+      "status": "PR ONLY",
+      "severity": "P0",
+      "testEvidence": "PR CI green only against stale base 0840c736 (run 42912880580). GitHub now: mergeable=false, mergeable_state=dirty, rebaseable=false. Local merge-tree vs a91d490e: 14 conflicting files",
+      "missingAcceptance": "Rebase/renumber to 091, regenerate Atlas, isolated Vault+Postgres acceptance, Sentinel review, key governance",
+      "dependency": "GF-SIGN-01",
+      "owner": "Synapse",
+      "notes": "Migration-id collision: 089_greenfield_online_signing_authority sorts BEFORE 089_messaging_v3 lexically (migrate.ts:31-41 sorts by filename) \u2192 on any DB already at 090 it would apply out of order."
+    },
+    {
+      "id": "F17",
+      "feature": "Vault Notes module",
+      "repo": "modula-mod/modula-vault-notes",
+      "paths": [
+        "frontend/",
+        "modula.product.json (2.1.0-rc.4)"
+      ],
+      "ref": "15bf535785cb544fed40fb440499b7081fa89e93",
+      "status": "SOURCE PRESENT",
+      "severity": "P2",
+      "testEvidence": "CI vault-notes job success on 15bf5357. #19 merged; #22 merged (2.1.0-rc.4, 26 reachable routes). #21 open, mergeable=false, 28 conflicting files vs main, version 2.0.3 < main 2.1.0-rc.4 \u2014 likely superseded by #22 (needs confirmation)",
+      "missingAcceptance": "Host navigation metadata, folder/tag filterParam, settings writes, function calls in native/GreenField hosts; signed package lifecycle; no fabricated UI success",
+      "dependency": "GF-VAULT-01",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F18",
+      "feature": "AI provider routing / gateway",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/ai/providers/resolver.ts:40-70",
+        "services/greenfield-api/src/ai/gateway-service.ts",
+        "services/greenfield-api/src/intelligence/provider-selection.ts:11"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "verify:phase7e-ai-* scripts exist; not executed in this audit",
+      "missingAcceptance": "Real provider configuration (runtime UNKNOWN); provider-selection.ts:11 still states no Nodus-backed provider registered",
+      "dependency": "GF-AI-01",
+      "owner": "Synapse",
+      "notes": ""
+    },
+    {
+      "id": "F19",
+      "feature": "GAIA / Nodus / MAR",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "packages/intelligence-governance/src/gaia.ts:17",
+        "packages/mar-runtime/src/testing/registered-capability-planner.ts:10",
+        "packages/mar-runtime/src/runtime.ts"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "Intelligence governance tests run in CI repository-validation",
+      "missingAcceptance": "Only DeterministicTestPlanner and a testing planner implement GaiaPlanner \u2014 no operational planner; no Nodus backend route though native calls /v1/intelligence/nodus/releases/latest (NodusRelease.swift:141)",
+      "dependency": "GF-AI-01",
+      "owner": "Synapse",
+      "notes": ""
+    },
+    {
+      "id": "F20",
+      "feature": "Connector OAuth / webhooks",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/connectors/provider-metadata.ts:60,86,107,127,183",
+        "services/greenfield-api/src/modules/routes/index.ts:1717"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P2",
+      "testEvidence": "n/a",
+      "missingAcceptance": "Metadata advertises webhook support for 5 providers but no connector webhook ingress route exists (only module backend webhook /v1/modules/:id/backend/webhooks/modula). Implement signed replay-safe ingress or set supported:false",
+      "dependency": "GF-EDGE-01",
+      "owner": "Synapse",
+      "notes": ""
+    },
+    {
+      "id": "F21",
+      "feature": "Media storage, backups, restore",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/domains/attachments/service.ts",
+        "ops/backup/greenfield-v1-backup.mjs:9",
+        "ops/backup/restore-test.sh",
+        "docs/operations/greenfield-spof-register.md:11"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P0",
+      "testEvidence": "Backup role pg_dump validation runs in CI; age-encrypted local backup to /var/backups/modula/greenfield-v1 (backup.mjs:9). No off-host destination in source",
+      "missingAcceptance": "Off-host encrypted copy + clean restore drill; live backup state UNKNOWN; SPOF register (2026-10-15) says backup destination \"No while all copies remain on the VPS\"",
+      "dependency": "GF-OPS-01, GF-OPS-02",
+      "owner": "Sentinel",
+      "notes": ""
+    },
+    {
+      "id": "F22",
+      "feature": "Push / notifications (APNs alert + VoIP)",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-worker/src/push/apns.ts",
+        "services/greenfield-worker/src/push/dispatch.ts",
+        "services/greenfield-worker/src/push/quiet-hours.ts",
+        "services/greenfield-worker/src/push/voip.ts"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "worker:test in CI",
+      "missingAcceptance": "APNs test delivery/expiry/quiet-hours; VoIP separate delivery; production deployment UNKNOWN",
+      "dependency": "GF-CALL-02",
+      "owner": "Mosaic",
+      "notes": ""
+    },
+    {
+      "id": "F23",
+      "feature": "Metrics, health, runbooks, release pin",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-api/src/domains/system/health.ts:17",
+        "ops/docker/compose.production.yml:59,79,112,132",
+        "ops/deploy/greenfield-production.sh:74,155"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "SOURCE PRESENT",
+      "severity": "P1",
+      "testEvidence": "deploy-safety verifier runs in CI",
+      "missingAcceptance": "compose.production.yml default SOURCE_EXPECTED_MIGRATION=076_greenfield_premium_entitlements (source tip 090); deploy script requires explicit --expected-migration but default is misleading; worker has no Docker healthcheck (G033)",
+      "dependency": "GF-OPS-01",
+      "owner": "Sentinel",
+      "notes": ""
+    },
+    {
+      "id": "F24",
+      "feature": "AT Protocol bridge",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "services/greenfield-bridges/atproto",
+        "services/greenfield-api/src/config/env.ts:56,429"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "INTENTIONALLY DISABLED",
+      "severity": "P3",
+      "testEvidence": "n/a",
+      "missingAcceptance": "MODULA_ATPROTO_ENABLED gated; optional interop only, not GreenField federation",
+      "dependency": "none",
+      "owner": "Mosaic",
+      "notes": ""
+    },
+    {
+      "id": "F25",
+      "feature": "DIMON",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "packages/dimon-contracts/src"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "INTENTIONALLY DISABLED",
+      "severity": "P3",
+      "testEvidence": "n/a",
+      "missingAcceptance": "Contracts only; D15\u2013D17 need separate legal/security approval",
+      "dependency": "gated team",
+      "owner": "Sentinel",
+      "notes": ""
+    },
+    {
+      "id": "F26",
+      "feature": "Node discovery / portable identity / federation / migration (D00\u2013D14)",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "(none) \u2014 full-tree scan of a91d490e: no /v1 node, federation, peer, principal or delegation routes; no packages/greenfield-{identity,events,federation,node-sdk}; no docs/protocol or docs/threat-model"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "NOT FOUND",
+      "severity": "P2",
+      "testEvidence": "n/a",
+      "missingAcceptance": "Entire D00\u2013D14 programme. Existing: packages/greenfield-protocol (canonical-json, event-envelope, checkpoint, record-envelope) and outbox_events table (001_init_schema.sql:182) \u2014 intra-server primitives only",
+      "dependency": "GF-D00-01 \u2026 GF-D05-01",
+      "owner": "Forge",
+      "notes": ""
+    },
+    {
+      "id": "F27",
+      "feature": "GreenField Experience Atlas screens (GF-UI-01\u201312, Part XI services)",
+      "repo": "modula-mod/modula-native",
+      "paths": [
+        "(none) \u2014 no CurrentNodeService/NodeDirectoryService/MigrationPlanningService in native or backend"
+      ],
+      "ref": "5db0f027dd29c6a877b04aa98e0b457ee2b82e2d",
+      "status": "NOT FOUND",
+      "severity": "P2",
+      "testEvidence": "n/a",
+      "missingAcceptance": "Part XI contracts must be frozen first; demo fixtures must be gated and labelled",
+      "dependency": "F26, Part XI freeze",
+      "owner": "Prism",
+      "notes": ""
+    },
+    {
+      "id": "F28",
+      "feature": "Native main baseline",
+      "repo": "modula-mod/modula-native",
+      "paths": [
+        "ios/",
+        ".github/workflows/native-boundaries.yml"
+      ],
+      "ref": "5db0f027dd29c6a877b04aa98e0b457ee2b82e2d",
+      "status": "CI VERIFIED",
+      "severity": "P1",
+      "testEvidence": "GitHub Actions run 43412276140 on 5db0f027: boundary-and-runtime = success (Ubuntu: verify:boundary, verify:design, typecheck, npm test \u2014 NO Xcode build/XCTest in CI); Prism cert3 (Mac-local, trial base 474573c): ModulaTests 713\u2013720 executed / 0 failed per PR #282\u2013#289; device build of #289 exit 0",
+      "missingAcceptance": "CI does not build iOS. UI tests on #289: 5 passed, 20 failed, run INCOMPLETE (20-min cap); no UI baseline on main; Moliboo visual unchanged NOT confirmed; main has since moved to 5db0f027 (merges of #282\u2013#289 + #292) \u2014 no post-merge Xcode run recorded",
+      "dependency": "GF-REG-01",
+      "owner": "Prism",
+      "notes": "CI VERIFIED applies only to the Ubuntu boundary/typecheck/JS checks."
+    },
+    {
+      "id": "F29",
+      "feature": "GreenField backend main baseline",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        ".github/workflows/api-atlas-contract-drift.yml"
+      ],
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449",
+      "status": "CI VERIFIED",
+      "severity": "P1",
+      "testEvidence": "GitHub Actions run 42937914326 on a91d490e: atlas, migration-validation, repository-validation = success (2026-11-11 01:18\u201301:24 UTC)",
+      "missingAcceptance": "Live VPS revision, migration ledger, worker image, flags, backup state: UNKNOWN (no runtime access in this mission)",
+      "dependency": "GF-OPS-01",
+      "owner": "Sentinel",
+      "notes": "CI VERIFIED = GitHub Actions only; no staging/production evidence."
+    },
+    {
+      "id": "F30",
+      "feature": "Live production runtime (VPS revision, migration ledger, flags, backups, DNS/nginx)",
+      "repo": "modula-mod/modula-latest",
+      "paths": [
+        "docs/audits/api-atlas-01/00-production-truth.md (dated 2026-10-14)",
+        "docs/audits/greenfield-feature-reality-01/FEATURE-REALITY-BASELINE.md (2026-10-31)"
+      ],
+      "ref": "UNKNOWN",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "severity": "P0",
+      "testEvidence": "None this mission \u2014 read-only runtime access unavailable",
+      "missingAcceptance": "Capture live SHA, schema_migrations tip, worker image digest, flags, off-host backup + restore status read-only",
+      "dependency": "GF-OPS-01",
+      "owner": "Sentinel",
+      "notes": "Historic snapshots said prod migration 073 / 075; treat as stale."
+    }
+  ],
+  "historicGaps": [
+    {
+      "id": "API-ATLAS-GAP-003",
+      "severity": "P1",
+      "title": "Registry artifact availability (2/14 historic)",
+      "recomputed": "RUNTIME RECHECK",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "Source guard partial: github-release-sync-service.ts:260,284 rejects missing/mismatched artifacts on new ingest; no backfill evidence; production coverage UNKNOWN",
+      "testEvidence": "none this mission",
+      "missingAcceptance": "Read-only prod count of releases with retrievable bytes; backfill or block installability",
+      "owner": "Mosaic",
+      "mission": "GF-MOD-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-004",
+      "severity": "P1",
+      "title": "Presentation assets metadata without blob (7/17 historic)",
+      "recomputed": "RUNTIME RECHECK",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "registry-presentation-service.ts:57,93 leftJoin asset blobs (absence tolerated at read); production coverage UNKNOWN",
+      "testEvidence": "none",
+      "missingAcceptance": "Ingestion must require blob; backfill/remove broken metadata",
+      "owner": "Mosaic",
+      "mission": "GF-MOD-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-007",
+      "severity": "P1",
+      "title": "No operational AI provider",
+      "recomputed": "STILL OPEN IN SOURCE (config) / RUNTIME UNKNOWN",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "provider-selection.ts:11 \"No Nodus-backed provider is registered. DeterministicTestProvider is a test adapter\"; resolver.ts filters disabled/dev-mock providers",
+      "testEvidence": "none",
+      "missingAcceptance": "Governed real/local provider configured on staging + gateway acceptance",
+      "owner": "Synapse",
+      "mission": "GF-AI-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-008",
+      "severity": "P1",
+      "title": "GAIA planner is acceptance-fixture only",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "Only DeterministicTestPlanner (gaia.ts:17) and testing/registered-capability-planner.ts:10 implement GaiaPlanner",
+      "testEvidence": "intelligence-governance tests (CI)",
+      "missingAcceptance": "Provider-backed or Nodus planner behind governed proposal contract",
+      "owner": "Synapse",
+      "mission": "GF-AI-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-009",
+      "severity": "P1",
+      "title": "No Nodus adapter / local-client contract",
+      "recomputed": "STILL OPEN IN SOURCE + NEW CONTRACT DRIFT",
+      "status": "NOT FOUND",
+      "evidence": "No backend /v1/intelligence/nodus/* route; native main calls /v1/intelligence/nodus/releases/latest (ios/Modula/Core/Intelligence/Nodus/NodusRelease.swift:141)",
+      "testEvidence": "none",
+      "missingAcceptance": "Define local-first Nodus contract; add route or remove native default path",
+      "owner": "Synapse",
+      "mission": "GF-AI-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-012",
+      "severity": "P1",
+      "title": "Link/poll composer not persisted",
+      "recomputed": "STILL OPEN (backend) / native capability-gated",
+      "status": "INTENTIONALLY DISABLED",
+      "evidence": "No poll/link fields in services/greenfield-api/src/domains/posts/writes.ts; polls exist only for communities and comments (PUT /v1/comments/:id/poll/vote). Native CreationCapabilities.swift:9-11 defaults linkPost/pollPost=false (\"Link posts aren\u2019t available yet\")",
+      "testEvidence": "none",
+      "missingAcceptance": "Either keep disabled with capability contract test, or implement validated persistence",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-013",
+      "severity": "P1",
+      "title": "Legacy inline post media vs nginx 1m body limit",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "post-media-storage.ts:51 decodes base64 inline media, :118 mediaUploadMaxBytes; ops/nginx/api.modula.digital.greenfield.conf:12 1m default",
+      "testEvidence": "none",
+      "missingAcceptance": "Retire inline media for attachment upload or scope edge limit; live nginx UNKNOWN",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-014",
+      "severity": "P1",
+      "title": "Single-host media/backup durability",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "Backups age-encrypted to /var/backups/modula/greenfield-v1 (ops/backup/greenfield-v1-backup.mjs:9); no off-host destination in source; spof-register.md:11",
+      "testEvidence": "backup role pg_dump CI step",
+      "missingAcceptance": "Off-host encrypted copy + restore drill; live state UNKNOWN",
+      "owner": "Sentinel",
+      "mission": "GF-OPS-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-015",
+      "severity": "P1",
+      "title": "Signed automated registry ingestion disabled/no source",
+      "recomputed": "INTENTIONALLY DISABLED (flag) / RUNTIME UNKNOWN",
+      "status": "INTENTIONALLY DISABLED",
+      "evidence": "services/greenfield-worker/src/config.ts:78,249 GREENFIELD_MODULE_GITHUB_SYNC_ENABLED default false",
+      "testEvidence": "none",
+      "missingAcceptance": "Reviewed sync source + repository\u2192published convergence with signature/artifact gates on staging",
+      "owner": "Mosaic",
+      "mission": "GF-MOD-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-016",
+      "severity": "P2",
+      "title": "Route JSON request/response schemas",
+      "recomputed": "PARTIALLY FIXED IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "64 `schema: {` occurrences in services/greenfield-api/src (messaging and calls routes use schemas, e.g. register-messaging-routes.ts:32); majority of ~615 routes still schema-less",
+      "testEvidence": "api:atlas:verify (CI)",
+      "missingAcceptance": "Incremental schemas at trust-boundary/mutating routes",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-019",
+      "severity": "P2",
+      "title": "Profile media dual pathways",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "profiles/writes.ts:344-346 still accept avatarUri/coverUri via normalizeMediaUri",
+      "testEvidence": "none",
+      "missingAcceptance": "Require owned attachment binding",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-020",
+      "severity": "P2",
+      "title": "Feed mode silent fallback",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "register-routes.ts:1487 mode = any string; :1493 unknown \u2192 modules-chrono-v1",
+      "testEvidence": "none",
+      "missingAcceptance": "Validate FeedMode enum (400 on unknown)",
+      "owner": "Forge",
+      "mission": "GF-EDGE-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-021",
+      "severity": "P2",
+      "title": "Private attachment unknown-ID oracle",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "register-attachment-routes.ts:100/204 NOT_FOUND vs :202 FORBIDDEN \"Attachment unavailable\"",
+      "testEvidence": "none",
+      "missingAcceptance": "Uniform not-found + shape/timing test",
+      "owner": "Sentinel",
+      "mission": "GF-EDGE-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-022",
+      "severity": "P2",
+      "title": "Social counter races",
+      "recomputed": "PARTIALLY FIXED IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "Fixed: reactions atomic SQL (reactions/service.ts:38-81); follows advisory lock (profiles/writes.ts:549). Open: comments read post outside trx (comments/service.ts:183) then set reply_count: post.reply_count + 1 (:236)",
+      "testEvidence": "phase7e.notifications concurrency tests (reactions)",
+      "missingAcceptance": "Atomic increment for comment reply_count + concurrency test",
+      "owner": "Forge",
+      "mission": "GF-EDGE-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-023",
+      "severity": "P2",
+      "title": "Discover/activity pagination and N+1",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "discovery/repository.ts:40 .limit(24), :77 .limit(30), no cursor",
+      "testEvidence": "none",
+      "missingAcceptance": "Cursor pagination + batch hydration",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-024",
+      "severity": "P2",
+      "title": "No realtime social/push surface",
+      "recomputed": "PARTIALLY FIXED IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "New since register: GET /v1/messaging/socket (register-messaging-routes.ts:504), calls signalling ws (register-calls-routes.ts:288), worker APNs/VoIP push; still single-instance; no realtime for comments/social (native polls 25 s per #298)",
+      "testEvidence": "unit tests only",
+      "missingAcceptance": "Define polling guarantees for social; shared pub/sub before multi-replica",
+      "owner": "Forge",
+      "mission": "GF-MSG-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-025",
+      "severity": "P2",
+      "title": "Connector webhook ingress advertised but absent",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "provider-metadata.ts:60,86,107,127,183 supported:true; no connector webhook route in 615-route scan",
+      "testEvidence": "none",
+      "missingAcceptance": "Signed replay-safe ingress or supported:false",
+      "owner": "Synapse",
+      "mission": "GF-EDGE-03",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-026",
+      "severity": "P2",
+      "title": "No-op worker jobs",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "services/greenfield-worker/src/jobs/runner.ts:97-114 module.* lifecycle events `break` with no side effect",
+      "testEvidence": "none",
+      "missingAcceptance": "Stop enqueueing or implement consumers with checkpoint audit",
+      "owner": "Forge",
+      "mission": "GF-EDGE-03",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-027",
+      "severity": "P2",
+      "title": "Vault Notes hard-coded in core",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "services/greenfield-api/src/ai/product-action-service.ts:23 VAULT_NOTES_MODULE_ID and Vault-specific prompt/context builders (:53-:614)",
+      "testEvidence": "verify:mp02b-vault-special-cases gate in CI (passes \u2014 gate scope may not cover AI path)",
+      "missingAcceptance": "Move into manifest/action declarations",
+      "owner": "Mosaic",
+      "mission": "GF-VAULT-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-028",
+      "severity": "P2",
+      "title": "Legacy install descriptor backfill (6/36 historic)",
+      "recomputed": "RUNTIME RECHECK",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "install-descriptor-service.ts present; production plan counts UNKNOWN",
+      "testEvidence": "none",
+      "missingAcceptance": "Read-only count + backfill/versioning",
+      "owner": "Mosaic",
+      "mission": "GF-MOD-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-030",
+      "severity": "P2",
+      "title": "profile_links read without write API",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "profiles/repository.ts:86,247 read only; no insertInto/updateTable(profile_links) in services/",
+      "testEvidence": "none",
+      "missingAcceptance": "Link CRUD or retire table",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-031",
+      "severity": "P2",
+      "title": "Duplicate/legacy routes",
+      "recomputed": "PARTIALLY FIXED IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "POST /v1/accounts/sessions no longer registered; legacy inline post media (post-media-storage.ts:29-52) still overlaps POST /v1/attachments/uploads",
+      "testEvidence": "api:atlas:verify",
+      "missingAcceptance": "Declare canonical, instrument, deprecate",
+      "owner": "Forge",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-032",
+      "severity": "P2",
+      "title": "Incomplete nginx\u2192worker trace propagation",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "Only search/index.ts:125 and digests.ts:162 carry correlation IDs; no generic job trace propagation",
+      "testEvidence": "none",
+      "missingAcceptance": "Propagate trace IDs into jobs + edge logs",
+      "owner": "Sentinel",
+      "mission": "GF-OPS-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-033",
+      "severity": "P2",
+      "title": "Worker Docker healthcheck",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "ops/docker/compose.production.yml healthchecks only for postgres (:22), redis (:42), api (:93); worker has none",
+      "testEvidence": "deploy-safety verifier (CI)",
+      "missingAcceptance": "Heartbeat-freshness healthcheck",
+      "owner": "Sentinel",
+      "mission": "GF-OPS-02",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-034",
+      "severity": "P2",
+      "title": "Routes without automated tests (83 historic)",
+      "recomputed": "RECHECK REQUIRED",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "Route count grew to ~615 registered patterns; atlas coverage not recomputed in this mission (UNVERIFIED)",
+      "testEvidence": "api:atlas:verify (CI) \u2014 coverage number not extracted",
+      "missingAcceptance": "Recompute via pnpm api:atlas",
+      "owner": "Sentinel",
+      "mission": "GF-EDGE-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-035",
+      "severity": "P2",
+      "title": "Development-only artwork",
+      "recomputed": "RUNTIME RECHECK",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "Production asset flags UNKNOWN",
+      "testEvidence": "none",
+      "missingAcceptance": "Publish production artwork with provenance",
+      "owner": "Mosaic",
+      "mission": "GF-MOD-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-036",
+      "severity": "P2",
+      "title": "Verifier pinned to schema 055",
+      "recomputed": "STILL OPEN IN SOURCE",
+      "status": "SOURCE PRESENT",
+      "evidence": "scripts/verify-greenfield-backend-v1.mjs:113 record('PRODUCTION SCHEMA', schema === '055')",
+      "testEvidence": "none",
+      "missingAcceptance": "Derive expected migration from ledger",
+      "owner": "Sentinel",
+      "mission": "GF-OPS-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-037",
+      "severity": "P3",
+      "title": "Potentially orphan tables (14 historic)",
+      "recomputed": "RECHECK REQUIRED",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "Atlas DB map not regenerated against prod",
+      "testEvidence": "none",
+      "missingAcceptance": "Disposition per table",
+      "owner": "Forge",
+      "mission": "GF-D00-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-038",
+      "severity": "P3",
+      "title": "Old QA PostgreSQL containers",
+      "recomputed": "RUNTIME RECHECK",
+      "status": "HISTORIC CLAIM NEEDS RECHECK",
+      "evidence": "VPS container list UNKNOWN",
+      "testEvidence": "none",
+      "missingAcceptance": "Inventory + retire after backup confirmation",
+      "owner": "Mosaic",
+      "mission": "GF-OPS-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-039",
+      "severity": "P3",
+      "title": "Redis role unclear / no persistence",
+      "recomputed": "PARTIALLY CLARIFIED",
+      "status": "SOURCE PRESENT",
+      "evidence": "Redis now referenced: gubic/lobby-hub.ts, product-standard/ingest-service.ts, calls/signalling-hub.ts:15 (pub/sub prerequisite for multi-instance); persistence config live UNKNOWN",
+      "testEvidence": "none",
+      "missingAcceptance": "Document role + persistence policy",
+      "owner": "Mosaic",
+      "mission": "GF-OPS-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    },
+    {
+      "id": "API-ATLAS-GAP-040",
+      "severity": "P3",
+      "title": "Static route/table mappings",
+      "recomputed": "STILL OPEN",
+      "status": "SOURCE PRESENT",
+      "evidence": "Atlas still static (tools/api-atlas/generate.mjs)",
+      "testEvidence": "none",
+      "missingAcceptance": "Runtime SQL tracing in disposable harness",
+      "owner": "Forge",
+      "mission": "GF-D00-01",
+      "ref": "a91d490e61ebfff38069378ddf757429eb000449"
+    }
+  ],
+  "previouslyFixed": [
+    {
+      "id": "API-ATLAS-GAP-001",
+      "title": "Follow approval",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "api-fix-01.follow-privacy.test.ts (CI DB job)"
+    },
+    {
+      "id": "API-ATLAS-GAP-002",
+      "title": "Unsigned release rejection",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "registry-trust.trust-block.test.ts (CI DB job)"
+    },
+    {
+      "id": "API-ATLAS-GAP-005",
+      "title": "Implicit permission grant",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "api-baseline-02.security-acceptance.test.ts (CI DB job)"
+    },
+    {
+      "id": "API-ATLAS-GAP-006",
+      "title": "Reaction notification retries",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "phase7e.notifications.test.ts + api-fix-01.reaction-dead-letter-retry.test.ts (CI DB job)"
+    },
+    {
+      "id": "API-ATLAS-GAP-010",
+      "title": "Legacy function invoke installation check",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "api-baseline-02.security-acceptance.test.ts (CI DB job)"
+    },
+    {
+      "id": "API-ATLAS-GAP-011",
+      "title": "AI stream cancel/reconnect ownership",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "api-baseline-02.security-acceptance.test.ts (CI DB job)"
+    },
+    {
+      "id": "API-ATLAS-GAP-017",
+      "title": "Attachment orphan cleanup scheduling",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "services/greenfield-worker/tests/media-cleanup.test.ts (worker:test)"
+    },
+    {
+      "id": "API-ATLAS-GAP-018",
+      "title": "Story upload validation",
+      "status": "SOURCE PRESENT",
+      "note": "Historic FIXED \u2014 AUTOMATED REGRESSION PASS; production acceptance still pending",
+      "testEvidence": "phase7i.f5-stories.test.ts (DB-gated; CI inclusion UNVERIFIED)"
+    }
+  ],
+  "counts": {
+    "features": {
+      "SOURCE PRESENT": 17,
+      "PR ONLY": 4,
+      "INTENTIONALLY DISABLED": 3,
+      "NOT FOUND": 3,
+      "CI VERIFIED": 2,
+      "HISTORIC CLAIM NEEDS RECHECK": 1
+    },
+    "historicOpenGaps": {
+      "HISTORIC CLAIM NEEDS RECHECK": 8,
+      "SOURCE PRESENT": 20,
+      "NOT FOUND": 1,
+      "INTENTIONALLY DISABLED": 2
+    },
+    "combined": {
+      "SOURCE PRESENT": 37,
+      "PR ONLY": 4,
+      "INTENTIONALLY DISABLED": 5,
+      "NOT FOUND": 4,
+      "CI VERIFIED": 2,
+      "HISTORIC CLAIM NEEDS RECHECK": 9
+    }
+  }
+}
