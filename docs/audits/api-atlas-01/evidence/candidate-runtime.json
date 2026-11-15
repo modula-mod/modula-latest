@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-14T23:54:59.491Z",
+  "capturedAt": "2026-11-15T00:21:44.215Z",
   "source": {
     "branch": "mosaic/gubic-p1-hardening",
-    "headAtCapture": "bc7dd2f3102530b227e7172abafd19a175edb851",
+    "headAtCapture": "f4cedeb2f39088a2a4e10a4046719eeb4d1ba847",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "1f12d2867b6098a19f6d2770539866a76dc425a270d478801e83e643f9e3c26d"
+    "apiSourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22"
   },
   "runtimeRoutes": [
     {

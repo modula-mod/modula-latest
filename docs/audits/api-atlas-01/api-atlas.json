@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "mosaic/gubic-p1-hardening",
-      "sourceSha256": "1f12d2867b6098a19f6d2770539866a76dc425a270d478801e83e643f9e3c26d",
-      "capturedAt": "2026-11-14T23:54:59.491Z",
+      "sourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22",
+      "capturedAt": "2026-11-15T00:21:44.215Z",
       "routeCount": 900
     },
     "status": "PASS"
