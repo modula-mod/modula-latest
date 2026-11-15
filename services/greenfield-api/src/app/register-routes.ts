@@ -2736,12 +2736,15 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     hub: messagingHub,
     features,
   })
-  await registerMessagingRoutes(app, db, {
+  const messagingRegistration = await registerMessagingRoutes(app, db, {
     feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, mediaEnabled: config.messaging.mediaEnabled,
     callsCapabilities: callsCapabilities(config.calls),
     hub: messagingHub,
     features,
+    messagingFeatures: config.messagingFeatures,
   })
+  // Run-once hooks for the scheduled-message dispatcher and the disappearing sweeper (tests, ops).
+  app.decorate('messagingFeatureHooks', messagingRegistration.featureHooks)
   await registerCallsRoutes(app, db, {
     config: config.calls, feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, bundleId: config.pushBundleId,
     messagingHub, hooks: callHooks,
