@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-14T23:30:53.691Z for branch `forge/gf-auth-resend-challenge-id`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-15T00:00:37.379Z for branch `forge/gf-test-db-01`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633
@@ -28925,7 +28925,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-listing.compatibility.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -28974,7 +28974,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-listing.compatibility.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -29023,7 +29023,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
+- Tests: `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `services/greenfield-api/tests/registry-listing.compatibility.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
