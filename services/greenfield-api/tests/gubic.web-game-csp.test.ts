@@ -562,3 +562,34 @@ describe('GUBIC web game content policy (Sentinel §37)', () => {
     expect(fails(gameArchive(doc(csp, '<script>var x = "text/html; charset=shift_jis"</script>')))).toMatch(/non-UTF-8 encoding \(shift_jis\)/)
   })
 })
+
+// Pins the single-pass charset decode (Sentinel mutation: charset back to the multi-pass scan decoder).
+describe('GUBIC web game charset labels are decoded exactly once', () => {
+  const csp = meta(STRICT)
+  const withCharset = (charsetMeta: string) => gameArchive(doc(csp).replace('<meta charset="utf-8">', charsetMeta))
+  const fails = (archive: Buffer) => {
+    try {
+      verifyWebGameArchive(archive)
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error('expected the archive to be rejected')
+  }
+
+  // The label starts with "&", so the raw-text charset prescan scan has nothing to match; only the
+  // attribute decode decides. A browser decodes once: "utf&#45;8" is not a UTF-8 label.
+  it('refuses a double-encoded meta charset label that only a multi-pass decode turns into utf-8', () => {
+    expect(fails(withCharset('<meta charset="&#117;tf&amp;#45;8">'))).toMatch(/GUBIC_HTML_MALFORMED.*non-UTF-8 encoding \(utf&#45;8\)/)
+    expect(fails(withCharset('<meta charset="&#117;tf&#38;#45;8">'))).toMatch(/non-UTF-8 encoding \(utf&#45;8\)/)
+  })
+
+  it('refuses a double-encoded charset in a Content-Type http-equiv content', () => {
+    expect(fails(gameArchive(doc(csp + '<meta http-equiv="Content-Type" content="text/html; charset=&#117;tf&amp;#45;8">'))))
+      .toMatch(/GUBIC_HTML_MALFORMED.*non-UTF-8 encoding \(utf&#45/)
+  })
+
+  it('accepts a singly-encoded utf-8 label', () => {
+    expect(() => verifyWebGameArchive(withCharset('<meta charset="&#117;tf&#45;8">'))).not.toThrow()
+    expect(() => verifyWebGameArchive(gameArchive(doc(csp + '<meta http-equiv="Content-Type" content="text/html; charset=&#117;tf-8">')))).not.toThrow()
+  })
+})
