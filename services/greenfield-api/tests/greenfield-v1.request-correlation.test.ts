@@ -70,12 +70,14 @@ describe('GreenField v1 request correlation boundary', () => {
     const response = await app.inject({method: 'GET', url: '/limited', headers: {'x-request-id': 'rate-limit-proof'}})
 
     expect(response.statusCode).toBe(429)
+    expect(response.headers['retry-after']).toMatch(/^[1-9][0-9]*$/)
     expect(Number(response.headers['retry-after'])).toBeGreaterThan(0)
     expect(response.json()).toMatchObject({
       ok: false,
       error: {code: 'RATE_LIMITED', requestId: 'rate-limit-proof', retryable: true},
       meta: {requestId: 'rate-limit-proof'},
     })
+    expect(response.json().error.details).toEqual({retryAfter: expect.anything(), limit: 1})
     expect(response.json()).not.toHaveProperty('statusCode')
   })
 })
