@@ -17,7 +17,11 @@ import {GreenfieldModuleMarketplaceService, notesList} from './marketplace-servi
 import {GreenfieldRegistryPresentationService} from './registry-presentation-service.js'
 import {GreenfieldRegistryTrustService, productProjection, type RegistryTrustOptions} from './registry-trust-service.js'
 
-export type GreenfieldModuleRegistryOptions = {publicApiUrl?: string | null}
+export type RegistryListLog = {
+  warn(fields: Record<string, unknown>, message: string): void
+}
+
+export type GreenfieldModuleRegistryOptions = {publicApiUrl?: string | null; log?: RegistryListLog}
 
 export class GreenfieldModuleRegistryService {
   private readonly releases: GreenfieldModuleReleaseService
@@ -25,7 +29,7 @@ export class GreenfieldModuleRegistryService {
   readonly presentation: GreenfieldRegistryPresentationService
   readonly trust: GreenfieldRegistryTrustService
 
-  constructor(private readonly db: ModulaDb, options: GreenfieldModuleRegistryOptions = {}) {
+  constructor(private readonly db: ModulaDb, private readonly options: GreenfieldModuleRegistryOptions = {}) {
     this.releases = new GreenfieldModuleReleaseService(db)
     this.marketplace = new GreenfieldModuleMarketplaceService(db)
     this.presentation = new GreenfieldRegistryPresentationService(db, options.publicApiUrl)
@@ -71,9 +75,23 @@ export class GreenfieldModuleRegistryService {
       // MPS is canonical for product identity. The extension-product kind in
       // the signed adapter remains "module" for a game hosted by that module.
       const productKind = row.mps_kind ?? row.product_kind
+      const compatibility = manifest?.compatibility
+      if (compatibility == null || typeof compatibility !== 'object') {
+        // Incomplete published fixtures (and similarly broken releases) must not
+        // 500 the whole listing. Skip the row, matching the existing `continue`
+        // path for entries the catalogue cannot show.
+        this.options.log?.warn({
+          moduleId: canonicalId,
+          releaseId: row.release_id,
+          version: row.version,
+          reason: 'missing_manifest_compatibility',
+        }, 'skipping registry listing entry with no manifest.compatibility')
+        continue
+      }
       if ((filters.productKind ?? 'module') !== 'all' && productKind !== (filters.productKind ?? 'module')) continue
       if (filters.q && !`${manifest.name} ${manifest.description} ${canonicalId}`.toLowerCase().includes(filters.q.toLowerCase())) continue
-      if (filters.platform && !manifest.compatibility.platforms.includes(filters.platform)) continue
+      const platforms = Array.isArray(compatibility.platforms) ? compatibility.platforms : []
+      if (filters.platform && !platforms.includes(filters.platform)) continue
       const beta = classifyBetaModule({moduleId: canonicalId, status: row.release_state, manifest: manifest as any})
       if (!beta.visibleInBeta) continue
       const existing = byModule.get(canonicalId)
@@ -99,9 +117,9 @@ export class GreenfieldModuleRegistryService {
           licenseStatus: row.license_status,
           status: row.release_state,
           installable,
-          platforms: manifest.compatibility.platforms,
+          platforms,
           permissionRequirements: manifest.permissions,
-          compatibility: manifest.compatibility as unknown as Record<string, unknown>,
+          compatibility: compatibility as unknown as Record<string, unknown>,
           standard: standardMetadataForManifest(manifest),
           betaClassification: beta.classification,
           installability: installabilityForBetaModule({

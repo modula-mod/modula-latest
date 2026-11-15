@@ -187,6 +187,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build API workspace dependencies
         run: pnpm --filter @modula/greenfield-api... build
+      - name: GF-TEST-DB-01 zero-skip guard unit tests
+        run: node --test scripts/assert-vitest-db-suites-ran.test.mjs
       - name: Create restricted database roles
         env:
           PGHOST: 127.0.0.1
@@ -308,3 +310,191 @@ jobs:
           tests/push.voip.test.ts
           tests/push.dispatch.test.ts
           tests/lease-renewal.integration.test.ts
+      # GF-TEST-DB-01: remaining worker DB-gated suites not already in this job.
+      - name: GF-TEST-DB-01 worker leftover database integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-worker exec vitest run
+          tests/lease.test.ts
+          tests/outbox-atomicity.test.ts
+          tests/phase7e.event-delivery.test.ts
+          tests/phase7e.search-projector.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-test-db-01-worker-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-test-db-01-worker-vitest.json
+          tests/lease.test.ts
+          tests/outbox-atomicity.test.ts
+          tests/phase7e.event-delivery.test.ts
+          tests/phase7e.search-projector.test.ts
+
+      # GF-TEST-DB-01: accounts (including mail identity), social, messaging and media suites.
+      - name: GF-TEST-DB-01 accounts, social and messaging database integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/greenfield.accounts.test.ts
+          tests/greenfield-backend-v1.account-data.test.ts
+          tests/greenfield-backend-v1.apple-auth.test.ts
+          tests/push.routes.test.ts
+          tests/messaging.integration.test.ts
+          tests/phase6.security.test.ts
+          tests/phase6s.social.test.ts
+          tests/communities.integration.test.ts
+          tests/collections-drafts.integration.test.ts
+          tests/story-dm-replies.integration.test.ts
+          tests/sticker-packs.integration.test.ts
+          tests/phase7i.f5-stories.test.ts
+          tests/phase7l.profile-update.test.ts
+          tests/post04.attachments.test.ts
+          tests/greenfield-backend-v1.social-completion.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-test-db-01-accounts-social-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-test-db-01-accounts-social-vitest.json
+          tests/greenfield.accounts.test.ts
+          tests/greenfield-backend-v1.account-data.test.ts
+          tests/greenfield-backend-v1.apple-auth.test.ts
+          tests/push.routes.test.ts
+          tests/messaging.integration.test.ts
+          tests/phase6.security.test.ts
+          tests/phase6s.social.test.ts
+          tests/communities.integration.test.ts
+          tests/collections-drafts.integration.test.ts
+          tests/story-dm-replies.integration.test.ts
+          tests/sticker-packs.integration.test.ts
+          tests/phase7i.f5-stories.test.ts
+          tests/phase7l.profile-update.test.ts
+          tests/post04.attachments.test.ts
+          tests/greenfield-backend-v1.social-completion.test.ts
+
+      # GF-TEST-DB-01: backend v1 ledgers, fabrics, entitlements and privilege rollback.
+      - name: GF-TEST-DB-01 backend v1 ledger and fabric database integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/greenfield-backend-v1.ai-engine.test.ts
+          tests/greenfield-backend-v1.data-ledger.test.ts
+          tests/greenfield-backend-v1.entitlements-usage.test.ts
+          tests/greenfield-backend-v1.extension-ai-prompt.test.ts
+          tests/greenfield-backend-v1.developer-domain.test.ts
+          tests/greenfield-backend-v1.build-release.test.ts
+          tests/greenfield-backend-v1.engine-fabric.test.ts
+          tests/greenfield-backend-v1.provider-fabric.test.ts
+          tests/greenfield-backend-v1.service-fabric.test.ts
+          tests/migration-privilege-rollback.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-test-db-01-backend-v1-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-test-db-01-backend-v1-vitest.json
+          tests/greenfield-backend-v1.ai-engine.test.ts
+          tests/greenfield-backend-v1.data-ledger.test.ts
+          tests/greenfield-backend-v1.entitlements-usage.test.ts
+          tests/greenfield-backend-v1.extension-ai-prompt.test.ts
+          tests/greenfield-backend-v1.developer-domain.test.ts
+          tests/greenfield-backend-v1.build-release.test.ts
+          tests/greenfield-backend-v1.engine-fabric.test.ts
+          tests/greenfield-backend-v1.provider-fabric.test.ts
+          tests/greenfield-backend-v1.service-fabric.test.ts
+          tests/migration-privilege-rollback.test.ts
+
+      # GF-TEST-DB-01: module settings, registry trust, publisher, Moliboo, GF-MOD and MPS publish.
+      - name: GF-TEST-DB-01 module, registry and product database integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/module-settings-permissions.test.ts
+          tests/registry-trust.assets.test.ts
+          tests/registry-trust.github-sync.test.ts
+          tests/registry-listing.compatibility.test.ts
+          tests/registry-trust.identity-aliases.test.ts
+          tests/registry-trust.install-descriptor.test.ts
+          tests/registry-trust.installed-state.test.ts
+          tests/publisher-console.release-jobs.test.ts
+          tests/publisher-first-party-policy.test.ts
+          tests/moliboo-game.integration.test.ts
+          tests/moliboo-signed-packs.integration.test.ts
+          tests/gf-mod-01.artifact-closure.test.ts
+          tests/gf-mod-02.presentation-blobs.test.ts
+          tests/greenfield-mps-v1.publish.test.ts
+          tests/greenfield-product-frontend-v1.runtime.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-test-db-01-module-registry-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-test-db-01-module-registry-vitest.json
+          tests/module-settings-permissions.test.ts
+          tests/registry-trust.assets.test.ts
+          tests/registry-trust.github-sync.test.ts
+          tests/registry-listing.compatibility.test.ts
+          tests/registry-trust.identity-aliases.test.ts
+          tests/registry-trust.install-descriptor.test.ts
+          tests/registry-trust.installed-state.test.ts
+          tests/publisher-console.release-jobs.test.ts
+          tests/publisher-first-party-policy.test.ts
+          tests/moliboo-game.integration.test.ts
+          tests/moliboo-signed-packs.integration.test.ts
+          tests/gf-mod-01.artifact-closure.test.ts
+          tests/gf-mod-02.presentation-blobs.test.ts
+          tests/greenfield-mps-v1.publish.test.ts
+          tests/greenfield-product-frontend-v1.runtime.test.ts
+
+      # GF-TEST-DB-01: remaining Phase 7, premium, GUBIC, PVP fabric, support and API integration suites.
+      - name: GF-TEST-DB-01 phase 7, premium, GUBIC and API integration
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/phase7b.module-runtime.test.ts
+          tests/phase7d.connection-lifecycle.test.ts
+          tests/phase7d.connector-security.test.ts
+          tests/phase7d.runtime-sessions.test.ts
+          tests/phase7e.ai-platform-foundation.test.ts
+          tests/phase7e.ai-product-actions.test.ts
+          tests/phase7e.ai-provider-runtime.test.ts
+          tests/phase7e.internal-events.test.ts
+          tests/phase7e.module-backend-runtime.test.ts
+          tests/phase7e.policy-audit-notifications.test.ts
+          tests/phase7e.search-platform.test.ts
+          tests/api.integration.test.ts
+          tests/gubic.play.integration.test.ts
+          tests/premium.apple-sandbox.integration.test.ts
+          tests/premium.integration.test.ts
+          tests/pvp-platform-2.extension-fabric.test.ts
+          tests/support-status.integration.test.ts
+          tests/synthetic-module-intelligence.integration.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/gf-test-db-01-phase7-api-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-test-db-01-phase7-api-vitest.json
+          tests/phase7b.module-runtime.test.ts
+          tests/phase7d.connection-lifecycle.test.ts
+          tests/phase7d.connector-security.test.ts
+          tests/phase7d.runtime-sessions.test.ts
+          tests/phase7e.ai-platform-foundation.test.ts
+          tests/phase7e.ai-product-actions.test.ts
+          tests/phase7e.ai-provider-runtime.test.ts
+          tests/phase7e.internal-events.test.ts
+          tests/phase7e.module-backend-runtime.test.ts
+          tests/phase7e.policy-audit-notifications.test.ts
+          tests/phase7e.search-platform.test.ts
+          tests/api.integration.test.ts
+          tests/gubic.play.integration.test.ts
+          tests/premium.apple-sandbox.integration.test.ts
+          tests/premium.integration.test.ts
+          tests/pvp-platform-2.extension-fabric.test.ts
+          tests/support-status.integration.test.ts
+          tests/synthetic-module-intelligence.integration.test.ts

@@ -21,6 +21,10 @@ const describeLive = testDatabaseUrl ? describe : describe.skip
 describeLive('lease exclusivity (live database)', () => {
   let db: ModulaWorkerDb
   const jobIds: string[] = []
+  // Isolate claims from leftover QUEUED jobs (e.g. gf-ops-01c-* from lease-renewal).
+  const jobPrefix = 'test-lease-'
+  const claim = (workerId: string, leaseDurationMs: number) =>
+    claimNextJob(db, workerId, leaseDurationMs, {idPrefix: jobPrefix})
 
   beforeAll(async () => {
     db = createDb(testDatabaseUrl as string)
@@ -28,11 +32,8 @@ describeLive('lease exclusivity (live database)', () => {
 
   afterAll(async () => {
     if (jobIds.length > 0) {
-      await db
-        .updateTable('background_jobs')
-        .set({status: 'SUCCEEDED', lease_owner: null, lease_expires_at: null})
-        .where('id', 'in', jobIds)
-        .execute()
+      await db.deleteFrom('job_failures').where('job_id', 'in', jobIds).execute()
+      await db.deleteFrom('background_jobs').where('id', 'in', jobIds).execute()
     }
     await db.destroy()
   })
@@ -59,9 +60,9 @@ describeLive('lease exclusivity (live database)', () => {
       .execute()
 
     const [a, b, c] = await Promise.all([
-      claimNextJob(db, 'worker-a', 60_000),
-      claimNextJob(db, 'worker-b', 60_000),
-      claimNextJob(db, 'worker-c', 60_000),
+      claim('worker-a', 60_000),
+      claim('worker-b', 60_000),
+      claim('worker-c', 60_000),
     ])
 
     const claimed = [a, b, c].filter(job => job?.id === jobId)
@@ -90,10 +91,10 @@ describeLive('lease exclusivity (live database)', () => {
       })
       .execute()
 
-    const first = await claimNextJob(db, 'worker-a', 60_000)
+    const first = await claim('worker-a', 60_000)
     expect(first?.id).toBe(jobId)
 
-    const second = await claimNextJob(db, 'worker-b', 60_000)
+    const second = await claim('worker-b', 60_000)
     expect(second?.id).not.toBe(jobId)
   })
 
@@ -135,7 +136,7 @@ describeLive('lease exclusivity (live database)', () => {
   })
 
   it('reclaims a crashed worker lease and fences the stale worker from completion', async () => {
-    const jobId = `test-crash-reclaim-${randomUUID()}`
+    const jobId = `test-lease-crash-reclaim-${randomUUID()}`
     jobIds.push(jobId)
     await db
       .insertInto('background_jobs')
@@ -155,13 +156,13 @@ describeLive('lease exclusivity (live database)', () => {
       })
       .execute()
 
-    const first = await claimNextJob(db, 'crashed-worker', 1)
+    const first = await claim('crashed-worker', 1)
     expect(first?.id).toBe(jobId)
     await markJobRunning(db, jobId, 'crashed-worker')
     await new Promise(resolve => setTimeout(resolve, 5))
     expect(await reapExpiredLeases(db)).toBeGreaterThanOrEqual(1)
 
-    const reclaimed = await claimNextJob(db, 'recovery-worker', 60_000)
+    const reclaimed = await claim('recovery-worker', 60_000)
     expect(reclaimed?.id).toBe(jobId)
     await markJobRunning(db, jobId, 'recovery-worker')
     await expect(completeJob(db, jobId, 'crashed-worker')).rejects.toMatchObject({code: 'JOB_LEASE_LOST'})

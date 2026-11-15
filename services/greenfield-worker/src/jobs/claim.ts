@@ -6,6 +6,29 @@ import type {Database} from '../database.js'
 export type ClaimedJob = Selectable<Database['background_jobs']>
 
 /**
+ * Optional claim scope. Production omits this, so claim semantics are unchanged.
+ * Tests pass `idPrefix` and/or `jobIds` so a shared database's leftover QUEUED
+ * jobs cannot be claimed by another suite.
+ */
+export type ClaimJobFilter = {
+  idPrefix?: string
+  jobIds?: readonly string[]
+}
+
+function claimScopeSql(filter: ClaimJobFilter) {
+  const clauses = []
+  if (filter.idPrefix) clauses.push(sql`AND starts_with(id, ${filter.idPrefix})`)
+  if (filter.jobIds && filter.jobIds.length > 0) {
+    clauses.push(sql`AND id IN (${sql.join(filter.jobIds.map(id => sql`${id}`))})`)
+  } else if (filter.jobIds) {
+    // An explicit empty list matches nothing, so a test cannot silently fall
+    // back to claiming an unrelated leftover job.
+    clauses.push(sql`AND false`)
+  }
+  return clauses.length > 0 ? sql.join(clauses, sql` `) : sql``
+}
+
+/**
  * Atomically claims the next eligible Greenfield-worker job using row-level locking so
  * multiple worker processes can run concurrently without double-processing.
  * `FOR UPDATE SKIP LOCKED` guarantees lease exclusivity: a row already locked
@@ -15,6 +38,7 @@ export async function claimNextJob(
   db: ModulaWorkerDb,
   workerId: string,
   leaseDurationMs: number,
+  filter: ClaimJobFilter = {},
 ): Promise<ClaimedJob | undefined> {
   const now = new Date()
   const leaseExpiresAt = new Date(now.getTime() + leaseDurationMs)
@@ -33,6 +57,7 @@ export async function claimNextJob(
       WHERE dispatch_mode = 'GREENFIELD_WORKER'
         AND status IN ('QUEUED', 'RETRYING')
         AND available_at <= ${now}
+        ${claimScopeSql(filter)}
       ORDER BY priority, created_at
       FOR UPDATE SKIP LOCKED
       LIMIT 1
