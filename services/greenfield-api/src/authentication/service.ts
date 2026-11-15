@@ -8,11 +8,12 @@ import {CredentialRegistryService} from '../auth/credentials/service.js'
 import {SecurityEventService} from '../auth/security-events/service.js'
 import {ChallengeService} from '../auth/challenges/service.js'
 import {RecoveryCodeService} from '../auth/mfa/recovery-codes.js'
+import {issuePendingEmailVerification} from '../accounts/verification-challenge.js'
 
 export class AuthenticationService {
   constructor(
     private readonly db: ModulaDb,
-    private readonly config: Pick<AppConfig, 'sessionPepper'>,
+    private readonly config: Pick<AppConfig, 'sessionPepper' | 'emailVerificationTtlHours'>,
     private readonly sessions: GreenfieldSessionService,
     private readonly mail?: MailService,
     private readonly credentials = new CredentialRegistryService(db),
@@ -197,7 +198,12 @@ export class AuthenticationService {
     return {...issued, recoveryCodesRemaining: consumed.remaining}
   }
 
-  async login(email: string, password: string, context?: {userAgent?: string; ipHash?: string; correlationId?: string}) {
+  async login(
+    email: string,
+    password: string,
+    context?: {userAgent?: string; ipHash?: string; correlationId?: string},
+    verification?: {ipHash?: string},
+  ) {
     const identity = await this.db
       .selectFrom('greenfield_auth_identities')
       .innerJoin('greenfield_password_credentials', 'greenfield_password_credentials.account_id', 'greenfield_auth_identities.account_id')
@@ -217,6 +223,27 @@ export class AuthenticationService {
       throw authError('INVALID_CREDENTIALS')
     }
     if (identity.status === 'suspended') throw authError('ACCOUNT_SUSPENDED')
+    if (identity.status === 'pendingVerification') {
+      // Only reached after the password verified. Issue a fresh verification
+      // challenge on the shared registration/resend budget (RATE_LIMITED → 429)
+      // so the client can resume verification without its original session.
+      const issued = await this.db.transaction().execute(trx =>
+        issuePendingEmailVerification(
+          trx,
+          {challenges: this.challenges, mail: this.mail, config: this.config},
+          {
+            accountId: identity.account_id,
+            email: identity.identifier,
+            handle: identity.primary_handle,
+            identityMetadata: identity.metadata,
+            ipHash: verification?.ipHash,
+            correlationId: context?.correlationId,
+            issuedFor: 'pending_login_verification',
+          },
+        ),
+      )
+      throw authError('EMAIL_VERIFICATION_REQUIRED', issued)
+    }
     if (identity.status !== 'active') throw authError('INVALID_CREDENTIALS')
     const passwordMethod = await this.credentials.findActivePasswordMethod(identity.account_id)
     if (!passwordMethod) throw authError('AUTH_METHOD_UNAVAILABLE')

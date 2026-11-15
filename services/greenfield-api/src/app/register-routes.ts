@@ -92,6 +92,7 @@ import {registerComposerRoutes} from './register-composer-routes.js'
 import {registerCommunitiesRoutes} from './register-communities-routes.js'
 import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
 import {registerMolibooRoutes} from './register-moliboo-routes.js'
+import {registerNativeEndpointRoutes} from './register-native-endpoint-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -99,6 +100,9 @@ function sendError(reply: any, code: any, message: string, requestId: string) {
 
 function mapDomainError(reply: any, error: any, requestId: string, fallback: string) {
   const code = error?.code
+  if (code === 'EMAIL_VERIFICATION_REQUIRED') {
+    return reply.code(statusForError(code)).send(failureEnvelope(code, error.message ?? fallback, requestId, {details: error.details}))
+  }
   if (
     code === 'VALIDATION_FAILED' ||
     code === 'NOT_FOUND' ||
@@ -854,7 +858,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const issued = await authentication.login(bodyString(request.body, 'email'), bodyString(request.body, 'password'), {
         userAgent: request.headers['user-agent'],
         correlationId: request.id,
-      })
+      }, {ipHash: requestIpHash(request, config)})
       return reply.send(
         successEnvelope(
           {
@@ -2728,6 +2732,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   await registerMolibooRoutes(app, db, config, {feedConfig, writeConfig})
+  await registerNativeEndpointRoutes(app, db, config.publicApiUrl, {feedConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig}, {appleVerifier: options.premiumAppleVerifier})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
