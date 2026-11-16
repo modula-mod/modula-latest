@@ -464,6 +464,41 @@
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
     },
     {
+      "file": "services/greenfield-api/src/publisher/publication-authority-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_PUBLICATION_AUTHORITY_DATABASE_URL is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 12,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_SIGNING_RUNNER_DATABASE_URL is required for the signing-only runner')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 14,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!signingProvider) throw new Error('A configured Vault Transit signing provider is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-signing-runner.ts",
+      "line": 64,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (options.workerId.length < 3 || options.workerId.length > 240) throw new Error('Signing runner worker ID must contain 3 to 240 characters')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/trust-verifier-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_TRUST_VERIFIER_DATABASE_URL is required')"
+    },
+    {
       "file": "services/greenfield-api/src/runtime/session-store.ts",
       "line": 133,
       "marker": "throw new Error",
@@ -2648,6 +2683,41 @@
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/publication-authority-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_PUBLICATION_AUTHORITY_DATABASE_URL is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 12,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_SIGNING_RUNNER_DATABASE_URL is required for the signing-only runner')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 14,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!signingProvider) throw new Error('A configured Vault Transit signing provider is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-signing-runner.ts",
+      "line": 64,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (options.workerId.length < 3 || options.workerId.length > 240) throw new Error('Signing runner worker ID must contain 3 to 240 characters')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/trust-verifier-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_TRUST_VERIFIER_DATABASE_URL is required')"
     },
     {
       "file": "services/greenfield-api/src/runtime/session-store.ts",

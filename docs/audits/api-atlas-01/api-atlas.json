@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gubic-p1-hardening",
-      "sourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22",
-      "capturedAt": "2026-11-15T00:21:44.215Z",
+      "branch": "security/greenfield-signer-08a-r2-runner-boundary",
+      "sourceSha256": "d7b6ac98593ee4ba4491f2554c28b82b2e932e5a820e5398a3eed67e7b2c60f2",
+      "capturedAt": "2026-11-16T15:59:02.779Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -13123,6 +13123,7 @@
           "greenfield_release_asset_blobs"
         ],
         "evidence": [
+          "services/greenfield-api/src/modules/github-release-sync-service.ts#applyRegistryCandidate",
           "services/greenfield-api/src/modules/github-release-sync-service.ts#applyVerified",
           "services/greenfield-api/src/modules/github-release-sync-service.ts#fetchVerified",
           "services/greenfield-api/src/modules/github-release-sync-service.ts#storePackageBlob",
@@ -108629,6 +108630,29 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_publisher_release_authority_principals",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher release authority principals",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "092_publisher_release_runner_boundary.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_publisher_release_job_logs",
       "columns": [],
       "primaryKey": [],
@@ -108693,6 +108717,29 @@
         "POST /v1/publisher/modules/:moduleId/release-jobs"
       ],
       "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_publisher_release_signing_claims",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher release signing claims",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "092_publisher_release_runner_boundary.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
     },

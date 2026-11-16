@@ -1,14 +1,14 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 91 ordered up migrations, latest `091_greenfield_online_signing_authority.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 92 ordered up migrations, latest `092_publisher_release_runner_boundary.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 383
+- Production tables: 385
 - Tables with API/worker source references: 369
-- Orphan candidates requiring manual confirmation: 14
+- Orphan candidates requiring manual confirmation: 16
 - Write-only candidates: 40
 - Read-only candidates: 35
 
@@ -4689,6 +4689,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_publisher_release_authority_principals`
+
+- Purpose: application state for greenfield publisher release authority principals
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `092_publisher_release_runner_boundary.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
 ### `greenfield_publisher_release_job_logs`
 
 - Purpose: application state for greenfield publisher release job logs
@@ -4722,6 +4739,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source reads: `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - API/worker source writes: `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - Disposition: active read/write or ledger/schema table
+
+### `greenfield_publisher_release_signing_claims`
+
+- Purpose: application state for greenfield publisher release signing claims
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `092_publisher_release_runner_boundary.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
 
 ### `greenfield_publisher_signing_audit_events`
 
@@ -6537,6 +6571,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - `greenfield_extension_entity_metadata`
 - `greenfield_module_sync_sources`
 - `greenfield_notification_batches`
+- `greenfield_publisher_release_authority_principals`
+- `greenfield_publisher_release_signing_claims`
 - `greenfield_schema_versions`
 - `intelligence_circuit_revisions`
 - `intelligence_circuits`
