@@ -1,6 +1,6 @@
 import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
-import {RELEASE_JOB_DISPATCH_MODE, RELEASE_JOB_PUBLISH, RELEASE_JOB_SIGN, RELEASE_JOB_VALIDATE} from './release-job-core.js'
+import {RELEASE_JOB_DISPATCH_MODE, RELEASE_JOB_VALIDATE} from './release-job-core.js'
 import type {PublisherReleaseJobProcessor} from './release-job-processor.js'
 
 type ClaimedRow = {id: string; job_type: string; payload: unknown; attempt_count: number; maximum_attempts: number}
@@ -19,7 +19,8 @@ export class PublisherReleaseJobRunner {
       UPDATE background_jobs SET status = CASE WHEN attempt_count >= maximum_attempts THEN 'DEAD_LETTER' ELSE 'RETRYING' END,
         lease_owner = NULL, lease_expires_at = NULL, available_at = ${now}, updated_at = ${now},
         error_code = 'WORKER_LEASE_EXPIRED', error_class = 'WORKER_LEASE_EXPIRED', last_error = 'Runner lease expired before completion'
-      WHERE dispatch_mode = ${RELEASE_JOB_DISPATCH_MODE} AND status IN ('LEASED', 'RUNNING') AND lease_expires_at <= ${now}
+      WHERE dispatch_mode = ${RELEASE_JOB_DISPATCH_MODE} AND job_type = ${RELEASE_JOB_VALIDATE}
+        AND status IN ('LEASED', 'RUNNING') AND lease_expires_at <= ${now}
     `.execute(this.db)
     return Number(result.numAffectedRows ?? 0)
   }
@@ -33,7 +34,9 @@ export class PublisherReleaseJobRunner {
         attempt_count = attempt_count + 1, started_at = ${now}, updated_at = ${now}
       WHERE id = (
         SELECT id FROM background_jobs
-        WHERE dispatch_mode = ${RELEASE_JOB_DISPATCH_MODE} AND status IN ('QUEUED', 'RETRYING') AND available_at <= ${now}
+        WHERE dispatch_mode = ${RELEASE_JOB_DISPATCH_MODE}
+          AND job_type = ${RELEASE_JOB_VALIDATE}
+          AND status IN ('QUEUED', 'RETRYING') AND available_at <= ${now}
         ORDER BY priority, created_at FOR UPDATE SKIP LOCKED LIMIT 1
       )
       RETURNING id, job_type, payload, attempt_count, maximum_attempts
@@ -42,8 +45,6 @@ export class PublisherReleaseJobRunner {
     const releaseJobId = String((claimed.payload as {releaseJobId?: unknown})?.releaseJobId ?? '')
     try {
       if (claimed.job_type === RELEASE_JOB_VALIDATE) await this.processor.validate(releaseJobId)
-      else if (claimed.job_type === RELEASE_JOB_SIGN) await this.processor.sign(releaseJobId)
-      else if (claimed.job_type === RELEASE_JOB_PUBLISH) await this.processor.publish(releaseJobId)
       else throw Object.assign(new Error(`Unknown publisher release work ${claimed.job_type}`), {permanent: true})
       await this.settle(claimed.id, 'SUCCEEDED', null)
     } catch (error) {

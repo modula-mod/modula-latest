@@ -39,6 +39,7 @@ export type ReleaseJobProcessorDeps = {
   githubEnabled?: boolean
   publish?: ReleasePublisher
   signingProvider?: PublisherSigningProvider
+  onlineSigningEnabled?: boolean
 }
 
 type CheckMap = Map<PublisherReleaseJobCheckId, PublisherReleaseJobCheck>
@@ -206,23 +207,39 @@ export class PublisherReleaseJobProcessor {
       return this.finish(validating, ['validating'], 'validation_failed', {validation: record(false), signature, permission_delta: permissionDelta,
         error: {code: 'VALIDATION_FAILED', message: preImportFailed.map(check => `${check.id}: ${check.message ?? 'failed'}`).join('; ').slice(0, 1000)}}, 'error', 'validate', `Validation failed: ${preImportFailed.map(check => check.id).join(', ')}`)
     }
-    const onlineIdentity = this.deps.signingProvider ? await this.db.selectFrom('greenfield_publisher_online_signing_identities')
+    const onlineSigningEnabled = this.deps.onlineSigningEnabled ?? Boolean(this.deps.signingProvider)
+    const onlineIdentity = onlineSigningEnabled ? await this.db.selectFrom('greenfield_publisher_online_signing_identities')
       .select(['identity_id']).where('publisher_id', '=', job.publisher_id).where('state', '=', 'ACTIVE')
       .where('valid_from', '<=', new Date()).where('valid_until', '>', new Date()).executeTakeFirst() : null
-    if (signature.state === 'missing' && this.deps.signingProvider && onlineIdentity) {
+    if (signature.state === 'missing' && onlineSigningEnabled && onlineIdentity) {
       checks.set('signature', {id: 'signature', status: 'pending', message: 'Awaiting publisher-scoped online signing'})
-      checks.set('packaging', {id: 'packaging', status: 'pending', message: 'Runs only after independent signature verification'})
+      let release: GreenfieldModuleReleaseRecord
+      try {
+        release = (await this.sync.applyPendingSigningCandidate(verified, existing ?? null)).release
+        if (release.releaseState !== 'pendingReview') throw new ModuleDomainError('VALIDATION_FAILED', `registry release is ${release.releaseState}, expected pendingReview`)
+        checks.set('packaging', {id: 'packaging', status: 'passed', message: `stored immutable candidate ${release.releaseId}`})
+      } catch (error) {
+        if (!(error instanceof ModuleDomainError)) throw error
+        checks.set('packaging', {id: 'packaging', status: 'failed', message: error.message.slice(0, 500), code: 'VALIDATION_FAILED'})
+        return this.finish(validating, ['validating'], 'validation_failed', {validation: record(false), signature, permission_delta: permissionDelta,
+          error: {code: 'VALIDATION_FAILED', message: error.message.slice(0, 1000)}}, 'error', 'packaging', `Candidate storage failed: ${error.message}`)
+      }
       const approvedFacts = approvalFactsForVerified(verified)
       const approvalSha256 = approvalFactsSha256(approvedFacts)
-      return this.finish(validating, ['validating'], 'ready_for_signing', {
+      return this.finish(validating, ['validating'], 'awaiting_approval', {
         validation: record(false),
-        signature: {state: 'pending', detail: 'Validated release is approved for publisher-scoped online signing'},
+        signature: {state: 'pending', detail: 'Validated release awaits independent approval'},
         permission_delta: permissionDelta,
-        approved_facts: approvedFacts,
-        approval_sha256: approvalSha256,
-        approved_at: new Date(),
+        approval_candidate_facts: approvedFacts,
+        approval_candidate_sha256: approvalSha256,
+        approval_candidate_at: new Date(),
+        approved_facts: null,
+        approval_sha256: null,
+        approved_at: null,
+        approved_by_account_id: null,
+        release_id: release.releaseId,
         error: null,
-      }, 'info', 'approve', `Immutable release facts approved for online signing (${approvalSha256})`)
+      }, 'info', 'approval', `Immutable release candidate recorded for independent approval (${approvalSha256})`)
     }
     if (signature.state !== 'verified') {
       set('packaging', 'skipped', 'not imported: signature not verified')

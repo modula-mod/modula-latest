@@ -205,7 +205,7 @@ export function toJobDto(row: ReleaseJobRow, logSummary: PublisherReleaseJobLogE
       canRequestSigning: state === 'ready_for_signing' && Boolean(row.approval_sha256),
       canPublish: state === 'ready_for_review' && validation.passed === true && signature.state === 'verified',
       canCancel: !['published', 'cancelled', 'conflicted'].includes(state) && !(state === 'publishing' && row.publish_started_at) && !(state === 'signing' && row.signing_started_at),
-      canResume: state === 'cancelled' && ['created', 'fetching', 'validating', 'ready_for_signing', 'signing', 'signature_verified', 'ready_for_review', 'publishing'].includes(cancelledFrom ?? ''),
+      canResume: state === 'cancelled' && ['created', 'fetching', 'validating', 'awaiting_approval', 'ready_for_signing', 'signing', 'signature_pending_verification', 'signature_verified', 'ready_for_review', 'publishing'].includes(cancelledFrom ?? ''),
     },
     createdByAccountId: row.created_by_account_id,
     createdAt: new Date(row.created_at).toISOString(),
