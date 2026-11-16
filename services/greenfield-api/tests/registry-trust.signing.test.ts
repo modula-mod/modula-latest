@@ -76,6 +76,21 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     }
   }
 
+  async function tamperPublishedSignature(releaseId: string, signature: string) {
+    const privilegedUrl = new URL(adminDatabaseUrl ?? databaseUrl!)
+    privilegedUrl.pathname = new URL(databaseUrl!).pathname
+    const privilegedDb = createDb(privilegedUrl.toString())
+    try {
+      await privilegedDb.transaction().execute(async trx => {
+        await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+        await trx.updateTable('greenfield_module_release_signatures')
+          .set({signature}).where('release_id', '=', releaseId).execute()
+      })
+    } finally {
+      await privilegedDb.destroy()
+    }
+  }
+
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
     process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'false'
@@ -191,9 +206,11 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     const {manifest, evidence} = signedImport(id)
     const imported = await releases.importPendingReview(manifest, evidence)
     await releases.publishRelease(id, '1.0.0')
-    await db.updateTable('greenfield_module_release_signatures')
-      .set({signature: randomBytes(64).toString('base64url')})
-      .where('release_id', '=', imported.releaseId).execute()
+    const forgedSignature = randomBytes(64).toString('base64url')
+    await expect(db.updateTable('greenfield_module_release_signatures')
+      .set({signature: forgedSignature})
+      .where('release_id', '=', imported.releaseId).execute()).rejects.toThrow(/immutable/)
+    await tamperPublishedSignature(imported.releaseId, forgedSignature)
     await expect(releases.verifyRelease(id, '1.0.0')).rejects.toThrow(/signature invalid/)
     const response = await app.inject({method: 'POST', url: `/v1/modules/${id}/install`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `invalid-signature-${suffix}`},
@@ -261,7 +278,10 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     const id = nextId()
     const {manifest, evidence} = signedImport(id)
     const imported = await releases.importPendingReview(manifest, evidence)
-    await db.updateTable('greenfield_module_releases').set({release_sha256: sha256('swapped artifact')}).where('release_id', '=', imported.releaseId).execute()
+    const swappedArtifactSha256 = sha256('swapped artifact')
+    await expect(db.updateTable('greenfield_module_releases').set({release_sha256: swappedArtifactSha256})
+      .where('release_id', '=', imported.releaseId).execute()).rejects.toThrow(/immutable/)
+    await tamperPublishedRelease(imported.releaseId, swappedArtifactSha256)
     await expect(releases.verifyRelease(id, '1.0.0')).rejects.toThrow(/signature invalid/)
     const after = await releases.getRelease(id, '1.0.0')
     expect(after?.releaseState).toBe('quarantined')

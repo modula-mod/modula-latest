@@ -603,11 +603,8 @@ export class GreenfieldModuleReleaseService {
         verification_state: result.state,
         verification_detail: result.detail,
         public_key_fingerprint: result.publicKeyFingerprint,
-        statement_sha256: result.statementSha256,
         verified_at: result.state === 'verified' ? now : null,
         revoked_at: result.state === 'revokedKey' ? (row.revoked_at ?? now) : row.revoked_at,
-        statement: row.statement ?? jsonb(statement),
-        observed_at: row.observed_at ?? now,
       }).where('signature_id', '=', row.signature_id).execute()
       if (result.state !== 'verified') {
         await this.quarantineRelease(release.releaseId, `signature ${result.state}`, 'block')
