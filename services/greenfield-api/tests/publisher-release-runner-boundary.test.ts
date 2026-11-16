@@ -169,8 +169,11 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     expect(privileges.rows[0]).toEqual({queue_insert: false, job_update: false, publisher_update: false, audit_insert: false})
     await denied(() => sql`INSERT INTO background_jobs (id, job_type, payload, status, action, trace_id) VALUES (${`forged-${suffix}`}, 'mail.send', '{}'::jsonb, 'QUEUED', 'mail.send', 'forged')`.execute(runner))
     await denied(() => sql`UPDATE greenfield_publisher_release_jobs SET approved_facts = '{}'::jsonb, approval_sha256 = ${'9'.repeat(64)} WHERE job_id = ${jobId}`.execute(runner))
+    await denied(() => sql`UPDATE greenfield_publisher_release_jobs SET approved_by_account_id = ${builderId}, state = 'ready_for_signing' WHERE job_id = ${jobId}`.execute(runner))
     await denied(() => sql`UPDATE greenfield_publisher_release_jobs SET state = 'published', publish_requested_by_account_id = ${builderId}, release_id = 'forged' WHERE job_id = ${jobId}`.execute(runner))
+    await denied(() => sql`UPDATE greenfield_publisher_release_jobs SET sign_requested_by_account_id = 'forged-requester', release_id = 'forged-release' WHERE job_id = ${jobId}`.execute(runner))
     await denied(() => sql`UPDATE greenfield_publisher_release_jobs SET created_by_account_id = 'forged', source_commit = ${'8'.repeat(40)} WHERE job_id = ${jobId}`.execute(runner))
+    await denied(() => sql`UPDATE greenfield_publisher_release_jobs SET signing_receipt = '{"state":"verified","forged":true}'::jsonb WHERE job_id = ${jobId}`.execute(runner))
     await denied(() => sql`UPDATE greenfield_publishers SET trust_level = 'firstParty' WHERE publisher_id = ${publisherId}`.execute(runner))
     await denied(() => sql`UPDATE greenfield_publishers SET trust_level = 'firstParty' WHERE publisher_id = 'modula'`.execute(runner))
     await denied(() => sql`UPDATE greenfield_module_releases SET source_commit = ${'7'.repeat(40)}, release_sha256 = ${'6'.repeat(64)}, trust_level = 'firstParty' WHERE release_id = ${releaseId}`.execute(runner))
@@ -183,6 +186,12 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     ) VALUES (
       ${`psae_${randomUUID()}`}, 'publication_authorized', ${jobId}, ${publisherId}, ${builderId},
       '{"forged":true}'::jsonb, '{"authorization":"forged"}'::jsonb, '2000-01-01'
+    )`.execute(runner))
+    await denied(() => sql`INSERT INTO greenfield_publisher_signing_audit_events (
+      event_id, event_type, job_id, publisher_id, actor_account_id, receipt, details, created_at
+    ) VALUES (
+      ${`psae_${randomUUID()}`}, 'signature_verified', ${jobId}, ${publisherId}, ${builderId},
+      '{"verified":true,"forged":true}'::jsonb, '{"approvalActor":"impersonated"}'::jsonb, '2000-01-01'
     )`.execute(runner))
     await denied(() => sql`UPDATE greenfield_publisher_signing_audit_events SET event_type = 'publication_authorized' WHERE job_id = ${jobId}`.execute(runner))
     await denied(() => sql`DELETE FROM greenfield_publisher_signing_audit_events WHERE job_id = ${jobId}`.execute(runner))
@@ -292,13 +301,20 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     expect(state).toEqual({status: 'QUEUED', attempt_count: 0})
   })
 
-  it('blocks revocation before signing, then completes the legitimate separated lifecycle', async () => {
+  it('blocks quarantine and revocation before signing or publication, then completes the legitimate separated lifecycle', async () => {
     const revocationId = `r2-revocation-${suffix}`
+    const quarantineId = `r2-quarantine-${suffix}`
+    const signingRunner = new RestrictedPublisherSigningRunner(runner, provider, {workerId: 'r2-positive-runner'})
+    await admin.insertInto('greenfield_module_quarantines').values({
+      quarantine_id: quarantineId, release_id: releaseId, reason: 'R2 signing quarantine negative test',
+      policy_action: 'block', created_by: 'test', created_at: new Date(), lifted_at: null,
+    }).execute()
+    expect(await signingRunner.runOnce()).toBe(false)
+    await admin.deleteFrom('greenfield_module_quarantines').where('quarantine_id', '=', quarantineId).execute()
     await admin.insertInto('greenfield_module_revocations').values({
       revocation_id: revocationId, scope: 'release', target_id: releaseId,
       reason: 'R2 negative test', created_by: 'test', created_at: new Date(),
     }).execute()
-    const signingRunner = new RestrictedPublisherSigningRunner(runner, provider, {workerId: 'r2-positive-runner'})
     expect(await signingRunner.runOnce()).toBe(false)
     await admin.deleteFrom('greenfield_module_revocations').where('revocation_id', '=', revocationId).execute()
 
@@ -324,6 +340,12 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     } as never).where('job_id', '=', jobId).execute()
     const publicationQueueId = await enqueueReleaseJobWork(admin, {jobId, workType: RELEASE_JOB_PUBLISH, accountId: builderId, moduleId})
     const publicationRunner = new RestrictedPublisherPublicationAuthority(publication)
+    await admin.insertInto('greenfield_module_quarantines').values({
+      quarantine_id: quarantineId, release_id: releaseId, reason: 'R2 publication quarantine negative test',
+      policy_action: 'block', created_by: 'test', created_at: new Date(), lifted_at: null,
+    }).execute()
+    await expect(publicationRunner.runOnce()).rejects.toMatchObject({code: '42501'})
+    await admin.deleteFrom('greenfield_module_quarantines').where('quarantine_id', '=', quarantineId).execute()
     await admin.insertInto('greenfield_module_revocations').values({
       revocation_id: revocationId, scope: 'release', target_id: releaseId,
       reason: 'R2 publication negative test', created_by: 'test', created_at: new Date(),
