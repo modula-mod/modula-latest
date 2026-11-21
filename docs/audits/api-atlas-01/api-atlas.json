@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gubic-connect-self",
-      "sourceSha256": "0656f6997209a849758f01accceb686cea4db833abf0876d3cd5cd8f8825c6ff",
-      "capturedAt": "2026-11-21T20:45:35.757Z",
+      "branch": "forge/gf-test-db-01",
+      "sourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128",
+      "capturedAt": "2026-11-15T01:05:55.755Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -69947,6 +69947,7 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-listing.compatibility.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
@@ -70062,6 +70063,7 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-listing.compatibility.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
@@ -70170,6 +70172,7 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-listing.compatibility.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts",

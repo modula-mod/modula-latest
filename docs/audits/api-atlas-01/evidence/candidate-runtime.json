@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-21T20:45:35.757Z",
+  "capturedAt": "2026-11-15T01:05:55.755Z",
   "source": {
-    "branch": "mosaic/gubic-connect-self",
-    "headAtCapture": "8b3f70433786842eeb2bab9a9aeddc75dec4d567",
+    "branch": "forge/gf-test-db-01",
+    "headAtCapture": "46043085d8fc121a29607b4d8e2a97468281eef7",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "0656f6997209a849758f01accceb686cea4db833abf0876d3cd5cd8f8825c6ff"
+    "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
   },
   "runtimeRoutes": [
     {
