@@ -10,6 +10,7 @@ import {GreenfieldModuleHealthService} from '../health-service.js'
 import {GreenfieldModuleInstallationService} from '../installation-service.js'
 import {GreenfieldModuleManifestService} from '../manifest-service.js'
 import {moduleError} from '../module-errors.js'
+import {requireStepUp} from '../../auth/step-up/http.js'
 import {GreenfieldModulePublisherService} from '../publisher-service.js'
 import {GreenfieldModuleRecordService} from '../record-service.js'
 import {GreenfieldModuleMediaBindingService} from '../media-binding-service.js'
@@ -1078,12 +1079,16 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
+      // #192: deleting module data needs server-side recent authentication (the session's
+      // auth time, refreshed by login or /v1/auth/step-up/*). Any body.recentAuth is ignored.
+      const deletesData = body.choice === 'deleteData'
+      if (deletesData && !requireStepUp('delete_module_data', auth, reply, request.id)) return
       return reply.code(202).send(
         successEnvelope(
           await uninstall.uninstall(auth.accountId, canonicalModuleParam(request), {
             choice: body.choice,
             confirmDelete: Boolean(body.confirmDelete),
-            recentAuth: Boolean(body.recentAuth),
+            recentAuthVerified: deletesData,
             removeDependants: Boolean(body.removeDependants),
             idempotencyKey: idempotencyKey(request, body),
           }),

@@ -62,7 +62,7 @@ import {TotpService} from '../auth/mfa/totp.js'
 import {RecoveryCodeService} from '../auth/mfa/recovery-codes.js'
 import {PasskeyService} from '../auth/passkeys/service.js'
 import {AppleAuthenticationService} from '../auth/apple/service.js'
-import {evaluateStepUpRequirement, type SensitiveAuthAction} from '../auth/step-up/policy.js'
+import {requireStepUp} from '../auth/step-up/http.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
 import {registerModuleRoutes} from '../modules/routes/index.js'
@@ -396,19 +396,6 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return null
     }
     return resolved
-  }
-
-  const requireStepUp = (action: SensitiveAuthAction, auth: Awaited<ReturnType<typeof requireGreenfieldAuth>>, reply: any, requestId: string) => {
-    if (!auth) return false
-    const evaluation = evaluateStepUpRequirement(action, {
-      recentAuthenticationAt: auth.recentAuthenticationAt,
-      authenticationStrength: auth.authenticationStrength,
-    })
-    if (!evaluation.allowed) {
-      sendError(reply, 'STEP_UP_REQUIRED', 'Recent stronger authentication required', requestId)
-      return false
-    }
-    return true
   }
 
   const accountPrimaryEmail = async (accountId: string) => {

@@ -48,10 +48,14 @@ export class GreenfieldModuleUninstallService {
     }
   }
 
-  async uninstall(accountId: string, moduleId: string, input: {choice?: GreenfieldModuleUninstallChoice; confirmDelete?: boolean; recentAuth?: boolean; removeDependants?: boolean; idempotencyKey: string}) {
+  async uninstall(accountId: string, moduleId: string, input: {choice?: GreenfieldModuleUninstallChoice; confirmDelete?: boolean; /** Set only by the route after the server-side step-up check; never from the request body. */ recentAuthVerified?: boolean; removeDependants?: boolean; idempotencyKey: string}) {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const choice = input.choice ?? 'keepData'
     if (choice === 'cancel') return {cancelled: true}
+    // Validate a data deletion before anything is enqueued (including dependants).
+    if (choice === 'deleteData' && (!input.confirmDelete || !input.recentAuthVerified)) {
+      throw moduleError('VALIDATION_FAILED', 'Deleting module records requires recent authentication and explicit confirmation')
+    }
     const preview = await this.preview(accountId, canonicalId)
     if (preview.dependantModules.length > 0 || preview.dependantExtensions.length > 0) {
       if (!input.removeDependants) throw moduleError('CONFLICT', 'Active dependant products must be removed with the target or cancelled')
@@ -71,9 +75,6 @@ export class GreenfieldModuleUninstallService {
           {dataRetentionChoice: choice, dependencyCascadeFrom: canonicalId},
         )
       }
-    }
-    if (choice === 'deleteData' && (!input.confirmDelete || !input.recentAuth)) {
-      throw moduleError('VALIDATION_FAILED', 'Deleting module records requires recent authentication and explicit confirmation')
     }
     return new GreenfieldModuleInstallationService(this.db, this.config).enqueueTransition(
       accountId,

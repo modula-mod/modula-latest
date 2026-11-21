@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "forge/gf-test-db-01",
-      "sourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128",
-      "capturedAt": "2026-11-15T01:05:55.755Z",
+      "branch": "mosaic/fix-192-module-delete-stepup",
+      "sourceSha256": "56d7e91dae4e3bbd44601cea1d506a41786173adbbdded89ffb57245ee042f91",
+      "capturedAt": "2026-11-21T20:57:57.066Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -2367,7 +2367,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 621
+        "line": 608
       },
       "handler": "inline",
       "controllerServices": [
@@ -2454,7 +2454,8 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
-          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts"
+          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
@@ -2471,6 +2472,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -2519,7 +2521,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 510
+        "line": 497
       },
       "handler": "inline",
       "controllerServices": [
@@ -2634,7 +2636,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 526
+        "line": 513
       },
       "handler": "inline",
       "controllerServices": [
@@ -2736,7 +2738,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 530
+        "line": 517
       },
       "handler": "inline",
       "controllerServices": [
@@ -2839,7 +2841,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 538
+        "line": 525
       },
       "handler": "inline",
       "controllerServices": [
@@ -2923,7 +2925,8 @@
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
@@ -2936,6 +2939,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -2984,7 +2988,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 584
+        "line": 571
       },
       "handler": "inline",
       "controllerServices": [
@@ -3075,7 +3079,8 @@
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
         "server": [
-          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
@@ -3088,6 +3093,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -3695,7 +3701,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 593
+        "line": 580
       },
       "handler": "inline",
       "controllerServices": [
@@ -3805,7 +3811,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 543
+        "line": 530
       },
       "handler": "inline",
       "controllerServices": [
@@ -3911,7 +3917,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 558
+        "line": 545
       },
       "handler": "inline",
       "controllerServices": [
@@ -4029,7 +4035,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 548
+        "line": 535
       },
       "handler": "inline",
       "controllerServices": [
@@ -4258,7 +4264,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2055
+        "line": 2042
       },
       "handler": "inline",
       "controllerServices": [
@@ -4368,7 +4374,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2065
+        "line": 2052
       },
       "handler": "inline",
       "controllerServices": [
@@ -4484,7 +4490,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 604
+        "line": 591
       },
       "handler": "inline",
       "controllerServices": [
@@ -4600,7 +4606,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 635
+        "line": 622
       },
       "handler": "inline",
       "controllerServices": [
@@ -4685,8 +4691,11 @@
           "src/api/local/routes/authRoutes.ts",
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/auth/step-up/policy.ts"
+        ],
         "tests": [
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
       },
@@ -4710,7 +4719,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 630
+        "line": 617
       },
       "handler": "inline",
       "controllerServices": [
@@ -4787,8 +4796,11 @@
           "src/api/local/routes/authRoutes.ts",
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/auth/step-up/policy.ts"
+        ],
         "tests": [
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
       },
@@ -5033,7 +5045,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 459
+        "line": 446
       },
       "handler": "inline",
       "controllerServices": [
@@ -5133,6 +5145,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -5193,7 +5206,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 495
+        "line": 482
       },
       "handler": "inline",
       "controllerServices": [
@@ -5303,7 +5316,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 517
+        "line": 504
       },
       "handler": "inline",
       "controllerServices": [
@@ -5419,7 +5432,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 481
+        "line": 468
       },
       "handler": "inline",
       "controllerServices": [
@@ -5526,6 +5539,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -5572,7 +5586,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2203
+        "line": 2190
       },
       "handler": "inline",
       "controllerServices": [
@@ -7141,7 +7155,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1959
+        "line": 1946
       },
       "handler": "inline",
       "controllerServices": [
@@ -7245,7 +7259,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1977
+        "line": 1964
       },
       "handler": "inline",
       "controllerServices": [
@@ -7349,7 +7363,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1988
+        "line": 1975
       },
       "handler": "inline",
       "controllerServices": [
@@ -7459,7 +7473,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2006
+        "line": 1993
       },
       "handler": "inline",
       "controllerServices": [
@@ -8395,7 +8409,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2366
+        "line": 2353
       },
       "handler": "inline",
       "controllerServices": [
@@ -8504,7 +8518,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2358
+        "line": 2345
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8604,7 +8618,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2660
+        "line": 2647
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8706,7 +8720,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2350
+        "line": 2337
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8806,7 +8820,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2504
+        "line": 2491
       },
       "handler": "inline",
       "controllerServices": [
@@ -8914,7 +8928,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2514
+        "line": 2501
       },
       "handler": "inline",
       "controllerServices": [
@@ -9025,7 +9039,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2627
+        "line": 2614
       },
       "handler": "inline",
       "controllerServices": [
@@ -9138,7 +9152,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2602
+        "line": 2589
       },
       "handler": "inline",
       "controllerServices": [
@@ -9250,7 +9264,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2647
+        "line": 2634
       },
       "handler": "inline",
       "controllerServices": [
@@ -9359,7 +9373,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2483
+        "line": 2470
       },
       "handler": "inline",
       "controllerServices": [
@@ -9464,7 +9478,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2421
+        "line": 2408
       },
       "handler": "inline",
       "controllerServices": [],
@@ -9564,7 +9578,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2392
+        "line": 2379
       },
       "handler": "inline",
       "controllerServices": [
@@ -9676,7 +9690,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2386
+        "line": 2373
       },
       "handler": "inline",
       "controllerServices": [
@@ -9778,7 +9792,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2572
+        "line": 2559
       },
       "handler": "inline",
       "controllerServices": [
@@ -9917,7 +9931,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2437
+        "line": 2424
       },
       "handler": "inline",
       "controllerServices": [
@@ -10026,7 +10040,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2378
+        "line": 2365
       },
       "handler": "inline",
       "controllerServices": [],
@@ -10124,7 +10138,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2537
+        "line": 2524
       },
       "handler": "inline",
       "controllerServices": [
@@ -10224,7 +10238,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2559
+        "line": 2546
       },
       "handler": "inline",
       "controllerServices": [
@@ -10328,7 +10342,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2494
+        "line": 2481
       },
       "handler": "inline",
       "controllerServices": [
@@ -10428,7 +10442,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2527
+        "line": 2514
       },
       "handler": "inline",
       "controllerServices": [
@@ -10528,7 +10542,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2547
+        "line": 2534
       },
       "handler": "inline",
       "controllerServices": [
@@ -10632,7 +10646,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 347
+        "line": 348
       },
       "handler": "inline",
       "controllerServices": [
@@ -11702,7 +11716,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 382
+        "line": 383
       },
       "handler": "inline",
       "controllerServices": [
@@ -11810,7 +11824,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1734
+        "line": 1739
       },
       "handler": "inline",
       "controllerServices": [
@@ -11935,7 +11949,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1834
+        "line": 1839
       },
       "handler": "inline",
       "controllerServices": [
@@ -12041,7 +12055,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1839
+        "line": 1844
       },
       "handler": "inline",
       "controllerServices": [
@@ -12153,7 +12167,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1850
+        "line": 1855
       },
       "handler": "inline",
       "controllerServices": [
@@ -12266,7 +12280,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1831
+        "line": 1836
       },
       "handler": "inline",
       "controllerServices": [
@@ -12371,7 +12385,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1828
+        "line": 1833
       },
       "handler": "inline",
       "controllerServices": [
@@ -12476,7 +12490,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1818
+        "line": 1823
       },
       "handler": "inline",
       "controllerServices": [],
@@ -12576,7 +12590,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1821
+        "line": 1826
       },
       "handler": "inline",
       "controllerServices": [
@@ -12688,7 +12702,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1824
+        "line": 1829
       },
       "handler": "inline",
       "controllerServices": [
@@ -12799,7 +12813,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1781
+        "line": 1786
       },
       "handler": "inline",
       "controllerServices": [
@@ -12925,7 +12939,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1778
+        "line": 1783
       },
       "handler": "inline",
       "controllerServices": [
@@ -13047,7 +13061,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1747
+        "line": 1752
       },
       "handler": "inline",
       "controllerServices": [
@@ -13166,7 +13180,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1767
+        "line": 1772
       },
       "handler": "inline",
       "controllerServices": [
@@ -14214,7 +14228,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2213
+        "line": 2200
       },
       "handler": "inline",
       "controllerServices": [
@@ -14321,7 +14335,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2278
+        "line": 2265
       },
       "handler": "inline",
       "controllerServices": [
@@ -14436,7 +14450,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2290
+        "line": 2277
       },
       "handler": "inline",
       "controllerServices": [
@@ -14547,7 +14561,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2302
+        "line": 2289
       },
       "handler": "inline",
       "controllerServices": [
@@ -14656,7 +14670,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2325
+        "line": 2312
       },
       "handler": "inline",
       "controllerServices": [
@@ -14761,7 +14775,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2245
+        "line": 2232
       },
       "handler": "inline",
       "controllerServices": [
@@ -14884,7 +14898,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2220
+        "line": 2207
       },
       "handler": "inline",
       "controllerServices": [
@@ -14997,7 +15011,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2311
+        "line": 2298
       },
       "handler": "inline",
       "controllerServices": [
@@ -15102,7 +15116,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2318
+        "line": 2305
       },
       "handler": "inline",
       "controllerServices": [
@@ -15864,7 +15878,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 748
+        "line": 735
       },
       "handler": "inline",
       "controllerServices": [
@@ -15971,7 +15985,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 738
+        "line": 725
       },
       "handler": "inline",
       "controllerServices": [
@@ -16073,7 +16087,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 735
+        "line": 722
       },
       "handler": "inline",
       "controllerServices": [
@@ -16169,7 +16183,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 729
+        "line": 716
       },
       "handler": "inline",
       "controllerServices": [
@@ -16269,7 +16283,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 814
+        "line": 801
       },
       "handler": "inline",
       "controllerServices": [
@@ -16384,7 +16398,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 771
+        "line": 758
       },
       "handler": "inline",
       "controllerServices": [
@@ -16490,7 +16504,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 786
+        "line": 773
       },
       "handler": "inline",
       "controllerServices": [
@@ -16723,7 +16737,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 835
+        "line": 822
       },
       "handler": "inline",
       "controllerServices": [
@@ -16826,7 +16840,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 840
+        "line": 827
       },
       "handler": "inline",
       "controllerServices": [
@@ -17051,7 +17065,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 709
+        "line": 696
       },
       "handler": "inline",
       "controllerServices": [
@@ -17161,7 +17175,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 684
+        "line": 671
       },
       "handler": "inline",
       "controllerServices": [
@@ -17274,7 +17288,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 643
+        "line": 630
       },
       "handler": "inline",
       "controllerServices": [
@@ -17382,7 +17396,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 658
+        "line": 645
       },
       "handler": "inline",
       "controllerServices": [
@@ -20669,7 +20683,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1086
+        "line": 1073
       },
       "handler": "inline",
       "controllerServices": [
@@ -20776,7 +20790,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1096
+        "line": 1083
       },
       "handler": "inline",
       "controllerServices": [
@@ -25766,7 +25780,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1354
+        "line": 1341
       },
       "handler": "inline",
       "controllerServices": [
@@ -25866,7 +25880,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1438
+        "line": 1425
       },
       "handler": "inline",
       "controllerServices": [
@@ -26009,7 +26023,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1363
+        "line": 1350
       },
       "handler": "inline",
       "controllerServices": [
@@ -26111,7 +26125,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1381
+        "line": 1368
       },
       "handler": "inline",
       "controllerServices": [
@@ -26215,7 +26229,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1372
+        "line": 1359
       },
       "handler": "inline",
       "controllerServices": [
@@ -26319,7 +26333,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1390
+        "line": 1377
       },
       "handler": "inline",
       "controllerServices": [
@@ -26473,7 +26487,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1307
+        "line": 1294
       },
       "handler": "inline",
       "controllerServices": [
@@ -26578,7 +26592,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1310
+        "line": 1297
       },
       "handler": "inline",
       "controllerServices": [
@@ -26685,7 +26699,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1315
+        "line": 1302
       },
       "handler": "inline",
       "controllerServices": [
@@ -31456,7 +31470,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2198
+        "line": 2185
       },
       "handler": "inline",
       "controllerServices": [
@@ -31569,7 +31583,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1216
+        "line": 1203
       },
       "handler": "inline",
       "controllerServices": [
@@ -31677,7 +31691,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1224
+        "line": 1211
       },
       "handler": "inline",
       "controllerServices": [
@@ -32154,7 +32168,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1248
+        "line": 1235
       },
       "handler": "inline",
       "controllerServices": [
@@ -32270,7 +32284,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1236
+        "line": 1223
       },
       "handler": "inline",
       "controllerServices": [
@@ -32386,7 +32400,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1258
+        "line": 1245
       },
       "handler": "inline",
       "controllerServices": [
@@ -32505,7 +32519,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 531
+        "line": 532
       },
       "handler": "inline",
       "controllerServices": [
@@ -32617,7 +32631,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 541
+        "line": 542
       },
       "handler": "inline",
       "controllerServices": [
@@ -32740,7 +32754,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 607
+        "line": 608
       },
       "handler": "inline",
       "controllerServices": [
@@ -32857,7 +32871,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 553
+        "line": 554
       },
       "handler": "inline",
       "controllerServices": [
@@ -32992,7 +33006,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 644
+        "line": 645
       },
       "handler": "inline",
       "controllerServices": [
@@ -33107,7 +33121,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 624
+        "line": 625
       },
       "handler": "inline",
       "controllerServices": [
@@ -33229,7 +33243,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1219
+        "line": 1206
       },
       "handler": "inline",
       "controllerServices": [
@@ -33332,7 +33346,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1231
+        "line": 1218
       },
       "handler": "inline",
       "controllerServices": [
@@ -33436,7 +33450,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1486
+        "line": 1473
       },
       "handler": "inline",
       "controllerServices": [
@@ -33565,7 +33579,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1517
+        "line": 1504
       },
       "handler": "inline",
       "controllerServices": [
@@ -33677,7 +33691,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1802
+        "line": 1789
       },
       "handler": "inline",
       "controllerServices": [
@@ -33785,7 +33799,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1778
+        "line": 1765
       },
       "handler": "inline",
       "controllerServices": [
@@ -33894,7 +33908,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1790
+        "line": 1777
       },
       "handler": "inline",
       "controllerServices": [
@@ -34209,7 +34223,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1284
+        "line": 1271
       },
       "handler": "inline",
       "controllerServices": [
@@ -34316,7 +34330,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1289
+        "line": 1276
       },
       "handler": "inline",
       "controllerServices": [
@@ -35754,7 +35768,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 217
+        "line": 218
       },
       "handler": "inline",
       "controllerServices": [
@@ -35857,7 +35871,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 199
+        "line": 200
       },
       "handler": "inline",
       "controllerServices": [
@@ -35962,7 +35976,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 190
+        "line": 191
       },
       "handler": "inline",
       "controllerServices": [
@@ -36066,7 +36080,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 235
+        "line": 236
       },
       "handler": "inline",
       "controllerServices": [
@@ -36271,7 +36285,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 253
+        "line": 254
       },
       "handler": "inline",
       "controllerServices": [
@@ -36380,7 +36394,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 266
+        "line": 267
       },
       "handler": "inline",
       "controllerServices": [
@@ -36825,7 +36839,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 244
+        "line": 245
       },
       "handler": "inline",
       "controllerServices": [
@@ -38089,7 +38103,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 285
+        "line": 286
       },
       "handler": "inline",
       "controllerServices": [
@@ -38198,7 +38212,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 208
+        "line": 209
       },
       "handler": "inline",
       "controllerServices": [
@@ -38303,7 +38317,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 226
+        "line": 227
       },
       "handler": "inline",
       "controllerServices": [
@@ -41059,7 +41073,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2695
+        "line": 2682
       },
       "handler": "inline",
       "controllerServices": [],
@@ -44521,7 +44535,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2171
+        "line": 2158
       },
       "handler": "inline",
       "controllerServices": [
@@ -45782,7 +45796,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 516
+        "line": 517
       },
       "handler": "inline",
       "controllerServices": [
@@ -45897,7 +45911,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1634
+        "line": 1639
       },
       "handler": "inline",
       "controllerServices": [
@@ -46013,7 +46027,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1457
+        "line": 1444
       },
       "handler": "inline",
       "controllerServices": [
@@ -46093,6 +46107,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -46111,6 +46126,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -46152,7 +46168,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1508
+        "line": 1513
       },
       "handler": "inline",
       "controllerServices": [
@@ -46248,6 +46264,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -46266,6 +46283,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -46408,6 +46426,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -46426,6 +46445,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -46569,6 +46589,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -46587,6 +46608,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -46730,6 +46752,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -46748,6 +46771,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -46789,7 +46813,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1672
+        "line": 1677
       },
       "handler": "inline",
       "controllerServices": [
@@ -46875,6 +46899,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -46893,6 +46918,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -46934,7 +46960,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1705
+        "line": 1710
       },
       "handler": "inline",
       "controllerServices": [
@@ -47023,6 +47049,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47041,6 +47068,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47082,7 +47110,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1683
+        "line": 1688
       },
       "handler": "inline",
       "controllerServices": [
@@ -47174,6 +47202,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47192,6 +47221,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47233,7 +47263,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1716
+        "line": 1721
       },
       "handler": "inline",
       "controllerServices": [
@@ -47315,6 +47345,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47333,6 +47364,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47374,7 +47406,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1694
+        "line": 1699
       },
       "handler": "inline",
       "controllerServices": [
@@ -47462,6 +47494,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47480,6 +47513,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47521,7 +47555,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1725
+        "line": 1730
       },
       "handler": "inline",
       "controllerServices": [
@@ -47603,6 +47637,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47621,6 +47656,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47662,7 +47698,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 665
+        "line": 666
       },
       "handler": "inline",
       "controllerServices": [
@@ -47752,6 +47788,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47770,6 +47807,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47811,7 +47849,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 680
+        "line": 681
       },
       "handler": "inline",
       "controllerServices": [
@@ -47905,6 +47943,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -47923,6 +47962,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -47964,7 +48004,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 695
+        "line": 696
       },
       "handler": "inline",
       "controllerServices": [
@@ -48053,6 +48093,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48071,6 +48112,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -48112,7 +48154,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 709
+        "line": 710
       },
       "handler": "inline",
       "controllerServices": [
@@ -48211,6 +48253,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48229,6 +48272,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -48270,7 +48314,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 725
+        "line": 726
       },
       "handler": "inline",
       "controllerServices": [
@@ -48366,6 +48410,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48384,6 +48429,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -48425,7 +48471,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 908
+        "line": 909
       },
       "handler": "inline",
       "controllerServices": [
@@ -48520,6 +48566,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48538,6 +48585,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -48579,7 +48627,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 895
+        "line": 896
       },
       "handler": "inline",
       "controllerServices": [
@@ -48684,6 +48732,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48702,6 +48751,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -48743,7 +48793,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1651
+        "line": 1656
       },
       "handler": "inline",
       "controllerServices": [
@@ -48833,6 +48883,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48851,6 +48902,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -48892,7 +48944,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1144
+        "line": 1149
       },
       "handler": "inline",
       "controllerServices": [
@@ -48975,6 +49027,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -48993,6 +49046,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49034,7 +49088,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1529
+        "line": 1534
       },
       "handler": "inline",
       "controllerServices": [
@@ -49142,6 +49196,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -49160,6 +49215,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49201,7 +49257,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1662
+        "line": 1667
       },
       "handler": "inline",
       "controllerServices": [
@@ -49293,6 +49349,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -49311,6 +49368,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49352,7 +49410,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1548
+        "line": 1553
       },
       "handler": "inline",
       "controllerServices": [
@@ -49440,6 +49498,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -49458,6 +49517,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49499,7 +49559,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1561
+        "line": 1566
       },
       "handler": "inline",
       "controllerServices": [
@@ -49590,6 +49650,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -49608,6 +49669,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49649,7 +49711,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1572
+        "line": 1577
       },
       "handler": "inline",
       "controllerServices": [
@@ -49740,6 +49802,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -49758,6 +49821,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49799,7 +49863,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1596
+        "line": 1601
       },
       "handler": "inline",
       "controllerServices": [
@@ -49891,6 +49955,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -49909,6 +49974,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -49950,7 +50016,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1583
+        "line": 1588
       },
       "handler": "inline",
       "controllerServices": [
@@ -50050,6 +50116,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -50068,6 +50135,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -50109,7 +50177,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1076
+        "line": 1077
       },
       "handler": "inline",
       "controllerServices": [
@@ -50199,6 +50267,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -50217,6 +50286,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -50258,7 +50328,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 809
+        "line": 810
       },
       "handler": "inline",
       "controllerServices": [
@@ -50387,6 +50457,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -50405,6 +50476,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -50446,7 +50518,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 856
+        "line": 857
       },
       "handler": "inline",
       "controllerServices": [
@@ -50536,6 +50608,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -50554,6 +50627,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -50595,7 +50669,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 774
+        "line": 775
       },
       "handler": "inline",
       "controllerServices": [
@@ -50699,6 +50773,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -50717,6 +50792,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -50758,7 +50834,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 762
+        "line": 763
       },
       "handler": "inline",
       "controllerServices": [
@@ -50855,6 +50931,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -50873,6 +50950,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -50914,7 +50992,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 867
+        "line": 868
       },
       "handler": "inline",
       "controllerServices": [
@@ -51006,6 +51084,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51024,6 +51103,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51065,7 +51145,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 792
+        "line": 793
       },
       "handler": "inline",
       "controllerServices": [
@@ -51167,6 +51247,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51185,6 +51266,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51226,7 +51308,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1052
+        "line": 1053
       },
       "handler": "inline",
       "controllerServices": [
@@ -51322,6 +51404,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51340,6 +51423,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51381,7 +51465,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1231
+        "line": 1236
       },
       "handler": "inline",
       "controllerServices": [
@@ -51475,6 +51559,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51493,6 +51578,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51534,7 +51620,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1186
+        "line": 1191
       },
       "handler": "inline",
       "controllerServices": [
@@ -51620,6 +51706,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51638,6 +51725,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51679,7 +51767,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1220
+        "line": 1225
       },
       "handler": "inline",
       "controllerServices": [
@@ -51776,6 +51864,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51794,6 +51883,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51835,7 +51925,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1209
+        "line": 1214
       },
       "handler": "inline",
       "controllerServices": [
@@ -51926,6 +52016,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -51944,6 +52035,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -51985,7 +52077,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1197
+        "line": 1202
       },
       "handler": "inline",
       "controllerServices": [
@@ -52074,6 +52166,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -52092,6 +52185,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -52133,7 +52227,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1257
+        "line": 1262
       },
       "handler": "inline",
       "controllerServices": [
@@ -52220,6 +52314,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -52238,6 +52333,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -52279,7 +52375,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1268
+        "line": 1273
       },
       "handler": "inline",
       "controllerServices": [
@@ -52391,6 +52487,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -52409,6 +52506,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -52450,7 +52548,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1459
+        "line": 1464
       },
       "handler": "inline",
       "controllerServices": [
@@ -52559,6 +52657,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -52577,6 +52676,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -52618,7 +52718,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1286
+        "line": 1291
       },
       "handler": "inline",
       "controllerServices": [
@@ -52704,6 +52804,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -52722,6 +52823,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -52763,7 +52865,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1440
+        "line": 1445
       },
       "handler": "inline",
       "controllerServices": [
@@ -52876,6 +52978,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -52894,6 +52997,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -52935,7 +53039,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1308
+        "line": 1313
       },
       "handler": "inline",
       "controllerServices": [
@@ -53023,6 +53127,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53041,6 +53146,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -53082,7 +53188,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1319
+        "line": 1324
       },
       "handler": "inline",
       "controllerServices": [
@@ -53185,6 +53291,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53203,6 +53310,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -53244,7 +53352,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1352
+        "line": 1357
       },
       "handler": "inline",
       "controllerServices": [
@@ -53342,6 +53450,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53360,6 +53469,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -53401,7 +53511,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1341
+        "line": 1346
       },
       "handler": "inline",
       "controllerServices": [
@@ -53501,6 +53611,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53519,6 +53630,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -53560,7 +53672,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1330
+        "line": 1335
       },
       "handler": "inline",
       "controllerServices": [
@@ -53660,6 +53772,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53678,6 +53791,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -53719,7 +53833,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1497
+        "line": 1502
       },
       "handler": "inline",
       "controllerServices": [
@@ -53819,6 +53933,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53837,6 +53952,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -53878,7 +53994,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1405
+        "line": 1410
       },
       "handler": "inline",
       "controllerServices": [
@@ -53969,6 +54085,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -53987,6 +54104,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54028,7 +54146,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1478
+        "line": 1483
       },
       "handler": "inline",
       "controllerServices": [
@@ -54141,6 +54259,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -54159,6 +54278,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54200,7 +54320,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1423
+        "line": 1428
       },
       "handler": "inline",
       "controllerServices": [
@@ -54291,6 +54411,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -54309,6 +54430,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54350,7 +54472,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1363
+        "line": 1368
       },
       "handler": "inline",
       "controllerServices": [
@@ -54440,6 +54562,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -54458,6 +54581,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54499,7 +54623,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1388
+        "line": 1393
       },
       "handler": "inline",
       "controllerServices": [
@@ -54587,6 +54711,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -54605,6 +54730,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54646,7 +54772,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1377
+        "line": 1382
       },
       "handler": "inline",
       "controllerServices": [
@@ -54733,6 +54859,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -54751,6 +54878,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54792,7 +54920,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1297
+        "line": 1302
       },
       "handler": "inline",
       "controllerServices": [
@@ -54890,6 +55018,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -54908,6 +55037,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -54949,7 +55079,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1175
+        "line": 1180
       },
       "handler": "inline",
       "controllerServices": [
@@ -55034,6 +55164,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55052,6 +55183,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -55093,7 +55225,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1165
+        "line": 1170
       },
       "handler": "inline",
       "controllerServices": [
@@ -55176,6 +55308,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55194,6 +55327,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -55235,7 +55369,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1242
+        "line": 1247
       },
       "handler": "inline",
       "controllerServices": [
@@ -55330,6 +55464,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55348,6 +55483,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -55389,7 +55525,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1022
+        "line": 1023
       },
       "handler": "inline",
       "controllerServices": [
@@ -55508,6 +55644,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55526,6 +55663,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -55567,7 +55705,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 655
+        "line": 656
       },
       "handler": "inline",
       "controllerServices": [
@@ -55660,6 +55798,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55678,6 +55817,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -55719,7 +55859,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1607
+        "line": 1612
       },
       "handler": "inline",
       "controllerServices": [
@@ -55807,6 +55947,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55825,6 +55966,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -55866,7 +56008,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1621
+        "line": 1626
       },
       "handler": "inline",
       "controllerServices": [
@@ -55952,6 +56094,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -55970,6 +56113,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56011,7 +56155,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 741
+        "line": 742
       },
       "handler": "inline",
       "controllerServices": [
@@ -56112,6 +56256,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -56130,6 +56275,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56171,7 +56317,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1108
+        "line": 1113
       },
       "handler": "inline",
       "controllerServices": [
@@ -56254,6 +56400,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -56272,6 +56419,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56313,7 +56461,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1118
+        "line": 1123
       },
       "handler": "inline",
       "controllerServices": [
@@ -56405,6 +56553,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -56423,6 +56572,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56464,7 +56614,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1098
+        "line": 1103
       },
       "handler": "inline",
       "controllerServices": [
@@ -56546,6 +56696,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -56564,6 +56715,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56605,7 +56757,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1066
+        "line": 1067
       },
       "handler": "inline",
       "controllerServices": [
@@ -56692,6 +56844,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -56710,6 +56863,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56751,7 +56905,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 981
+        "line": 982
       },
       "handler": "inline",
       "controllerServices": [
@@ -56868,6 +57022,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -56886,6 +57041,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -56927,7 +57083,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 946
+        "line": 947
       },
       "handler": "inline",
       "controllerServices": [
@@ -57028,6 +57184,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -57046,6 +57203,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -57087,7 +57245,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 932
+        "line": 933
       },
       "handler": "inline",
       "controllerServices": [
@@ -57174,6 +57332,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -57192,6 +57351,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -57233,7 +57393,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 920
+        "line": 921
       },
       "handler": "inline",
       "controllerServices": [
@@ -57313,6 +57473,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -57331,6 +57492,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -57372,7 +57534,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1134
+        "line": 1139
       },
       "handler": "inline",
       "controllerServices": [
@@ -57458,6 +57620,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -57476,6 +57639,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -57517,7 +57681,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1154
+        "line": 1159
       },
       "handler": "inline",
       "controllerServices": [
@@ -57605,6 +57769,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/auth/step-up/policy.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -57623,6 +57788,7 @@
           "scripts/verify-phase7e-vault-notes-lifecycle.mjs",
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/gf-mod-01.artifact-closure.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/module-platform-02.records.test.ts",
@@ -57664,7 +57830,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1128
+        "line": 1133
       },
       "handler": "inline",
       "controllerServices": [
@@ -57770,7 +57936,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 963
+        "line": 964
       },
       "handler": "inline",
       "controllerServices": [
@@ -57891,7 +58057,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 502
+        "line": 503
       },
       "handler": "inline",
       "controllerServices": [
@@ -58014,7 +58180,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 508
+        "line": 509
       },
       "handler": "inline",
       "controllerServices": [
@@ -58124,7 +58290,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 881
+        "line": 882
       },
       "handler": "inline",
       "controllerServices": [
@@ -60442,7 +60608,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2024
+        "line": 2011
       },
       "handler": "inline",
       "controllerServices": [
@@ -60554,7 +60720,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2039
+        "line": 2026
       },
       "handler": "inline",
       "controllerServices": [
@@ -60665,7 +60831,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2048
+        "line": 2035
       },
       "handler": "inline",
       "controllerServices": [
@@ -60771,7 +60937,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1304
+        "line": 1291
       },
       "handler": "inline",
       "controllerServices": [
@@ -60869,7 +61035,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1546
+        "line": 1533
       },
       "handler": "inline",
       "controllerServices": [
@@ -61010,7 +61176,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1582
+        "line": 1569
       },
       "handler": "inline",
       "controllerServices": [
@@ -61143,7 +61309,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1539
+        "line": 1526
       },
       "handler": "inline",
       "controllerServices": [
@@ -61275,7 +61441,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1565
+        "line": 1552
       },
       "handler": "inline",
       "controllerServices": [
@@ -61698,7 +61864,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1593
       },
       "handler": "inline",
       "controllerServices": [
@@ -61846,7 +62012,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1593
       },
       "handler": "inline",
       "controllerServices": [
@@ -62537,7 +62703,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1593
       },
       "handler": "inline",
       "controllerServices": [
@@ -62685,7 +62851,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1593
       },
       "handler": "inline",
       "controllerServices": [
@@ -62833,7 +62999,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1593
       },
       "handler": "inline",
       "controllerServices": [
@@ -62981,7 +63147,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1593
       },
       "handler": "inline",
       "controllerServices": [
@@ -63129,7 +63295,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1643
+        "line": 1630
       },
       "handler": "inline",
       "controllerServices": [
@@ -63820,7 +63986,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 323
+        "line": 324
       },
       "handler": "inline",
       "controllerServices": [
@@ -63929,7 +64095,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 335
+        "line": 336
       },
       "handler": "inline",
       "controllerServices": [
@@ -64035,7 +64201,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1662
+        "line": 1649
       },
       "handler": "inline",
       "controllerServices": [
@@ -64182,7 +64348,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1686
+        "line": 1673
       },
       "handler": "inline",
       "controllerServices": [
@@ -64319,7 +64485,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1702
+        "line": 1689
       },
       "handler": "inline",
       "controllerServices": [
@@ -64456,7 +64622,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1670
+        "line": 1657
       },
       "handler": "inline",
       "controllerServices": [
@@ -64592,7 +64758,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1890
+        "line": 1877
       },
       "handler": "inline",
       "controllerServices": [
@@ -64727,7 +64893,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1874
+        "line": 1861
       },
       "handler": "inline",
       "controllerServices": [
@@ -64866,7 +65032,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1741
+        "line": 1728
       },
       "handler": "inline",
       "controllerServices": [
@@ -65010,7 +65176,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1718
+        "line": 1705
       },
       "handler": "inline",
       "controllerServices": [
@@ -65154,7 +65320,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1920
+        "line": 1907
       },
       "handler": "inline",
       "controllerServices": [
@@ -65289,7 +65455,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1905
+        "line": 1892
       },
       "handler": "inline",
       "controllerServices": [
@@ -65425,7 +65591,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1814
+        "line": 1801
       },
       "handler": "inline",
       "controllerServices": [
@@ -65564,7 +65730,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1859
+        "line": 1846
       },
       "handler": "inline",
       "controllerServices": [
@@ -65677,7 +65843,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1842
+        "line": 1829
       },
       "handler": "inline",
       "controllerServices": [
@@ -65793,7 +65959,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1859
+        "line": 1846
       },
       "handler": "inline",
       "controllerServices": [
@@ -65905,7 +66071,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1842
+        "line": 1829
       },
       "handler": "inline",
       "controllerServices": [
@@ -66020,7 +66186,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1764
+        "line": 1751
       },
       "handler": "inline",
       "controllerServices": [
@@ -68886,7 +69052,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2208
+        "line": 2195
       },
       "handler": "inline",
       "controllerServices": [
@@ -69106,7 +69272,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 448
+        "line": 449
       },
       "handler": "inline",
       "controllerServices": [
@@ -69212,7 +69378,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 172
+        "line": 173
       },
       "handler": "inline",
       "controllerServices": [
@@ -69345,7 +69511,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 296
+        "line": 297
       },
       "handler": "inline",
       "controllerServices": [
@@ -69478,7 +69644,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 483
+        "line": 484
       },
       "handler": "inline",
       "controllerServices": [
@@ -69600,7 +69766,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 393
+        "line": 394
       },
       "handler": "inline",
       "controllerServices": [
@@ -69727,7 +69893,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 402
+        "line": 403
       },
       "handler": "inline",
       "controllerServices": [
@@ -69860,7 +70026,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 181
+        "line": 182
       },
       "handler": "inline",
       "controllerServices": [
@@ -69974,7 +70140,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 305
+        "line": 306
       },
       "handler": "inline",
       "controllerServices": [
@@ -70090,7 +70256,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 314
+        "line": 315
       },
       "handler": "inline",
       "controllerServices": [
@@ -70199,7 +70365,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 495
+        "line": 496
       },
       "handler": "inline",
       "controllerServices": [
@@ -70299,7 +70465,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 412
+        "line": 413
       },
       "handler": "inline",
       "controllerServices": [
@@ -70400,7 +70566,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 422
+        "line": 423
       },
       "handler": "inline",
       "controllerServices": [
@@ -70527,7 +70693,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 461
+        "line": 462
       },
       "handler": "inline",
       "controllerServices": [
@@ -70651,7 +70817,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 436
+        "line": 437
       },
       "handler": "inline",
       "controllerServices": [
@@ -70766,7 +70932,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1935
+        "line": 1922
       },
       "handler": "inline",
       "controllerServices": [
@@ -70887,7 +71053,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1948
+        "line": 1935
       },
       "handler": "inline",
       "controllerServices": [
@@ -70991,7 +71157,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1107
+        "line": 1094
       },
       "handler": "inline",
       "controllerServices": [
@@ -71096,7 +71262,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1196
+        "line": 1183
       },
       "handler": "inline",
       "controllerServices": [
@@ -71202,7 +71368,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1205
+        "line": 1192
       },
       "handler": "inline",
       "controllerServices": [
@@ -71305,7 +71471,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1116
+        "line": 1103
       },
       "handler": "inline",
       "controllerServices": [
@@ -71408,7 +71574,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1130
+        "line": 1117
       },
       "handler": "inline",
       "controllerServices": [
@@ -71518,7 +71684,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1173
+        "line": 1160
       },
       "handler": "inline",
       "controllerServices": [
@@ -71632,7 +71798,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1122
+        "line": 1109
       },
       "handler": "inline",
       "controllerServices": [
@@ -71735,7 +71901,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1149
+        "line": 1136
       },
       "handler": "inline",
       "controllerServices": [
@@ -71958,7 +72124,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2081
+        "line": 2068
       },
       "handler": "inline",
       "controllerServices": [
@@ -72068,7 +72234,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2118
+        "line": 2105
       },
       "handler": "inline",
       "controllerServices": [
@@ -72173,7 +72339,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2098
+        "line": 2085
       },
       "handler": "inline",
       "controllerServices": [
@@ -72274,7 +72440,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2108
+        "line": 2095
       },
       "handler": "inline",
       "controllerServices": [
@@ -72377,7 +72543,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2129
+        "line": 2116
       },
       "handler": "inline",
       "controllerServices": [
@@ -72477,7 +72643,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2139
+        "line": 2126
       },
       "handler": "inline",
       "controllerServices": [
@@ -72581,7 +72747,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2160
+        "line": 2147
       },
       "handler": "inline",
       "controllerServices": [
@@ -72685,7 +72851,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2149
+        "line": 2136
       },
       "handler": "inline",
       "controllerServices": [
@@ -72793,7 +72959,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2090
+        "line": 2077
       },
       "handler": "inline",
       "controllerServices": [
@@ -72891,7 +73057,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 856
+        "line": 843
       },
       "handler": "inline",
       "controllerServices": [
@@ -72993,6 +73159,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -73043,7 +73210,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1078
+        "line": 1065
       },
       "handler": "inline",
       "controllerServices": [
@@ -73148,6 +73315,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/fix-192.module-delete-stepup.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -73198,7 +73366,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1017
+        "line": 1004
       },
       "handler": "inline",
       "controllerServices": [
@@ -73314,7 +73482,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1005
+        "line": 992
       },
       "handler": "inline",
       "controllerServices": [
@@ -73416,7 +73584,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1072
+        "line": 1059
       },
       "handler": "inline",
       "controllerServices": [
@@ -73530,7 +73698,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 893
+        "line": 880
       },
       "handler": "inline",
       "controllerServices": [
@@ -73639,7 +73807,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 878
+        "line": 865
       },
       "handler": "inline",
       "controllerServices": [
@@ -73746,7 +73914,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1479
+        "line": 1466
       },
       "handler": "inline",
       "controllerServices": [
@@ -73849,7 +74017,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1473
+        "line": 1460
       },
       "handler": "inline",
       "controllerServices": [],
@@ -73944,7 +74112,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 964
+        "line": 951
       },
       "handler": "inline",
       "controllerServices": [
@@ -74066,7 +74234,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 949
+        "line": 936
       },
       "handler": "inline",
       "controllerServices": [
@@ -74173,7 +74341,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 921
+        "line": 908
       },
       "handler": "inline",
       "controllerServices": [
@@ -74281,7 +74449,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1053
+        "line": 1040
       },
       "handler": "inline",
       "controllerServices": [
@@ -75678,7 +75846,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1270
+        "line": 1257
       },
       "handler": "inline",
       "controllerServices": [
@@ -75781,7 +75949,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1274
+        "line": 1261
       },
       "handler": "inline",
       "controllerServices": [
@@ -75982,7 +76150,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1454
+        "line": 1441
       },
       "handler": "inline",
       "controllerServices": [
