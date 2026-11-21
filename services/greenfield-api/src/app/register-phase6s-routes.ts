@@ -3,6 +3,7 @@ import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {RecoveryService} from '../accounts/recovery.js'
 import {AppearanceService} from '../domains/appearance/service.js'
+import {LiveCommentPublisher} from '../domains/comments/live.js'
 import {CommentService} from '../domains/comments/service.js'
 import {MentionService} from '../domains/mentions/service.js'
 import {QuoteService} from '../domains/quotes/service.js'
@@ -45,6 +46,8 @@ export async function registerPhase6sRoutes(
     feedConfig: Record<string, unknown>
     profileConfig: Record<string, unknown>
     authWriteConfig: Record<string, unknown>
+    /** Live comment fan-out over the messaging socket; absent means off. */
+    liveComments?: LiveCommentPublisher
   },
 ): Promise<void> {
   const reactions = new ReactionService(db)
@@ -56,6 +59,17 @@ export async function registerPhase6sRoutes(
   const recovery = new RecoveryService(db, config)
   const lifecycle = new ExtensionLifecycleService(db)
   const functionJobs = new FunctionJobService(db)
+  const live = opts.liveComments ?? new LiveCommentPublisher(db, null, false)
+  const now = () => new Date().toISOString()
+  const fanOut = (request: any, task: () => Promise<unknown>) => {
+    if (!live.active) return
+    task().catch(error => request.log.warn({error: error?.message}, 'live comment publish failed'))
+  }
+  const commentEvent = (request: any, commentId: string, type: 'post.comment.updated' | 'post.comment.deleted' | 'post.comment.reactions') =>
+    fanOut(request, async () => {
+      const located = await comments.locate(commentId)
+      if (located) await live.publish(located.postId, {type, postId: located.postId, commentId, at: now()}, located.authorActorId)
+    })
 
   const requireGreenfieldAuth = async (request: any, reply: any) => {
     const header = request.headers.authorization
@@ -78,6 +92,7 @@ export async function registerPhase6sRoutes(
       const {postId} = request.params as {postId: string}
       const type = (request.body as {type?: string} | null)?.type ?? null
       const summary = await reactions.setReaction(auth.actorId, postId, type as any)
+      fanOut(request, () => live.publish(postId, {type: 'post.engagement', postId, at: now()}))
       return reply.send(successEnvelope(summary, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Reaction failed')
@@ -89,7 +104,9 @@ export async function registerPhase6sRoutes(
     if (!auth) return
     try {
       const {postId} = request.params as {postId: string}
-      return reply.send(successEnvelope(await reactions.setReaction(auth.actorId, postId, null), request.id))
+      const summary = await reactions.setReaction(auth.actorId, postId, null)
+      fanOut(request, () => live.publish(postId, {type: 'post.engagement', postId, at: now()}))
+      return reply.send(successEnvelope(summary, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Reaction removal failed')
     }
@@ -124,6 +141,7 @@ export async function registerPhase6sRoutes(
       const text = String((request.body as any)?.text ?? '')
       const created = await comments.createComment(auth.actorId, postId, text, {accountId: auth.accountId, raw: (request.body as any)?.media}, (request.body as any)?.quotedCommentId)
       await mentions.storeMentions(auth.actorId, 'comment', created.comment_id, text)
+      fanOut(request, () => live.publish(created.post_id, {type: 'post.comment.created', postId: created.post_id, commentId: created.comment_id, parentCommentId: null, at: now()}, auth.actorId))
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Failed to create comment')
@@ -147,6 +165,7 @@ export async function registerPhase6sRoutes(
       const text = String((request.body as any)?.text ?? '')
       const created = await comments.createReply(auth.actorId, commentId, text, {accountId: auth.accountId, raw: (request.body as any)?.media})
       await mentions.storeMentions(auth.actorId, 'comment', created.comment_id, text)
+      fanOut(request, () => live.publish(created.post_id, {type: 'post.comment.created', postId: created.post_id, commentId: created.comment_id, parentCommentId: created.parent_comment_id ?? null, at: now()}, auth.actorId))
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Failed to create reply')
@@ -165,6 +184,7 @@ export async function registerPhase6sRoutes(
         String(body.text ?? ''),
         Number(body.expectedVersion),
       )
+      commentEvent(request, commentId, 'post.comment.updated')
       return reply.send(successEnvelope(updated, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Failed to update comment')
@@ -177,6 +197,7 @@ export async function registerPhase6sRoutes(
     try {
       const {commentId} = request.params as {commentId: string}
       await comments.deleteComment(auth.actorId, commentId)
+      commentEvent(request, commentId, 'post.comment.deleted')
       return reply.send(successEnvelope({deleted: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Failed to delete comment')
@@ -216,6 +237,7 @@ export async function registerPhase6sRoutes(
       const {commentId} = request.params as {commentId: string}
       const type = (request.body as {type?: string} | null)?.type ?? null
       await comments.setCommentReaction(auth.actorId, commentId, type as any)
+      commentEvent(request, commentId, 'post.comment.reactions')
       return reply.send(successEnvelope({ok: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Comment reaction failed')
@@ -228,6 +250,7 @@ export async function registerPhase6sRoutes(
     try {
       const {commentId} = request.params as {commentId: string}
       await comments.setCommentReaction(auth.actorId, commentId, null)
+      commentEvent(request, commentId, 'post.comment.reactions')
       return reply.send(successEnvelope({ok: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Comment reaction removal failed')

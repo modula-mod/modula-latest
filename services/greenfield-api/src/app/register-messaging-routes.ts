@@ -2,7 +2,11 @@ import type {FastifyInstance} from 'fastify'
 import websocket from '@fastify/websocket'
 
 import type {ModulaDb} from '../database/client.js'
-import {MessagingRealtimeHub, type MessagingRealtimeEvent} from '../domains/messaging/realtime-hub.js'
+import {CommentService} from '../domains/comments/service.js'
+import {MessagingRealtimeHub, POST_TOPICS_MAX_PER_SOCKET, type MessagingRealtimeEvent, type MessagingSubscriber} from '../domains/messaging/realtime-hub.js'
+import {MESSAGING_FEATURES_ALL_OFF, SOCIAL_FEATURES_ALL_OFF, type MessagingFeaturesConfig, type SocialFeaturesConfig} from '../config/env.js'
+import {MessagingFeaturesService} from '../domains/messaging/features4.js'
+import {messagingFeaturesCapabilities, registerMessagingFeaturesRoutes, type MessagingFeaturesHooks} from './register-messaging-features-routes.js'
 import {
   GROUP_MAX_MEMBERS,
   MESSAGE_ATTACHMENTS_MAX,
@@ -67,11 +71,18 @@ export async function registerMessagingRoutes(
     hub?: MessagingRealtimeHub
     /** Calls capability block (see register-calls-routes). Absent means calls are off. */
     callsCapabilities?: Record<string, unknown>
+    /** Additive social feature switches (mark unread, live comments). */
+    features?: Partial<SocialFeaturesConfig>
+    /** Messaging features 4 switches (pins, saved, scheduled, disappearing, folders, ...). */
+    messagingFeatures?: Partial<MessagingFeaturesConfig>
   },
-): Promise<{hub: MessagingRealtimeHub; messaging: MessagingService}> {
-  const messaging = new MessagingService(db, {publicApiUrl: options.publicApiUrl})
+): Promise<{hub: MessagingRealtimeHub; messaging: MessagingService; featureHooks: MessagingFeaturesHooks}> {
+  const messaging = new MessagingFeaturesService(db, {publicApiUrl: options.publicApiUrl})
+  const messagingFeatures: MessagingFeaturesConfig = {...MESSAGING_FEATURES_ALL_OFF, ...(options.messagingFeatures ?? {})}
   const hub = options.hub ?? new MessagingRealtimeHub()
   const mediaEnabled = options.mediaEnabled === true
+  const features: SocialFeaturesConfig = {...SOCIAL_FEATURES_ALL_OFF, ...(options.features ?? {})}
+  const comments = new CommentService(db, options.publicApiUrl)
   const {feedConfig, writeConfig} = options
   const publish = (request: any, recipients: Promise<string[]> | string[], event: MessagingRealtimeEvent) => {
     Promise.resolve(recipients)
@@ -82,6 +93,10 @@ export async function registerMessagingRoutes(
     publish(request, messaging.realtimeRecipients(conversationId, actorId, {includeActor}), event)
   const read = (extra: Record<string, any> = {}) => ({...feedConfig, ...extra})
   const write = (extra: Record<string, any> = {}) => ({...writeConfig, ...extra})
+  const featureHooks = registerMessagingFeaturesRoutes(app, db, {
+    messaging, hub, features: messagingFeatures, mediaEnabled, read, write, toMembers,
+    notify: (sender, conversationId, message, mentioned) => notifyConversationMembers(db, messaging, sender, conversationId, message, mentioned),
+  })
 
   app.get('/v1/conversations', read(), async (request, reply) => {
     const auth = requireCapability(request, reply, 'social:read')
@@ -141,7 +156,7 @@ export async function registerMessagingRoutes(
     const {id} = request.params as {id: string}
     const body = (request.body ?? {}) as {text?: unknown; replyToMessageId?: unknown; clientMessageId?: unknown; kind?: unknown; attachments?: unknown}
     try {
-      const result = await messaging.sendDetailed(auth.actorId, id, body, {accountId: auth.accountId, mediaEnabled})
+      const result = await messaging.sendDetailed(auth.actorId, id, body, {accountId: auth.accountId, mediaEnabled, disappearingEnabled: messagingFeatures.disappearingMessages})
       if (!result.created) return reply.code(200).send(successEnvelope({message: result.message, duplicate: true}, request.id))
       await notifyConversationMembers(db, messaging, auth.actorId, id, result.message, result.mentionedActorIds)
         .catch(error => request.log.warn({error: error?.message}, 'message push enqueue failed'))
@@ -168,6 +183,31 @@ export async function registerMessagingRoutes(
       return reply.send(successEnvelope({ok: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Unable to mark conversation read')
+    }
+  })
+
+  /**
+   * Mark a conversation unread for the caller only (capability `markUnread`).
+   * last_read_at is untouched, so other members' read receipts are not
+   * revoked; POST /read (or `{"unread": false}`) clears the marker.
+   */
+  app.post('/v1/conversations/:id/unread', write(idParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    if (!features.markUnread) {
+      return reply.code(statusForError('CAPABILITY_DISABLED')).send(failureEnvelope('CAPABILITY_DISABLED', 'Mark unread is not available', request.id))
+    }
+    const {id} = request.params as {id: string}
+    const body = (request.body ?? {}) as {unread?: unknown}
+    if (body.unread !== undefined && typeof body.unread !== 'boolean') {
+      return reply.code(statusForError('VALIDATION_FAILED')).send(failureEnvelope('VALIDATION_FAILED', 'unread must be a boolean', request.id))
+    }
+    try {
+      const result = await messaging.setMarkedUnread(auth.actorId, id, body.unread !== false)
+      hub.publish([auth.actorId], {type: 'conversation.unread', conversationId: id, actorId: auth.actorId, markedUnread: result.markedUnread, at: new Date().toISOString()})
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Unable to mark conversation unread')
     }
   })
 
@@ -322,6 +362,11 @@ export async function registerMessagingRoutes(
       idempotentSend: true,
       notificationActions: ['reply', 'markRead'],
       calls: options.callsCapabilities ?? {enabled: false, audio: false, video: false, voipPush: false},
+      markUnread: features.markUnread,
+      liveComments: features.liveComments
+        ? {enabled: true, subscribeFrame: 'post.subscribe', unsubscribeFrame: 'post.unsubscribe', maxPostsPerSocket: POST_TOPICS_MAX_PER_SOCKET}
+        : {enabled: false},
+      ...messagingFeaturesCapabilities(messagingFeatures),
     }, request.id))
   })
 
@@ -514,7 +559,8 @@ export async function registerMessagingRoutes(
     const auth = socketAuth.get(request)
     if (!auth) { socket.close(4401, 'Authentication required'); return }
     const send = (event: MessagingRealtimeEvent) => socket.send(JSON.stringify(event))
-    const unsubscribe = hub.subscribe({actorId: auth.actorId, send})
+    const subscriber: MessagingSubscriber = {actorId: auth.actorId, send}
+    const unsubscribe = hub.subscribe(subscriber)
     if (!unsubscribe) { socket.close(4429, 'Too many open message sockets'); return }
     let lastTouch = 0
     const touch = async (force = false) => {
@@ -545,9 +591,28 @@ export async function registerMessagingRoutes(
         }
         return
       }
+      if ((message?.type === 'post.subscribe' || message?.type === 'post.unsubscribe') && features.liveComments) {
+        const postId = message.postId
+        if (typeof postId !== 'string' || postId.length < 1 || postId.length > 64) { send({type: 'error', reason: 'invalid-post'}); return }
+        if (message.type === 'post.unsubscribe') {
+          hub.unfollowPost(subscriber, postId)
+          send({type: 'post.unsubscribed', postId})
+          return
+        }
+        // Same read policy as GET /v1/posts/:postId/comments (visibility, blocks).
+        const allowed = await comments.canFollowPost(auth.actorId, postId).catch(() => false)
+        if (closed) return
+        if (!allowed) { send({type: 'error', reason: 'not-found'}); return }
+        if (!hub.followPost(subscriber, postId)) { send({type: 'error', reason: 'too-many-posts'}); return }
+        send({type: 'post.subscribed', postId})
+        return
+      }
       send({type: 'error', reason: 'unsupported'})
     })
+    let closed = false
     socket.on('close', () => {
+      closed = true
+      hub.unfollowAllPosts(subscriber)
       unsubscribe()
       if (!hub.isOnline(auth.actorId)) {
         const at = new Date()
@@ -639,7 +704,7 @@ export async function registerMessagingRoutes(
     }
   })
 
-  return {hub, messaging}
+  return {hub, messaging, featureHooks}
 }
 
 /**
