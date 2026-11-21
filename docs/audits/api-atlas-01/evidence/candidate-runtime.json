@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-15T01:05:55.755Z",
+  "capturedAt": "2026-11-21T21:05:46.693Z",
   "source": {
-    "branch": "forge/gf-test-db-01",
-    "headAtCapture": "46043085d8fc121a29607b4d8e2a97468281eef7",
+    "branch": "mosaic/stepup-client-contract",
+    "headAtCapture": "c42257834b4dfa90469c9d6520a8e2d8e1d965a8",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
+    "apiSourceSha256": "d71b3afa509fc21bca6b48f22fe5e9ab598cd85b11c6a33306b3b131d764fb14"
   },
   "runtimeRoutes": [
     {

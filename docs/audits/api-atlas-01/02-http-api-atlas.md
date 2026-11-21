@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-15T01:05:55.755Z for branch `forge/gf-test-db-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-21T21:05:46.693Z for branch `mosaic/stepup-client-contract`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633
@@ -42,23 +42,23 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Account | GET | `/v1/account/data-requests/:requestId/artifacts` | AUTHENTICATED | none | `services/greenfield-api/src/account-data/routes.ts:47` | candidate-registered-not-production-probed |
 | Account | POST | `/v1/account/data-requests/:requestId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/account-data/routes.ts:52` | candidate-registered-not-production-probed |
 | Account | POST | `/v1/account/deletion-requests` | AUTHENTICATED | none | `services/greenfield-api/src/account-data/routes.ts:42` | candidate-registered-not-production-probed |
-| Account | GET | `/v1/account/deletion-requests/current` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:48` | candidate-registered-not-production-probed |
+| Account | GET | `/v1/account/deletion-requests/current` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:55` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/:accountId/handle-history` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:621` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/forgot-password` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:510` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/handles/:handle/availability` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:526` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/mail-local-parts/:localPart/availability` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:530` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:538` | candidate-registered-not-production-probed |
 | Authentication | PATCH | `/v1/accounts/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:584` | candidate-registered-not-production-probed |
-| Authentication | GET | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:40` | candidate-registered-not-production-probed |
-| Authentication | PATCH | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:41` | candidate-registered-not-production-probed |
+| Authentication | GET | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:47` | candidate-registered-not-production-probed |
+| Authentication | PATCH | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:48` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:270` | candidate-registered-not-production-probed |
 | Authentication | PATCH | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:275` | candidate-registered-not-production-probed |
-| Authentication | GET | `/v1/accounts/me/blocks` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:43` | candidate-registered-not-production-probed |
+| Authentication | GET | `/v1/accounts/me/blocks` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:50` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/me/handle` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:593` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/modula-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:543` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/me/modula-mail/forwarding` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:558` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/me/modula-mail/provision` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:548` | candidate-registered-not-production-probed |
-| Authentication | GET | `/v1/accounts/me/mutes` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:42` | candidate-registered-not-production-probed |
+| Authentication | GET | `/v1/accounts/me/mutes` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:49` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/notification-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2055` | candidate-registered-not-production-probed |
 | Authentication | PATCH | `/v1/accounts/me/notification-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2065` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/me/password` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:604` | candidate-registered-not-production-probed |
@@ -173,7 +173,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Authentication | POST | `/v1/auth/preview/session` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:354` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/auth/recovery-codes` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:835` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/recovery-codes/regenerate` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:840` | candidate-registered-not-production-probed |
-| Authentication | POST | `/v1/auth/step-up/password` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:47` | candidate-registered-not-production-probed |
+| Authentication | POST | `/v1/auth/step-up/password` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:54` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/step-up/totp` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:709` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/totp/disable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:684` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/auth/totp/enroll` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:643` | candidate-registered-not-production-probed |
@@ -229,7 +229,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Commerce | GET | `/v1/commerce/billing-adapters` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:32` | candidate-registered-not-production-probed |
 | Commerce | GET | `/v1/commerce/entitlements` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:30` | candidate-registered-not-production-probed |
 | Commerce | POST | `/v1/commerce/entitlements/check` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:31` | candidate-registered-not-production-probed |
-| Commerce | GET | `/v1/commerce/invoices` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:46` | candidate-registered-not-production-probed |
+| Commerce | GET | `/v1/commerce/invoices` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:53` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/communities` | PUBLIC | none | `services/greenfield-api/src/app/register-communities-routes.ts:95` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/communities` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-communities-routes.ts:122` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/communities/:communityId` | PUBLIC | none | `services/greenfield-api/src/app/register-communities-routes.ts:150` | candidate-registered-not-production-probed |
@@ -277,8 +277,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:255` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/conversations/:id/typing` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:240` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/conversations/unread` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:97` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/creator/insights` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:44` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/creator/payouts` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:45` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/creator/insights` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:51` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/creator/payouts` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:52` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | GET | `/v1/developer/board` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:38` | candidate-registered-not-production-probed |
 | Developer | PUT | `/v1/developer/gubic/games/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:50` | candidate-registered-not-production-probed |
@@ -1070,7 +1070,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/account/deletion-requests/current`
 - Public URL: `https://api.modula.digital/v1/account/deletion-requests/current`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:48`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:55`
 - Handler: inline
 - Controller/service calls: `service.currentDeletion`
 - Authentication: greenfield bearer access session
@@ -1413,7 +1413,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/app-preferences`
 - Public URL: `https://api.modula.digital/v1/accounts/me/app-preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:40`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:47`
 - Handler: inline
 - Controller/service calls: `service.preferences`
 - Authentication: greenfield bearer access session
@@ -1462,7 +1462,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/app-preferences`
 - Public URL: `https://api.modula.digital/v1/accounts/me/app-preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:41`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:48`
 - Handler: inline
 - Controller/service calls: `service.updatePreferences`
 - Authentication: greenfield bearer access session
@@ -1609,7 +1609,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/blocks`
 - Public URL: `https://api.modula.digital/v1/accounts/me/blocks`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:43`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:50`
 - Handler: inline
 - Controller/service calls: `service.blocks`
 - Authentication: greenfield bearer access session
@@ -1854,7 +1854,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/mutes`
 - Public URL: `https://api.modula.digital/v1/accounts/me/mutes`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:42`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:49`
 - Handler: inline
 - Controller/service calls: `service.mutes`
 - Authentication: greenfield bearer access session
@@ -7489,7 +7489,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/auth/step-up/password`
 - Public URL: `https://api.modula.digital/v1/auth/step-up/password`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:47`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:54`
 - Handler: inline
 - Controller/service calls: `service.passwordStepUp`
 - Authentication: greenfield bearer access session
@@ -10233,7 +10233,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/commerce/invoices`
 - Public URL: `https://api.modula.digital/v1/commerce/invoices`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:46`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:53`
 - Handler: inline
 - Controller/service calls: `service.invoices`
 - Authentication: greenfield bearer access session
@@ -12585,7 +12585,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/creator/insights`
 - Public URL: `https://api.modula.digital/v1/creator/insights`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:44`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:51`
 - Handler: inline
 - Controller/service calls: `service.insights`
 - Authentication: greenfield bearer access session
@@ -12634,7 +12634,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/creator/payouts`
 - Public URL: `https://api.modula.digital/v1/creator/payouts`
 - API version: v1
-- Source file: `services/greenfield-api/src/settings-v2/routes.ts:45`
+- Source file: `services/greenfield-api/src/settings-v2/routes.ts:52`
 - Handler: inline
 - Controller/service calls: `service.payouts`
 - Authentication: greenfield bearer access session
