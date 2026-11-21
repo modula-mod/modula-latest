@@ -51,6 +51,9 @@ const envSchema = z.object({
   MODULA_AI_BACKEND_URL: z.string().url().optional(),
   MODULA_AI_BACKEND_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).default(30_000),
   MODULA_ENVIRONMENT: z.enum(['development', 'preview', 'production']).default('development'),
+  // GF-AUTH-FLOWS-01b (#194): explicit, test-only opt-in for returning verificationToken /
+  // recoveryToken in API responses. Off by default; ignored (fail closed) in production/preview.
+  MODULA_TEST_INBAND_AUTH_TOKENS: z.string().optional(),
   MODULA_MINIMUM_CLIENT_VERSION: z.string().default('0.1.0'),
   MODULA_SESSION_TTL_HOURS: z.coerce.number().int().positive().default(720),
   MODULA_ATPROTO_ENABLED: z
@@ -205,6 +208,12 @@ export type RegistrationMode = 'open' | 'invite-only' | 'closed'
 
 export type AppConfig = {
   nodeEnv: 'development' | 'test' | 'production'
+  /**
+   * GF-AUTH-FLOWS-01b (#194): true only when MODULA_TEST_INBAND_AUTH_TOKENS=1 and the process is
+   * neither MODULA_ENVIRONMENT=production/preview nor NODE_ENV=production. Never derived from
+   * "not production" alone. Read it through `inbandAuthTokensEnabled(config)`.
+   */
+  testInbandAuthTokens?: boolean
   host: string
   port: number
   publicApiUrl: string
@@ -303,6 +312,40 @@ export type AppConfig = {
       onlineChecks: boolean
     }
   }
+}
+
+/**
+ * Fail-closed check used by the account and recovery services before returning a
+ * verificationToken or recoveryToken in-band. Re-checks the environment so a config object
+ * spread with `environment: 'production'` can never expose tokens.
+ */
+export function inbandAuthTokensEnabled(config: Pick<AppConfig, 'environment' | 'nodeEnv' | 'testInbandAuthTokens'>): boolean {
+  return (
+    config.testInbandAuthTokens === true &&
+    config.environment !== 'production' &&
+    config.environment !== 'preview' &&
+    config.nodeEnv !== 'production'
+  )
+}
+
+function resolveTestInbandAuthTokens(raw: {
+  MODULA_TEST_INBAND_AUTH_TOKENS?: string
+  MODULA_ENVIRONMENT: 'development' | 'preview' | 'production'
+  NODE_ENV: 'development' | 'test' | 'production'
+}): boolean {
+  const requested = raw.MODULA_TEST_INBAND_AUTH_TOKENS
+  if (requested === undefined || requested === '' || requested === '0' || requested === 'false') return false
+  if (requested !== '1') {
+    console.warn('[modula-config] MODULA_TEST_INBAND_AUTH_TOKENS must be "1" to enable; ignoring value and keeping in-band auth tokens disabled')
+    return false
+  }
+  if (raw.MODULA_ENVIRONMENT === 'production' || raw.MODULA_ENVIRONMENT === 'preview' || raw.NODE_ENV === 'production') {
+    console.warn(
+      `[modula-config] MODULA_TEST_INBAND_AUTH_TOKENS=1 ignored: in-band auth tokens are refused when MODULA_ENVIRONMENT=${raw.MODULA_ENVIRONMENT} / NODE_ENV=${raw.NODE_ENV}`,
+    )
+    return false
+  }
+  return true
 }
 
 function refuse(message: string): never {
@@ -507,6 +550,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
 
   return {
     nodeEnv: raw.NODE_ENV,
+    testInbandAuthTokens: resolveTestInbandAuthTokens(raw),
     host: raw.MODULA_API_HOST,
     port: raw.MODULA_API_PORT,
     publicApiUrl: raw.MODULA_PUBLIC_API_URL,

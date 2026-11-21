@@ -1,5 +1,6 @@
 import {createHash, randomBytes} from 'node:crypto'
 import type {AppConfig} from '../config/index.js'
+import {inbandAuthTokensEnabled} from '../config/env.js'
 import type {ModulaDb} from '../database/client.js'
 import {hashPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
@@ -47,7 +48,8 @@ export class RecoveryService {
         correlationId: options.correlationId,
       })
     })
-    return this.config.environment === 'production' ? {requested: true} : {requested: true, recoveryToken: token}
+    // #194: never keyed off "not production"; only the explicit test-only flag exposes the token.
+    return inbandAuthTokensEnabled(this.config) ? {requested: true, recoveryToken: token} : {requested: true}
   }
   async completeRecovery(token: string, password: string, options: {correlationId?: string} = {}): Promise<void> {
     if (password.length < 10) {

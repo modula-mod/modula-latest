@@ -74,9 +74,14 @@ async function provision(spec: IdentitySpec) {
       accountId = existing.account_id
     } else {
       // The production AccountService intentionally never returns a verification
-      // token. This guarded CLI uses the same service in development-token mode,
-      // then activates without provisioning a real mailbox.
-      const accounts = new AccountService(db, {...config, environment: 'development'}, undefined)
+      // token. This guarded CLI uses the same service in-process (never over HTTP) in
+      // development-token mode with the explicit test-only in-band flag (#194), then
+      // activates without provisioning a real mailbox.
+      const accounts = new AccountService(
+        db,
+        {...config, environment: 'development', nodeEnv: config.nodeEnv === 'production' ? 'development' : config.nodeEnv, testInbandAuthTokens: true},
+        undefined,
+      )
       const registration = await accounts.register({
         email: spec.email,
         password: spec.password,
