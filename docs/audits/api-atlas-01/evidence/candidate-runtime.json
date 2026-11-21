@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-15T01:05:55.755Z",
+  "capturedAt": "2026-11-21T20:57:57.066Z",
   "source": {
-    "branch": "forge/gf-test-db-01",
-    "headAtCapture": "46043085d8fc121a29607b4d8e2a97468281eef7",
+    "branch": "mosaic/fix-192-module-delete-stepup",
+    "headAtCapture": "3e0aa83a6b63ce1660c6e9cfb3b917b92c44b547",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
+    "apiSourceSha256": "56d7e91dae4e3bbd44601cea1d506a41786173adbbdded89ffb57245ee042f91"
   },
   "runtimeRoutes": [
     {
