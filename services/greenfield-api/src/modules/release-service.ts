@@ -788,7 +788,9 @@ export class GreenfieldModuleReleaseService {
       await trx
         .insertInto('greenfield_module_revocations')
         .values({revocation_id: `module-revocation:${releaseId}`, scope: 'release', target_id: releaseId, reason, created_by: null, created_at: now})
-        .onConflict(oc => oc.columns(['scope', 'target_id']).doUpdateSet({reason, created_at: now}))
+        // Revocation history is immutable. A repeated request is idempotent and
+        // must never replace the original reason or database timestamp.
+        .onConflict(oc => oc.columns(['scope', 'target_id']).doNothing())
         .execute()
       await new GreenfieldEventBus(trx).publish({
         eventType: 'module.release.revoked',

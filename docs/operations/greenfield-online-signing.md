@@ -77,8 +77,8 @@ For confirmed compromise, revoke rather than suspend. Existing release signature
 ## Feature-flagged rollout
 
 1. Deploy Vault and networking with signing disabled; test HA, snapshot restore, token renewal and emergency policy removal.
-2. Apply migrations `091_greenfield_online_signing_authority` and `092_publisher_release_runner_boundary`, then verify API, worker, backup, migrator and authority-role privileges.
-3. Provision five distinct restricted database logins for the signing runner, release approver, trust verifier, publication authority and publisher-trust authority. Apply `ops/security/publisher-release-runner-grants.sql` with separate operator accounts for approval, publication and publisher trust.
+2. Apply migrations `091_greenfield_online_signing_authority`, `092_publisher_release_runner_boundary` and `093_publisher_release_governance_integrity`, then verify API, worker, backup, migrator and authority-role privileges.
+3. Provision seven distinct restricted database logins for the signing runner, release approver, trust verifier, publication authority, publisher-trust authority, signing-identity authority and quarantine authority. Apply `ops/security/publisher-release-runner-grants.sql` with separate operator accounts for approval, publication, publisher trust, identity registration and quarantine lifting.
 4. Create a new, distinct Modula online Ed25519 key; register its public half and first-party policy through two-person operator review.
 5. Enable a Modula-only pilot for one non-public release candidate. Keep offline verification compatibility and do not replace the offline key.
 6. Review receipts, alerts, latency, retry behavior, revocation drills and audit completeness.
