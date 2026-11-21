@@ -179,4 +179,23 @@ describeIfDb('settings backend v2 (database)', () => {
     await expect(service.passwordStepUp(auth, {password: 'correct horse battery'})).rejects.toMatchObject({code: 'RATE_LIMITED'})
     expect((await service.currentDeletion(accountId)).request).toBeNull()
   })
+
+  it('tells the client when a rate-limited password step-up can be retried (Retry-After and details.retryAfterSeconds)', async () => {
+    const issued = await sessions.issue(fanAccountId, {authenticationStrength: 'low', recentAuthenticationAt: new Date(0)} as any)
+    const headers = {authorization: `Bearer ${issued.accessToken}`}
+    const stepUp = (password: string) => app.inject({method: 'POST', url: '/v1/auth/step-up/password', headers, payload: {password}})
+    for (let index = 0; index < 5; index += 1) expect((await stepUp(`nope-${index}`)).statusCode).toBe(400)
+    const limited = await stepUp('another correct horse')
+    expect(limited.statusCode).toBe(429)
+    const retryAfter = Number(limited.headers['retry-after'])
+    expect(Number.isInteger(retryAfter)).toBe(true)
+    expect(retryAfter).toBeGreaterThan(14 * 60)
+    expect(retryAfter).toBeLessThanOrEqual(15 * 60)
+    expect(limited.json().error).toMatchObject({code: 'RATE_LIMITED', retryable: true, details: {retryAfterSeconds: retryAfter}})
+    // Errors without a known reset time are unchanged: no Retry-After, no details.
+    const invalid = await stepUp('')
+    expect(invalid.statusCode).toBe(400)
+    expect(invalid.headers['retry-after']).toBeUndefined()
+    expect(invalid.json().error.details).toBeUndefined()
+  })
 })

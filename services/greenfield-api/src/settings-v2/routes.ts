@@ -31,9 +31,16 @@ export async function registerSettingsV2Routes(
       const code = ['VALIDATION_FAILED', 'RATE_LIMITED', 'NOT_FOUND', 'CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(error?.code) ? error.code : 'SERVER_ERROR'
       const fieldErrors = code === 'VALIDATION_FAILED' && error?.field ? {[error.field]: error.message} : undefined
       if (code === 'SERVER_ERROR') request.log?.error({err: error}, 'settings-v2 request failed')
+      // A limiter that knows its reset time says so: Retry-After (seconds) and details.retryAfterSeconds.
+      const retryAfterSeconds = code === 'RATE_LIMITED' && Number.isInteger(error?.retryAfterSeconds) && error.retryAfterSeconds > 0 ? error.retryAfterSeconds as number : undefined
+      if (retryAfterSeconds !== undefined) reply.header('Retry-After', String(retryAfterSeconds))
       return reply
         .code(statusForError(code))
-        .send(failureEnvelope(code, code === 'SERVER_ERROR' ? 'Request failed' : error.message, request.id, {fieldErrors, retryable: code === 'RATE_LIMITED'}))
+        .send(failureEnvelope(code, code === 'SERVER_ERROR' ? 'Request failed' : error.message, request.id, {
+          fieldErrors,
+          retryable: code === 'RATE_LIMITED',
+          details: retryAfterSeconds !== undefined ? {retryAfterSeconds} : undefined,
+        }))
     }
   }
 

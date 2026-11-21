@@ -237,7 +237,11 @@ export class SettingsV2Service {
     if (!password || password.length > 1024) invalid('Enter your password', 'password')
     const now = Date.now()
     const recent = (this.attempts.get(auth.accountId) ?? []).filter(at => now - at < STEP_UP_WINDOW_MS)
-    if (recent.length >= STEP_UP_ATTEMPTS) throw Object.assign(new Error('Too many attempts. Try again in a few minutes.'), {code: 'RATE_LIMITED'})
+    if (recent.length >= STEP_UP_ATTEMPTS) {
+      // Attempts are recorded in order, so the limit lifts when the oldest attempt that still counts leaves the window.
+      const retryAfterSeconds = Math.max(1, Math.ceil((recent[recent.length - STEP_UP_ATTEMPTS]! + STEP_UP_WINDOW_MS - now) / 1000))
+      throw Object.assign(new Error('Too many attempts. Try again in a few minutes.'), {code: 'RATE_LIMITED', retryAfterSeconds})
+    }
     const credential = await this.db.selectFrom('greenfield_password_credentials').select('password_hash').where('account_id', '=', auth.accountId).executeTakeFirst()
     if (!credential) throw Object.assign(new Error('This account has no password. Confirm with your authenticator or passkey instead.'), {code: 'CONFLICT'})
     if (!(await verifyPassword(password, credential.password_hash))) {
