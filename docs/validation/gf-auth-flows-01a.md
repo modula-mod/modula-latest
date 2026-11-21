@@ -54,4 +54,4 @@ Clients must single-flight refresh: two parallel refreshes with the same token n
 
 ## Tests
 
-`services/greenfield-api/tests/gf-auth-flows-01a.test.ts` (DB-gated; needs adding to the GF-TEST-DB-01 CI step once #189 lands). `api-baseline-02.security-acceptance` now expects 404 for the cross-account revoke.
+`services/greenfield-api/tests/gf-auth-flows-01a.test.ts` (DB-gated; runs in the GF-TEST-DB-01 accounts step under the zero-skip guard). `api-baseline-02.security-acceptance` now expects 404 for the cross-account revoke.
