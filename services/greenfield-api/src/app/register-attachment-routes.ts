@@ -7,6 +7,8 @@ import {PostRepository} from '../domains/posts/repository.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
 import {MessagingService} from '../domains/messaging/service.js'
 import {StoryService, storyItemLiveCutoff} from '../domains/stories/service.js'
+import {StorySocialService} from '../domains/stories/social.js'
+import {socialFeatures} from '../config/env.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {applyBrowserVisibleMediaHeaders} from './media-response.js'
@@ -34,6 +36,8 @@ export async function registerAttachmentRoutes(
   const posts = new PostRepository(db, config.publicApiUrl)
   const profiles = new ProfileRepository(db)
   const stories = new StoryService(db, config)
+  const storySocial = new StorySocialService(db, stories)
+  const highlightsEnabled = socialFeatures(config).storyHighlights
   const messaging = new MessagingService(db, {publicApiUrl: config.publicApiUrl})
   const moduleAccess = new GreenfieldModuleRuntimeAccessService(db, config)
   const {writeConfig, feedConfig, mutationsAllowed} = options
@@ -172,6 +176,10 @@ export async function registerAttachmentRoutes(
           storyBinding.owner_actor_id,
           storyBinding.visibility,
         )
+      }
+      if (!allowed && highlightsEnabled) {
+        // Story media kept by an active highlight (beyond 24h).
+        allowed = await storySocial.canViewHighlightedMedia(request.auth?.actorId ?? null, {attachmentId})
       }
     }
     if (!allowed && request.auth?.accountId) {

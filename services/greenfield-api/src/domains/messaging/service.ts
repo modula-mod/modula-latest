@@ -18,6 +18,8 @@ export type ConversationDto = {
   updatedAt: string
   muted?: boolean
   archived?: boolean
+  /** Manually marked unread by the viewer (capability `markUnread`). */
+  markedUnread?: boolean
 }
 export type StartConversationResult = {conversation: ConversationDto; created: boolean}
 export type MessageDto = {
@@ -240,7 +242,7 @@ export class MessagingService {
     const row = await this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['m.state', 'm.role', 'm.last_read_at', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_by_actor_id'])
+      .select(['m.state', 'm.role', 'm.last_read_at', 'm.marked_unread_at', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_by_actor_id'])
       .where('m.conversation_id', '=', conversationId)
       .where('m.actor_id', '=', actorId)
       .executeTakeFirst()
@@ -442,7 +444,7 @@ export class MessagingService {
     let query = this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['c.conversation_id', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_at', 'm.last_read_at', 'm.muted_until', 'm.archived_at', 'm.role'])
+      .select(['c.conversation_id', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_at', 'm.last_read_at', 'm.muted_until', 'm.archived_at', 'm.role', 'm.marked_unread_at'])
       .where('m.actor_id', '=', viewer)
       .where('m.state', '=', state)
       .where('c.kind', 'in', kind === 'chat' ? ['direct', 'group'] : ['inmail'])
@@ -495,16 +497,17 @@ export class MessagingService {
         updatedAt: row.last_message_at.toISOString(),
         muted: Boolean(row.muted_until && row.muted_until.getTime() > Date.now()),
         archived: Boolean(row.archived_at),
+        markedUnread: Boolean(row.marked_unread_at),
       }
     })
     return {items, nextCursor, hasMore}
   }
 
-  async unreadSummary(viewer: string): Promise<{unreadCount: number}> {
+  async unreadSummary(viewer: string): Promise<{unreadCount: number; markedUnreadCount: number}> {
     const rows = await this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['m.conversation_id', 'm.last_read_at'])
+      .select(['m.conversation_id', 'm.last_read_at', 'm.marked_unread_at'])
       .where('m.actor_id', '=', viewer)
       .where('m.state', '=', 'active')
       .where('c.kind', 'in', ['direct', 'group'])
@@ -513,7 +516,9 @@ export class MessagingService {
     const counts = await this.unreadCounts(rows, viewer)
     let total = 0
     for (const value of counts.values()) total += value
-    return {unreadCount: total}
+    // Conversations marked unread that have no unread messages still need a badge.
+    const markedUnreadCount = rows.filter(row => row.marked_unread_at && (counts.get(row.conversation_id) ?? 0) === 0).length
+    return {unreadCount: total, markedUnreadCount}
   }
 
   /** Resolve a public handle, then atomically create or reuse its direct conversation. */
@@ -634,6 +639,7 @@ export class MessagingService {
         : null,
       unreadCount: unread.get(conversationId) ?? 0,
       updatedAt: member.last_message_at.toISOString(),
+      markedUnread: Boolean(member.marked_unread_at),
     }
   }
 
@@ -1084,10 +1090,27 @@ export class MessagingService {
     const now = new Date()
     await this.db
       .updateTable('greenfield_conversation_members')
-      .set({last_read_at: now, updated_at: now})
+      .set({last_read_at: now, marked_unread_at: null, updated_at: now})
       .where('conversation_id', '=', conversationId)
       .where('actor_id', '=', viewer)
       .execute()
+  }
+
+  /**
+   * Per-member manual unread marker. Only active members of a direct or group
+   * conversation may set it; it never touches last_read_at.
+   */
+  async setMarkedUnread(viewer: string, conversationId: string, unread: boolean): Promise<{markedUnread: boolean}> {
+    const member = await this.membership(conversationId, viewer, 'chat')
+    if (member.state !== 'active') throw Object.assign(new Error('Conversation not found'), {code: 'NOT_FOUND'})
+    const now = new Date()
+    await this.db
+      .updateTable('greenfield_conversation_members')
+      .set({marked_unread_at: unread ? now : null, updated_at: now})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', viewer)
+      .execute()
+    return {markedUnread: unread}
   }
 
   // ---- messaging v3: groups, privacy, receipts, reactors, search, presence ----
