@@ -384,7 +384,9 @@ describeIf('Phase 6 security', () => {
 
   it('enforces job lease exclusivity with SKIP LOCKED', async () => {
     const workerDb = createWorkerDb(databaseUrl!)
-    const jobId = randomUUID()
+    const jobId = `test-phase6-lease-${randomUUID()}`
+    const claim = (workerId: string, leaseDurationMs: number) =>
+      claimNextJob(workerDb as any, workerId, leaseDurationMs, {idPrefix: 'test-phase6-lease-'})
     await db
       .insertInto('background_jobs')
       .values({
@@ -406,10 +408,11 @@ describeIf('Phase 6 security', () => {
         completed_at: null,
       })
       .execute()
-    const first = await claimNextJob(workerDb as any, 'worker-a', 30)
-    const second = await claimNextJob(workerDb as any, 'worker-b', 30)
+    const first = await claim('worker-a', 30)
+    const second = await claim('worker-b', 30)
     expect(first?.id).toBe(jobId)
     expect(second?.id === jobId).toBe(false)
+    await db.deleteFrom('background_jobs').where('id', '=', jobId).execute()
     await workerDb.destroy()
   })
 })

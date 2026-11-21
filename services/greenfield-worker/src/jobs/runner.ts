@@ -23,7 +23,7 @@ import {handleExtensionEventDispatch} from '../modules/extension-event-handler.j
 import {handleNotificationCreate} from '../notifications/create.js'
 import {handleSocialNotification} from '../notifications/social.js'
 import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
-import {claimNextJob, completeJob, deadLetterJob, markJobRunning, renewJobLease, scheduleRetry} from './claim.js'
+import {claimNextJob, completeJob, deadLetterJob, markJobRunning, renewJobLease, scheduleRetry, type ClaimJobFilter} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
 import {computeNextAvailableAt} from './retry.js'
 import {resolveLeaseRenewIntervalMs} from './lease-renew-interval.js'
@@ -36,15 +36,15 @@ export type JobRunnerLog = {
   error(fields: Record<string, unknown>, message: string): void
 }
 
-export type ProcessJobOptions = {log?: JobRunnerLog}
+export type ProcessJobOptions = {log?: JobRunnerLog} & ClaimJobFilter
 
 export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, options: ProcessJobOptions = {}): Promise<boolean> {
   // Resolved before claiming: an invalid interval refuses here, with no job claimed.
   config = {...config, leaseRenewIntervalMs: resolveLeaseRenewIntervalMs(config)}
-  const job = await claimNextJob(db, config.workerId, config.leaseDurationMs)
+  const {log, ...claimFilter} = options
+  const job = await claimNextJob(db, config.workerId, config.leaseDurationMs, claimFilter)
   if (!job) return false
   metrics.increment('jobsClaimed')
-  const log = options.log
   // GF-OPS-01(c): the lease is renewed on its own timer while the handler runs,
   // so a job longer than leaseDurationMs is not reaped and re-claimed mid-run.
   let leaseLost = false
