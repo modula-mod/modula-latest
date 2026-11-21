@@ -298,7 +298,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     slowMark.throwBefore = Object.assign(new Error('injected pre-run failure'), {code: 'INJECTED_PRE_RUN_FAILURE'})
     const log = {warn: vi.fn(), error: vi.fn()}
     const retriedBefore = metrics.read().jobsRetried
-    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    await expect(runJob(cfg, {log})).resolves.toBe(true)
     expect(slowMark.handlerRuns).toBe(0)
     const row = await db
       .selectFrom('background_jobs')
@@ -337,7 +337,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     slowMark.throwBefore = Object.assign(new Error('injected pre-run failure'), {code: 'INJECTED_PRE_RUN_FAILURE'})
     const lostBefore = metrics.read().jobLeasesLost
     const log = {warn: vi.fn(), error: vi.fn()}
-    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    await expect(runJob(cfg, {log})).resolves.toBe(true)
     expect(slowMark.handlerRuns).toBe(0)
     expect(await jobRow(jobId)).toMatchObject({status: 'LEASED', lease_owner: other, attempt_count: 2})
     expect(metrics.read().jobLeasesLost - lostBefore).toBe(1)
