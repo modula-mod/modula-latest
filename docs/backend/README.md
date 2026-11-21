@@ -436,6 +436,35 @@ SQL privilege, capability escalation, service impersonation, raw-bearer, SSRF,
 redirect, dependency, artifact, manifest, secret, event, job, path, archive,
 injection, remote-code, sandbox, entitlement and namespace impersonation tests.
 
+### In-band auth tokens (test-only) and legacy recovery
+
+Account APIs never return verification or recovery secrets in responses by
+default, in any environment (GF-AUTH-FLOWS-01b, #194). Real clients verify with
+the emailed code (`POST /v1/accounts/verify-email` with `{challengeId, code}`)
+and reset with the emailed token.
+
+For local harnesses only, `MODULA_TEST_INBAND_AUTH_TOKENS=1` opts in to in-band
+tokens:
+
+- `POST /v1/accounts/register` adds `verificationToken` (a 43-character
+  base64url legacy token) next to `verificationChallengeId`. The 6-digit
+  email code is never returned in-band. `POST /v1/accounts/verify-email`
+  accepts either `{token}` (that legacy token) or `{challengeId, code}`.
+- `POST /v1/accounts/forgot-password` and `POST /v1/accounts/recovery/request`
+  add `recoveryToken` for a known email. Unknown emails still get only
+  `{requested: true}`.
+
+Only the exact value `1` enables it. The flag is ignored with a warning (fail
+closed) when `MODULA_ENVIRONMENT` is `production` or `preview` or `NODE_ENV`
+is `production`, and the account services re-check the environment before
+returning a token. Test suites that read these tokens set the flag explicitly.
+
+The legacy `POST /v1/accounts/recovery/request` route stays in the frozen
+contract but delegates to the same mailed send path as
+`POST /v1/accounts/forgot-password` (#193): every recovery token counted toward
+the 3-per-hour reset cap is mailed, so the legacy route can no longer use up the
+reset budget without sending mail.
+
 ## Recovery and release discipline
 
 Every Greenfield-hosted production release must converge source main, web, API,
