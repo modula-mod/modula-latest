@@ -128,34 +128,38 @@ export class GreenfieldSessionService {
       .where('session_id', '=', token.session_id)
       .executeTakeFirstOrThrow()
 
-    const reuse =
-      Boolean(token.rotated_at) ||
-      Boolean(token.reused_at) ||
-      Boolean(token.revoked_at) ||
-      session.status !== 'active' ||
-      token.expires_at <= now
-
-    if (reuse) {
-      await this.db
-        .updateTable('greenfield_session_tokens')
-        .set({reused_at: now})
-        .where('token_id', '=', token.token_id)
-        .execute()
-      await this.revokeFamily(token.family_id, token.session_id, session.account_id, 'session.refreshReuseDetected')
-      throw Object.assign(new Error('Refresh token reuse detected'), {code: 'UNAUTHENTICATED'})
-    }
-
     const accessToken = randomBytes(32).toString('base64url')
     const newRefreshToken = randomBytes(48).toString('base64url')
     const accessExpiresAt = new Date(now.getTime() + this.config.accessTokenTtlMinutes * 60_000)
     const refreshExpiresAt = new Date(now.getTime() + this.config.refreshTokenTtlDays * 86_400_000)
 
-    await this.db.transaction().execute(async trx => {
-      await trx
+    // Atomic single-use rotation (#195): the presented token is claimed with a
+    // conditional UPDATE that only matches while it is still current. Two
+    // concurrent refreshes serialise on the row lock; the loser re-evaluates the
+    // predicate after the winner commits, matches zero rows and takes the reuse
+    // path below, which revokes the whole token family.
+    const rotated = await this.db.transaction().execute(async trx => {
+      const claimed = await trx
         .updateTable('greenfield_session_tokens')
         .set({rotated_at: now, revoked_at: now})
         .where('token_id', '=', token.token_id)
-        .execute()
+        .where('kind', '=', 'refresh')
+        .where('rotated_at', 'is', null)
+        .where('reused_at', 'is', null)
+        .where('revoked_at', 'is', null)
+        .where('expires_at', '>', now)
+        .where(eb =>
+          eb.exists(
+            eb
+              .selectFrom('greenfield_sessions')
+              .select('greenfield_sessions.session_id')
+              .where('greenfield_sessions.session_id', '=', token.session_id)
+              .where('greenfield_sessions.status', '=', 'active'),
+          ),
+        )
+        .returning('token_id')
+        .executeTakeFirst()
+      if (!claimed) return false
       // Revoke prior access tokens for this session.
       await trx
         .updateTable('greenfield_session_tokens')
@@ -199,7 +203,20 @@ export class GreenfieldSessionService {
         .where('session_id', '=', token.session_id)
         .execute()
       await this.insertEvent(trx, token.session_id, session.account_id, 'session.refreshed')
+      return true
     })
+
+    if (!rotated) {
+      // Presenting a rotated, reused, revoked or expired refresh token (or losing
+      // a concurrent rotation race) is treated as reuse: revoke the family.
+      await this.db
+        .updateTable('greenfield_session_tokens')
+        .set({reused_at: now})
+        .where('token_id', '=', token.token_id)
+        .execute()
+      await this.revokeFamily(token.family_id, token.session_id, session.account_id, 'session.refreshReuseDetected')
+      throw Object.assign(new Error('Refresh token reuse detected'), {code: 'UNAUTHENTICATED'})
+    }
 
     return {
       accessToken,
