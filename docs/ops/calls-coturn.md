@@ -76,10 +76,15 @@ Render:
 
 ```sh
 set -a; . /etc/modula/coturn.env; set +a
-envsubst '${TURN_REALM} ${TURN_EXTERNAL_IP} ${TURN_STATIC_AUTH_SECRET} ${TURN_CERT} ${TURN_PKEY}' \
-  < ops/coturn/turnserver.conf.template > /etc/modula/turnserver.conf
+umask 077
+grep -v '^[[:space:]]*#' ops/coturn/turnserver.conf.template \
+  | envsubst '${TURN_REALM} ${TURN_EXTERNAL_IP} ${TURN_STATIC_AUTH_SECRET} ${TURN_CERT} ${TURN_PKEY}' \
+  > /etc/modula/turnserver.conf
 chmod 0600 /etc/modula/turnserver.conf
 ```
+
+Comment lines are stripped before substitution so no placeholder in a comment
+can ever expand to the secret. Never print the rendered file.
 
 ## 3. Firewall (VPS + provider panel)
 
