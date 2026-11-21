@@ -93,6 +93,7 @@ import {registerCommunitiesRoutes} from './register-communities-routes.js'
 import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
 import {registerMolibooRoutes} from './register-moliboo-routes.js'
 import {registerNativeEndpointRoutes} from './register-native-endpoint-routes.js'
+import {registerCredentialResponseNoStore} from './credential-response-cache.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -209,6 +210,8 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const connectorCredentials = new ConnectorCredentialService(db, config)
   const connectorConnections = new ConnectorConnectionService(db, connectorProviders)
   const connectorOAuthStates = new ConnectorOAuthStateService(db, config, connectorProviders)
+
+  registerCredentialResponseNoStore(app)
 
   app.addHook('preHandler', async (request, reply) => {
     if (request.url.startsWith('/v1/atproto') && !config.atprotoEnabled) {
