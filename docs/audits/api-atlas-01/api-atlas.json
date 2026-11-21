@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "forge/gf-test-db-01",
-      "sourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128",
-      "capturedAt": "2026-11-15T01:05:55.755Z",
+      "branch": "mosaic/stepup-client-contract",
+      "sourceSha256": "d71b3afa509fc21bca6b48f22fe5e9ab598cd85b11c6a33306b3b131d764fb14",
+      "capturedAt": "2026-11-21T21:05:46.693Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -2254,7 +2254,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 48
+        "line": 55
       },
       "handler": "inline",
       "controllerServices": [
@@ -3122,7 +3122,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 40
+        "line": 47
       },
       "handler": "inline",
       "controllerServices": [
@@ -3238,7 +3238,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 41
+        "line": 48
       },
       "handler": "inline",
       "controllerServices": [
@@ -3579,7 +3579,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 43
+        "line": 50
       },
       "handler": "inline",
       "controllerServices": [
@@ -4142,7 +4142,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 42
+        "line": 49
       },
       "handler": "inline",
       "controllerServices": [
@@ -16932,7 +16932,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 47
+        "line": 54
       },
       "handler": "inline",
       "controllerServices": [
@@ -23314,7 +23314,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 46
+        "line": 53
       },
       "handler": "inline",
       "controllerServices": [
@@ -28902,7 +28902,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 44
+        "line": 51
       },
       "handler": "inline",
       "controllerServices": [
@@ -29025,7 +29025,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/settings-v2/routes.ts",
-        "line": 45
+        "line": 52
       },
       "handler": "inline",
       "controllerServices": [

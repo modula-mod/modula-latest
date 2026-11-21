@@ -507,7 +507,7 @@
     },
     {
       "file": "services/greenfield-api/src/settings-v2/service.ts",
-      "line": 251,
+      "line": 255,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!this.sessions) throw new Error('sessions unavailable')"
@@ -2693,7 +2693,7 @@
     },
     {
       "file": "services/greenfield-api/src/settings-v2/service.ts",
-      "line": 251,
+      "line": 255,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!this.sessions) throw new Error('sessions unavailable')"
