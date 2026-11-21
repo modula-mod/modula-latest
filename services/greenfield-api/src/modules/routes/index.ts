@@ -125,7 +125,7 @@ export async function registerModuleRoutes(
   options: {githubReleaseSource?: GithubReleaseSource} = {},
 ): Promise<void> {
   await loadRegisteredIdentityAliases(db, app.log)
-  const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
+  const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl, log: app.log})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
   const signingKeys = new GreenfieldPublisherSigningKeyService(db)
   const githubSync = new GreenfieldGithubReleaseSyncService(db, options.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}))
