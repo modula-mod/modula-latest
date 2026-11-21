@@ -1,7 +1,7 @@
 import type {FastifyInstance} from 'fastify'
 
 import type {ModulaDb} from '../database/client.js'
-import {MESSAGING_FEATURES_ALL_ON, type MessagingFeaturesConfig} from '../config/env.js'
+import {MESSAGING_FEATURES_ALL_OFF, type MessagingFeaturesConfig} from '../config/env.js'
 import {
   CHAT_FOLDER_ITEMS_MAX,
   CHAT_FOLDERS_MAX,
@@ -80,7 +80,7 @@ export function registerMessagingFeaturesRoutes(
   },
 ): MessagingFeaturesHooks {
   const {messaging, hub, read, write, toMembers, notify} = options
-  const features: MessagingFeaturesConfig = {...MESSAGING_FEATURES_ALL_ON, ...(options.features ?? {})}
+  const features: MessagingFeaturesConfig = {...MESSAGING_FEATURES_ALL_OFF, ...(options.features ?? {})}
   const now = () => new Date().toISOString()
   const disabled = (reply: any, request: any, key: FeatureKey) => {
     if (features[key]) return false
@@ -374,8 +374,9 @@ export function registerMessagingFeaturesRoutes(
 
   // ---- background work -------------------------------------------------------
 
+  // The timer only runs when a feature that needs it is switched on (both are off by default).
   const interval = features.schedulerIntervalMs
-  if (interval > 0) {
+  if (interval > 0 && (features.scheduledMessages || features.disappearingMessages)) {
     const timer = setInterval(() => {
       if (features.scheduledMessages) runScheduledOnce().catch(error => app.log.warn({error: error?.message}, 'scheduled message dispatch failed'))
       sweepExpiredOnce().catch(error => app.log.warn({error: error?.message}, 'disappearing message sweep failed'))

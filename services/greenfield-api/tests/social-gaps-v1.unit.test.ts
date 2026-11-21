@@ -59,8 +59,8 @@ describe('story reaction emoji', () => {
 })
 
 describe('social feature flags', () => {
-  it('default on and can be withdrawn per feature', () => {
-    expect(socialFeatures({})).toEqual({markUnread: true, storyViewers: true, storyReactions: true, storyHighlights: true, liveComments: true})
-    expect(socialFeatures({social: {liveComments: false}}).liveComments).toBe(false)
+  it('default off and can be enabled per feature', () => {
+    expect(socialFeatures({})).toEqual({markUnread: false, storyViewers: false, storyReactions: false, storyHighlights: false, liveComments: false})
+    expect(socialFeatures({social: {liveComments: true}})).toEqual({markUnread: false, storyViewers: false, storyReactions: false, storyHighlights: false, liveComments: true})
   })
 })
