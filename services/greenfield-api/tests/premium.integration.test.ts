@@ -26,7 +26,7 @@ describeIfDb('Premium, Verification and public identity integration', () => {
     parsedDatabaseUrl.pathname = `/${databaseName}`
     databaseUrl = parsedDatabaseUrl.toString()
     Object.assign(process.env, {
-      NODE_ENV: 'test', MODULA_ENVIRONMENT: 'development', MODULA_API_HOST: '127.0.0.1', MODULA_API_PORT: '4032',
+      NODE_ENV: 'test', MODULA_ENVIRONMENT: 'development', MODULA_TEST_INBAND_AUTH_TOKENS: '1', MODULA_API_HOST: '127.0.0.1', MODULA_API_PORT: '4032',
       MODULA_PUBLIC_API_URL: 'http://127.0.0.1:4032', MODULA_DATABASE_URL: databaseUrl, MODULA_DATABASE_MIGRATOR_URL: databaseUrl,
       MODULA_ALLOWED_ORIGINS: 'https://modula.digital,http://localhost:8081', MODULA_PREVIEW_WRITES_ENABLED: 'true',
       MODULA_INVITE_ONLY: 'true', MODULA_REGISTRATION_INVITE_CODES: 'test-invite', MODULA_ATPROTO_ENABLED: 'false',

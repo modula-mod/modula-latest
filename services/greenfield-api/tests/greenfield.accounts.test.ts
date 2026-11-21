@@ -1,6 +1,9 @@
-import {describe, expect, it} from 'vitest'
+import {describe, expect, it, vi} from 'vitest'
 import {afterAll, beforeAll, beforeEach} from 'vitest'
-import {loadConfig} from '../src/config/env.js'
+import {inbandAuthTokensEnabled, loadConfig} from '../src/config/env.js'
+import {AccountService} from '../src/accounts/service.js'
+import {RecoveryService} from '../src/accounts/recovery.js'
+import {MailService} from '../src/mail/service.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {validateHandle} from '../src/accounts/handle.js'
@@ -176,6 +179,59 @@ describe('Greenfield unit primitives', () => {
     expect(config.mutationsEnabled).toBe(true)
   })
 
+  it('keeps in-band auth tokens off unless MODULA_TEST_INBAND_AUTH_TOKENS=1, and refuses them in production/preview (#194)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      // Default: a non-production environment no longer implies in-band tokens.
+      const development = loadConfig(configEnv())
+      expect(development.testInbandAuthTokens).toBe(false)
+      expect(inbandAuthTokensEnabled(development)).toBe(false)
+      for (const value of ['', '0', 'false']) {
+        expect(loadConfig(configEnv({MODULA_TEST_INBAND_AUTH_TOKENS: value})).testInbandAuthTokens).toBe(false)
+      }
+      expect(warn).not.toHaveBeenCalled()
+
+      // Only the exact value "1" opts in.
+      expect(loadConfig(configEnv({MODULA_TEST_INBAND_AUTH_TOKENS: 'true'})).testInbandAuthTokens).toBe(false)
+      expect(warn).toHaveBeenCalledTimes(1)
+      const optedIn = loadConfig(configEnv({MODULA_TEST_INBAND_AUTH_TOKENS: '1'}))
+      expect(optedIn.testInbandAuthTokens).toBe(true)
+      expect(inbandAuthTokensEnabled(optedIn)).toBe(true)
+
+      // Production and preview refuse the flag (fail closed) and log a warning.
+      warn.mockClear()
+      const production = loadConfig(
+        configEnv({
+          MODULA_ENVIRONMENT: 'production',
+          MODULA_PUBLIC_API_URL: 'https://api.modula.digital',
+          MODULA_PUBLIC_WEB_URL: 'https://modula.digital',
+          MODULA_PREVIEW_WRITES_ENABLED: 'false',
+          MODULA_TEST_INBAND_AUTH_TOKENS: '1',
+        }),
+      )
+      expect(production.testInbandAuthTokens).toBe(false)
+      expect(inbandAuthTokensEnabled(production)).toBe(false)
+      const preview = loadConfig(
+        configEnv({
+          MODULA_ENVIRONMENT: 'preview',
+          MODULA_PUBLIC_API_URL: 'https://api.preview.modula.digital',
+          MODULA_PUBLIC_WEB_URL: 'https://preview.modula.digital',
+          MODULA_TEST_INBAND_AUTH_TOKENS: '1',
+        }),
+      )
+      expect(preview.testInbandAuthTokens).toBe(false)
+      expect(warn).toHaveBeenCalledTimes(2)
+      expect(String(warn.mock.calls[0]?.[0])).toMatch(/MODULA_TEST_INBAND_AUTH_TOKENS=1 ignored/)
+
+      // Defense in depth: a config object forced to production never exposes tokens.
+      expect(inbandAuthTokensEnabled({...optedIn, environment: 'production'})).toBe(false)
+      expect(inbandAuthTokensEnabled({...optedIn, environment: 'preview'})).toBe(false)
+      expect(inbandAuthTokensEnabled({...optedIn, nodeEnv: 'production'})).toBe(false)
+    } finally {
+      warn.mockRestore()
+    }
+  })
+
   it('evaluates sensitive-action step-up policy on the server', () => {
     const now = new Date('2026-08-11T12:00:00.000Z')
     expect(
@@ -274,6 +330,7 @@ describeIf('Greenfield native accounts integration', () => {
   beforeAll(async () => {
     process.env.NODE_ENV = 'test'
     process.env.MODULA_ENVIRONMENT = 'development'
+    process.env.MODULA_TEST_INBAND_AUTH_TOKENS = '1' // #194: suite reads in-band verification/recovery tokens
     process.env.MODULA_API_HOST = '127.0.0.1'
     process.env.MODULA_API_PORT = '4022'
     process.env.MODULA_PUBLIC_API_URL = 'http://127.0.0.1:4022'
@@ -759,6 +816,107 @@ describeIf('Greenfield native accounts integration', () => {
 
     const newLogin = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password: nextPassword}})
     expect(newLogin.statusCode).toBe(200)
+  })
+
+  it('returns no in-band verification/recovery tokens unless the test-only flag is on, never in production (#194)', async () => {
+    const base = loadConfig()
+    const suffix = `inb${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`.slice(0, 16)
+    const register = async (config: typeof base, tag: string) => {
+      const handle = `${suffix}${tag}`.slice(0, 20)
+      const email = `${handle}@example.com`
+      const result = await new AccountService(db, config, new MailService(db, config)).register({
+        email,
+        password: 'secure-pass-word-1',
+        handle,
+        displayName: 'Inband User',
+        acceptedTerms: true,
+        inviteCode: 'test-invite',
+      } as any)
+      const recovery = await new RecoveryService(db, config, new MailService(db, config)).requestRecovery(email)
+      return {result, recovery}
+    }
+
+    // Flag off (default) in a non-production environment: nothing in-band.
+    const off = await register({...base, environment: 'development', testInbandAuthTokens: false}, 'o')
+    expect(off.result.verificationChallengeId).toBeTruthy()
+    expect('verificationToken' in off.result).toBe(false)
+    expect(off.recovery).toEqual({requested: true})
+
+    // Flag on in a non-production environment: both tokens are returned in-band.
+    const on = await register({...base, environment: 'development', testInbandAuthTokens: true}, 'n')
+    expect(on.result.verificationToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(on.recovery.recoveryToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
+
+    // Flag on but production (or preview): nothing in-band, tokens are still mailed.
+    for (const [environment, tag] of [['production', 'p'], ['preview', 'v']] as const) {
+      const prod = await register({...base, environment, testInbandAuthTokens: true}, tag)
+      expect('verificationToken' in prod.result).toBe(false)
+      expect(prod.recovery).toEqual({requested: true})
+      const mails = await db
+        .selectFrom('greenfield_mail_jobs')
+        .select('template_id')
+        .where('recipient_account_id', '=', prod.result.accountId)
+        .execute()
+      expect(mails.map((m: any) => m.template_id).sort()).toEqual(['password-reset', 'verification-code'])
+    }
+
+    // Over HTTP the suite opts in explicitly; the response shape is the documented in-band shape.
+    const httpHandle = `${suffix}h`.slice(0, 20)
+    const httpRegister = await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/register',
+      payload: {email: `${httpHandle}@example.com`, password: 'secure-pass-word-1', handle: httpHandle, displayName: 'Inband Http', acceptedTerms: true, inviteCode: 'test-invite'},
+    })
+    expect(httpRegister.statusCode).toBe(201)
+    expect(Object.keys(httpRegister.json().data).sort()).toEqual([
+      'accountId', 'primaryHandle', 'status', 'verificationChallengeId', 'verificationDelivery', 'verificationExpiresAt', 'verificationToken',
+    ])
+  })
+
+  it('legacy /v1/accounts/recovery/request mails every reset token it counts toward the cap (#193)', async () => {
+    const account = await createVerifiedAccountWithSession(app, db, {prefix: 'legrec'})
+    const counts = async () => {
+      const tokens = await db
+        .selectFrom('greenfield_recovery_tokens')
+        .select(db.fn.countAll().as('n'))
+        .where('account_id', '=', account.accountId)
+        .executeTakeFirstOrThrow()
+      const mails = await db
+        .selectFrom('greenfield_mail_jobs')
+        .select(db.fn.countAll().as('n'))
+        .where('recipient_account_id', '=', account.accountId)
+        .where('template_id', '=', 'password-reset')
+        .executeTakeFirstOrThrow()
+      return {tokens: Number(tokens.n), mails: Number(mails.n)}
+    }
+
+    // Two legacy requests: each one mints a token AND queues a reset mail (counts once each).
+    for (let i = 0; i < 2; i += 1) {
+      const legacy = await app.inject({method: 'POST', url: '/v1/accounts/recovery/request', payload: {email: account.email}})
+      expect(legacy.statusCode).toBe(200)
+      expect(legacy.json().data.requested).toBe(true)
+    }
+    expect(await counts()).toEqual({tokens: 2, mails: 2})
+
+    // The real forgot-password path still sends mail afterwards.
+    const forgot = await app.inject({method: 'POST', url: '/v1/accounts/forgot-password', payload: {email: account.email}})
+    expect(forgot.statusCode).toBe(200)
+    expect(await counts()).toEqual({tokens: 3, mails: 3})
+
+    // At the 3/hour cap both routes stop minting, and no token ever exists without a mail.
+    const capped = await app.inject({method: 'POST', url: '/v1/accounts/recovery/request', payload: {email: account.email}})
+    expect(capped.statusCode).toBe(200)
+    expect(await counts()).toEqual({tokens: 3, mails: 3})
+
+    // A legacy-issued (mailed) token completes a reset via the emailed link token.
+    const mailed = await db
+      .selectFrom('greenfield_mail_jobs')
+      .select(['text_body'])
+      .where('recipient_account_id', '=', account.accountId)
+      .where('template_id', '=', 'password-reset')
+      .orderBy('created_at', 'asc')
+      .executeTakeFirstOrThrow()
+    expect(String(mailed.text_body)).toMatch(/token=|[A-Za-z0-9_-]{43}/)
   })
 
   it('enrolls authenticator MFA, generates recovery codes, steps up, and disables safely', async () => {
