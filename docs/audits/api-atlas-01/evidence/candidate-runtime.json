@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-15T00:21:44.215Z",
+  "capturedAt": "2026-11-21T20:17:23.556Z",
   "source": {
-    "branch": "mosaic/gubic-p1-hardening",
-    "headAtCapture": "f4cedeb2f39088a2a4e10a4046719eeb4d1ba847",
+    "branch": "forge/gf-auth-flows-01a",
+    "headAtCapture": "af16e56db478cec3b19075e4feb1a7dacfc3b7ce",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22"
+    "apiSourceSha256": "2ea84b5be0b7b952466eb5c7cb1500b07d210a7fa96ee87d1e79ac6a36e0a6e8"
   },
   "runtimeRoutes": [
     {

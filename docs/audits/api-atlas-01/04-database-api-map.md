@@ -858,10 +858,10 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `window_started_at`, `updated_at`
 - Migration introduced: `031_phase7i_f5_auth_domain.sql`
-- Routes reading: none observed
-- Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/auth/challenges/service.ts`
-- API/worker source writes: `services/greenfield-api/src/auth/challenges/service.ts`
+- Routes reading: `POST /v1/sessions`
+- Routes writing: `POST /v1/sessions`
+- API/worker source reads: `services/greenfield-api/src/auth/challenges/service.ts`, `services/greenfield-api/src/auth/password-login-throttle.ts`
+- API/worker source writes: `services/greenfield-api/src/auth/challenges/service.ts`, `services/greenfield-api/src/auth/password-login-throttle.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_authentication_methods`

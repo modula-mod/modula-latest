@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gubic-p1-hardening",
-      "sourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22",
-      "capturedAt": "2026-11-15T00:21:44.215Z",
+      "branch": "forge/gf-auth-flows-01a",
+      "sourceSha256": "2ea84b5be0b7b952466eb5c7cb1500b07d210a7fa96ee87d1e79ac6a36e0a6e8",
+      "capturedAt": "2026-11-21T20:17:23.556Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -1374,7 +1374,7 @@
       "apiVersion": "versionless",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 350
+        "line": 363
       },
       "handler": "inline",
       "controllerServices": [
@@ -1475,7 +1475,7 @@
       "apiVersion": "versionless",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 346
+        "line": 359
       },
       "handler": "inline",
       "controllerServices": [
@@ -2367,7 +2367,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 621
+        "line": 638
       },
       "handler": "inline",
       "controllerServices": [
@@ -2454,7 +2454,8 @@
         ],
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
-          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts"
+          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/app/credential-routes.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
@@ -2471,6 +2472,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -2519,7 +2521,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 510
+        "line": 525
       },
       "handler": "inline",
       "controllerServices": [
@@ -2552,11 +2554,9 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).email ?? '', {correlationId: request.id}), request.id))"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -2607,9 +2607,12 @@
           "src/api/local/routes/authRoutes.ts",
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase7e-real-auth.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -2634,7 +2637,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 526
+        "line": 543
       },
       "handler": "inline",
       "controllerServices": [
@@ -2736,7 +2739,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 530
+        "line": 547
       },
       "handler": "inline",
       "controllerServices": [
@@ -2839,7 +2842,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 538
+        "line": 555
       },
       "handler": "inline",
       "controllerServices": [
@@ -2936,6 +2939,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -2984,7 +2988,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 584
+        "line": 601
       },
       "handler": "inline",
       "controllerServices": [
@@ -3088,6 +3092,7 @@
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/messaging.integration.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts",
@@ -3695,7 +3700,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 593
+        "line": 610
       },
       "handler": "inline",
       "controllerServices": [
@@ -3728,9 +3733,7 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).handle ?? ''), request.id),"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
         "pagination": {
@@ -3805,7 +3808,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 543
+        "line": 560
       },
       "handler": "inline",
       "controllerServices": [
@@ -3911,7 +3914,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 558
+        "line": 575
       },
       "handler": "inline",
       "controllerServices": [
@@ -4029,7 +4032,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 548
+        "line": 565
       },
       "handler": "inline",
       "controllerServices": [
@@ -4258,7 +4261,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2055
+        "line": 2090
       },
       "handler": "inline",
       "controllerServices": [
@@ -4368,7 +4371,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2065
+        "line": 2100
       },
       "handler": "inline",
       "controllerServices": [
@@ -4484,7 +4487,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 604
+        "line": 621
       },
       "handler": "inline",
       "controllerServices": [
@@ -4600,7 +4603,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 635
+        "line": 652
       },
       "handler": "inline",
       "controllerServices": [
@@ -4710,7 +4713,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 630
+        "line": 647
       },
       "handler": "inline",
       "controllerServices": [
@@ -4898,7 +4901,9 @@
       "externalIntegrations": [],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": []
       },
       "automatedTest": false,
@@ -5006,7 +5011,9 @@
       ],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase6s-social-backend.mjs",
           "scripts/verify-phase7c-api-parity.mjs",
@@ -5033,7 +5040,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 459
+        "line": 472
       },
       "handler": "inline",
       "controllerServices": [
@@ -5123,7 +5130,8 @@
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts"
+          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/app/credential-routes.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
@@ -5133,6 +5141,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -5193,7 +5202,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 495
+        "line": 508
       },
       "handler": "inline",
       "controllerServices": [
@@ -5226,11 +5235,9 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).email ?? '', {"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -5276,10 +5283,13 @@
           "src/api/local/routes/authRoutes.ts",
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
           "scripts/verify-phase7e-real-auth.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts"
         ]
       },
@@ -5303,7 +5313,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 517
+        "line": 534
       },
       "handler": "inline",
       "controllerServices": [
@@ -5392,7 +5402,9 @@
           "src/api/local/routes/authRoutes.ts",
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase7e-real-auth.mjs",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -5419,7 +5431,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 481
+        "line": 494
       },
       "handler": "inline",
       "controllerServices": [
@@ -5516,7 +5528,8 @@
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
         "server": [
-          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts"
+          "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/app/credential-routes.ts"
         ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
@@ -5526,6 +5539,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
@@ -5572,7 +5586,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2203
+        "line": 2238
       },
       "handler": "inline",
       "controllerServices": [
@@ -7141,7 +7155,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1959
+        "line": 1994
       },
       "handler": "inline",
       "controllerServices": [
@@ -7245,7 +7259,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1977
+        "line": 2012
       },
       "handler": "inline",
       "controllerServices": [
@@ -7349,7 +7363,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1988
+        "line": 2023
       },
       "handler": "inline",
       "controllerServices": [
@@ -7459,7 +7473,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2006
+        "line": 2041
       },
       "handler": "inline",
       "controllerServices": [
@@ -8395,7 +8409,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2366
+        "line": 2401
       },
       "handler": "inline",
       "controllerServices": [
@@ -8504,7 +8518,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2358
+        "line": 2393
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8604,7 +8618,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2660
+        "line": 2695
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8706,7 +8720,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2350
+        "line": 2385
       },
       "handler": "inline",
       "controllerServices": [],
@@ -8806,7 +8820,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2504
+        "line": 2539
       },
       "handler": "inline",
       "controllerServices": [
@@ -8914,7 +8928,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2514
+        "line": 2549
       },
       "handler": "inline",
       "controllerServices": [
@@ -9025,7 +9039,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2627
+        "line": 2662
       },
       "handler": "inline",
       "controllerServices": [
@@ -9138,7 +9152,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2602
+        "line": 2637
       },
       "handler": "inline",
       "controllerServices": [
@@ -9250,7 +9264,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2647
+        "line": 2682
       },
       "handler": "inline",
       "controllerServices": [
@@ -9359,7 +9373,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2483
+        "line": 2518
       },
       "handler": "inline",
       "controllerServices": [
@@ -9464,7 +9478,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2421
+        "line": 2456
       },
       "handler": "inline",
       "controllerServices": [],
@@ -9564,7 +9578,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2392
+        "line": 2427
       },
       "handler": "inline",
       "controllerServices": [
@@ -9676,7 +9690,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2386
+        "line": 2421
       },
       "handler": "inline",
       "controllerServices": [
@@ -9778,7 +9792,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2572
+        "line": 2607
       },
       "handler": "inline",
       "controllerServices": [
@@ -9917,7 +9931,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2437
+        "line": 2472
       },
       "handler": "inline",
       "controllerServices": [
@@ -10026,7 +10040,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2378
+        "line": 2413
       },
       "handler": "inline",
       "controllerServices": [],
@@ -10124,7 +10138,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2537
+        "line": 2572
       },
       "handler": "inline",
       "controllerServices": [
@@ -10224,7 +10238,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2559
+        "line": 2594
       },
       "handler": "inline",
       "controllerServices": [
@@ -10328,7 +10342,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2494
+        "line": 2529
       },
       "handler": "inline",
       "controllerServices": [
@@ -10428,7 +10442,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2527
+        "line": 2562
       },
       "handler": "inline",
       "controllerServices": [
@@ -10528,7 +10542,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2547
+        "line": 2582
       },
       "handler": "inline",
       "controllerServices": [
@@ -14214,7 +14228,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2213
+        "line": 2248
       },
       "handler": "inline",
       "controllerServices": [
@@ -14321,7 +14335,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2278
+        "line": 2313
       },
       "handler": "inline",
       "controllerServices": [
@@ -14436,7 +14450,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2290
+        "line": 2325
       },
       "handler": "inline",
       "controllerServices": [
@@ -14547,7 +14561,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2302
+        "line": 2337
       },
       "handler": "inline",
       "controllerServices": [
@@ -14656,7 +14670,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2325
+        "line": 2360
       },
       "handler": "inline",
       "controllerServices": [
@@ -14761,7 +14775,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2245
+        "line": 2280
       },
       "handler": "inline",
       "controllerServices": [
@@ -14884,7 +14898,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2220
+        "line": 2255
       },
       "handler": "inline",
       "controllerServices": [
@@ -14997,7 +15011,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2311
+        "line": 2346
       },
       "handler": "inline",
       "controllerServices": [
@@ -15102,7 +15116,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2318
+        "line": 2353
       },
       "handler": "inline",
       "controllerServices": [
@@ -15864,7 +15878,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 748
+        "line": 765
       },
       "handler": "inline",
       "controllerServices": [
@@ -15971,7 +15985,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 738
+        "line": 755
       },
       "handler": "inline",
       "controllerServices": [
@@ -16073,7 +16087,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 735
+        "line": 752
       },
       "handler": "inline",
       "controllerServices": [
@@ -16169,7 +16183,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 729
+        "line": 746
       },
       "handler": "inline",
       "controllerServices": [
@@ -16269,7 +16283,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 814
+        "line": 831
       },
       "handler": "inline",
       "controllerServices": [
@@ -16384,7 +16398,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 771
+        "line": 788
       },
       "handler": "inline",
       "controllerServices": [
@@ -16490,7 +16504,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 786
+        "line": 803
       },
       "handler": "inline",
       "controllerServices": [
@@ -16606,7 +16620,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 354
+        "line": 367
       },
       "handler": "inline",
       "controllerServices": [
@@ -16723,7 +16737,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 835
+        "line": 852
       },
       "handler": "inline",
       "controllerServices": [
@@ -16826,7 +16840,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 840
+        "line": 857
       },
       "handler": "inline",
       "controllerServices": [
@@ -17051,7 +17065,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 709
+        "line": 726
       },
       "handler": "inline",
       "controllerServices": [
@@ -17161,7 +17175,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 684
+        "line": 701
       },
       "handler": "inline",
       "controllerServices": [
@@ -17274,7 +17288,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 643
+        "line": 660
       },
       "handler": "inline",
       "controllerServices": [
@@ -17359,6 +17373,7 @@
         "server": [],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts"
         ]
       },
@@ -17382,7 +17397,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 658
+        "line": 675
       },
       "handler": "inline",
       "controllerServices": [
@@ -20669,7 +20684,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1086
+        "line": 1121
       },
       "handler": "inline",
       "controllerServices": [
@@ -20776,7 +20791,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1096
+        "line": 1131
       },
       "handler": "inline",
       "controllerServices": [
@@ -25766,7 +25781,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1354
+        "line": 1389
       },
       "handler": "inline",
       "controllerServices": [
@@ -25866,7 +25881,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1438
+        "line": 1473
       },
       "handler": "inline",
       "controllerServices": [
@@ -26009,7 +26024,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1363
+        "line": 1398
       },
       "handler": "inline",
       "controllerServices": [
@@ -26111,7 +26126,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1381
+        "line": 1416
       },
       "handler": "inline",
       "controllerServices": [
@@ -26215,7 +26230,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1372
+        "line": 1407
       },
       "handler": "inline",
       "controllerServices": [
@@ -26319,7 +26334,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1390
+        "line": 1425
       },
       "handler": "inline",
       "controllerServices": [
@@ -26473,7 +26488,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1307
+        "line": 1342
       },
       "handler": "inline",
       "controllerServices": [
@@ -26578,7 +26593,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1310
+        "line": 1345
       },
       "handler": "inline",
       "controllerServices": [
@@ -26685,7 +26700,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1315
+        "line": 1350
       },
       "handler": "inline",
       "controllerServices": [
@@ -31456,7 +31471,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2198
+        "line": 2233
       },
       "handler": "inline",
       "controllerServices": [
@@ -31569,7 +31584,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1216
+        "line": 1251
       },
       "handler": "inline",
       "controllerServices": [
@@ -31677,7 +31692,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1224
+        "line": 1259
       },
       "handler": "inline",
       "controllerServices": [
@@ -32154,7 +32169,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1248
+        "line": 1283
       },
       "handler": "inline",
       "controllerServices": [
@@ -32270,7 +32285,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1236
+        "line": 1271
       },
       "handler": "inline",
       "controllerServices": [
@@ -32386,7 +32401,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1258
+        "line": 1293
       },
       "handler": "inline",
       "controllerServices": [
@@ -33229,7 +33244,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1219
+        "line": 1254
       },
       "handler": "inline",
       "controllerServices": [
@@ -33332,7 +33347,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1231
+        "line": 1266
       },
       "handler": "inline",
       "controllerServices": [
@@ -33436,7 +33451,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1486
+        "line": 1521
       },
       "handler": "inline",
       "controllerServices": [
@@ -33565,7 +33580,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1517
+        "line": 1552
       },
       "handler": "inline",
       "controllerServices": [
@@ -33677,7 +33692,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1802
+        "line": 1837
       },
       "handler": "inline",
       "controllerServices": [
@@ -33785,7 +33800,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1778
+        "line": 1813
       },
       "handler": "inline",
       "controllerServices": [
@@ -33894,7 +33909,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1790
+        "line": 1825
       },
       "handler": "inline",
       "controllerServices": [
@@ -34209,7 +34224,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1284
+        "line": 1319
       },
       "handler": "inline",
       "controllerServices": [
@@ -34316,7 +34331,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1289
+        "line": 1324
       },
       "handler": "inline",
       "controllerServices": [
@@ -38811,7 +38826,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 277
+        "line": 290
       },
       "handler": "inline",
       "controllerServices": [],
@@ -38886,7 +38901,8 @@
           "scripts/verify-phase7h-live-contracts.mjs",
           "scripts/verify-phase7i-mail-production.mjs",
           "scripts/verify-phase7j-b.mjs",
-          "services/greenfield-api/tests/api.integration.test.ts"
+          "services/greenfield-api/tests/api.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts"
         ]
       },
       "automatedTest": true,
@@ -38923,7 +38939,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 281
+        "line": 294
       },
       "handler": "inline",
       "controllerServices": [],
@@ -41059,7 +41075,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2695
+        "line": 2730
       },
       "handler": "inline",
       "controllerServices": [],
@@ -44521,7 +44537,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2171
+        "line": 2206
       },
       "handler": "inline",
       "controllerServices": [
@@ -45641,7 +45657,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 293
+        "line": 306
       },
       "handler": "inline",
       "controllerServices": [
@@ -46013,7 +46029,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1457
+        "line": 1492
       },
       "handler": "inline",
       "controllerServices": [
@@ -60442,7 +60458,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2024
+        "line": 2059
       },
       "handler": "inline",
       "controllerServices": [
@@ -60554,7 +60570,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2039
+        "line": 2074
       },
       "handler": "inline",
       "controllerServices": [
@@ -60665,7 +60681,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2048
+        "line": 2083
       },
       "handler": "inline",
       "controllerServices": [
@@ -60771,7 +60787,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1304
+        "line": 1339
       },
       "handler": "inline",
       "controllerServices": [
@@ -60869,7 +60885,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1546
+        "line": 1581
       },
       "handler": "inline",
       "controllerServices": [
@@ -61010,7 +61026,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1582
+        "line": 1617
       },
       "handler": "inline",
       "controllerServices": [
@@ -61143,7 +61159,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1539
+        "line": 1574
       },
       "handler": "inline",
       "controllerServices": [
@@ -61275,7 +61291,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1565
+        "line": 1600
       },
       "handler": "inline",
       "controllerServices": [
@@ -61698,7 +61714,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1641
       },
       "handler": "inline",
       "controllerServices": [
@@ -61846,7 +61862,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1641
       },
       "handler": "inline",
       "controllerServices": [
@@ -62537,7 +62553,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1641
       },
       "handler": "inline",
       "controllerServices": [
@@ -62685,7 +62701,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1641
       },
       "handler": "inline",
       "controllerServices": [
@@ -62833,7 +62849,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1641
       },
       "handler": "inline",
       "controllerServices": [
@@ -62981,7 +62997,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1606
+        "line": 1641
       },
       "handler": "inline",
       "controllerServices": [
@@ -63129,7 +63145,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1643
+        "line": 1678
       },
       "handler": "inline",
       "controllerServices": [
@@ -64035,7 +64051,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1662
+        "line": 1697
       },
       "handler": "inline",
       "controllerServices": [
@@ -64182,7 +64198,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1686
+        "line": 1721
       },
       "handler": "inline",
       "controllerServices": [
@@ -64319,7 +64335,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1702
+        "line": 1737
       },
       "handler": "inline",
       "controllerServices": [
@@ -64456,7 +64472,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1670
+        "line": 1705
       },
       "handler": "inline",
       "controllerServices": [
@@ -64592,7 +64608,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1890
+        "line": 1925
       },
       "handler": "inline",
       "controllerServices": [
@@ -64727,7 +64743,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1874
+        "line": 1909
       },
       "handler": "inline",
       "controllerServices": [
@@ -64866,7 +64882,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1741
+        "line": 1776
       },
       "handler": "inline",
       "controllerServices": [
@@ -65010,7 +65026,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1718
+        "line": 1753
       },
       "handler": "inline",
       "controllerServices": [
@@ -65154,7 +65170,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1920
+        "line": 1955
       },
       "handler": "inline",
       "controllerServices": [
@@ -65289,7 +65305,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1905
+        "line": 1940
       },
       "handler": "inline",
       "controllerServices": [
@@ -65425,7 +65441,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1814
+        "line": 1849
       },
       "handler": "inline",
       "controllerServices": [
@@ -65564,7 +65580,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1859
+        "line": 1894
       },
       "handler": "inline",
       "controllerServices": [
@@ -65677,7 +65693,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1842
+        "line": 1877
       },
       "handler": "inline",
       "controllerServices": [
@@ -65793,7 +65809,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1859
+        "line": 1894
       },
       "handler": "inline",
       "controllerServices": [
@@ -65905,7 +65921,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1842
+        "line": 1877
       },
       "handler": "inline",
       "controllerServices": [
@@ -66020,7 +66036,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1764
+        "line": 1799
       },
       "handler": "inline",
       "controllerServices": [
@@ -68886,7 +68902,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2208
+        "line": 2243
       },
       "handler": "inline",
       "controllerServices": [
@@ -70763,7 +70779,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1935
+        "line": 1970
       },
       "handler": "inline",
       "controllerServices": [
@@ -70884,7 +70900,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1948
+        "line": 1983
       },
       "handler": "inline",
       "controllerServices": [
@@ -70988,7 +71004,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1107
+        "line": 1142
       },
       "handler": "inline",
       "controllerServices": [
@@ -71093,7 +71109,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1196
+        "line": 1231
       },
       "handler": "inline",
       "controllerServices": [
@@ -71199,7 +71215,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1205
+        "line": 1240
       },
       "handler": "inline",
       "controllerServices": [
@@ -71302,7 +71318,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1116
+        "line": 1151
       },
       "handler": "inline",
       "controllerServices": [
@@ -71405,7 +71421,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1130
+        "line": 1165
       },
       "handler": "inline",
       "controllerServices": [
@@ -71515,7 +71531,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1173
+        "line": 1208
       },
       "handler": "inline",
       "controllerServices": [
@@ -71629,7 +71645,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1122
+        "line": 1157
       },
       "handler": "inline",
       "controllerServices": [
@@ -71732,7 +71748,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1149
+        "line": 1184
       },
       "handler": "inline",
       "controllerServices": [
@@ -71955,7 +71971,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2081
+        "line": 2116
       },
       "handler": "inline",
       "controllerServices": [
@@ -72065,7 +72081,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2118
+        "line": 2153
       },
       "handler": "inline",
       "controllerServices": [
@@ -72170,7 +72186,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2098
+        "line": 2133
       },
       "handler": "inline",
       "controllerServices": [
@@ -72271,7 +72287,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2108
+        "line": 2143
       },
       "handler": "inline",
       "controllerServices": [
@@ -72374,7 +72390,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2129
+        "line": 2164
       },
       "handler": "inline",
       "controllerServices": [
@@ -72474,7 +72490,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2139
+        "line": 2174
       },
       "handler": "inline",
       "controllerServices": [
@@ -72578,7 +72594,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2160
+        "line": 2195
       },
       "handler": "inline",
       "controllerServices": [
@@ -72682,7 +72698,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2149
+        "line": 2184
       },
       "handler": "inline",
       "controllerServices": [
@@ -72790,7 +72806,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 2090
+        "line": 2125
       },
       "handler": "inline",
       "controllerServices": [
@@ -72888,12 +72904,15 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 856
+        "line": 873
       },
       "handler": "inline",
       "controllerServices": [
         "accessExpiresAt.toISOString",
         "authentication.login",
+        "passwordLoginThrottle.assertAllowed",
+        "passwordLoginThrottle.recordFailure",
+        "passwordLoginThrottle.reset",
         "refreshExpiresAt.toISOString"
       ],
       "authentication": "none",
@@ -72925,7 +72944,7 @@
         "query": [],
         "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -72953,10 +72972,18 @@
         "reads": [
           "greenfield_accounts",
           "greenfield_auth_identities",
+          "greenfield_auth_rate_limits",
           "greenfield_password_credentials"
         ],
-        "writes": [],
+        "writes": [
+          "SET",
+          "greenfield_auth_rate_limits"
+        ],
         "evidence": [
+          "services/greenfield-api/src/auth/password-login-throttle.ts#assertAllowed",
+          "services/greenfield-api/src/auth/password-login-throttle.ts#key",
+          "services/greenfield-api/src/auth/password-login-throttle.ts#recordFailure",
+          "services/greenfield-api/src/auth/password-login-throttle.ts#reset",
           "services/greenfield-api/src/authentication/service.ts#login"
         ],
         "confidence": "partial-static"
@@ -72976,6 +73003,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/app/credential-routes.ts",
           "services/greenfield-api/src/security/session.ts"
         ],
         "tests": [
@@ -72990,6 +73018,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -73040,7 +73069,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1078
+        "line": 1110
       },
       "handler": "inline",
       "controllerServices": [
@@ -73131,6 +73160,7 @@
         "server": [
           "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/scripts/qa-vault-package-install-plan.ts",
+          "services/greenfield-api/src/app/credential-routes.ts",
           "services/greenfield-api/src/security/session.ts"
         ],
         "tests": [
@@ -73145,6 +73175,7 @@
           "services/greenfield-api/tests/calls.integration.test.ts",
           "services/greenfield-api/tests/collections-drafts.integration.test.ts",
           "services/greenfield-api/tests/communities.integration.test.ts",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts",
           "services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts",
@@ -73195,7 +73226,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1017
+        "line": 1047
       },
       "handler": "inline",
       "controllerServices": [
@@ -73285,9 +73316,12 @@
       ],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-greenfield-backend-v1-auth.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts"
         ]
       },
@@ -73311,7 +73345,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1005
+        "line": 1035
       },
       "handler": "inline",
       "controllerServices": [
@@ -73390,6 +73424,7 @@
         "server": [],
         "tests": [
           "scripts/verify-greenfield-backend-v1-auth.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts"
         ]
       },
@@ -73413,7 +73448,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1072
+        "line": 1104
       },
       "handler": "inline",
       "controllerServices": [
@@ -73527,7 +73562,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 893
+        "line": 923
       },
       "handler": "inline",
       "controllerServices": [
@@ -73609,9 +73644,12 @@
         "clients": [
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -73636,7 +73674,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 878
+        "line": 908
       },
       "handler": "inline",
       "controllerServices": [
@@ -73716,9 +73754,12 @@
         "clients": [
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
         ]
@@ -73743,7 +73784,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1479
+        "line": 1514
       },
       "handler": "inline",
       "controllerServices": [
@@ -73846,7 +73887,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1473
+        "line": 1508
       },
       "handler": "inline",
       "controllerServices": [],
@@ -73941,7 +73982,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 964
+        "line": 994
       },
       "handler": "inline",
       "controllerServices": [
@@ -74037,9 +74078,12 @@
       ],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts"
         ]
       },
@@ -74063,7 +74107,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 949
+        "line": 979
       },
       "handler": "inline",
       "controllerServices": [
@@ -74147,6 +74191,7 @@
         "server": [],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts"
         ]
       },
@@ -74170,7 +74215,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 921
+        "line": 951
       },
       "handler": "inline",
       "controllerServices": [
@@ -74252,9 +74297,12 @@
       ],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts"
         ]
       },
@@ -74278,7 +74326,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1053
+        "line": 1083
       },
       "handler": "inline",
       "controllerServices": [
@@ -74313,11 +74361,9 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).refreshToken)"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -74349,7 +74395,8 @@
         "writes": [
           "greenfield_session_events",
           "greenfield_session_tokens",
-          "greenfield_sessions"
+          "greenfield_sessions",
+          "that"
         ],
         "evidence": [
           "services/greenfield-api/src/sessions/service.ts#hash",
@@ -74368,13 +74415,16 @@
           "src/api/local/routes/authRoutes.ts",
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/app/credential-routes.ts"
+        ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
           "scripts/verify-phase6-greenfield-frontend.mjs",
           "scripts/verify-phase7c-api-parity.mjs",
           "scripts/verify-phase7e-real-auth.mjs",
           "scripts/verify-phase7l-b-session.mjs",
+          "services/greenfield-api/tests/gf-auth-flows-01a.test.ts",
           "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "tests/konsta-web-presentation.test.ts",
           "tests/phase7l-b-auth-regression.test.ts"
@@ -75675,7 +75725,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1270
+        "line": 1305
       },
       "handler": "inline",
       "controllerServices": [
@@ -75778,7 +75828,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1274
+        "line": 1309
       },
       "handler": "inline",
       "controllerServices": [
@@ -75883,7 +75933,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 273
+        "line": 286
       },
       "handler": "inline",
       "controllerServices": [],
@@ -75979,7 +76029,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 1454
+        "line": 1489
       },
       "handler": "inline",
       "controllerServices": [
@@ -76075,7 +76125,7 @@
       "apiVersion": "versionless",
       "source": {
         "file": "services/greenfield-api/src/app/register-routes.ts",
-        "line": 269
+        "line": 282
       },
       "handler": "inline",
       "controllerServices": [],
@@ -83486,15 +83536,21 @@
       ],
       "migrationIntroduced": "031_phase7i_f5_auth_domain.sql",
       "sourceReads": [
-        "services/greenfield-api/src/auth/challenges/service.ts"
+        "services/greenfield-api/src/auth/challenges/service.ts",
+        "services/greenfield-api/src/auth/password-login-throttle.ts"
       ],
       "sourceWrites": [
-        "services/greenfield-api/src/auth/challenges/service.ts"
+        "services/greenfield-api/src/auth/challenges/service.ts",
+        "services/greenfield-api/src/auth/password-login-throttle.ts"
       ],
       "jobReads": [],
       "jobWrites": [],
-      "routeReads": [],
-      "routeWrites": [],
+      "routeReads": [
+        "POST /v1/sessions"
+      ],
+      "routeWrites": [
+        "POST /v1/sessions"
+      ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false

@@ -10859,13 +10859,21 @@
     "reads": [
       "greenfield_accounts",
       "greenfield_auth_identities",
+      "greenfield_auth_rate_limits",
       "greenfield_password_credentials"
     ],
-    "writes": [],
+    "writes": [
+      "SET",
+      "greenfield_auth_rate_limits"
+    ],
     "emits": [],
     "jobs": [],
     "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/auth/password-login-throttle.ts#assertAllowed",
+      "services/greenfield-api/src/auth/password-login-throttle.ts#key",
+      "services/greenfield-api/src/auth/password-login-throttle.ts#recordFailure",
+      "services/greenfield-api/src/auth/password-login-throttle.ts#reset",
       "services/greenfield-api/src/authentication/service.ts#login"
     ]
   },
@@ -11048,7 +11056,8 @@
     "writes": [
       "greenfield_session_events",
       "greenfield_session_tokens",
-      "greenfield_sessions"
+      "greenfield_sessions",
+      "that"
     ],
     "emits": [],
     "jobs": [],
