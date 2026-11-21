@@ -178,6 +178,12 @@ export async function completeJob(db: ModulaWorkerDb, jobId: string, workerId: s
   assertLeaseTransition(row, jobId, workerId)
 }
 
+/**
+ * Moves a job this worker still owns from LEASED or RUNNING to RETRYING.
+ * Accepting LEASED covers a failure after claim and before markJobRunning
+ * so the original error is recorded instead of a false JOB_LEASE_LOST.
+ * The ownership guard still refuses a row another worker has taken.
+ */
 export async function scheduleRetry(
   db: ModulaWorkerDb,
   jobId: string,
@@ -200,13 +206,17 @@ export async function scheduleRetry(
       updated_at: now,
     })
     .where('id', '=', jobId)
-    .where('status', '=', 'RUNNING')
+    .where('status', 'in', ['LEASED', 'RUNNING'])
     .where('lease_owner', '=', workerId)
     .returning('id')
     .executeTakeFirst()
   assertLeaseTransition(row, jobId, workerId)
 }
 
+/**
+ * Terminates a job this worker still owns from LEASED or RUNNING. Same
+ * LEASED allowance as scheduleRetry, with the same owner guard.
+ */
 export async function deadLetterJob(
   db: ModulaWorkerDb,
   job: ClaimedJob,
@@ -231,7 +241,7 @@ export async function deadLetterJob(
         updated_at: now,
       })
       .where('id', '=', job.id)
-      .where('status', '=', 'RUNNING')
+      .where('status', 'in', ['LEASED', 'RUNNING'])
       .where('lease_owner', '=', workerId)
       .returning('id')
       .executeTakeFirst()

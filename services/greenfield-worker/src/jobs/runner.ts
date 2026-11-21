@@ -241,12 +241,21 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig, op
     const message = messageFor(error)
     const permanent = isPermanentFailure(error)
     const exhausted = job.attempt_count >= job.maximum_attempts
-    if (permanent || exhausted) {
-      await deadLetterJob(db, job, config.workerId, code, message, permanent)
-      metrics.increment('jobsDeadLettered')
-    } else {
-      await scheduleRetry(db, job.id, config.workerId, computeNextAvailableAt(job.attempt_count + 1), code, message)
-      metrics.increment('jobsRetried')
+    // Log the original error first so a later lease-transition failure cannot hide it.
+    log?.error({operation: 'job.run.failed', jobId: job.id, jobType: job.job_type, error: safeError(error), errorCode: code}, 'job failed; recording retry or dead-letter')
+    try {
+      if (permanent || exhausted) {
+        await deadLetterJob(db, job, config.workerId, code, message, permanent)
+        metrics.increment('jobsDeadLettered')
+      } else {
+        await scheduleRetry(db, job.id, config.workerId, computeNextAvailableAt(job.attempt_count + 1), code, message)
+        metrics.increment('jobsRetried')
+      }
+    } catch (transitionError: unknown) {
+      // Owner mismatch on the LEASED/RUNNING row: the original error is already
+      // logged, and this worker must not write an outcome it no longer owns.
+      if (errorCodeFor(transitionError) === 'JOB_LEASE_LOST') return leaseLostOutcome(log, job.id, job.job_type)
+      throw transitionError
     }
   }
   return true
