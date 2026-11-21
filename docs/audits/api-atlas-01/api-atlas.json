@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "forge/gf-test-db-01",
-      "sourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128",
-      "capturedAt": "2026-11-15T01:05:55.755Z",
+      "branch": "mosaic/gubic-connect-self",
+      "sourceSha256": "4b5012df3ad96d357800c65c161a968a5bb6f8abfb60a8e2360fe5a7d0da10f7",
+      "capturedAt": "2026-11-21T20:59:55.689Z",
       "routeCount": 900
     },
     "status": "PASS"
