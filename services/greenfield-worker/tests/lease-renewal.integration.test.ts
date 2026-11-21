@@ -59,6 +59,11 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
   const suffix = randomUUID().slice(0, 8)
   const jobIds: string[] = []
   const workerIds: string[] = []
+  // Isolate this file's claims from other suites (and other concurrent runs) on a shared DB.
+  const claimScope = {idPrefix: `gf-ops-01c-${suffix}-`}
+  const claim = (workerId: string, leaseDurationMs: number) => claimNextJob(db, workerId, leaseDurationMs, claimScope)
+  const runJob = (cfg: WorkerConfig, options: {log?: {warn: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn>}} = {}) =>
+    processOneJob(db, cfg, {...claimScope, ...options})
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
   const jobRow = (id: string) => db.selectFrom('background_jobs').select(['status', 'lease_owner', 'lease_expires_at', 'attempt_count']).where('id', '=', id).executeTakeFirstOrThrow()
@@ -134,7 +139,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     const jobId = await enqueue()
     // The old main loop wrote the heartbeat, then blocked inside the job.
     await recordHeartbeat(db, {workerId: cfg.workerId, releaseSha: null, startedAt: new Date()})
-    const job = await claimNextJob(db, cfg.workerId, LEASE_MS)
+    const job = await claim(cfg.workerId, LEASE_MS)
     expect(job?.id).toBe(jobId)
     await markJobRunning(db, jobId, cfg.workerId)
     await sleep(JOB_MS)
@@ -162,7 +167,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
         probedPastLease = true
         // Past the original 60 s lease: the reaper and a second claimer must both leave it alone.
         await reapExpiredLeases(db)
-        const thief = await claimNextJob(db, `gf-ops-01c-thief-${suffix}`, LEASE_MS)
+        const thief = await claim(`gf-ops-01c-thief-${suffix}`, LEASE_MS)
         await releaseForeignClaim(thief, jobId)
         expect(thief?.id).not.toBe(jobId)
         const row = await jobRow(jobId)
@@ -172,7 +177,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     }
     const log = {warn: vi.fn(), error: vi.fn()}
     try {
-      await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+      await expect(runJob(cfg, {log})).resolves.toBe(true)
     } finally {
       await heartbeat.stop()
     }
@@ -189,7 +194,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
   it('never renews a lease that was reaped or reclaimed by another worker', async () => {
     const jobId = await enqueue()
     const a = `gf-ops-01c-a-${suffix}`
-    const job = await claimNextJob(db, a, LEASE_MS)
+    const job = await claim(a, LEASE_MS)
     expect(job?.id).toBe(jobId)
     expect(await renewJobLease(db, jobId, a, LEASE_MS)).toBe(true) // LEASED
     expect(await renewJobLease(db, jobId, 'gf-ops-01c-not-owner', LEASE_MS)).toBe(false)
@@ -206,7 +211,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     // ... and another worker claims and runs it: the stale worker still cannot extend it.
     await db.updateTable('background_jobs').set({available_at: new Date(0)}).where('id', '=', jobId).execute()
     const b = `gf-ops-01c-b-${suffix}`
-    const reclaimed = await claimNextJob(db, b, LEASE_MS)
+    const reclaimed = await claim(b, LEASE_MS)
     expect(reclaimed?.id).toBe(jobId)
     await markJobRunning(db, jobId, b)
     const ownedByB = await jobRow(jobId)
@@ -234,7 +239,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     }
     const lostBefore = metrics.read().jobLeasesLost
     const log = {warn: vi.fn(), error: vi.fn()}
-    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    await expect(runJob(cfg, {log})).resolves.toBe(true)
     expect(stolen).toBe(true)
     expect(await jobRow(jobId)).toMatchObject({status: 'RUNNING', lease_owner: other, attempt_count: 2})
     expect(metrics.read().jobLeasesLost - lostBefore).toBe(1)
@@ -258,7 +263,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
       expect(row).toMatchObject({status: 'LEASED', lease_owner: cfg.workerId})
       expect(new Date(row.lease_expires_at!).getTime()).toBeGreaterThan(Date.now())
     }
-    await expect(processOneJob(db, cfg)).resolves.toBe(true)
+    await expect(runJob(cfg)).resolves.toBe(true)
     expect(probed).toBe(true)
     expect(metrics.read().jobLeaseRenewals - renewalsBefore).toBeGreaterThanOrEqual(3)
     expect(slowMark.handlerRuns).toBe(1)
@@ -276,7 +281,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
         .where('id', '=', jobId).execute()
     }
     const log = {warn: vi.fn(), error: vi.fn()}
-    await expect(processOneJob(db, cfg, {log})).resolves.toBe(true)
+    await expect(runJob(cfg, {log})).resolves.toBe(true)
     expect(slowMark.handlerRuns).toBe(0)
     expect(await jobRow(jobId)).toMatchObject({status: 'LEASED', lease_owner: other, attempt_count: 2})
     expect(log.warn.mock.calls.map(([fields]) => (fields as {operation: string}).operation)).toContain('job.lease.lost')
@@ -355,7 +360,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     slowJob.durationMs = JOB_MS // longer than the lease: only the default renewal keeps it
     const renewalsBefore = metrics.read().jobLeaseRenewals
     const log = {warn: vi.fn(), error: vi.fn()}
-    await expect(processOneJob(db, cfg as WorkerConfig, {log})).resolves.toBe(true)
+    await expect(runJob(cfg as WorkerConfig, {log})).resolves.toBe(true)
     expect(slowMark.handlerRuns).toBe(1)
     expect(await jobRow(jobId)).toMatchObject({status: 'SUCCEEDED', lease_owner: null, attempt_count: 1})
     expect(metrics.read().jobLeaseRenewals - renewalsBefore).toBeGreaterThanOrEqual(2)
@@ -368,7 +373,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     const jobId = await enqueue()
     for (const leaseRenewIntervalMs of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5, LEASE_MS / 2 + 1, LEASE_MS, LEASE_MS + 1, '200' as unknown as number, null as unknown as number]) {
       const cfg = {...config(`gf-ops-01c-bad-renew-cfg-${suffix}`), leaseRenewIntervalMs}
-      await expect(processOneJob(db, cfg)).rejects.toThrow(RangeError)
+      await expect(runJob(cfg)).rejects.toThrow(RangeError)
     }
     expect(slowMark.handlerRuns).toBe(0)
     expect(await jobRow(jobId)).toMatchObject({status: 'QUEUED', lease_owner: null, lease_expires_at: null, attempt_count: 0})
@@ -379,7 +384,7 @@ describeLive('GF-OPS-01(c) heartbeat and lease renewal (live Postgres)', () => {
     const cfg = config(`gf-ops-01c-stop-${suffix}`)
     const jobId = await enqueue()
     slowJob.durationMs = RENEW_MS * 2
-    await processOneJob(db, cfg)
+    await runJob(cfg)
     expect(await jobRow(jobId)).toMatchObject({status: 'SUCCEEDED'})
     const renewals = metrics.read().jobLeaseRenewals
     await sleep(RENEW_MS * 3)
