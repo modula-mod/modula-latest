@@ -1409,6 +1409,8 @@ export interface Database {
     created_at: Date
     updated_at: Date
     last_message_at: Date
+    disappearing_ttl_seconds: Generated<number | null>
+    theme: Generated<string | null>
   }
   greenfield_conversation_members: {
     conversation_id: string
@@ -1423,6 +1425,8 @@ export interface Database {
     role: Generated<'owner' | 'admin' | 'member'>
     added_by_actor_id: Generated<string | null>
     marked_unread_at: Generated<Date | null>
+    pinned_at: Generated<Date | null>
+    notify_level: Generated<'all' | 'mentions' | 'none'>
   }
   greenfield_conversation_messages: {
     message_id: string
@@ -1436,7 +1440,31 @@ export interface Database {
     deleted_at: Date | null
     message_kind: Generated<'text' | 'voice' | 'media'>
     client_message_id: Generated<string | null>
+    forwarded_from_message_id: Generated<string | null>
+    forwarded_from_actor_id: Generated<string | null>
+    forwarded_from_sent_at: Generated<Date | null>
+    expires_at: Generated<Date | null>
   }
+  greenfield_message_pins: {conversation_id: string; message_id: string; pinned_by_actor_id: string; pinned_at: Generated<Date>}
+  greenfield_saved_messages: {actor_id: string; message_id: string; conversation_id: string; saved_at: Generated<Date>}
+  greenfield_message_edits: {edit_id: string; message_id: string; previous_body: string; edited_at: Generated<Date>}
+  greenfield_scheduled_messages: {
+    scheduled_id: string
+    conversation_id: string
+    sender_actor_id: string
+    body: string
+    reply_to_message_id: string | null
+    send_at: Date
+    state: Generated<'pending' | 'sending' | 'sent' | 'failed' | 'cancelled'>
+    sent_message_id: Generated<string | null>
+    failure_reason: Generated<string | null>
+    attempts: Generated<number>
+    created_at: Generated<Date>
+    updated_at: Generated<Date>
+  }
+  greenfield_chat_folders: {folder_id: string; actor_id: string; name: string; emoji: string | null; sort_order: Generated<number>; created_at: Generated<Date>; updated_at: Generated<Date>}
+  greenfield_chat_folder_items: {folder_id: string; conversation_id: string; added_at: Generated<Date>}
+  greenfield_quick_replies: {reply_id: string; actor_id: string; shortcut: string; body: string; created_at: Generated<Date>; updated_at: Generated<Date>}
   greenfield_message_reactions: {
     message_id: string
     actor_id: string
