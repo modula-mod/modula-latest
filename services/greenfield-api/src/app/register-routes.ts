@@ -93,7 +93,7 @@ import {registerCommunitiesRoutes} from './register-communities-routes.js'
 import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
 import {registerMolibooRoutes} from './register-moliboo-routes.js'
 import {registerNativeEndpointRoutes} from './register-native-endpoint-routes.js'
-import {registerCredentialResponseNoStore} from './credential-response-cache.js'
+import {registerCredentialBodyErrorEnvelope, registerCredentialResponseNoStore} from './credential-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -130,6 +130,12 @@ function bodyString(body: unknown, key: string): string {
   if (!body || typeof body !== 'object') return ''
   const value = (body as Record<string, unknown>)[key]
   return typeof value === 'string' ? value : ''
+}
+
+/** #198: a missing body, non-object body or absent field is a 400 VALIDATION_FAILED, never a 500. */
+function requiredBodyString(body: unknown, key: string): string | null {
+  const value = bodyString(body, key)
+  return value.trim() ? value : null
 }
 
 function requestIpHash(request: {ip?: string}, config: AppConfig): string | undefined {
@@ -212,6 +218,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const connectorOAuthStates = new ConnectorOAuthStateService(db, config, connectorProviders)
 
   registerCredentialResponseNoStore(app)
+  registerCredentialBodyErrorEnvelope(app)
 
   app.addHook('preHandler', async (request, reply) => {
     if (request.url.startsWith('/v1/atproto') && !config.atprotoEnabled) {
@@ -496,10 +503,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
   app.post('/v1/accounts/resend-verification', authWriteConfig, async (request, reply) => {
+    const email = requiredBodyString(request.body, 'email')
+    if (email === null) return sendError(reply, 'VALIDATION_FAILED', 'Email required', request.id)
     try {
       return reply.send(
         successEnvelope(
-          await accounts.resendVerification((request.body as any).email ?? '', {
+          await accounts.resendVerification(email, {
             correlationId: request.id,
             ipHash: requestIpHash(request, config),
           }),
@@ -511,8 +520,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
   app.post('/v1/accounts/forgot-password', authWriteConfig, async (request, reply) => {
+    const email = requiredBodyString(request.body, 'email')
+    if (email === null) return sendError(reply, 'VALIDATION_FAILED', 'Email required', request.id)
     try {
-      return reply.send(successEnvelope(await recovery.requestRecovery((request.body as any).email ?? '', {correlationId: request.id}), request.id))
+      return reply.send(successEnvelope(await recovery.requestRecovery(email, {correlationId: request.id}), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Recovery request failed')
     }
@@ -598,7 +609,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     if (!auth) return
     try {
       return reply.send(
-        successEnvelope(await accounts.changeHandle(auth.accountId, (request.body as any).handle ?? ''), request.id),
+        successEnvelope(await accounts.changeHandle(auth.accountId, bodyString(request.body, 'handle')), request.id),
       )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Handle change failed')
@@ -1054,8 +1065,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
   app.post('/v1/sessions/refresh', authWriteConfig, async (request, reply) => {
+    const refreshToken = requiredBodyString(request.body, 'refreshToken')
+    if (refreshToken === null) return sendError(reply, 'VALIDATION_FAILED', 'Refresh token required', request.id)
     try {
-      const issued = await greenfieldSessions.refresh((request.body as any).refreshToken)
+      const issued = await greenfieldSessions.refresh(refreshToken)
       return reply.send(
         successEnvelope(
           {

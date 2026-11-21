@@ -1,4 +1,5 @@
-import type {FastifyInstance} from 'fastify'
+import type {FastifyError, FastifyInstance} from 'fastify'
+import {failureEnvelope, statusForError} from '../transport/envelope.js'
 
 /**
  * Routes whose responses can carry bearer credentials or one-time secrets:
@@ -31,5 +32,24 @@ export function registerCredentialResponseNoStore(app: FastifyInstance): void {
       reply.header('Pragma', 'no-cache')
     }
     return payload
+  })
+}
+
+/**
+ * #198: an empty or unparseable JSON body on a credential route is answered in the
+ * standard failure envelope as 400 VALIDATION_FAILED instead of Fastify's bare
+ * default error body. Every other error keeps the default handling unchanged.
+ */
+export function registerCredentialBodyErrorEnvelope(app: FastifyInstance): void {
+  app.setErrorHandler((error: FastifyError, request, reply) => {
+    const bodyParseError =
+      error?.statusCode === 400 &&
+      ((typeof error.code === 'string' && error.code.startsWith('FST_ERR_CTP_')) || error instanceof SyntaxError)
+    if (bodyParseError && isCredentialRoute(request.routeOptions?.url)) {
+      return reply
+        .code(statusForError('VALIDATION_FAILED'))
+        .send(failureEnvelope('VALIDATION_FAILED', 'Request body must be a JSON object', request.id))
+    }
+    return reply.send(error)
   })
 }
