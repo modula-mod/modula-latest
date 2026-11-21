@@ -115,7 +115,7 @@ mandatory restrictive CSP, 50 MB compressed / 64 MB expanded) plus `gubic.game.j
 Rules (enforced by `validateGubicManifest`, unit-tested):
 
 * `engine` ∈ `html5 | phaser | playcanvas`. `mmorpg-client` and `retro-emulation` are recognised but refused as "later phase".
-* `network` ∈ `none | lobby-relay`. **Games never get open internet access**; CSP has `connect-src 'none'`.
+* `network` ∈ `none | lobby-relay`. **Games never get open internet access**; CSP has `connect-src 'none'` or, for a game whose loader fetches its own files (e.g. Phaser), exactly `connect-src 'self'`, which reaches only the per-package isolated origin (§4.2). The lobby relay goes through the bridge, never a game-opened socket.
 * Multiplayer needs `network: lobby-relay`, the `lobby` capability, and 2 ≤ min ≤ max ≤ 16.
 * Bridge capabilities: `lifecycle` (required), `score`, `achievements`, `lobby`, `player.profile`, `moliboo.avatar`, `storage.namespaced`. Unknown ones are rejected.
 * Up to 100 achievements, keys `^[a-z0-9][a-z0-9_.-]{0,63}$`, 0 to 100 points each, ≤ 1000 total.
@@ -133,8 +133,10 @@ in attribute names or unquoted values, unterminated tags, malformed end tags, CD
 Every HTML document must declare exactly one `<meta http-equiv="Content-Security-Policy">` (matched exactly,
 ASCII case-insensitive, no padding; any `&` in an `http-equiv` value is refused, and attribute values used for
 acceptance decisions such as the CSP content are decoded exactly once, as a browser does), preceded only by whitespace, a DOCTYPE, `<html>`, `<head>` and
-`<meta charset>`. The policy must set `default-src 'none'`, `script-src 'self'`, `connect-src 'none'`,
-`base-uri 'none'` and `worker-src 'none'` (no `unsafe-*`, wildcards, remote, `data:` or `blob:` code sources).
+`<meta charset>`. The policy must set `default-src 'none'`, `script-src 'self'`, `connect-src` (exactly `'none'` or
+exactly `'self'`, see §4.2), `base-uri 'none'` and `worker-src 'none'` (no `unsafe-*`, wildcards, remote, `data:` or `blob:` code sources).
+`connect-src` refuses any host (including the API origin), any scheme (`ws:`, `wss:`, `https:`, `http:`, `data:`, `blob:`, …),
+`*`, and any extra source next to `'self'`.
 Ingestion also refuses, with a machine-readable code:
 
 * `GUBIC_HTML_ACTIVE_CONTENT`: inline `on*` handlers, `javascript:`/`vbscript:` URLs, `srcdoc`,
@@ -158,12 +160,11 @@ they miss deliberately obfuscated or runtime-built calls. The enforcing controls
 
 `GubicPlayerView` hosts one `WKWebView` per play:
 
-* **Origin isolation**: content is served only from a custom `gubic://<random-session-origin>/` scheme
-  handler from an in-memory file map (bundled sample or a verified package). Unlisted paths, queries
-  and fragments fail. Responses carry `Content-Security-Policy: default-src 'none'; script-src 'self';
-  style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'none';
-  object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`, `nosniff`,
-  `no-referrer`, `no-store` and a Permissions-Policy denying camera, mic, location and motion.
+* **Origin isolation**: content is served only from a per-package isolated origin, a custom scheme
+  handler (`modula-pkg://<packageId>/`, §4.2) backed by an in-memory file map (bundled sample or a
+  verified package). Unlisted paths, queries and fragments fail. Responses carry the header CSP in
+  §4.2 (the earlier header with `connect-src 'self'` and `font-src 'self'`), `nosniff`, `no-referrer`,
+  `no-store` and a Permissions-Policy denying camera, mic, location and motion.
 * **Data**: `WKWebsiteDataStore.nonPersistent()`, so no cookies, storage or cache survive the session.
   (Namespaced saves come later through `storage.namespaced`.)
 * **Navigation**: only the session origin; everything else is cancelled. No new windows; `alert/confirm/prompt` are suppressed; media/device permission requests are denied, and the device-API shim from `WebGameHost` is reused.
@@ -192,6 +193,88 @@ Native side (`GubicBridge`, a `WKScriptMessageHandler` named `gubic`):
 * Rate limits per message type; payload cap of 4 KB.
 * The page never receives tokens, account IDs or wallet data, only the public handle (if `player.profile` is declared).
 * Achievement unlocks go to `POST /v1/gubic/sessions/:id/achievements/:key`; the server is authoritative. For the bundled sample (not in the catalogue) unlocks are shown as **local preview, not recorded** — nothing is faked.
+
+### 4.2 Per-package origin contract (`connect-src 'self'`)
+
+ATLAS ruling, 21 Nov 2026: html5 GUBIC games may declare `connect-src 'self'` so a loader such as Phaser's
+can fetch the package's own JSON, XML and audio. This section is the contract the native host implements
+(Prism mirrors it in `modula-native`) and that ingestion (`web-game-csp.ts`) validates. **The Greenfield
+API does not serve package members on any origin.** It only delivers the whole signed archive
+(`/v1/registry/artifacts/:sha256`, `Content-Disposition: attachment`) and presentation artwork. So
+`'self'` only ever means the native per-package origin below, never `api.modula.digital`.
+
+**Origin.** `modula-pkg://<packageId>/`, where `<packageId>` is the game's package/module ID, lowercased
+(for example `modula-pkg://test.modula.gubic-phaser-connect-self/`). Each package gets its own origin, and
+no two packages share one. It is never `api.modula.digital`, a Modula web origin, or any origin that carries
+cookies, tokens or other auth. The web view uses a non-persistent data store (§4), so nothing on the
+origin outlives the play session.
+
+**Handler (scheme handler for `modula-pkg`).**
+
+* It serves only members listed in the package's signed inventory (`game.files.json`, digests verified at
+  install). The inventory file itself is not served.
+* The request path is percent-decoded once, with the leading `/` removed, and must equal a listed member
+  path exactly (case-sensitive). Paths containing `.` or `..` segments, empty segments (`//`), a
+  backslash or an encoded `/` (`%2F`) never match, so they get `404`. `/` on its own is `404`: the
+  entry document is loaded by its explicit path.
+* **GET only.** Every other method (`HEAD`, `POST`, `PUT`, `DELETE`, `OPTIONS`, …) gets `404`, with no
+  allow-list header. Same-origin fetches never need a CORS preflight.
+* An unlisted path gets `404`, an empty body, and the same security headers.
+* A request whose host is not this package's ID gets `404`. A request URL with a query (`?…`) gets
+  `404`; games must not add cache-busting queries, and Phaser's loader adds none by default. A fragment
+  (`#…`) is never part of a subresource request; if a platform delivers one to the handler, the
+  response is `404`, as in §4.
+* WebKit media elements send `Range` requests. A single `bytes=` range may be answered with `206`. A
+  multi-range or malformed `Range` header is ignored and the full file is returned with `200`. It is
+  still GET-only.
+* **No credentials or cookies.** The handler ignores any `Cookie` or `Authorization` request header and
+  never sends `Set-Cookie`. It sends no `Access-Control-Allow-*` headers, so there is no CORS at all,
+  credentialed or not. It never proxies to the API or to any other host.
+
+**Response headers.** Every response from the handler (200, 206 and 404 alike) carries:
+
+```
+Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self'; object-src 'none'; worker-src 'none'; child-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Cache-Control: no-store
+Cross-Origin-Resource-Policy: same-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=(), accelerometer=(), gyroscope=(), magnetometer=()
+```
+
+The document's own meta CSP is enforced as well (a browser applies both policies, so a load must pass
+both). A game that declares `connect-src 'none'` therefore still cannot fetch, even though the header says
+`'self'`. There is no `ws:` or `wss:` source and no remote host anywhere in either policy. Under CSP 3,
+`'self'` also matches a WebSocket to the same host, but the `modula-pkg` origin has no socket endpoint,
+so there is nothing to reach. The lobby relay goes through the bridge (§4.1).
+
+**MIME map** (by lowercased extension; anything else is `application/octet-stream`, inert under `nosniff`):
+
+| Extension | Content-Type |
+|---|---|
+| `html` | `text/html; charset=utf-8` |
+| `js`, `mjs` | `text/javascript; charset=utf-8` |
+| `css` | `text/css; charset=utf-8` |
+| `json` | `application/json` |
+| `xml` | `application/xml` |
+| `txt` | `text/plain; charset=utf-8` |
+| `png` / `jpg`, `jpeg` / `gif` / `webp` / `svg` | `image/png` / `image/jpeg` / `image/gif` / `image/webp` / `image/svg+xml` |
+| `mp3` / `ogg` / `m4a` / `wav` | `audio/mpeg` / `audio/ogg` / `audio/mp4` / `audio/wav` |
+| `mp4` / `webm` | `video/mp4` / `video/webm` |
+| `woff` / `woff2` / `ttf` / `otf` | `font/woff` / `font/woff2` / `font/ttf` / `font/otf` |
+
+**Fetches versus navigation.** `fetch()` and `XMLHttpRequest` calls (Phaser's loader), and image, audio and
+font loads, are *subresource* requests. `connect-src 'self'` and this handler govern them. They are not
+navigations. Top-level navigation stays limited to the entry URL (`modula-pkg://<packageId>/<runtime.entry>`)
+as native #300 requires. A game cannot navigate to a member such as an `.svg` or `.json` file just because
+it can fetch it.
+
+**Blocked by construction.** Fetches to `https://api.modula.digital`, to any other Modula origin, or to a
+remote host violate `connect-src` and never leave the device. `data:` and `blob:` fetches are refused
+(`connect-src` allows neither), so assets must be real package members. Ingestion refuses any
+`connect-src` other than exactly `'none'` or exactly `'self'`. The tests in
+`services/greenfield-api/tests/gubic.web-game-csp.test.ts` pin this, using a Phaser package fixture
+(`tests/helpers/gubic-phaser-package-fixture.ts`: JSON atlas, bitmap-font XML, Ogg/MP3/M4A/WAV audio).
 
 ## 5. Publishing and review flow
 
