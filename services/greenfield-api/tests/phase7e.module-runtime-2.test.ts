@@ -438,6 +438,7 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
 function configureTestEnv(): void {
   process.env.NODE_ENV = 'test'
   process.env.MODULA_ENVIRONMENT = 'development'
+  process.env.MODULA_TEST_INBAND_AUTH_TOKENS = '1' // #194: suite reads in-band verification/recovery tokens
   process.env.MODULA_API_HOST = '127.0.0.1'
   process.env.MODULA_API_PORT = '4029'
   process.env.MODULA_PUBLIC_API_URL = 'https://api.test.modula.digital'

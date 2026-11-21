@@ -139,6 +139,7 @@ async function startApi({databaseUrl, port, mediaRoot}) {
     HOME: process.env.HOME,
     NODE_ENV: 'development',
     MODULA_ENVIRONMENT: 'development',
+    MODULA_TEST_INBAND_AUTH_TOKENS: '1', // #194: this harness reads the in-band verificationToken
     MODULA_API_HOST: '127.0.0.1',
     MODULA_API_PORT: String(port),
     MODULA_PUBLIC_API_URL: `http://127.0.0.1:${port}`,
@@ -239,7 +240,7 @@ async function register(prefix) {
   const created = await http('POST', '/v1/accounts/register', {body: {email, password, handle, displayName: handle, acceptedTerms: true, inviteCode: 'e2e-invite'}})
   if (created.status !== 201) throw new Error(`register ${prefix} -> ${created.status} ${created.text.slice(0, 300)}`)
   const verificationToken = created.data?.verificationToken
-  if (!verificationToken) throw new Error('register did not return a development verification token')
+  if (!verificationToken) throw new Error('register did not return an in-band verification token (server needs MODULA_TEST_INBAND_AUTH_TOKENS=1)')
   const verified = await http('POST', '/v1/accounts/verify-email', {body: {token: verificationToken}})
   if (verified.status !== 200) throw new Error(`verify-email ${prefix} -> ${verified.status}`)
   const session = await http('POST', '/v1/sessions', {body: {email, password}})

@@ -2,6 +2,7 @@ import type {FastifyInstance} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {RecoveryService} from '../accounts/recovery.js'
+import {MailService} from '../mail/service.js'
 import {AppearanceService} from '../domains/appearance/service.js'
 import {CommentService} from '../domains/comments/service.js'
 import {MentionService} from '../domains/mentions/service.js'
@@ -53,7 +54,11 @@ export async function registerPhase6sRoutes(
   const saves = new SaveService(db, config.publicApiUrl)
   const mentions = new MentionService(db)
   const appearance = new AppearanceService(db)
-  const recovery = new RecoveryService(db, config)
+  // GF-AUTH-FLOWS-01b (#193): the legacy /v1/accounts/recovery/request route is part of the
+  // frozen contract baseline, so it is kept but delegates to the same mailed send path as
+  // /v1/accounts/forgot-password. A RecoveryService without a mail queue minted tokens that
+  // counted toward the 3/hour reset cap without ever sending a reset mail.
+  const recovery = new RecoveryService(db, config, new MailService(db, config))
   const lifecycle = new ExtensionLifecycleService(db)
   const functionJobs = new FunctionJobService(db)
 
@@ -288,7 +293,7 @@ export async function registerPhase6sRoutes(
   app.post('/v1/accounts/recovery/request', opts.authWriteConfig, async (request, reply) => {
     try {
       const email = String((request.body as any)?.email ?? '')
-      return reply.send(successEnvelope(await recovery.requestRecovery(email), request.id))
+      return reply.send(successEnvelope(await recovery.requestRecovery(email, {correlationId: request.id}), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Recovery request failed')
     }

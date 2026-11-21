@@ -25,6 +25,7 @@ describeIfDb('Messaging v3: groups, mentions, voice notes, privacy, receipts, se
   beforeAll(async () => {
     process.env.NODE_ENV = 'test'
     process.env.MODULA_ENVIRONMENT = 'development'
+    process.env.MODULA_TEST_INBAND_AUTH_TOKENS = '1' // #194: suite reads in-band verification/recovery tokens
     process.env.MODULA_API_HOST = '127.0.0.1'
     process.env.MODULA_API_PORT = '4032'
     process.env.MODULA_PUBLIC_API_URL = 'http://127.0.0.1:4032'

@@ -1786,7 +1786,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "da713f0abf56131460be3b79f0180b269713e0b8e7670f28085dacc5f2426f77"
+      "sourceContractSha256": "a4ab3d3af01587088fcad817214cd9fbe157a998fe24ac7b8af32949f83f309a"
     },
     {
       "id": "POST /v1/accounts/register",

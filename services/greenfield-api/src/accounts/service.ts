@@ -2,6 +2,7 @@ import {createHash, randomBytes} from 'node:crypto'
 import {GREENFIELD_INITIAL_COLLECTIONS} from '@modula/greenfield-protocol'
 import type {Transaction} from 'kysely'
 import type {AppConfig} from '../config/index.js'
+import {inbandAuthTokensEnabled} from '../config/env.js'
 import type {ModulaDb} from '../database/client.js'
 import type {Database} from '../database/types.js'
 import {hashPassword, verifyPassword} from '../lib/password.js'
@@ -88,8 +89,9 @@ export class AccountService {
     const accountId = uuidv7()
     const now = new Date()
     const verificationExpiresAt = new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000)
-    const legacyVerificationToken =
-      this.config.environment === 'production' ? null : randomBytes(32).toString('base64url')
+    // #194: the legacy in-band verification token is minted only behind the explicit test-only
+    // flag MODULA_TEST_INBAND_AUTH_TOKENS=1 (never derived from "not production").
+    const legacyVerificationToken = inbandAuthTokensEnabled(this.config) ? randomBytes(32).toString('base64url') : null
     const passwordHash = await hashPassword(input.password)
     let verificationChallengeId = ''
     let verificationChallengeExpiresAt = verificationExpiresAt

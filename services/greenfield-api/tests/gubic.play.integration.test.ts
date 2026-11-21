@@ -39,7 +39,7 @@ describeIfDb('GUBIC play platform (library, sessions, lobbies, achievements, sub
     const url = new URL(baseDatabaseUrl!)
     url.pathname = `/${databaseName}`
     Object.assign(process.env, {
-      NODE_ENV: 'test', MODULA_ENVIRONMENT: 'development', MODULA_API_HOST: '127.0.0.1', MODULA_API_PORT: '4033',
+      NODE_ENV: 'test', MODULA_ENVIRONMENT: 'development', MODULA_TEST_INBAND_AUTH_TOKENS: '1', MODULA_API_HOST: '127.0.0.1', MODULA_API_PORT: '4033',
       MODULA_PUBLIC_API_URL: 'http://127.0.0.1:4033', MODULA_DATABASE_URL: url.toString(), MODULA_DATABASE_MIGRATOR_URL: url.toString(),
       MODULA_ALLOWED_ORIGINS: 'https://modula.digital', MODULA_PREVIEW_WRITES_ENABLED: 'true', MODULA_INVITE_ONLY: 'true',
       MODULA_REGISTRATION_INVITE_CODES: 'test-invite', MODULA_ATPROTO_ENABLED: 'false', MODULA_RATE_LIMIT_ENABLED: 'false',

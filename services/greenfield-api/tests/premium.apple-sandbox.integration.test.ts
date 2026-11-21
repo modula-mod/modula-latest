@@ -341,7 +341,13 @@ describeIfDb('Premium Apple sandbox verification integration', () => {
     await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute()
     const register = await app.inject({method: 'POST', url: '/v1/accounts/register', payload: {email, password, handle, displayName, acceptedTerms: true, inviteCode: 'test-invite'}})
     expect(register.statusCode, register.body).toBe(201)
-    const verified = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token: register.json().data.verificationToken}})
+    // #194: preview never returns in-band tokens (MODULA_TEST_INBAND_AUTH_TOKENS is refused in
+    // preview), so verify with the emailed code from the mail queue, as a real client would.
+    const mail = await db.selectFrom('greenfield_mail_jobs').select(['text_body'])
+      .where('recipient_account_id', '=', register.json().data.accountId).where('template_id', '=', 'verification-code')
+      .orderBy('created_at', 'desc').executeTakeFirstOrThrow()
+    const code = String(mail.text_body).match(/\b\d{6,8}\b/)?.[0]
+    const verified = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {challengeId: register.json().data.verificationChallengeId, code}})
     expect(verified.statusCode, verified.body).toBe(200)
     const session = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password}})
     expect([200, 201]).toContain(session.statusCode)
