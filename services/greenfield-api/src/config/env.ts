@@ -160,6 +160,63 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v !== 'false'),
+  /** Pinned messages per chat. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_PINNED_MESSAGES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Saved (bookmarked) messages synced across devices. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_SAVED_MESSAGES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Message edit history. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_EDIT_HISTORY_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Scheduled messages. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_SCHEDULED_MESSAGES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Disappearing messages timer per chat. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_DISAPPEARING_MESSAGES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Synced chat folders. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_CHAT_FOLDERS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Synced pinned chats. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_CHAT_PINS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Per-chat notification levels. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_NOTIFICATION_LEVELS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Quick-reply templates. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_QUICK_REPLIES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Forward with attribution. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_FORWARDING_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Shared chat themes. On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_CHAT_THEMES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Scheduled-message dispatch and disappearing-message sweep interval (ms). 0 disables the in-process timer. */
+  MODULA_MESSAGING_SCHEDULER_INTERVAL_MS: z.coerce.number().int().min(0).max(600_000).optional(),
   /** Photo and video direct/group messages. Off by default; voice notes do not need this. */
   MODULA_MESSAGING_MEDIA_ENABLED: z
     .string()
@@ -318,6 +375,8 @@ export type AppConfig = {
   calls: CallsConfig
   /** Additive social features; each is advertised through a capability flag. */
   social: SocialFeaturesConfig
+  /** Messaging features 4; each is advertised in /v1/messaging/capabilities. */
+  messagingFeatures: MessagingFeaturesConfig
   premium: {
     enabled: boolean
     qaAssignmentsEnabled: boolean
@@ -616,8 +675,46 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       storyHighlights: raw.MODULA_STORY_HIGHLIGHTS_ENABLED !== false,
       liveComments: raw.MODULA_LIVE_COMMENTS_ENABLED !== false,
     },
+    messagingFeatures: {
+      pinnedMessages: raw.MODULA_MESSAGING_PINNED_MESSAGES_ENABLED !== false,
+      savedMessages: raw.MODULA_MESSAGING_SAVED_MESSAGES_ENABLED !== false,
+      editHistory: raw.MODULA_MESSAGING_EDIT_HISTORY_ENABLED !== false,
+      scheduledMessages: raw.MODULA_MESSAGING_SCHEDULED_MESSAGES_ENABLED !== false,
+      disappearingMessages: raw.MODULA_MESSAGING_DISAPPEARING_MESSAGES_ENABLED !== false,
+      chatFolders: raw.MODULA_MESSAGING_CHAT_FOLDERS_ENABLED !== false,
+      chatPins: raw.MODULA_MESSAGING_CHAT_PINS_ENABLED !== false,
+      notificationLevels: raw.MODULA_MESSAGING_NOTIFICATION_LEVELS_ENABLED !== false,
+      quickReplies: raw.MODULA_MESSAGING_QUICK_REPLIES_ENABLED !== false,
+      forwarding: raw.MODULA_MESSAGING_FORWARDING_ENABLED !== false,
+      chatThemes: raw.MODULA_MESSAGING_CHAT_THEMES_ENABLED !== false,
+      schedulerIntervalMs: raw.MODULA_MESSAGING_SCHEDULER_INTERVAL_MS ?? 15_000,
+    },
     premium: premiumConfig(raw),
   }
+}
+
+export type MessagingFeaturesConfig = {
+  pinnedMessages: boolean
+  savedMessages: boolean
+  editHistory: boolean
+  scheduledMessages: boolean
+  disappearingMessages: boolean
+  chatFolders: boolean
+  chatPins: boolean
+  notificationLevels: boolean
+  quickReplies: boolean
+  forwarding: boolean
+  chatThemes: boolean
+  schedulerIntervalMs: number
+}
+
+export const MESSAGING_FEATURES_ALL_ON: MessagingFeaturesConfig = {
+  pinnedMessages: true, savedMessages: true, editHistory: true, scheduledMessages: true, disappearingMessages: true, chatFolders: true, chatPins: true, notificationLevels: true, quickReplies: true, forwarding: true, chatThemes: true, schedulerIntervalMs: 15_000,
+}
+
+/** Effective messaging feature switches; hand-built configs without `messagingFeatures` get the defaults. */
+export function messagingFeatures(config: {messagingFeatures?: Partial<MessagingFeaturesConfig>}): MessagingFeaturesConfig {
+  return {...MESSAGING_FEATURES_ALL_ON, ...(config.messagingFeatures ?? {})}
 }
 
 export type SocialFeaturesConfig = {
