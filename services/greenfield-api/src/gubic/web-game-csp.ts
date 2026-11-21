@@ -60,7 +60,23 @@ const ALLOWED_DIRECTIVES = new Set([
 const CODE_DIRECTIVES = new Set(['script-src', 'script-src-elem', 'script-src-attr', 'worker-src', 'child-src', 'frame-src', 'object-src'])
 
 /** Directives whose value must be exactly `'none'`. All but object-src are mandatory. */
-const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'connect-src', 'object-src', 'base-uri', 'worker-src'])
+const NONE_ONLY_DIRECTIVES = new Set(['default-src', 'object-src', 'base-uri', 'worker-src'])
+
+/**
+ * connect-src is mandatory and must be exactly `'none'` or exactly `'self'`
+ * (ATLAS ruling, 21 Nov 2026). `'self'` lets a game's loader (e.g. Phaser)
+ * fetch its own manifest-listed JSON/XML/audio from the per-package isolated
+ * origin (`modula-pkg://<packageId>/` on native), never the API or any host
+ * that carries cookies or auth. No host, scheme (ws:, wss:, https:, data:,
+ * blob:), wildcard or extra source is accepted, alone or alongside `'self'`.
+ */
+const CONNECT_SRC_SOURCES = new Set(["'none'", "'self'"])
+
+function assertConnectSrc(sources: readonly string[]): void {
+  if (sources.length !== 1 || !CONNECT_SRC_SOURCES.has(sources[0]!.toLowerCase())) {
+    fail(`Web game CSP connect-src must be exactly 'none' or exactly 'self' (found ${sources.join(' ')})`)
+  }
+}
 
 export type ParsedCsp = Map<string, string[]>
 
@@ -111,6 +127,10 @@ export function assertRestrictiveGameCsp(directives: ParsedCsp): void {
   for (const [name, sources] of directives) {
     if (!ALLOWED_DIRECTIVES.has(name)) fail(`Web game CSP directive is not permitted: ${name}`)
     if (!sources.length) fail(`Web game CSP directive ${name} has no sources`)
+    if (name === 'connect-src') {
+      assertConnectSrc(sources)
+      continue
+    }
     for (const source of sources) {
       const lower = source.toLowerCase()
       if (lower === "'unsafe-eval'" || lower === "'unsafe-inline'" || lower === "'wasm-unsafe-eval'" || lower === "'unsafe-hashes'") {
@@ -133,6 +153,7 @@ export function assertRestrictiveGameCsp(directives: ParsedCsp): void {
     if (name === 'object-src' && !sources) continue
     if (!sources || sources.length !== 1 || sources[0]!.toLowerCase() !== "'none'") fail(`Web game CSP must set ${name} 'none'`)
   }
+  if (!directives.has('connect-src')) fail("Web game CSP must set connect-src 'none' or 'self'")
   const script = directives.get('script-src')
   if (!script || script.length !== 1 || script[0]!.toLowerCase() !== "'self'") fail("Web game CSP must set script-src 'self'")
 }
