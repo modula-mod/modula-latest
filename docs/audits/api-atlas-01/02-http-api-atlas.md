@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-15T00:21:44.215Z for branch `mosaic/gubic-p1-hardening`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-21T20:45:35.757Z for branch `mosaic/gubic-connect-self`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633

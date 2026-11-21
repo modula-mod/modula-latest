@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gubic-p1-hardening",
-      "sourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22",
-      "capturedAt": "2026-11-15T00:21:44.215Z",
+      "branch": "mosaic/gubic-connect-self",
+      "sourceSha256": "0656f6997209a849758f01accceb686cea4db833abf0876d3cd5cd8f8825c6ff",
+      "capturedAt": "2026-11-21T20:45:35.757Z",
       "routeCount": 900
     },
     "status": "PASS"
