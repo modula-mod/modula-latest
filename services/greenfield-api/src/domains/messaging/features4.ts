@@ -250,12 +250,17 @@ export class MessagingFeaturesService extends MessagingService {
         send_at: sendAt, state: 'pending', attempts: 0, created_at: now, updated_at: now,
       }).execute()
     })
-    return this.getScheduled(viewer, id)
+    return this.getScheduled(viewer, conversationId, id)
   }
 
-  async getScheduled(viewer: string, scheduledId: string): Promise<ScheduledMessageDto> {
+  /**
+   * A scheduled message is addressed by the conversation in the path as well as
+   * its id: an id that belongs to another conversation is NOT_FOUND (no leak of
+   * whether it exists elsewhere).
+   */
+  async getScheduled(viewer: string, conversationId: string, scheduledId: string): Promise<ScheduledMessageDto> {
     const row = await this.fdb.selectFrom('greenfield_scheduled_messages').selectAll()
-      .where('scheduled_id', '=', scheduledId).where('sender_actor_id', '=', viewer).executeTakeFirst()
+      .where('scheduled_id', '=', scheduledId).where('conversation_id', '=', conversationId).where('sender_actor_id', '=', viewer).executeTakeFirst()
     if (!row) fail('NOT_FOUND', 'Scheduled message not found')
     return scheduledDto(row)
   }
@@ -271,8 +276,8 @@ export class MessagingFeaturesService extends MessagingService {
     return {items: rows.map(scheduledDto)}
   }
 
-  async updateScheduled(viewer: string, scheduledId: string, input: {text?: unknown; sendAt?: unknown}) {
-    const current = await this.getScheduled(viewer, scheduledId)
+  async updateScheduled(viewer: string, conversationId: string, scheduledId: string, input: {text?: unknown; sendAt?: unknown}) {
+    const current = await this.getScheduled(viewer, conversationId, scheduledId)
     if (current.state !== 'pending' && current.state !== 'failed') fail('CONFLICT', 'This message can no longer be changed', 'not-pending')
     if (input.text === undefined && input.sendAt === undefined) fail('VALIDATION_FAILED', 'Nothing to update')
     const set: Record<string, unknown> = {updated_at: new Date(), state: 'pending', failure_reason: null}
@@ -280,27 +285,27 @@ export class MessagingFeaturesService extends MessagingService {
     if (input.sendAt !== undefined) set.send_at = this.parseSendAt(input.sendAt)
     else if (current.state === 'failed') set.send_at = new Date(Math.max(Date.parse(current.sendAt), Date.now()))
     const result = await this.fdb.updateTable('greenfield_scheduled_messages').set(set as any)
-      .where('scheduled_id', '=', scheduledId).where('sender_actor_id', '=', viewer).where('state', 'in', ['pending', 'failed']).executeTakeFirst()
+      .where('scheduled_id', '=', scheduledId).where('conversation_id', '=', conversationId).where('sender_actor_id', '=', viewer).where('state', 'in', ['pending', 'failed']).executeTakeFirst()
     if (Number(result.numUpdatedRows) === 0) fail('CONFLICT', 'This message can no longer be changed', 'not-pending')
-    return this.getScheduled(viewer, scheduledId)
+    return this.getScheduled(viewer, conversationId, scheduledId)
   }
 
-  async cancelScheduled(viewer: string, scheduledId: string) {
+  async cancelScheduled(viewer: string, conversationId: string, scheduledId: string) {
     const result = await this.fdb.updateTable('greenfield_scheduled_messages').set({state: 'cancelled', updated_at: new Date()})
-      .where('scheduled_id', '=', scheduledId).where('sender_actor_id', '=', viewer).where('state', 'in', ['pending', 'failed']).executeTakeFirst()
+      .where('scheduled_id', '=', scheduledId).where('conversation_id', '=', conversationId).where('sender_actor_id', '=', viewer).where('state', 'in', ['pending', 'failed']).executeTakeFirst()
     if (Number(result.numUpdatedRows) === 0) {
-      await this.getScheduled(viewer, scheduledId)
+      await this.getScheduled(viewer, conversationId, scheduledId)
       fail('CONFLICT', 'This message can no longer be cancelled', 'not-pending')
     }
-    return this.getScheduled(viewer, scheduledId)
+    return this.getScheduled(viewer, conversationId, scheduledId)
   }
 
   /** Make a pending message due now; the dispatcher (or the caller) sends it. */
-  async makeDueNow(viewer: string, scheduledId: string) {
+  async makeDueNow(viewer: string, conversationId: string, scheduledId: string) {
     const result = await this.fdb.updateTable('greenfield_scheduled_messages').set({send_at: new Date(), updated_at: new Date()})
-      .where('scheduled_id', '=', scheduledId).where('sender_actor_id', '=', viewer).where('state', '=', 'pending').executeTakeFirst()
+      .where('scheduled_id', '=', scheduledId).where('conversation_id', '=', conversationId).where('sender_actor_id', '=', viewer).where('state', '=', 'pending').executeTakeFirst()
     if (Number(result.numUpdatedRows) === 0) {
-      await this.getScheduled(viewer, scheduledId)
+      await this.getScheduled(viewer, conversationId, scheduledId)
       fail('CONFLICT', 'This message is not pending', 'not-pending')
     }
   }

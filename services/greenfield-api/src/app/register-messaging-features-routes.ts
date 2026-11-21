@@ -235,15 +235,21 @@ export function registerMessagingFeaturesRoutes(
     }
   })
   app.patch('/v1/conversations/:id/scheduled/:scheduledId', write(params('id', 'scheduledId')), (request, reply) =>
-    scheduledRoute(request, reply, actor => messaging.updateScheduled(actor, (request.params as {scheduledId: string}).scheduledId, body(request)), 'Unable to update scheduled message'))
+    scheduledRoute(request, reply, actor => {
+      const {id, scheduledId} = request.params as {id: string; scheduledId: string}
+      return messaging.updateScheduled(actor, id, scheduledId, body(request))
+    }, 'Unable to update scheduled message'))
   app.delete('/v1/conversations/:id/scheduled/:scheduledId', write(params('id', 'scheduledId')), (request, reply) =>
-    scheduledRoute(request, reply, actor => messaging.cancelScheduled(actor, (request.params as {scheduledId: string}).scheduledId), 'Unable to cancel scheduled message'))
+    scheduledRoute(request, reply, actor => {
+      const {id, scheduledId} = request.params as {id: string; scheduledId: string}
+      return messaging.cancelScheduled(actor, id, scheduledId)
+    }, 'Unable to cancel scheduled message'))
   app.post('/v1/conversations/:id/scheduled/:scheduledId/send-now', write(params('id', 'scheduledId')), (request, reply) =>
     scheduledRoute(request, reply, async actor => {
-      const {scheduledId} = request.params as {scheduledId: string}
-      await messaging.makeDueNow(actor, scheduledId)
+      const {id, scheduledId} = request.params as {id: string; scheduledId: string}
+      await messaging.makeDueNow(actor, id, scheduledId)
       await runScheduledOnce(scheduledId)
-      return messaging.getScheduled(actor, scheduledId)
+      return messaging.getScheduled(actor, id, scheduledId)
     }, 'Unable to send scheduled message'))
 
   // ---- shared chat settings (disappearing, theme) ---------------------------
