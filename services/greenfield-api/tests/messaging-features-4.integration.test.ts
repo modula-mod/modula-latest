@@ -43,7 +43,8 @@ describeIfDb('Messaging features 4', () => {
 
   beforeAll(async () => {
     setEnv()
-    for (const flag of FLAGS) delete process.env[flag]
+    // Features are off by default; this suite exercises them switched on (exactly 'true').
+    for (const flag of FLAGS) process.env[flag] = 'true'
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -406,8 +407,9 @@ describeIfDb('Messaging features 4', () => {
     expect((await authed(owner.accessToken, 'POST', `/v1/conversations/${group.id}/theme`, {theme: 'forest'})).statusCode).toBe(200)
   })
 
-  it('returns CAPABILITY_DISABLED for every route when the flags are off', async () => {
-    for (const flag of FLAGS) process.env[flag] = 'false'
+  it('returns CAPABILITY_DISABLED for every route by default (flags unset)', async () => {
+    // No flag set at all: the shipped default must be off.
+    for (const flag of FLAGS) delete process.env[flag]
     const off = await createServer(loadConfig())
     await off.app.ready()
     try {
@@ -428,7 +430,7 @@ describeIfDb('Messaging features 4', () => {
         expect(res.json().error?.code, `${method} ${url}`).toBe('CAPABILITY_DISABLED')
       }
     } finally {
-      for (const flag of FLAGS) delete process.env[flag]
+      for (const flag of FLAGS) process.env[flag] = 'true'
       await off.app.close()
       await off.db.destroy()
     }

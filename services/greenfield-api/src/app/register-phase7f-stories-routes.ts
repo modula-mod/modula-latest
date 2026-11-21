@@ -5,7 +5,7 @@ import type {FastifyInstance} from 'fastify'
 
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
-import {SOCIAL_FEATURES_ALL_ON, type SocialFeaturesConfig} from '../config/env.js'
+import {SOCIAL_FEATURES_ALL_OFF, type SocialFeaturesConfig} from '../config/env.js'
 import type {MessagingRealtimeHub} from '../domains/messaging/realtime-hub.js'
 import {StoryService, storyItemLiveCutoff} from '../domains/stories/service.js'
 import {HIGHLIGHT_ITEMS_MAX, HIGHLIGHT_TITLE_MAX, HIGHLIGHTS_MAX_PER_OWNER, StorySocialService} from '../domains/stories/social.js'
@@ -90,7 +90,7 @@ export async function registerPhase7fStoriesRoutes(
   const stories = new StoryService(db, config)
   const social = new StorySocialService(db, stories)
   const {feedConfig, writeConfig} = options
-  const features: SocialFeaturesConfig = {...SOCIAL_FEATURES_ALL_ON, ...(options.features ?? {})}
+  const features: SocialFeaturesConfig = {...SOCIAL_FEATURES_ALL_OFF, ...(options.features ?? {})}
   const disabled = (reply: any, request: any, what: string) =>
     sendError(reply, 'CAPABILITY_DISABLED', `${what} is not available`, request.id)
 

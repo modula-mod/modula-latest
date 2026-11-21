@@ -37,7 +37,8 @@ describeIfDb('Social gaps v1: mark unread, story viewers/reactions/highlights, l
 
   beforeAll(async () => {
     setEnv()
-    for (const flag of SOCIAL_FLAGS) delete process.env[flag]
+    // Features are off by default; this suite exercises them switched on (exactly 'true').
+    for (const flag of SOCIAL_FLAGS) process.env[flag] = 'true'
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -358,8 +359,9 @@ describeIfDb('Social gaps v1: mark unread, story viewers/reactions/highlights, l
     for (const s of [watcherSock, blockedSock, outsiderSock]) s.ws.terminate()
   })
 
-  it('withdraws every feature and its capability flag when switched off', async () => {
-    for (const flag of SOCIAL_FLAGS) process.env[flag] = 'false'
+  it('withdraws every feature and its capability flag by default (flags unset)', async () => {
+    // No flag set at all: the shipped default must be off.
+    for (const flag of SOCIAL_FLAGS) delete process.env[flag]
     const off = await createServer(loadConfig())
     try {
       await off.app.ready()
@@ -378,7 +380,7 @@ describeIfDb('Social gaps v1: mark unread, story viewers/reactions/highlights, l
         expect(res.json().error?.code, `${method} ${url}`).toBe('CAPABILITY_DISABLED')
       }
     } finally {
-      for (const flag of SOCIAL_FLAGS) delete process.env[flag]
+      for (const flag of SOCIAL_FLAGS) process.env[flag] = 'true'
       await off.app.close()
       await off.db.destroy()
     }
