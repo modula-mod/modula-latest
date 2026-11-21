@@ -3,6 +3,7 @@ import {gzipSync} from 'node:zlib'
 import {describe, expect, it} from 'vitest'
 import {assertNoRemoteWorkers, decodeAttributeValueOnce, assertStaticSvg, assertWebGameDocumentPolicy, isSvgMember, parseCspDirectives, WebGameContentPolicyError} from '../src/gubic/web-game-csp.js'
 import {verifyWebGameArchive} from '../src/modules/github-release-sync-service.js'
+import {GUBIC_PACKAGE_MIME_TYPES, PHASER_CONNECT_SELF_CSP, PHASER_TEST_PACKAGE_ID, phaserIndexHtml, phaserPackageMembers} from './helpers/gubic-phaser-package-fixture.js'
 
 // GUBIC-P1 / Sentinel §16.6: the web-game ingestion CSP gate must parse the
 // effective policy instead of matching substrings anywhere in index.html.
@@ -560,5 +561,89 @@ describe('GUBIC web game content policy (Sentinel §37)', () => {
     // The encoding prescan ignores element context, so a charset inside script text still counts.
     expect(fails(gameArchive(doc(csp, '<script>/* <meta charset="iso-2022-jp"> */</script><script src="main.js"></script>')))).toMatch(/non-UTF-8 encoding \(iso-2022-jp\)/)
     expect(fails(gameArchive(doc(csp, '<script>var x = "text/html; charset=shift_jis"</script>')))).toMatch(/non-UTF-8 encoding \(shift_jis\)/)
+  })
+})
+
+// ATLAS ruling, 21 Nov 2026: html5 games may use connect-src 'self' so Phaser's loader can fetch
+// the package's own JSON/XML/audio from the per-package isolated origin. Exactly 'none' or exactly
+// 'self'; nothing else, alone or alongside 'self'.
+describe("GUBIC web game connect-src 'self' (ATLAS 21 Nov ruling)", () => {
+  const withConnect = (connect: string) => STRICT.replace("connect-src 'none'", `connect-src ${connect}`)
+  const refusal = (policy: string) => {
+    try {
+      verifyWebGameArchive(gameArchive(doc(meta(policy))))
+    } catch (error) {
+      return (error as Error).message
+    }
+    throw new Error(`expected the policy to be rejected: ${policy}`)
+  }
+
+  it("accepts connect-src 'self' and still accepts connect-src 'none'", () => {
+    expect(() => verifyWebGameArchive(gameArchive(doc(meta(withConnect("'self'")))))).not.toThrow()
+    expect(() => verifyWebGameArchive(gameArchive(doc(meta(withConnect("'SELF'")))))).not.toThrow()
+    expect(() => verifyWebGameArchive(gameArchive(doc(meta(STRICT))))).not.toThrow()
+    expect(parseCspDirectives(withConnect("'self'")).get('connect-src')).toEqual(["'self'"])
+  })
+
+  it('rejects the API origin and any remote host, alone or alongside self', () => {
+    for (const connect of [
+      'https://api.modula.digital', 'api.modula.digital', 'https://*.modula.digital', 'https://evil.example', 'http://127.0.0.1:4000', '//evil.example',
+      "'self' https://api.modula.digital", "'self' api.modula.digital", "'self' https://evil.example",
+    ]) expect(refusal(withConnect(connect)), connect).toMatch(/connect-src must be exactly 'none' or exactly 'self'/)
+  })
+
+  it('rejects ws:, wss:, https:, http:, data:, blob: and other schemes, alone or alongside self', () => {
+    for (const scheme of ['ws:', 'wss:', 'https:', 'http:', 'data:', 'blob:', 'filesystem:', 'modula-pkg:', 'wss://api.modula.digital']) {
+      expect(refusal(withConnect(scheme)), scheme).toMatch(/connect-src must be exactly 'none' or exactly 'self'/)
+      expect(refusal(withConnect(`'self' ${scheme}`)), `'self' ${scheme}`).toMatch(/connect-src must be exactly 'none' or exactly 'self'/)
+    }
+  })
+
+  it("rejects '*', a repeated or mixed keyword, and other keywords", () => {
+    for (const connect of ['*', "'self' *", "'self' 'none'", "'none' 'self'", "'self' 'self'", "'unsafe-inline'", "'strict-dynamic'", "'self' 'unsafe-eval'", "self", "'self"]) {
+      expect(refusal(withConnect(connect)), connect).toMatch(/connect-src must be exactly 'none' or exactly 'self'/)
+    }
+  })
+
+  it('still requires connect-src, with at least one source', () => {
+    expect(refusal(STRICT.replace("connect-src 'none'; ", ''))).toMatch(/must set connect-src 'none' or 'self'/)
+    expect(refusal(withConnect(''))).toMatch(/connect-src has no sources/)
+  })
+
+  it('leaves default-src and the other required directives unchanged', () => {
+    const selfConnect = withConnect("'self'")
+    expect(refusal(selfConnect.replace("default-src 'none'", "default-src 'self'"))).toMatch(/default-src 'none'/)
+    expect(refusal(selfConnect.replace("worker-src 'none'", "worker-src 'self'"))).toMatch(/worker-src 'none'/)
+    expect(refusal(selfConnect.replace("base-uri 'none'", "base-uri 'self'"))).toMatch(/base-uri 'none'/)
+    expect(refusal(selfConnect.replace("object-src 'none'", "object-src 'self'"))).toMatch(/object-src 'none'/)
+    expect(refusal(selfConnect.replace("script-src 'self'", "script-src 'self' https://cdn.example"))).toMatch(/script-src/)
+    // The tokenizer rules are untouched: a remote script before the CSP is still refused with connect-src 'self'.
+    expect(() => verifyWebGameArchive(gameArchive(doc(meta(selfConnect), '<script src="https://evil.example/x.js"></script>')))).toThrow(/non-local script/)
+    expect(() => verifyWebGameArchive(gameArchive(`<!doctype html><!--><script src="https://evil.example/x.js"></script>--><html><head>${meta(selfConnect)}</head></html>`))).toThrow()
+  })
+
+  describe('Phaser package fixture (JSON atlas, bitmap-font XML, audio)', () => {
+    const phaserArchive = (csp?: string) => gameArchive(phaserIndexHtml(csp), phaserPackageMembers())
+
+    it("passes validation with connect-src 'self'", () => {
+      expect(() => verifyWebGameArchive(phaserArchive())).not.toThrow()
+      expect(PHASER_TEST_PACKAGE_ID.startsWith('test.modula.')).toBe(true)
+    })
+
+    it('ships only member types the documented MIME map covers (json, xml, ogg/mp3/m4a/wav, png, css, js)', () => {
+      const members = Object.keys(phaserPackageMembers())
+      for (const path of members) expect(GUBIC_PACKAGE_MIME_TYPES[path.split('.').pop()!], path).toBeDefined()
+      expect(members.filter(path => /\.json$/.test(path)).map(path => GUBIC_PACKAGE_MIME_TYPES.json)).toEqual(['application/json', 'application/json'])
+      expect(GUBIC_PACKAGE_MIME_TYPES).toMatchObject({xml: 'application/xml', mp3: 'audio/mpeg', ogg: 'audio/ogg', m4a: 'audio/mp4', wav: 'audio/wav', woff: 'font/woff', woff2: 'font/woff2', gif: 'image/gif', mp4: 'video/mp4'})
+    })
+
+    it('is refused if its policy would let the loader reach the API origin, a remote host or a socket', () => {
+      for (const connect of ["'self' https://api.modula.digital", "'self' https://evil.example", "'self' wss:", 'https:', '*']) {
+        expect(() => verifyWebGameArchive(phaserArchive(PHASER_CONNECT_SELF_CSP.replace("connect-src 'self'", `connect-src ${connect}`))), connect)
+          .toThrow(/connect-src must be exactly 'none' or exactly 'self'/)
+      }
+      // default-src stays 'none', so nothing falls back to a wider connect policy.
+      expect(parseCspDirectives(PHASER_CONNECT_SELF_CSP).get('default-src')).toEqual(["'none'"])
+    })
   })
 })
