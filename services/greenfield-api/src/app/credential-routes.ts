@@ -18,6 +18,27 @@ const CREDENTIAL_ROUTES = new Set([
   '/v1/accounts/recovery/complete',
 ])
 
+/**
+ * #198: credential routes that always require a JSON object body. A missing,
+ * null or non-object body is a 400 VALIDATION_FAILED before the handler runs.
+ * Routes whose body is optional (for example the passkey and Apple options routes)
+ * are deliberately not listed.
+ */
+const BODY_REQUIRED_CREDENTIAL_ROUTES = new Set([
+  '/v1/accounts/register',
+  '/v1/accounts/verify-email',
+  '/v1/accounts/resend-verification',
+  '/v1/accounts/forgot-password',
+  '/v1/accounts/reset-password',
+  '/v1/sessions',
+  '/v1/sessions/refresh',
+  '/v1/sessions/email-code/request',
+  '/v1/sessions/email-code',
+  '/v1/sessions/recovery-code',
+  '/v1/sessions/passkey',
+  '/v1/sessions/apple',
+])
+
 export function isCredentialRoute(routeUrl: string | undefined): boolean {
   if (!routeUrl) return false
   if (CREDENTIAL_ROUTES.has(routeUrl)) return true
@@ -32,6 +53,18 @@ export function registerCredentialResponseNoStore(app: FastifyInstance): void {
       reply.header('Pragma', 'no-cache')
     }
     return payload
+  })
+}
+
+export function registerCredentialBodyRequired(app: FastifyInstance): void {
+  app.addHook('preValidation', async (request, reply) => {
+    if (request.method !== 'POST' || !BODY_REQUIRED_CREDENTIAL_ROUTES.has(request.routeOptions?.url ?? '')) return
+    const body = request.body
+    if (body === undefined || body === null || typeof body !== 'object' || Array.isArray(body)) {
+      return reply
+        .code(statusForError('VALIDATION_FAILED'))
+        .send(failureEnvelope('VALIDATION_FAILED', 'Request body must be a JSON object', request.id))
+    }
   })
 }
 
