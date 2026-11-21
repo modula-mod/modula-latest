@@ -325,14 +325,22 @@ export class GreenfieldSessionService {
     })
   }
 
-  async revokeSession(sessionId: string, accountId?: string): Promise<void> {
+  /**
+   * Revokes a session. When accountId is given, only that account's session
+   * matches. Returns false when no matching session exists, so callers can
+   * answer a foreign session exactly like a missing one.
+   */
+  async revokeSession(sessionId: string, accountId?: string): Promise<boolean> {
+    if (!sessionId) return false
     const row = await this.db
       .selectFrom('greenfield_sessions')
       .selectAll()
       .where('session_id', '=', sessionId)
       .$if(Boolean(accountId), qb => qb.where('account_id', '=', accountId!))
       .executeTakeFirst()
-    if (row) await this.revokeFamily(row.family_id, sessionId, row.account_id, 'session.revoked')
+    if (!row) return false
+    await this.revokeFamily(row.family_id, sessionId, row.account_id, 'session.revoked')
+    return true
   }
 
   async revokeAllForAccount(accountId: string): Promise<void> {

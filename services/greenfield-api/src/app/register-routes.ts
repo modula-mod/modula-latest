@@ -1079,7 +1079,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
     const {sessionId} = request.params as {sessionId: string}
-    await greenfieldSessions.revokeSession(sessionId, auth.accountId)
+    // A session owned by another account is answered exactly like a missing one.
+    if (!(await greenfieldSessions.revokeSession(sessionId, auth.accountId))) {
+      return sendError(reply, 'NOT_FOUND', 'Session not found', request.id)
+    }
     return reply.send(successEnvelope({revoked: true}, request.id))
   })
 
