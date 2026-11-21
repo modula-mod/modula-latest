@@ -255,6 +255,43 @@ describeIfDb('Messaging features 4', () => {
     bSock.ws.terminate()
   })
 
+  it('scopes scheduled PATCH, DELETE and send-now to the conversation in the path (404 across conversations)', async () => {
+    const {a, convo: ab} = await dm('scx')
+    const c = await user('scxc')
+    await follow(c, a)
+    const opened = await authed(a.accessToken, 'POST', '/v1/conversations', {handle: c.handle, text: 'hello c'})
+    expect(opened.statusCode, opened.body).toBeLessThan(300)
+    const ac = opened.json().data.conversation.id as string
+    expect(ac).not.toBe(ab)
+    const sendAt = new Date(Date.now() + 60_000).toISOString()
+    const sched = (await authed(a.accessToken, 'POST', `/v1/conversations/${ab}/scheduled`, {text: 'for b only', sendAt})).json().data.scheduled
+    expect(sched.conversationId).toBe(ab)
+
+    // Same sender, real scheduled id, but a different conversation of theirs in the path.
+    for (const [method, url, payload] of [
+      ['PATCH', `/v1/conversations/${ac}/scheduled/${sched.id}`, {text: 'moved?'}],
+      ['DELETE', `/v1/conversations/${ac}/scheduled/${sched.id}`, undefined],
+      ['POST', `/v1/conversations/${ac}/scheduled/${sched.id}/send-now`, undefined],
+      ['PATCH', `/v1/conversations/does-not-exist/scheduled/${sched.id}`, {text: 'moved?'}],
+      ['DELETE', `/v1/conversations/does-not-exist/scheduled/${sched.id}`, undefined],
+    ] as const) {
+      const res = await authed(a.accessToken, method, url, payload)
+      expect(res.statusCode, `${method} ${url}`).toBe(404)
+      expect(res.json(), `${method} ${url}`).toMatchObject({error: {code: 'NOT_FOUND'}})
+    }
+    const untouched = await db.selectFrom('greenfield_scheduled_messages').select(['conversation_id', 'body', 'state', 'sent_message_id'])
+      .where('scheduled_id', '=', sched.id).executeTakeFirstOrThrow()
+    expect(untouched).toEqual({conversation_id: ab, body: 'for b only', state: 'pending', sent_message_id: null})
+
+    // The matching conversation still works.
+    const edited = await authed(a.accessToken, 'PATCH', `/v1/conversations/${ab}/scheduled/${sched.id}`, {text: 'for b, edited'})
+    expect(edited.statusCode, edited.body).toBe(200)
+    expect(edited.json().data.scheduled).toMatchObject({id: sched.id, conversationId: ab, text: 'for b, edited'})
+    const cancelled = await authed(a.accessToken, 'DELETE', `/v1/conversations/${ab}/scheduled/${sched.id}`)
+    expect(cancelled.statusCode, cancelled.body).toBe(200)
+    expect(cancelled.json().data.scheduled.state).toBe('cancelled')
+  })
+
   it('expires disappearing messages and wipes them server-side', async () => {
     const {a, b, convo} = await dm('dis')
     const before = await send(a, convo, 'stays')
