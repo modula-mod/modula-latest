@@ -58,10 +58,12 @@ describeIfDb('API-BASELINE-02 ownership and trust acceptance', () => {
     expect(privateHandleHistory.statusCode).toBe(403)
     expect(privateHandleHistory.json().error.code).toBe('FORBIDDEN')
 
-    // The endpoint deliberately returns an idempotent success, but its account
-    // predicate must leave the other user's session active.
+    // GF-AUTH-FLOWS-01a (FLOWS-01 INFO): another account's session is answered
+    // 404 exactly like a missing one, and the account predicate must leave the
+    // other user's session active.
     const crossSessionRevoke = await app.inject({method: 'DELETE', url: `/v1/sessions/${bSessionId}`, headers: auth(tokenA)})
-    expect(crossSessionRevoke.statusCode).toBe(200)
+    expect(crossSessionRevoke.statusCode).toBe(404)
+    expect(crossSessionRevoke.json().error.code).toBe('NOT_FOUND')
     const stillActive = await app.inject({method: 'GET', url: '/v1/accounts/me', headers: auth(bToken2)})
     expect(stillActive.statusCode).toBe(200)
     expect(stillActive.json().data.accountId).toBe(accountB)
