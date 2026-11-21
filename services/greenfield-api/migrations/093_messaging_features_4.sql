@@ -10,9 +10,9 @@ ALTER TABLE greenfield_conversation_messages
   ADD COLUMN forwarded_from_actor_id TEXT REFERENCES actors(id),
   ADD COLUMN forwarded_from_sent_at TIMESTAMPTZ,
   ADD COLUMN expires_at TIMESTAMPTZ;
-CREATE INDEX greenfield_conversation_messages_expiry_idx
-  ON greenfield_conversation_messages (expires_at)
-  WHERE expires_at IS NOT NULL AND deleted_at IS NULL;
+-- The partial expiry index for the disappearing-message sweeper is built
+-- CONCURRENTLY by 094 (outside the runner transaction) so the existing
+-- greenfield_conversation_messages table is never write-locked for the build.
 
 -- ---- conversation-level shared settings ----------------------------------
 ALTER TABLE greenfield_conversations

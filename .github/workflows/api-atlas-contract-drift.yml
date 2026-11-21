@@ -568,6 +568,7 @@ jobs:
           tests/greenfield-backend-v1.provider-fabric.test.ts
           tests/greenfield-backend-v1.service-fabric.test.ts
           tests/migration-privilege-rollback.test.ts
+          tests/migration-no-transaction.test.ts
           --maxWorkers=1 --no-file-parallelism
           --reporter=default --reporter=json
           --outputFile.json=/tmp/gf-test-db-01-backend-v1-vitest.json
@@ -582,6 +583,7 @@ jobs:
           tests/greenfield-backend-v1.provider-fabric.test.ts
           tests/greenfield-backend-v1.service-fabric.test.ts
           tests/migration-privilege-rollback.test.ts
+          tests/migration-no-transaction.test.ts
 
       # GF-TEST-DB-01: module settings, registry trust, publisher, Moliboo, GF-MOD and MPS publish.
       - name: GF-TEST-DB-01 module, registry and product database integration
