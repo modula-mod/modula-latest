@@ -10857,6 +10857,7 @@
   },
   "POST /v1/sessions": {
     "reads": [
+      "a",
       "greenfield_accounts",
       "greenfield_auth_identities",
       "greenfield_password_credentials"

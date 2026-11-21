@@ -16,15 +16,26 @@ const AUTH_ERROR_MESSAGES: Partial<Record<ApiErrorCode, string>> = {
 export class AuthDomainError extends Error {
   readonly code: ApiErrorCode
   readonly details?: Record<string, unknown>
+  readonly retryAfterSeconds?: number
 
-  constructor(code: ApiErrorCode, message = AUTH_ERROR_MESSAGES[code] ?? 'Authentication failed', details?: Record<string, unknown>) {
+  constructor(
+    code: ApiErrorCode,
+    message = AUTH_ERROR_MESSAGES[code] ?? 'Authentication failed',
+    details?: Record<string, unknown>,
+    retryAfterSeconds?: number,
+  ) {
     super(message)
     this.name = 'AuthDomainError'
     this.code = code
     this.details = details
+    this.retryAfterSeconds = retryAfterSeconds
   }
 }
 
-export function authError(code: ApiErrorCode, details?: Record<string, unknown>): AuthDomainError {
-  return new AuthDomainError(code, AUTH_ERROR_MESSAGES[code], details)
+export function authError(
+  code: ApiErrorCode,
+  details?: Record<string, unknown>,
+  retryAfterSeconds?: number,
+): AuthDomainError {
+  return new AuthDomainError(code, AUTH_ERROR_MESSAGES[code], details, retryAfterSeconds)
 }

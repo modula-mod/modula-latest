@@ -31,6 +31,19 @@ Authentication amendment (GF-AUTH resumable verification, additive code):
 |---|---:|---|
 | `EMAIL_VERIFICATION_REQUIRED` | 403 | Correct password for an account whose email is not yet verified; `details` carries a fresh `challengeId`, `expiresAt` and `delivery`. Previously this case returned `INVALID_CREDENTIALS` (401). |
 
+Known accepted residual risks from the GF-AUTH resumable-verification change
+(Sentinel report §36; ATLAS accepted these as low, 2026-11-15):
+
+- **R2:** Anonymous resends for an unregistered email can exhaust that address's
+  per-email verification-send limit and block its registration with
+  `RATE_LIMITED` (429) for about 10 minutes. The requester can renew the lockout
+  by sending again when the window resets.
+- **R3:** Within 10 minutes of a registration, the per-email 429 arrives one
+  resend earlier than it would for an unregistered email, which can leak that
+  the address was just registered.
+- **R4:** A decoy resend is about 1 ms faster than a real resend because it
+  skips the mail-job insert.
+
 `NOTE_REVISION_CONFLICT` is the sole bounded compatibility alias and maps to
 canonical `REVISION_CONFLICT`. New code must emit the canonical value.
 

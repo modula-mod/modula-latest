@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-15T01:05:55.755Z",
+  "capturedAt": "2026-11-21T20:29:56.683Z",
   "source": {
-    "branch": "forge/gf-test-db-01",
-    "headAtCapture": "46043085d8fc121a29607b4d8e2a97468281eef7",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
+    "branch": "forge/gf-auth-hardening-01",
+    "headAtCapture": "e90b2dcf2460e3262c8434fe4196dd6f81ddbd8f",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "12410aa87109eb6785bf455989e250b038fde1f09d55e8a7dd532bcbce2cbaa0"
   },
   "runtimeRoutes": [
     {

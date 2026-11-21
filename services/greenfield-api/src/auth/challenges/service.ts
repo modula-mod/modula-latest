@@ -348,7 +348,7 @@ export class ChallengeService {
       .executeTakeFirst()
 
     if (existing?.blocked_until && existing.blocked_until > now) {
-      throw authError('RATE_LIMITED')
+      throw authError('RATE_LIMITED', undefined, retryAfterSeconds(existing.blocked_until, now))
     }
     if (!existing || now.getTime() - existing.window_started_at.getTime() > windowSeconds * 1000) {
       await db
@@ -381,7 +381,7 @@ export class ChallengeService {
       .where('rate_limit_key', '=', rateLimitKey)
       .where('purpose', '=', purpose)
       .execute()
-    if (blockedUntil) throw authError('RATE_LIMITED')
+    if (blockedUntil) throw authError('RATE_LIMITED', undefined, retryAfterSeconds(blockedUntil, now))
   }
 
   private async supersedePending(
@@ -461,3 +461,8 @@ function generateNumericCode(digits: number): string {
   const ceiling = 10 ** normalizedDigits
   return randomInt(0, ceiling).toString().padStart(normalizedDigits, '0')
 }
+
+function retryAfterSeconds(until: Date, now: Date): number {
+  return Math.max(1, Math.ceil((until.getTime() - now.getTime()) / 1000))
+}
+

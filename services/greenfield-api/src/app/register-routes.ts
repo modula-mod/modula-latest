@@ -103,6 +103,13 @@ function mapDomainError(reply: any, error: any, requestId: string, fallback: str
   if (code === 'EMAIL_VERIFICATION_REQUIRED') {
     return reply.code(statusForError(code)).send(failureEnvelope(code, error.message ?? fallback, requestId, {details: error.details}))
   }
+  if (code === 'RATE_LIMITED') {
+    const seconds = error?.retryAfterSeconds
+    if (typeof seconds === 'number' && Number.isFinite(seconds)) {
+      reply.header('Retry-After', String(Math.max(1, Math.ceil(seconds))))
+    }
+    return sendError(reply, code, error.message ?? fallback, requestId)
+  }
   if (
     code === 'VALIDATION_FAILED' ||
     code === 'NOT_FOUND' ||
@@ -113,7 +120,6 @@ function mapDomainError(reply: any, error: any, requestId: string, fallback: str
     code === 'CHALLENGE_EXPIRED' ||
     code === 'CHALLENGE_INVALID' ||
     code === 'CHALLENGE_REPLAYED' ||
-    code === 'RATE_LIMITED' ||
     code === 'STEP_UP_REQUIRED' ||
     code === 'PASSKEY_NOT_FOUND' ||
     code === 'AUTH_METHOD_UNAVAILABLE' ||

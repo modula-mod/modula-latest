@@ -1,6 +1,6 @@
 import type {ModulaDb} from '../database/client.js'
 import type {AppConfig} from '../config/index.js'
-import {verifyPassword} from '../lib/password.js'
+import {passwordHashForVerification, verifyPassword} from '../lib/password.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
 import {GreenfieldSessionService} from '../sessions/service.js'
 import {authError} from '../auth/errors.js'
@@ -219,7 +219,11 @@ export class AuthenticationService {
       .where('greenfield_auth_identities.kind', '=', 'email')
       .where('greenfield_auth_identities.identifier', '=', email.trim().toLowerCase())
       .executeTakeFirst()
-    if (!identity || !(await verifyPassword(password, identity.password_hash))) {
+    // Always verify, including unknown emails, so timing cannot distinguish a
+    // missing account from a wrong password. The dummy hash uses the same
+    // Argon2id parameters as real credentials.
+    const passwordOk = await verifyPassword(password, passwordHashForVerification(identity?.password_hash))
+    if (!identity || !passwordOk) {
       throw authError('INVALID_CREDENTIALS')
     }
     if (identity.status === 'suspended') throw authError('ACCOUNT_SUSPENDED')

@@ -9,6 +9,18 @@ export const PASSWORD_OPTIONS = {
   outputLen: 32,
 }
 
+/**
+ * Precomputed Argon2id hash using PASSWORD_OPTIONS of an unguessable random
+ * secret that is not retained. Unknown-email login verifies against this so the
+ * work matches a wrong-password attempt; the secret cannot be used to sign in.
+ */
+export const DUMMY_PASSWORD_HASH =
+  '$argon2id$v=19$m=19456,t=2,p=1$v/XLzaaRTysNFB24NUYdEw$TENhf/cKJiKv7sK8Hyjejv73dRbrUxRYhx3FABLHQmA'
+
+export function passwordHashForVerification(storedHash: string | null | undefined): string {
+  return storedHash ?? DUMMY_PASSWORD_HASH
+}
+
 export async function hashPassword(password: string): Promise<string> {
   if (password.length < 10 || password.length > 1024) {
     throw Object.assign(new Error('Password must be 10-1024 characters'), {code: 'VALIDATION_FAILED'})
