@@ -66,6 +66,21 @@ describeIfDb('#192 module data deletion requires server-side step-up', () => {
     await db.updateTable('greenfield_sessions').set({recent_authentication_at: new Date(Date.now() - ageMs)}).where('account_id', '=', accountId).execute()
   }
 
+  /** Installs `dependant` (enabled) with a `requires` dependency on `target`, so uninstalling the target cascades. */
+  async function installDependant(accountId: string, target: string, label: string) {
+    const dependant = await installEnabled(accountId, label)
+    await db.insertInto('greenfield_module_dependencies').values({
+      dependency_id: `fix192-dependency:${dependant.releaseId}:${target}`, release_id: dependant.releaseId, module_id: dependant.moduleId,
+      dependency_module_id: target, version_range: '^1.0.0', optional: false, reason: 'requires', created_at: new Date(),
+    }).execute()
+    return dependant
+  }
+
+  /** Uninstall transitions queued for these installations (the account is shared across tests). */
+  const queuedTransitions = async (installationIds: string[]) => Number((await db.selectFrom('greenfield_extension_installations')
+    .select(({fn}) => fn.countAll<number>().as('count')).where('installation_id', 'in', installationIds).where('status', '=', 'uninstalling')
+    .executeTakeFirstOrThrow()).count)
+
   async function installEnabled(accountId: string, label: string) {
     const moduleId = `test.modula.fix192-${label}-${suffix}`
     const manifest = fixtureManifest(moduleId, '1.0.0')
@@ -77,7 +92,7 @@ describeIfDb('#192 module data deletion requires server-side step-up', () => {
       installation_id: installationId, extension_version_id: published.extensionVersionId, account_id: accountId,
       status: 'enabled', config: {}, created_at: new Date(), updated_at: new Date(),
     }).execute()
-    return {moduleId, installationId}
+    return {moduleId, installationId, releaseId: published.releaseId}
   }
 
   const uninstall = (token: string, moduleId: string, payload: Record<string, unknown>) => app.inject({
@@ -125,6 +140,54 @@ describeIfDb('#192 module data deletion requires server-side step-up', () => {
     expect((await uninstall(session.token, moduleId, {choice: 'deleteData', confirmDelete: true, recentAuth: true})).statusCode).toBe(401)
     await ageSessions(session.accountId, 60 * 1000)
     expect((await uninstall(session.token, moduleId, {choice: 'deleteData', confirmDelete: true})).statusCode).toBe(202)
+  })
+
+  it('refuses at 15m10s and accepts at 14m50s: the window is exactly the 15-minute policy', async () => {
+    const session = await signIn()
+    const {moduleId, installationId} = await installEnabled(session.accountId, 'boundary')
+    await ageSessions(session.accountId, 15 * 60 * 1000 + 10 * 1000)
+    const refused = await uninstall(session.token, moduleId, {choice: 'deleteData', confirmDelete: true})
+    expect(refused.statusCode).toBe(401)
+    expect(refused.json().error.code).toBe('STEP_UP_REQUIRED')
+    expect(await installationStatus(installationId)).toBe('enabled')
+    await ageSessions(session.accountId, 14 * 60 * 1000 + 50 * 1000)
+    expect((await uninstall(session.token, moduleId, {choice: 'deleteData', confirmDelete: true})).statusCode).toBe(202)
+  })
+
+  it('refuses a fresh session whose authentication strength is below medium', async () => {
+    const session = await signIn()
+    const {moduleId, installationId} = await installEnabled(session.accountId, 'weak')
+    await ageSessions(session.accountId, 60 * 1000)
+    for (const strength of ['low', 'recovery'] as const) {
+      await db.updateTable('greenfield_sessions').set({authentication_strength: strength}).where('account_id', '=', session.accountId).execute()
+      const refused = await uninstall(session.token, moduleId, {choice: 'deleteData', confirmDelete: true, recentAuth: true})
+      expect(refused.statusCode, strength).toBe(401)
+      expect(refused.json().error.code).toBe('STEP_UP_REQUIRED')
+    }
+    expect(await installationStatus(installationId)).toBe('enabled')
+  })
+
+  it('refuses deleteData with removeDependants on a stale session, or without confirmDelete, and queues nothing (not even dependants)', async () => {
+    const session = await signIn()
+    const target = await installEnabled(session.accountId, 'cascade')
+    const dependant = await installDependant(session.accountId, target.moduleId, 'cascade-dependant')
+    // The cascade is real: without removeDependants a keep-data uninstall is a conflict.
+    expect((await uninstall(session.token, target.moduleId, {choice: 'keepData'})).statusCode).toBe(409)
+
+    await ageSessions(session.accountId, SEVEN_DAYS_MS)
+    const stale = await uninstall(session.token, target.moduleId, {choice: 'deleteData', confirmDelete: true, removeDependants: true, recentAuth: true})
+    expect(stale.statusCode).toBe(401)
+    expect(stale.json().error.code).toBe('STEP_UP_REQUIRED')
+    expect(await queuedTransitions([target.installationId, dependant.installationId])).toBe(0)
+
+    // Fresh session, but no explicit confirmation: the service refuses before enqueueing any dependant.
+    const fresh = await signIn()
+    const unconfirmed = await uninstall(fresh.token, target.moduleId, {choice: 'deleteData', removeDependants: true})
+    expect(unconfirmed.statusCode).toBe(400)
+    expect(unconfirmed.json().error.code).toBe('VALIDATION_FAILED')
+    expect(await installationStatus(dependant.installationId)).toBe('enabled')
+    expect(await installationStatus(target.installationId)).toBe('enabled')
+    expect(await queuedTransitions([target.installationId, dependant.installationId])).toBe(0)
   })
 
   it('accepts deleteData on a fresh session without any body.recentAuth', async () => {
