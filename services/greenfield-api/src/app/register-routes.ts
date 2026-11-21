@@ -93,6 +93,7 @@ import {registerCommunitiesRoutes} from './register-communities-routes.js'
 import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
 import {registerMolibooRoutes} from './register-moliboo-routes.js'
 import {registerNativeEndpointRoutes} from './register-native-endpoint-routes.js'
+import {PasswordLoginThrottle, PasswordLoginThrottledError} from '../auth/password-login-throttle.js'
 import {registerCredentialBodyErrorEnvelope, registerCredentialResponseNoStore} from './credential-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
@@ -201,6 +202,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const accounts = new AccountService(db, config, mail)
   const recovery = new RecoveryService(db, config, mail)
   const authentication = new AuthenticationService(db, config, greenfieldSessions, mail)
+  const passwordLoginThrottle = new PasswordLoginThrottle(db, config.sessionPepper)
   const totp = new TotpService(db, config)
   const recoveryCodes = new RecoveryCodeService(db, config)
   const passkeys = new PasskeyService(db, config)
@@ -868,11 +870,15 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
 
   app.post('/v1/sessions', authWriteConfig, async (request, reply) => {
+    const email = bodyString(request.body, 'email')
     try {
-      const issued = await authentication.login(bodyString(request.body, 'email'), bodyString(request.body, 'password'), {
+      // Per-account wrong-password backoff; unknown emails are throttled identically.
+      await passwordLoginThrottle.assertAllowed(email)
+      const issued = await authentication.login(email, bodyString(request.body, 'password'), {
         userAgent: request.headers['user-agent'],
         correlationId: request.id,
       }, {ipHash: requestIpHash(request, config)})
+      await passwordLoginThrottle.reset(email)
       return reply.send(
         successEnvelope(
           {
@@ -886,6 +892,15 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
         ),
       )
     } catch (error) {
+      if (error instanceof PasswordLoginThrottledError) {
+        return reply
+          .code(statusForError('RATE_LIMITED'))
+          .header('Retry-After', String(error.retryAfterSeconds))
+          .send(failureEnvelope('RATE_LIMITED', error.message, request.id, {retryable: true, details: {retryAfterSeconds: error.retryAfterSeconds}}))
+      }
+      const code = (error as {code?: string})?.code
+      if (code === 'INVALID_CREDENTIALS') await passwordLoginThrottle.recordFailure(email)
+      else if (code === 'EMAIL_VERIFICATION_REQUIRED') await passwordLoginThrottle.reset(email)
       return mapDomainError(reply, error, request.id, 'Sign-in failed')
     }
   })
