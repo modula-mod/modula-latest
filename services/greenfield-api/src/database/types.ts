@@ -1422,6 +1422,7 @@ export interface Database {
     typing_at: Date | null
     role: Generated<'owner' | 'admin' | 'member'>
     added_by_actor_id: Generated<string | null>
+    marked_unread_at: Generated<Date | null>
   }
   greenfield_conversation_messages: {
     message_id: string
@@ -1760,6 +1761,29 @@ export interface Database {
     item_id: string
     viewer_actor_id: string
     viewed_at: Date
+  }
+  greenfield_story_reactions: {
+    item_id: string
+    actor_id: string
+    emoji: string
+    created_at: Generated<Date>
+    updated_at: Generated<Date>
+  }
+  greenfield_story_highlights: {
+    highlight_id: string
+    owner_actor_id: string
+    title: string
+    cover_item_id: string | null
+    sort_order: Generated<number>
+    created_at: Generated<Date>
+    updated_at: Generated<Date>
+    deleted_at: Date | null
+  }
+  greenfield_story_highlight_items: {
+    highlight_id: string
+    item_id: string
+    sort_order: Generated<number>
+    added_at: Generated<Date>
   }
   greenfield_product_families: {family_id: string; display_name: string; created_at: Date; updated_at: Date}
   greenfield_product_family_members: {family_id: string; product_id: string; member_role: 'root' | 'member'; created_at: Date}

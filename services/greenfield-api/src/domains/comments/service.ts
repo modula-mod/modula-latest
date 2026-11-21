@@ -42,6 +42,29 @@ export class CommentService {
     return this.withAuthors(await query.execute(), viewerActorId)
   }
 
+  /**
+   * Live comment subscriptions use exactly the read policy of
+   * GET /v1/posts/:postId/comments, so a socket can never follow a post whose
+   * comments the viewer could not list.
+   */
+  async canFollowPost(viewerActorId: string, postId: string): Promise<boolean> {
+    const post = await this.db.selectFrom('posts').select('id').where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!post) return false
+    try {
+      await this.policies.assertAllowed({actorId: viewerActorId, action: 'comment.list', resource: {type: 'post', id: postId}})
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /** Post and author for a comment, used to route live events. */
+  async locate(commentId: string): Promise<{postId: string; authorActorId: string; parentCommentId: string | null} | null> {
+    const row = await this.db.selectFrom('greenfield_comments').select(['post_id', 'author_actor_id', 'parent_comment_id'])
+      .where('comment_id', '=', commentId).executeTakeFirst()
+    return row ? {postId: row.post_id, authorActorId: row.author_actor_id, parentCommentId: row.parent_comment_id} : null
+  }
+
   async listReplies(viewerActorId: string | null, commentId: string) {
     await this.policies.assertAllowed({
       actorId: viewerActorId,

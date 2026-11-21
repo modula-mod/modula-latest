@@ -140,6 +140,31 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  /** Mark a conversation unread (per member). On by default; set to 'false' to withdraw the capability. */
+  MODULA_MESSAGING_MARK_UNREAD_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Owner-only story viewer lists. On by default; set to 'false' to withdraw the capability. */
+  MODULA_STORY_VIEWERS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Emoji reactions on story items, delivered to the owner. On by default; set to 'false' to withdraw the capability. */
+  MODULA_STORY_REACTIONS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Story highlight collections on profiles. On by default; set to 'false' to withdraw the capability. */
+  MODULA_STORY_HIGHLIGHTS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
+  /** Live comment and like updates over the messaging socket. On by default; set to 'false' to withdraw the capability. */
+  MODULA_LIVE_COMMENTS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
   /** Photo and video direct/group messages. Off by default; voice notes do not need this. */
   MODULA_MESSAGING_MEDIA_ENABLED: z
     .string()
@@ -306,6 +331,8 @@ export type AppConfig = {
     mediaEnabled: boolean
   }
   calls: CallsConfig
+  /** Additive social features; each is advertised through a capability flag. */
+  social: SocialFeaturesConfig
   premium: {
     enabled: boolean
     qaAssignmentsEnabled: boolean
@@ -602,8 +629,32 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     gubic: {playEnabled: Boolean(raw.MODULA_GUBIC_PLAY_ENABLED)},
     messaging: {mediaEnabled: Boolean(raw.MODULA_MESSAGING_MEDIA_ENABLED)},
     calls: callsConfig(raw),
+    social: {
+      markUnread: raw.MODULA_MESSAGING_MARK_UNREAD_ENABLED !== false,
+      storyViewers: raw.MODULA_STORY_VIEWERS_ENABLED !== false,
+      storyReactions: raw.MODULA_STORY_REACTIONS_ENABLED !== false,
+      storyHighlights: raw.MODULA_STORY_HIGHLIGHTS_ENABLED !== false,
+      liveComments: raw.MODULA_LIVE_COMMENTS_ENABLED !== false,
+    },
     premium: premiumConfig(raw),
   }
+}
+
+export type SocialFeaturesConfig = {
+  markUnread: boolean
+  storyViewers: boolean
+  storyReactions: boolean
+  storyHighlights: boolean
+  liveComments: boolean
+}
+
+export const SOCIAL_FEATURES_ALL_ON: SocialFeaturesConfig = {
+  markUnread: true, storyViewers: true, storyReactions: true, storyHighlights: true, liveComments: true,
+}
+
+/** Effective social feature switches; hand-built configs without `social` get the defaults. */
+export function socialFeatures(config: {social?: Partial<SocialFeaturesConfig>}): SocialFeaturesConfig {
+  return {...SOCIAL_FEATURES_ALL_ON, ...(config.social ?? {})}
 }
 
 export type CallsConfig = {

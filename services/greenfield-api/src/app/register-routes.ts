@@ -71,6 +71,9 @@ import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
 import {registerPushRoutes} from './register-push-routes.js'
 import {registerMessagingRoutes} from './register-messaging-routes.js'
+import {MessagingRealtimeHub} from '../domains/messaging/realtime-hub.js'
+import {LiveCommentPublisher} from '../domains/comments/live.js'
+import {socialFeatures} from '../config/env.js'
 import {callsCapabilities, registerCallsRoutes, type CallPolicyHooks} from './register-calls-routes.js'
 import {registerMolibooGameRoutes} from './register-moliboo-game-routes.js'
 import {registerPremiumRoutes} from '../premium/routes.js'
@@ -175,6 +178,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const sessions = new SessionService(db, config)
   const postWrites = new PostWriteService(db, config)
   const reactions = new ReactionService(db)
+  // One in-process realtime hub serves the messaging socket, calls and live comments.
+  const features = socialFeatures(config)
+  const messagingHub = new MessagingRealtimeHub()
+  const liveComments = new LiveCommentPublisher(db, messagingHub, features.liveComments)
   const postShares = new PostShareService(db)
   const postMediaStorage = new PostMediaStorage(config)
   const profileWrites = new ProfileWriteService(db)
@@ -1622,6 +1629,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
           }
           const post = await posts.getById(postId, auth.actorId)
           if (!post) return sendError(reply, 'NOT_FOUND', 'Post not found', request.id)
+          if (kind === 'like' && liveComments.active) {
+            liveComments.publish(postId, {type: 'post.engagement', postId, likeCount: post.likeCount, reactionCount: post.reactionCount, replyCount: post.replyCount, at: new Date().toISOString()})
+              .catch(error => request.log.warn({error: error?.message}, 'live engagement publish failed'))
+          }
           return reply.send(successEnvelope({
             liked: post.liked,
             saved: post.saved,
@@ -2715,16 +2726,21 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     feedConfig,
     profileConfig,
     authWriteConfig,
+    liveComments,
   })
 
   await registerPhase7fStoriesRoutes(app, db, config, {
     sessions,
     feedConfig,
     writeConfig,
+    hub: messagingHub,
+    features,
   })
-  const {hub: messagingHub} = await registerMessagingRoutes(app, db, {
+  await registerMessagingRoutes(app, db, {
     feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, mediaEnabled: config.messaging.mediaEnabled,
     callsCapabilities: callsCapabilities(config.calls),
+    hub: messagingHub,
+    features,
   })
   await registerCallsRoutes(app, db, {
     config: config.calls, feedConfig, writeConfig, publicApiUrl: config.publicApiUrl, bundleId: config.pushBundleId,
