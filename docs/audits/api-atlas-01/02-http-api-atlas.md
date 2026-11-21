@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-15T00:21:44.215Z for branch `mosaic/gubic-p1-hardening`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-21T20:12:48.541Z for branch `forge/gf-auth-flows-01b`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633
@@ -51,8 +51,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Authentication | PATCH | `/v1/accounts/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:584` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:40` | candidate-registered-not-production-probed |
 | Authentication | PATCH | `/v1/accounts/me/app-preferences` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:41` | candidate-registered-not-production-probed |
-| Authentication | GET | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:270` | candidate-registered-not-production-probed |
-| Authentication | PATCH | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:275` | candidate-registered-not-production-probed |
+| Authentication | GET | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:275` | candidate-registered-not-production-probed |
+| Authentication | PATCH | `/v1/accounts/me/appearance` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:280` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/blocks` | AUTHENTICATED | none | `services/greenfield-api/src/settings-v2/routes.ts:43` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/me/handle` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:593` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/modula-mail` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:543` | candidate-registered-not-production-probed |
@@ -64,8 +64,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Authentication | POST | `/v1/accounts/me/password` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:604` | candidate-registered-not-production-probed |
 | Authentication | DELETE | `/v1/accounts/me/sessions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:635` | candidate-registered-not-production-probed |
 | Authentication | GET | `/v1/accounts/me/sessions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:630` | candidate-registered-not-production-probed |
-| Authentication | POST | `/v1/accounts/recovery/complete` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:296` | candidate-registered-not-production-probed |
-| Authentication | POST | `/v1/accounts/recovery/request` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:288` | candidate-registered-not-production-probed |
+| Authentication | POST | `/v1/accounts/recovery/complete` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:301` | candidate-registered-not-production-probed |
+| Authentication | POST | `/v1/accounts/recovery/request` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:293` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/register` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:459` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/resend-verification` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:495` | candidate-registered-not-production-probed |
 | Authentication | POST | `/v1/accounts/reset-password` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:517` | candidate-registered-not-production-probed |
@@ -217,15 +217,15 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/calls/:callId/media-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:209` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/calls/:callId/signalling` | PUBLIC | none | `services/greenfield-api/src/app/register-calls-routes.ts:286` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/calls/:callId/signalling-ticket` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:198` | candidate-registered-not-production-probed |
-| Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:173` | candidate-registered-not-production-probed |
-| Comments | PATCH | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:155` | candidate-registered-not-production-probed |
-| Comments | DELETE | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:199` | candidate-registered-not-production-probed |
-| Comments | PUT | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:199` | candidate-registered-not-production-probed |
-| Comments | PUT | `/v1/comments/:commentId/poll/vote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:185` | candidate-registered-not-production-probed |
-| Comments | DELETE | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:224` | candidate-registered-not-production-probed |
-| Comments | PUT | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:211` | candidate-registered-not-production-probed |
-| Comments | GET | `/v1/comments/:commentId/replies` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:132` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/comments/:commentId/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:141` | candidate-registered-not-production-probed |
+| Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:178` | candidate-registered-not-production-probed |
+| Comments | PATCH | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:160` | candidate-registered-not-production-probed |
+| Comments | DELETE | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:204` | candidate-registered-not-production-probed |
+| Comments | PUT | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:204` | candidate-registered-not-production-probed |
+| Comments | PUT | `/v1/comments/:commentId/poll/vote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:190` | candidate-registered-not-production-probed |
+| Comments | DELETE | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:229` | candidate-registered-not-production-probed |
+| Comments | PUT | `/v1/comments/:commentId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:216` | candidate-registered-not-production-probed |
+| Comments | GET | `/v1/comments/:commentId/replies` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:137` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/comments/:commentId/replies` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:146` | candidate-registered-not-production-probed |
 | Commerce | GET | `/v1/commerce/billing-adapters` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:32` | candidate-registered-not-production-probed |
 | Commerce | GET | `/v1/commerce/entitlements` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:30` | candidate-registered-not-production-probed |
 | Commerce | POST | `/v1/commerce/entitlements/check` | AUTHENTICATED | none | `services/greenfield-api/src/entitlements/routes.ts:31` | candidate-registered-not-production-probed |
@@ -304,9 +304,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Discover | GET | `/v1/discover` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2198` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1216` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/extensions/:extensionId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1224` | candidate-registered-not-production-probed |
-| Modules | PATCH | `/v1/extensions/:extensionId/configuration` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:327` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:317` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/extensions/:extensionId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:307` | candidate-registered-not-production-probed |
+| Modules | PATCH | `/v1/extensions/:extensionId/configuration` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:332` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionId/disable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:322` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/extensions/:extensionId/enable` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:312` | candidate-registered-not-production-probed |
 | Modules | DELETE | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1248` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/extensions/:extensionId/install` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1236` | candidate-registered-not-production-probed |
 | Modules | PATCH | `/v1/extensions/:extensionId/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1258` | candidate-registered-not-production-probed |
@@ -323,11 +323,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | DELETE | `/v1/follow-requests/:requestId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1802` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/follow-requests/:requestId/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1778` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/follow-requests/:requestId/reject` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1790` | candidate-registered-not-production-probed |
-| Modules | GET | `/v1/function-jobs/:jobId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:344` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/function-jobs/:jobId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:354` | candidate-registered-not-production-probed |
+| Modules | GET | `/v1/function-jobs/:jobId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:349` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/function-jobs/:jobId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:359` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/functions` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1284` | candidate-registered-not-production-probed |
 | Modules | POST | `/v1/functions/:functionId/invoke` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1289` | candidate-registered-not-production-probed |
-| Modules | POST | `/v1/functions/:functionId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:366` | candidate-registered-not-production-probed |
+| Modules | POST | `/v1/functions/:functionId/jobs` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:371` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/search` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:36` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/status` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:21` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gifs/trending` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:26` | candidate-registered-not-production-probed |
@@ -540,14 +540,14 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Posts | DELETE | `/v1/posts/:postId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1582` | candidate-registered-not-production-probed |
 | Posts | GET | `/v1/posts/:postId` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:1539` | candidate-registered-not-production-probed |
 | Posts | PATCH | `/v1/posts/:postId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1565` | candidate-registered-not-production-probed |
-| Comments | GET | `/v1/posts/:postId/comments` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:109` | candidate-registered-not-production-probed |
-| Comments | POST | `/v1/posts/:postId/comments` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:118` | candidate-registered-not-production-probed |
+| Comments | GET | `/v1/posts/:postId/comments` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:114` | candidate-registered-not-production-probed |
+| Comments | POST | `/v1/posts/:postId/comments` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:123` | candidate-registered-not-production-probed |
 | Reactions | DELETE | `/v1/posts/:postId/like` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1606` | candidate-registered-not-production-probed |
 | Reactions | POST | `/v1/posts/:postId/like` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1606` | candidate-registered-not-production-probed |
-| Sharing | POST | `/v1/posts/:postId/quote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:238` | candidate-registered-not-production-probed |
-| Reactions | DELETE | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:86` | candidate-registered-not-production-probed |
-| Reactions | PUT | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:73` | candidate-registered-not-production-probed |
-| Reactions | GET | `/v1/posts/:postId/reactions` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:97` | candidate-registered-not-production-probed |
+| Sharing | POST | `/v1/posts/:postId/quote` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:243` | candidate-registered-not-production-probed |
+| Reactions | DELETE | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:91` | candidate-registered-not-production-probed |
+| Reactions | PUT | `/v1/posts/:postId/reaction` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:78` | candidate-registered-not-production-probed |
+| Reactions | GET | `/v1/posts/:postId/reactions` | PUBLIC | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:102` | candidate-registered-not-production-probed |
 | Sharing | DELETE | `/v1/posts/:postId/repost` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1606` | candidate-registered-not-production-probed |
 | Sharing | POST | `/v1/posts/:postId/repost` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1606` | candidate-registered-not-production-probed |
 | Posts | DELETE | `/v1/posts/:postId/save` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1606` | candidate-registered-not-production-probed |
@@ -628,7 +628,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Account | DELETE | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1173` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1122` | candidate-registered-not-production-probed |
 | Account | PATCH | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1149` | candidate-registered-not-production-probed |
-| Posts | GET | `/v1/saves` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:252` | candidate-registered-not-production-probed |
+| Posts | GET | `/v1/saves` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:257` | candidate-registered-not-production-probed |
 | Search | GET | `/v1/search` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2081` | candidate-registered-not-production-probed |
 | Search | DELETE | `/v1/search/recent` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2118` | candidate-registered-not-production-probed |
 | Search | GET | `/v1/search/recent` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:2098` | candidate-registered-not-production-probed |
@@ -1511,7 +1511,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/appearance`
 - Public URL: `https://api.modula.digital/v1/accounts/me/appearance`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:270`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:275`
 - Handler: inline
 - Controller/service calls: `appearance.get`
 - Authentication: greenfield bearer access session
@@ -1560,7 +1560,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/me/appearance`
 - Public URL: `https://api.modula.digital/v1/accounts/me/appearance`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:275`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:280`
 - Handler: inline
 - Controller/service calls: `appearance.patch`
 - Authentication: greenfield bearer access session
@@ -2148,7 +2148,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/recovery/complete`
 - Public URL: `https://api.modula.digital/v1/accounts/recovery/complete`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:296`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:301`
 - Handler: inline
 - Controller/service calls: `recovery.completeRecovery`
 - Authentication: none
@@ -2197,7 +2197,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/accounts/recovery/request`
 - Public URL: `https://api.modula.digital/v1/accounts/recovery/request`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:288`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:293`
 - Handler: inline
 - Controller/service calls: `recovery.requestRecovery`
 - Authentication: none
@@ -2220,7 +2220,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: `SMTP/Modula Mail`
 - Known clients: none observed
-- Tests: `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `services/greenfield-api/tests/phase6s.social.test.ts`
+- Tests: `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -9645,7 +9645,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:173`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:178`
 - Handler: inline
 - Controller/service calls: `comments.deleteComment`
 - Authentication: legacy or bridged bearer session
@@ -9694,7 +9694,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:155`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:160`
 - Handler: inline
 - Controller/service calls: `comments.updateComment`
 - Authentication: legacy or bridged bearer session
@@ -9743,7 +9743,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/pin`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/pin`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:199`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:204`
 - Handler: inline
 - Controller/service calls: `comments.setPinned`
 - Authentication: legacy or bridged bearer session
@@ -9792,7 +9792,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/pin`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/pin`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:199`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:204`
 - Handler: inline
 - Controller/service calls: `comments.setPinned`
 - Authentication: legacy or bridged bearer session
@@ -9841,7 +9841,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/poll/vote`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/poll/vote`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:185`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:190`
 - Handler: inline
 - Controller/service calls: `comments.votePoll`
 - Authentication: legacy or bridged bearer session
@@ -9890,7 +9890,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/reaction`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:224`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:229`
 - Handler: inline
 - Controller/service calls: `comments.setCommentReaction`
 - Authentication: legacy or bridged bearer session
@@ -9939,7 +9939,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/reaction`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:211`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:216`
 - Handler: inline
 - Controller/service calls: `comments.setCommentReaction`
 - Authentication: legacy or bridged bearer session
@@ -9988,7 +9988,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/replies`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:132`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:137`
 - Handler: inline
 - Controller/service calls: `comments.listReplies`
 - Authentication: none
@@ -10037,7 +10037,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/comments/:commentId/replies`
 - Public URL: `https://api.modula.digital/v1/comments/:commentId/replies`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:141`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:146`
 - Handler: inline
 - Controller/service calls: `comments.createReply`, `mentions.storeMentions`
 - Authentication: legacy or bridged bearer session
@@ -13908,7 +13908,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionId/configuration`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/configuration`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:327`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:332`
 - Handler: inline
 - Controller/service calls: `lifecycle.configure`
 - Authentication: greenfield bearer access session
@@ -13957,7 +13957,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionId/disable`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:317`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:322`
 - Handler: inline
 - Controller/service calls: `lifecycle.disable`
 - Authentication: greenfield bearer access session
@@ -14006,7 +14006,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/extensions/:extensionId/enable`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/enable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:307`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:312`
 - Handler: inline
 - Controller/service calls: `lifecycle.enable`
 - Authentication: greenfield bearer access session
@@ -14839,7 +14839,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/function-jobs/:jobId`
 - Public URL: `https://api.modula.digital/v1/function-jobs/:jobId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:344`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:349`
 - Handler: inline
 - Controller/service calls: `functionJobs.getJob`
 - Authentication: greenfield bearer access session
@@ -14888,7 +14888,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/function-jobs/:jobId/cancel`
 - Public URL: `https://api.modula.digital/v1/function-jobs/:jobId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:354`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:359`
 - Handler: inline
 - Controller/service calls: `functionJobs.cancel`
 - Authentication: greenfield bearer access session
@@ -15035,7 +15035,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/functions/:functionId/jobs`
 - Public URL: `https://api.modula.digital/v1/functions/:functionId/jobs`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:366`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:371`
 - Handler: inline
 - Controller/service calls: `functionJobs.invoke`
 - Authentication: greenfield bearer access session
@@ -25472,7 +25472,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/comments`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/comments`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:109`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:114`
 - Handler: inline
 - Controller/service calls: `comments.listComments`
 - Authentication: none
@@ -25521,7 +25521,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/comments`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/comments`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:118`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:123`
 - Handler: inline
 - Controller/service calls: `comments.createComment`, `mentions.storeMentions`
 - Authentication: legacy or bridged bearer session
@@ -25668,7 +25668,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/quote`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/quote`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:238`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:243`
 - Handler: inline
 - Controller/service calls: `mentions.storeMentions`, `quotes.createQuote`
 - Authentication: legacy or bridged bearer session
@@ -25717,7 +25717,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/reaction`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:86`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:91`
 - Handler: inline
 - Controller/service calls: `reactions.setReaction`
 - Authentication: legacy or bridged bearer session
@@ -25766,7 +25766,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/reaction`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reaction`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:73`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:78`
 - Handler: inline
 - Controller/service calls: `reactions.setReaction`
 - Authentication: legacy or bridged bearer session
@@ -25815,7 +25815,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/posts/:postId/reactions`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reactions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:97`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:102`
 - Handler: inline
 - Controller/service calls: `reactions.listReactions`
 - Authentication: none
@@ -29784,7 +29784,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/saves`
 - Public URL: `https://api.modula.digital/v1/saves`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:252`
+- Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:257`
 - Handler: inline
 - Controller/service calls: `saves.listSaves`
 - Authentication: legacy or bridged bearer session

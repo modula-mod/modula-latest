@@ -199,35 +199,35 @@
     },
     {
       "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
-      "line": 88,
+      "line": 93,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!registration.verificationToken) throw new Error(`Audit verification token missing for ${spec.handle}`)"
     },
     {
       "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
-      "line": 135,
+      "line": 140,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('Set API_ATLAS_IDENTITY_BOOTSTRAP to the exact documented guard value')"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 309,
+      "line": 352,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 337,
+      "line": 380,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 339,
+      "line": 382,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2385,35 +2385,35 @@
     },
     {
       "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
-      "line": 88,
+      "line": 93,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!registration.verificationToken) throw new Error(`Audit verification token missing for ${spec.handle}`)"
     },
     {
       "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
-      "line": 135,
+      "line": 140,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('Set API_ATLAS_IDENTITY_BOOTSTRAP to the exact documented guard value')"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 309,
+      "line": 352,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 337,
+      "line": 380,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 339,
+      "line": 382,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"

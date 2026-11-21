@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "mosaic/gubic-p1-hardening",
-      "sourceSha256": "c447355c7d98606dfdd631b5d0b22ac8d6402adb02af198ec4f69905b4453d22",
-      "capturedAt": "2026-11-15T00:21:44.215Z",
+      "branch": "forge/gf-auth-flows-01b",
+      "sourceSha256": "23af442f189fd5ec91114ecc29306271076257a890fde69da784788ee136515f",
+      "capturedAt": "2026-11-21T20:12:48.541Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -3359,7 +3359,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 270
+        "line": 275
       },
       "handler": "inline",
       "controllerServices": [
@@ -3466,7 +3466,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 275
+        "line": 280
       },
       "handler": "inline",
       "controllerServices": [
@@ -4812,7 +4812,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 296
+        "line": 301
       },
       "handler": "inline",
       "controllerServices": [
@@ -4921,7 +4921,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 288
+        "line": 293
       },
       "handler": "inline",
       "controllerServices": [
@@ -5010,6 +5010,7 @@
         "tests": [
           "scripts/verify-phase6s-social-backend.mjs",
           "scripts/verify-phase7c-api-parity.mjs",
+          "services/greenfield-api/tests/greenfield.accounts.test.ts",
           "services/greenfield-api/tests/phase6s.social.test.ts"
         ]
       },
@@ -21927,7 +21928,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 173
+        "line": 178
       },
       "handler": "inline",
       "controllerServices": [
@@ -22044,7 +22045,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 155
+        "line": 160
       },
       "handler": "inline",
       "controllerServices": [
@@ -22163,7 +22164,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 199
+        "line": 204
       },
       "handler": "inline",
       "controllerServices": [
@@ -22284,7 +22285,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 199
+        "line": 204
       },
       "handler": "inline",
       "controllerServices": [
@@ -22405,7 +22406,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 185
+        "line": 190
       },
       "handler": "inline",
       "controllerServices": [
@@ -22527,7 +22528,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 224
+        "line": 229
       },
       "handler": "inline",
       "controllerServices": [
@@ -22644,7 +22645,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 211
+        "line": 216
       },
       "handler": "inline",
       "controllerServices": [
@@ -22763,7 +22764,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 132
+        "line": 137
       },
       "handler": "inline",
       "controllerServices": [
@@ -22878,7 +22879,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 141
+        "line": 146
       },
       "handler": "inline",
       "controllerServices": [
@@ -31788,7 +31789,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 327
+        "line": 332
       },
       "handler": "inline",
       "controllerServices": [
@@ -31908,7 +31909,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 317
+        "line": 322
       },
       "handler": "inline",
       "controllerServices": [
@@ -32031,7 +32032,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 307
+        "line": 312
       },
       "handler": "inline",
       "controllerServices": [
@@ -34002,7 +34003,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 344
+        "line": 349
       },
       "handler": "inline",
       "controllerServices": [
@@ -34103,7 +34104,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 354
+        "line": 359
       },
       "handler": "inline",
       "controllerServices": [
@@ -34428,7 +34429,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 366
+        "line": 371
       },
       "handler": "inline",
       "controllerServices": [
@@ -61413,7 +61414,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 109
+        "line": 114
       },
       "handler": "inline",
       "controllerServices": [
@@ -61544,7 +61545,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 118
+        "line": 123
       },
       "handler": "inline",
       "controllerServices": [
@@ -61994,7 +61995,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 238
+        "line": 243
       },
       "handler": "inline",
       "controllerServices": [
@@ -62137,7 +62138,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 86
+        "line": 91
       },
       "handler": "inline",
       "controllerServices": [
@@ -62273,7 +62274,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 73
+        "line": 78
       },
       "handler": "inline",
       "controllerServices": [
@@ -62411,7 +62412,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 97
+        "line": 102
       },
       "handler": "inline",
       "controllerServices": [
@@ -71847,7 +71848,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-phase6s-routes.ts",
-        "line": 252
+        "line": 257
       },
       "handler": "inline",
       "controllerServices": [
