@@ -7,7 +7,7 @@ Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no 
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 633 application / 900 runtime method routes
-Route evidence: local-candidate-runtime for feature branch forge/gf-test-db-01; not deployed
+Route evidence: local-candidate-runtime for feature branch forge/gf-auth-flows-01a; not deployed
 Public routes: 151
 Authenticated routes: 378
 Admin/internal routes: 104
@@ -17,7 +17,7 @@ Routes with request schemas: 107
 Routes with response schemas: 0
 Routes with automated tests: 551
 Routes live-probed: 26 unique routes
-Routes with known callers: 251
+Routes with known callers: 256
 Database tables: 383
 Workers: 1 GreenField worker
 Queues: PostgreSQL outbox plus background job tables
