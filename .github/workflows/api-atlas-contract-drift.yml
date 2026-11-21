@@ -340,6 +340,7 @@ jobs:
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/greenfield.accounts.test.ts
+          tests/gf-auth-flows-01a.test.ts
           tests/greenfield-backend-v1.account-data.test.ts
           tests/greenfield-backend-v1.apple-auth.test.ts
           tests/push.routes.test.ts
@@ -359,6 +360,7 @@ jobs:
           --outputFile.json=/tmp/gf-test-db-01-accounts-social-vitest.json
           && node scripts/assert-vitest-db-suites-ran.mjs /tmp/gf-test-db-01-accounts-social-vitest.json
           tests/greenfield.accounts.test.ts
+          tests/gf-auth-flows-01a.test.ts
           tests/greenfield-backend-v1.account-data.test.ts
           tests/greenfield-backend-v1.apple-auth.test.ts
           tests/push.routes.test.ts

@@ -591,11 +591,9 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).email ?? '', {correlationId: request.id}), request.id))"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -611,7 +609,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "b76ee542b6ec3434475f66a8d4e447bbf87f304a362704e49048a5736aa0a299"
+      "sourceContractSha256": "f2c89b206381e4e645dca8d520610566ba7e518d8b1f557b03922862e909890b"
     },
     {
       "id": "GET /v1/accounts/handles/:handle/availability",
@@ -1151,9 +1149,7 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).handle ?? ''), request.id),"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
         "pagination": {
@@ -1171,7 +1167,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "05ad0535f909d8e9bd0afbb17cfd44c65351b09ec531c379eb80c448054eb876"
+      "sourceContractSha256": "cc785b6822da53f0688e932d23d8f6b8f947c54e5c4b167611bd44d926475ef6"
     },
     {
       "id": "GET /v1/accounts/me/modula-mail",
@@ -1880,11 +1876,9 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).email ?? '', {"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -1900,7 +1894,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "edc4e206aae3d643857a932f84d54aadf10096ffb97ed4b6abb29a124f22a7af"
+      "sourceContractSha256": "16417dc84f786be4547655cebb57cf797d65c54cd9bd34fd0cdfb77fcda9ebdd"
     },
     {
       "id": "POST /v1/accounts/reset-password",
@@ -34954,7 +34948,7 @@
         "query": [],
         "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -34970,7 +34964,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "bd7b5579872b107156822f603f68b910a3ec08fa4e347d69559c6d11e7ea9986"
+      "sourceContractSha256": "0c2f22f43f2b50ed665e3259dcaa6475cc22d8cadb7083273c6e48cac4530e9a"
     },
     {
       "id": "DELETE /v1/sessions/:sessionId",
@@ -35027,7 +35021,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "d27eddb628bde592970a3cde359c95392914d434b6ae1912f6c508f35b95d0eb"
+      "sourceContractSha256": "0ce0052244dfbb693400bce173e71b384b88e21c1ebc3f923930dc2795790d69"
     },
     {
       "id": "POST /v1/sessions/apple",
@@ -35616,11 +35610,9 @@
       "request": {
         "params": [],
         "query": [],
-        "body": [
-          "any).refreshToken)"
-        ],
+        "body": [],
         "explicitFastifySchema": false,
-        "manualValidationObserved": false,
+        "manualValidationObserved": true,
         "pagination": {
           "style": "none observed",
           "defaultPageSize": null,
@@ -35636,7 +35628,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "193ce0f4a4f4983907fac967114e62d565d39f7ecf8b8ad8a3bbcd32f2d03c73"
+      "sourceContractSha256": "5fb1eae8650e7adcef9a8f20e64016ff3c39dbd8cfee419a91b512f0684681c2"
     },
     {
       "id": "GET /v1/status",
