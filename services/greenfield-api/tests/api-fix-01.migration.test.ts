@@ -21,7 +21,7 @@ function expectMediaTypes(definition: string | undefined, expected: readonly str
   for (const mediaType of expected) expect(definition).toContain(mediaType)
 }
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 093', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 094', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -123,7 +123,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_social_gaps_v1', '093_messaging_features_4',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_social_gaps_v1', '093_messaging_features_4', '094_messaging_expiry_index_concurrently',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -131,7 +131,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('093')
+    expect(version.rows[0]?.value).toBe('094')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -140,7 +140,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('093_messaging_features_4')
+    expect(applied.at(-1)).toBe('094_messaging_expiry_index_concurrently')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -162,8 +162,28 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     `)
     expect(canonicalMolibooItems.rows[0]?.count).toBeGreaterThan(0)
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
+    // 094 runs outside the runner transaction: the CONCURRENTLY build must leave a valid index.
+    const expiryIndex = await client.query(`
+      SELECT i.indisvalid, i.indisready, pg_get_indexdef(i.indexrelid) AS definition
+      FROM pg_index i WHERE i.indexrelid = to_regclass('public.greenfield_conversation_messages_expiry_idx')
+    `)
+    expect(expiryIndex.rows[0]?.indisvalid).toBe(true)
+    expect(expiryIndex.rows[0]?.indisready).toBe(true)
+    expect(expiryIndex.rows[0]?.definition).toContain('(expires_at)')
+    expect(expiryIndex.rows[0]?.definition).toContain('WHERE ((expires_at IS NOT NULL) AND (deleted_at IS NULL))')
     await client.end()
 
+
+    expect(await migrateDown(freshUrl)).toBe('094_messaging_expiry_index_concurrently')
+    const rolledBackExpiryIndex = new pg.Client({connectionString: freshUrl})
+    await rolledBackExpiryIndex.connect()
+    const expiryIndexAfter = await rolledBackExpiryIndex.query(`SELECT to_regclass('public.greenfield_conversation_messages_expiry_idx') AS name`)
+    const expiresColumnKept = await rolledBackExpiryIndex.query(`SELECT count(*)::int AS count FROM information_schema.columns WHERE table_name = 'greenfield_conversation_messages' AND column_name = 'expires_at'`)
+    const versionAfter094 = await rolledBackExpiryIndex.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(expiryIndexAfter.rows[0]?.name).toBeNull()
+    expect(expiresColumnKept.rows[0]?.count).toBe(1)
+    expect(versionAfter094.rows[0]?.value).toBe('093')
+    await rolledBackExpiryIndex.end()
 
     expect(await migrateDown(freshUrl)).toBe('093_messaging_features_4')
     const rolledBackFeatures4 = new pg.Client({connectionString: freshUrl})
@@ -432,7 +452,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_social_gaps_v1', '093_messaging_features_4',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_social_gaps_v1', '093_messaging_features_4', '094_messaging_expiry_index_concurrently',
     ])
     const reapplied = new pg.Client({connectionString: freshUrl})
     await reapplied.connect()
@@ -462,7 +482,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_social_gaps_v1', '093_messaging_features_4',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_social_gaps_v1', '093_messaging_features_4', '094_messaging_expiry_index_concurrently',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
@@ -477,7 +497,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(version.rows[0]?.value).toBe('093')
+    expect(version.rows[0]?.value).toBe('094')
     expect(account.rows[0]?.count).toBe(1)
     expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     await after.end()

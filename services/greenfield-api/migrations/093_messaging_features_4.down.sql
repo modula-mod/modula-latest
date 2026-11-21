@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS greenfield_saved_messages;
 DROP TABLE IF EXISTS greenfield_message_pins;
 ALTER TABLE greenfield_conversation_members DROP COLUMN IF EXISTS notify_level, DROP COLUMN IF EXISTS pinned_at;
 ALTER TABLE greenfield_conversations DROP COLUMN IF EXISTS theme, DROP COLUMN IF EXISTS disappearing_ttl_seconds;
-DROP INDEX IF EXISTS greenfield_conversation_messages_expiry_idx;
+-- 094 owns greenfield_conversation_messages_expiry_idx (dropping expires_at would drop it anyway).
 ALTER TABLE greenfield_conversation_messages
   DROP COLUMN IF EXISTS expires_at,
   DROP COLUMN IF EXISTS forwarded_from_sent_at,
