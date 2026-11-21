@@ -23,7 +23,10 @@ const runnerUrl = process.env.MODULA_SIGNING_RUNNER_DATABASE_URL
 const approverUrl = process.env.MODULA_RELEASE_APPROVER_DATABASE_URL
 const verifierUrl = process.env.MODULA_TRUST_VERIFIER_DATABASE_URL
 const publicationUrl = process.env.MODULA_PUBLICATION_AUTHORITY_DATABASE_URL
-const describeDb = adminUrl && runnerUrl && approverUrl && verifierUrl && publicationUrl ? describe : describe.skip
+const publisherTrustUrl = process.env.MODULA_PUBLISHER_TRUST_AUTHORITY_DATABASE_URL
+const apiUrl = process.env.MODULA_API_DATABASE_URL
+const workerUrl = process.env.MODULA_WORKER_DATABASE_URL
+const describeDb = adminUrl && runnerUrl && approverUrl && verifierUrl && publicationUrl && publisherTrustUrl && apiUrl && workerUrl ? describe : describe.skip
 
 describe('migration 092 static security boundary', () => {
   it('contains no backend, statistics, or session-variable authorization', async () => {
@@ -38,6 +41,7 @@ describe('migration 092 static security boundary', () => {
     expect(grants).toContain('REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"runner_role"')
     expect(grants).toContain('greenfield_signing_runner_claim')
     expect(grants).toContain('greenfield_signing_runner_submit_signature')
+    expect(grants).toContain('greenfield_publisher_trust_authority_set')
     expect(grants).not.toMatch(/GRANT\s+(?:SELECT|INSERT|UPDATE|DELETE|ALL)[^;]*\b(?:background_jobs|greenfield_module_releases|greenfield_publishers|greenfield_publisher_signing_audit_events)\b/i)
   })
 })
@@ -49,6 +53,9 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
   let approver: ModulaDb
   let verifierDb: ModulaDb
   let publication: ModulaDb
+  let publisherTrust: ModulaDb
+  let api: ModulaDb
+  let worker: ModulaDb
   const provider = new DisposableEd25519SigningProvider({allowInsecureTestProvider: true})
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const builderId = `r2-builder-${suffix}`
@@ -81,6 +88,9 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     approver = createDb(approverUrl!, undefined, {max: 1, applicationName: 'r2-boundary-approver'})
     verifierDb = createDb(verifierUrl!, undefined, {max: 1, applicationName: 'r2-boundary-verifier'})
     publication = createDb(publicationUrl!, undefined, {max: 1, applicationName: 'r2-boundary-publication'})
+    publisherTrust = createDb(publisherTrustUrl!, undefined, {max: 1, applicationName: 'r3a-publisher-trust'})
+    api = createDb(apiUrl!, undefined, {max: 1, applicationName: 'r3a-api-role'})
+    worker = createDb(workerUrl!, undefined, {max: 1, applicationName: 'r3a-worker-role'})
     const now = new Date()
     await admin.insertInto('greenfield_accounts').values({account_id: builderId, primary_handle: `r2${suffix}`, status: 'active', created_at: now, updated_at: now}).execute()
     await admin.insertInto('greenfield_publishers').values({
@@ -155,7 +165,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
   }, 60_000)
 
   afterAll(async () => {
-    await Promise.all([admin, runner, runnerPeer, approver, verifierDb, publication].filter(Boolean).map(db => db.destroy()))
+    await Promise.all([admin, runner, runnerPeer, approver, verifierDb, publication, publisherTrust, api, worker].filter(Boolean).map(db => db.destroy()))
   })
 
   it('denies arbitrary runner SQL across queue, governance, registry, and audit tables', async () => {
@@ -218,11 +228,12 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
           'greenfield_trust_verifier_claim',
           'greenfield_trust_verifier_record',
           'greenfield_publication_authority_publish',
-          'greenfield_publication_authority_publish_next'
+          'greenfield_publication_authority_publish_next',
+          'greenfield_publisher_trust_authority_set'
         )
       ORDER BY proc.proname
     `.execute(admin)
-    expect(functions.rows).toHaveLength(7)
+    expect(functions.rows).toHaveLength(8)
     for (const fn of functions.rows) expect(fn).toMatchObject({
       owner: 'modula_migrator', owner_super: false, security_definer: true,
       search_path: ['search_path=pg_catalog'], public_execute: false,
@@ -231,6 +242,85 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
       SELECT pg_has_role(current_user, 'pg_read_all_stats', 'MEMBER') AS stats_member
     `.execute(runner)
     expect(stats.rows[0]).toEqual({stats_member: false})
+  })
+
+  it('removes legacy worker governance DML and blocks authority transitions through the API role', async () => {
+    const workerPrivileges = await sql<{
+      publisher_update: boolean; release_update: boolean; signature_update: boolean;
+      audit_insert: boolean; catalogue_update: boolean; revocation_delete: boolean;
+    }>`
+      SELECT
+        has_table_privilege(current_user, 'greenfield_publishers', 'UPDATE') AS publisher_update,
+        has_table_privilege(current_user, 'greenfield_module_releases', 'UPDATE') AS release_update,
+        has_table_privilege(current_user, 'greenfield_module_release_signatures', 'UPDATE') AS signature_update,
+        has_table_privilege(current_user, 'greenfield_publisher_signing_audit_events', 'INSERT') AS audit_insert,
+        has_table_privilege(current_user, 'greenfield_extension_catalogue', 'UPDATE') AS catalogue_update,
+        has_table_privilege(current_user, 'greenfield_module_revocations', 'DELETE') AS revocation_delete
+    `.execute(worker)
+    expect(workerPrivileges.rows[0]).toEqual({
+      publisher_update: false,
+      release_update: false,
+      signature_update: false,
+      audit_insert: false,
+      catalogue_update: false,
+      revocation_delete: false,
+    })
+
+    await denied(() => sql`UPDATE greenfield_publishers SET trust_level = 'firstParty' WHERE publisher_id = ${publisherId}`.execute(api))
+    await denied(() => sql`UPDATE greenfield_module_releases SET release_state = 'published', published_at = NOW() WHERE release_id = ${releaseId}`.execute(api))
+    await denied(() => sql`UPDATE greenfield_module_versions SET status = 'published' WHERE module_version_id = ${`module-version:${moduleId}:${version}`}`.execute(api))
+    await denied(() => sql`INSERT INTO greenfield_publisher_signing_audit_events (
+      event_id, event_type, job_id, publisher_id, actor_account_id, receipt, details, created_at
+    ) VALUES (
+      ${`psae_${randomUUID()}`}, 'signature_verified', ${jobId}, ${publisherId}, ${builderId},
+      '{}'::jsonb, '{}'::jsonb, '2000-01-01'
+    )`.execute(api))
+    await denied(() => sql`UPDATE greenfield_publishers SET trust_level = 'firstParty' WHERE publisher_id = ${publisherId}`.execute(worker))
+  })
+
+  it('assigns publisher trust only through its fixed authority and records database provenance', async () => {
+    const trustPublisherId = `${namespace}.trust-authority`
+    const trustNamespace = `${namespace}.trusted`
+    const startedAt = new Date()
+    await admin.insertInto('greenfield_publishers').values({
+      publisher_id: trustPublisherId,
+      display_name: 'R3A trust authority fixture',
+      website: null,
+      status: 'verified',
+      trust_level: 'untrustedManifest',
+      created_at: startedAt,
+      updated_at: startedAt,
+      verified_at: startedAt,
+      suspended_at: null,
+      revoked_at: null,
+    }).execute()
+    await admin.insertInto('greenfield_publisher_namespaces').values({
+      namespace: trustNamespace,
+      publisher_id: trustPublisherId,
+      verification_method: 'disposable-test',
+      verification_evidence: {fixture: 'GF-SIGNER-R3A'},
+      verified_at: startedAt,
+      revoked_at: null,
+      created_at: startedAt,
+    }).execute()
+
+    const assigned = await sql<{greenfield_publisher_trust_authority_set: string}>`
+      SELECT greenfield_publisher_trust_authority_set(
+        ${trustPublisherId}, 'untrustedManifest', 'firstParty', 'R3A isolated authority test'
+      )
+    `.execute(publisherTrust)
+    expect(assigned.rows[0]?.greenfield_publisher_trust_authority_set).toBe('firstParty')
+    const audit = await admin.selectFrom('greenfield_publisher_signing_audit_events')
+      .select(['event_type', 'actor_account_id', 'actor_database_role', 'created_at'])
+      .where('publisher_id', '=', trustPublisherId)
+      .where('event_type', '=', 'publisher_trust_assigned')
+      .executeTakeFirstOrThrow()
+    expect(audit).toMatchObject({
+      event_type: 'publisher_trust_assigned',
+      actor_account_id: 'r3a-publisher-trust-account',
+      actor_database_role: 'r3a_publisher_trust_authority',
+    })
+    expect(audit.created_at.getTime()).toBeGreaterThanOrEqual(startedAt.getTime())
   })
 
   it('reproduces the rejected SECURITY DEFINER pg_stat_activity visibility defect without granting statistics access', async () => {
@@ -329,6 +419,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     expect(verify(null, statementBytes(evidence.statement), createPublicKey(evidence.public_key_pem), Buffer.from(evidence.signature, 'base64url'))).toBe(true)
     await expect(sql`UPDATE greenfield_module_release_signatures SET verification_state = 'verified', verified_at = NOW() WHERE signature_id = ${evidence.signature_id}`.execute(admin))
       .rejects.toMatchObject({code: '42501'})
+    await denied(() => sql`UPDATE greenfield_module_release_signatures SET verification_state = 'verified', verified_at = NOW() WHERE signature_id = ${evidence.signature_id}`.execute(api))
     expect(await new RestrictedPublisherTrustVerifier(verifierDb).runOnce(jobId)).toBe(true)
     const verified = await admin.selectFrom('greenfield_module_release_signatures').select(['verification_state'])
       .where('signature_id', '=', evidence.signature_id).executeTakeFirstOrThrow()
@@ -357,8 +448,20 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     expect(finalJob).toEqual({state: 'published', publication_authorized_by_account_id: 'r2-publication-account'})
     const publicationQueue = await admin.selectFrom('background_jobs').select(['status']).where('id', '=', publicationQueueId).executeTakeFirstOrThrow()
     expect(publicationQueue.status).toBe('SUCCEEDED')
+    const catalogue = await admin.selectFrom('greenfield_extension_catalogue').select(['version', 'trust', 'catalogue_status'])
+      .where('slug', '=', moduleId).executeTakeFirstOrThrow()
+    expect(catalogue).toEqual({version, trust: 'verifiedPublisher', catalogue_status: 'active'})
     const fabricated = await admin.selectFrom('greenfield_publisher_signing_audit_events').select(({fn}) => fn.countAll().as('count'))
       .where('job_id', '=', jobId).where('event_type', '=', 'publication_authorized').executeTakeFirstOrThrow()
     expect(Number(fabricated.count)).toBe(1)
+    const authorities = await admin.selectFrom('greenfield_publisher_signing_audit_events')
+      .select(['event_type', 'actor_database_role']).where('job_id', '=', jobId)
+      .where('event_type', 'in', ['signature_created', 'signature_verified', 'publication_authorized'])
+      .orderBy('created_at').execute()
+    expect(authorities).toEqual([
+      {event_type: 'signature_created', actor_database_role: 'r2_signing_runner'},
+      {event_type: 'signature_verified', actor_database_role: 'r2_trust_verifier'},
+      {event_type: 'publication_authorized', actor_database_role: 'r2_publication_authority'},
+    ])
   }, 60_000)
 })

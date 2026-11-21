@@ -1,3 +1,14 @@
+DROP TRIGGER IF EXISTS greenfield_extension_publication_guard ON greenfield_extensions;
+DROP TRIGGER IF EXISTS greenfield_extension_version_publication_guard ON greenfield_extension_versions;
+DROP TRIGGER IF EXISTS greenfield_module_version_publication_guard ON greenfield_module_versions;
+DROP FUNCTION IF EXISTS greenfield_registry_status_publication_guard();
+DROP TRIGGER IF EXISTS greenfield_registry_publication_guard ON greenfield_extension_catalogue;
+DROP FUNCTION IF EXISTS greenfield_registry_publication_guard();
+DROP TRIGGER IF EXISTS greenfield_publisher_signing_audit_authenticity_guard
+  ON greenfield_publisher_signing_audit_events;
+DROP FUNCTION IF EXISTS greenfield_publisher_signing_audit_authenticity_guard();
+DROP TRIGGER IF EXISTS greenfield_publisher_trust_guard ON greenfield_publishers;
+DROP FUNCTION IF EXISTS greenfield_publisher_trust_guard();
 DROP TRIGGER IF EXISTS greenfield_publisher_release_immutable_facts_guard ON greenfield_module_releases;
 DROP FUNCTION IF EXISTS greenfield_publisher_release_immutable_facts_guard();
 DROP TRIGGER IF EXISTS greenfield_publisher_signature_evidence_guard ON greenfield_module_release_signatures;
@@ -14,6 +25,7 @@ DROP FUNCTION IF EXISTS greenfield_signing_runner_submit_signature(TEXT, TEXT, T
 DROP FUNCTION IF EXISTS greenfield_signing_runner_claim(TEXT, INTEGER);
 DROP FUNCTION IF EXISTS greenfield_release_approver_invalidate(TEXT, TEXT);
 DROP FUNCTION IF EXISTS greenfield_release_approver_record(TEXT, TEXT);
+DROP FUNCTION IF EXISTS greenfield_publisher_trust_authority_set(TEXT, TEXT, TEXT, TEXT);
 
 DROP TRIGGER IF EXISTS greenfield_publisher_release_claim_must_be_consumed
   ON greenfield_publisher_release_signing_claims;
@@ -25,8 +37,10 @@ DROP FUNCTION IF EXISTS greenfield_publisher_authority_has(TEXT);
 DROP TABLE IF EXISTS greenfield_publisher_release_signing_claims;
 DROP TABLE IF EXISTS greenfield_publisher_release_authority_principals;
 
-ALTER TABLE greenfield_publisher_signing_audit_events
-  DROP COLUMN IF EXISTS actor_database_role;
+-- Keep the additive event value and database-role provenance column so an
+-- operational rollback cannot erase already-recorded authorization evidence.
+-- The forward migration uses ADD COLUMN IF NOT EXISTS and replaces the named
+-- check constraint, making reapplication deterministic.
 
 UPDATE greenfield_publisher_release_jobs
 SET state = CASE
@@ -96,6 +110,39 @@ CREATE UNIQUE INDEX greenfield_publisher_release_jobs_inflight_version_idx
     'created', 'fetching', 'validating', 'ready_for_signing', 'signing',
     'signature_verified', 'ready_for_review', 'publishing'
   );
+
+-- Restore the exact legacy service access which existed at schema 091. The
+-- forward migration intentionally removes these privileges again.
+GRANT ALL PRIVILEGES ON TABLE
+  greenfield_publishers,
+  greenfield_publisher_namespaces,
+  greenfield_module_releases,
+  greenfield_module_release_signatures,
+  greenfield_extension_catalogue,
+  greenfield_module_versions,
+  greenfield_extension_versions,
+  greenfield_extensions,
+  greenfield_module_revocations,
+  greenfield_module_quarantines
+TO modula_api, modula_worker;
+GRANT SELECT ON greenfield_publisher_release_jobs TO modula_worker;
+GRANT SELECT, INSERT ON greenfield_publisher_signing_audit_events TO modula_worker;
+
+CREATE OR REPLACE FUNCTION greenfield_reject_published_release_manifest_mutation()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.manifest IS DISTINCT FROM OLD.manifest AND EXISTS (
+    SELECT 1 FROM greenfield_module_releases AS release
+    WHERE release.module_version_id = OLD.module_version_id
+      AND release.release_state IN ('published', 'superseded', 'revoked')
+  ) THEN
+    RAISE EXCEPTION 'published release manifest is immutable; create a new release';
+  END IF;
+  RETURN NEW;
+END;
+$$;
 
 INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '091')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = pg_catalog.clock_timestamp();

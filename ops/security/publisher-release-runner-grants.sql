@@ -30,6 +30,16 @@
   \echo 'publication_authority_account_id is required'
   \quit 2
 \endif
+\if :{?publisher_trust_authority_role}
+\else
+  \echo 'publisher_trust_authority_role is required'
+  \quit 2
+\endif
+\if :{?publisher_trust_authority_account_id}
+\else
+  \echo 'publisher_trust_authority_account_id is required'
+  \quit 2
+\endif
 
 -- Environment owners provision these login roles and their credentials. This
 -- script only removes ambient authority and installs the fixed boundaries.
@@ -57,17 +67,24 @@ SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = :'publication_a
   \echo 'publication_authority_role does not exist'
   \quit 3
 \endif
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = :'publisher_trust_authority_role') AS role_exists \gset
+\if :role_exists
+\else
+  \echo 'publisher_trust_authority_role does not exist'
+  \quit 3
+\endif
 
-SELECT COUNT(DISTINCT role_name) = 4 AS roles_are_distinct
+SELECT COUNT(DISTINCT role_name) = 5 AS roles_are_distinct
 FROM (VALUES
   (:'runner_role'),
   (:'approver_role'),
   (:'trust_verifier_role'),
-  (:'publication_authority_role')
+  (:'publication_authority_role'),
+  (:'publisher_trust_authority_role')
 ) AS roles(role_name) \gset
 \if :roles_are_distinct
 \else
-  \echo 'runner, approver, trust verifier and publication authority roles must be distinct'
+  \echo 'runner, approver, trust verifier, publication authority and publisher trust authority roles must be distinct'
   \quit 4
 \endif
 
@@ -75,6 +92,7 @@ SELECT NOT EXISTS (
   SELECT 1 FROM pg_catalog.pg_roles
   WHERE rolname IN (
     :'runner_role', :'approver_role', :'trust_verifier_role', :'publication_authority_role'
+    , :'publisher_trust_authority_role'
   ) AND (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)
 ) AS roles_are_restricted \gset
 \if :roles_are_restricted
@@ -93,6 +111,12 @@ SELECT EXISTS (SELECT 1 FROM greenfield_accounts WHERE account_id = :'publicatio
 \if :actor_exists
 \else
   \echo 'publication_authority_account_id does not identify an existing account'
+  \quit 6
+\endif
+SELECT EXISTS (SELECT 1 FROM greenfield_accounts WHERE account_id = :'publisher_trust_authority_account_id') AS actor_exists \gset
+\if :actor_exists
+\else
+  \echo 'publisher_trust_authority_account_id does not identify an existing account'
   \quit 6
 \endif
 
@@ -127,6 +151,13 @@ GRANT USAGE ON SCHEMA public TO :"publication_authority_role";
 GRANT EXECUTE ON FUNCTION greenfield_publication_authority_publish_next()
   TO :"publication_authority_role";
 
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"publisher_trust_authority_role";
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM :"publisher_trust_authority_role";
+REVOKE CREATE ON SCHEMA public FROM :"publisher_trust_authority_role";
+GRANT USAGE ON SCHEMA public TO :"publisher_trust_authority_role";
+GRANT EXECUTE ON FUNCTION greenfield_publisher_trust_authority_set(TEXT, TEXT, TEXT, TEXT)
+  TO :"publisher_trust_authority_role";
+
 -- The actual login role (session_user), not SET ROLE/current_user or a caller
 -- parameter, is bound to each authority. These rows are never visible to the
 -- boundary roles and cannot be created or changed by them.
@@ -136,7 +167,8 @@ INSERT INTO greenfield_publisher_release_authority_principals (
   (:'runner_role', 'SIGNING_RUNNER', NULL, TRUE, pg_catalog.clock_timestamp(), NULL),
   (:'approver_role', 'RELEASE_APPROVER', :'approver_account_id', TRUE, pg_catalog.clock_timestamp(), NULL),
   (:'trust_verifier_role', 'TRUST_VERIFIER', NULL, TRUE, pg_catalog.clock_timestamp(), NULL),
-  (:'publication_authority_role', 'PUBLICATION_AUTHORITY', :'publication_authority_account_id', TRUE, pg_catalog.clock_timestamp(), NULL)
+  (:'publication_authority_role', 'PUBLICATION_AUTHORITY', :'publication_authority_account_id', TRUE, pg_catalog.clock_timestamp(), NULL),
+  (:'publisher_trust_authority_role', 'PUBLISHER_TRUST_AUTHORITY', :'publisher_trust_authority_account_id', TRUE, pg_catalog.clock_timestamp(), NULL)
 ON CONFLICT (database_role, authority) DO UPDATE
 SET account_id = EXCLUDED.account_id,
     active = TRUE,
@@ -151,3 +183,4 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM :"run
 ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM :"approver_role";
 ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM :"trust_verifier_role";
 ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM :"publication_authority_role";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM :"publisher_trust_authority_role";
