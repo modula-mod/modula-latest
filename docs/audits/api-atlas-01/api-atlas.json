@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "forge/gf-auth-hardening-01",
-      "sourceSha256": "449aa4e19b9bbb105b3aeb7275558fe359aa20f78a25a4241b62aa1b5ac34da3",
-      "capturedAt": "2026-11-15T01:10:46.828Z",
+      "sourceSha256": "12410aa87109eb6785bf455989e250b038fde1f09d55e8a7dd532bcbce2cbaa0",
+      "capturedAt": "2026-11-21T20:29:56.683Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -69947,6 +69947,7 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-listing.compatibility.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
@@ -70062,6 +70063,7 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-listing.compatibility.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts",
@@ -70170,6 +70172,7 @@
         "server": [],
         "tests": [
           "services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts",
+          "services/greenfield-api/tests/registry-listing.compatibility.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts",

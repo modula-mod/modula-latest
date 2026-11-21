@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-15T01:10:46.828Z",
+  "capturedAt": "2026-11-21T20:29:56.683Z",
   "source": {
     "branch": "forge/gf-auth-hardening-01",
-    "headAtCapture": "d1b0f1e00d3c3ede3911d69b8aee8794aa454941",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "449aa4e19b9bbb105b3aeb7275558fe359aa20f78a25a4241b62aa1b5ac34da3"
+    "headAtCapture": "e90b2dcf2460e3262c8434fe4196dd6f81ddbd8f",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "12410aa87109eb6785bf455989e250b038fde1f09d55e8a7dd532bcbce2cbaa0"
   },
   "runtimeRoutes": [
     {

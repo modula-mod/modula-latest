@@ -367,63 +367,63 @@
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 278,
+      "line": 296,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const placeholder = await this.db"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 284,
+      "line": 302,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 285,
+      "line": 303,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 286,
+      "line": 304,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 291,
+      "line": 309,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "name: placeholder.name,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 292,
+      "line": 310,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "description: placeholder.description,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 293,
+      "line": 311,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "publisher: {publisherId: 'modula', displayName: placeholder.publisher},"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 296,
+      "line": 314,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "trust: placeholder.trust,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 300,
+      "line": 318,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: manifest,"
@@ -2553,63 +2553,63 @@
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 278,
+      "line": 296,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const placeholder = await this.db"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 284,
+      "line": 302,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 285,
+      "line": 303,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 286,
+      "line": 304,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 291,
+      "line": 309,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "name: placeholder.name,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 292,
+      "line": 310,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "description: placeholder.description,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 293,
+      "line": 311,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "publisher: {publisherId: 'modula', displayName: placeholder.publisher},"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 296,
+      "line": 314,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "trust: placeholder.trust,"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
-      "line": 300,
+      "line": 318,
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "placeholder: manifest,"
