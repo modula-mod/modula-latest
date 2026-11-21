@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-15T01:05:55.755Z",
+  "capturedAt": "2026-11-21T20:42:20.568Z",
   "source": {
-    "branch": "forge/gf-test-db-01",
-    "headAtCapture": "46043085d8fc121a29607b4d8e2a97468281eef7",
+    "branch": "forge/gf-ops-01-leased-catch-path",
+    "headAtCapture": "be07796f02fe93549471d234a052bce6622d4b98",
     "worktreeDirtyAtCapture": false,
     "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
   },
