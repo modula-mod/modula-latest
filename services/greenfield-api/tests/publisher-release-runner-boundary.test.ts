@@ -3,6 +3,7 @@ import {readFile} from 'node:fs/promises'
 import {sql} from 'kysely'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {createDb, type ModulaDb} from '../src/database/client.js'
+import {migrateDown} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {
   approvalFactsSha256,
@@ -19,6 +20,7 @@ import {DisposableEd25519SigningProvider} from '../src/publisher/signing-provide
 import {adapterManifest} from './helpers/registry-fixtures.js'
 
 const adminUrl = process.env.MODULA_TEST_DATABASE_URL
+const superuserUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL
 const runnerUrl = process.env.MODULA_SIGNING_RUNNER_DATABASE_URL
 const approverUrl = process.env.MODULA_RELEASE_APPROVER_DATABASE_URL
 const verifierUrl = process.env.MODULA_TRUST_VERIFIER_DATABASE_URL
@@ -26,12 +28,13 @@ const publicationUrl = process.env.MODULA_PUBLICATION_AUTHORITY_DATABASE_URL
 const publisherTrustUrl = process.env.MODULA_PUBLISHER_TRUST_AUTHORITY_DATABASE_URL
 const signingIdentityUrl = process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL
 const quarantineAuthorityUrl = process.env.MODULA_QUARANTINE_AUTHORITY_DATABASE_URL
+const revocationAuthorityUrl = process.env.MODULA_REVOCATION_AUTHORITY_DATABASE_URL
 const apiUrl = process.env.MODULA_API_DATABASE_URL
 const workerUrl = process.env.MODULA_WORKER_DATABASE_URL
-const describeDb = adminUrl && runnerUrl && approverUrl && verifierUrl && publicationUrl && publisherTrustUrl
-  && signingIdentityUrl && quarantineAuthorityUrl && apiUrl && workerUrl ? describe : describe.skip
+const describeDb = adminUrl && superuserUrl && runnerUrl && approverUrl && verifierUrl && publicationUrl && publisherTrustUrl
+  && signingIdentityUrl && quarantineAuthorityUrl && revocationAuthorityUrl && apiUrl && workerUrl ? describe : describe.skip
 
-describe('migration 092 static security boundary', () => {
+describe('publisher signing governance static security boundary', () => {
   it('contains no backend, statistics, or session-variable authorization', async () => {
     const migration = await readFile(new URL('../migrations/092_publisher_release_runner_boundary.sql', import.meta.url), 'utf8')
     expect(migration).not.toMatch(/pg_stat_activity|pg_backend_pid|backend_start|set_config\s*\(|current_setting\s*\(/i)
@@ -46,7 +49,12 @@ describe('migration 092 static security boundary', () => {
     expect(grants).toContain('greenfield_signing_runner_submit_signature')
     expect(grants).toContain('greenfield_publisher_trust_authority_set')
     expect(grants).toContain('greenfield_signing_identity_authority_register')
+    expect(grants).toContain('greenfield_signing_identity_authority_rotate')
+    expect(grants).toContain('greenfield_signing_identity_authority_revoke')
+    expect(grants).toContain('greenfield_quarantine_authority_record')
     expect(grants).toContain('greenfield_quarantine_authority_lift')
+    expect(grants).toContain('greenfield_revocation_authority_record')
+    expect(grants).toContain('greenfield_assert_publisher_authority_role_isolation')
     expect(grants).not.toMatch(/GRANT\s+(?:SELECT|INSERT|UPDATE|DELETE|ALL)[^;]*\b(?:background_jobs|greenfield_module_releases|greenfield_publishers|greenfield_publisher_signing_audit_events)\b/i)
   })
 
@@ -58,10 +66,25 @@ describe('migration 092 static security boundary', () => {
     expect(migration).toContain('catalogue publication requires one exact authoritative release')
     expect(migration).not.toMatch(/GRANT\s+(?:ALL|INSERT|UPDATE|DELETE)[^;]*TO\s+(?:modula_api|modula_worker)/i)
   })
+
+  it('makes 093 and 094 automated downgrades fail closed', async () => {
+    const migration = await readFile(new URL('../migrations/094_publisher_signing_governance_hardening.sql', import.meta.url), 'utf8')
+    const down093 = await readFile(new URL('../migrations/093_publisher_release_governance_integrity.down.sql', import.meta.url), 'utf8')
+    const down094 = await readFile(new URL('../migrations/094_publisher_signing_governance_hardening.down.sql', import.meta.url), 'utf8')
+    expect(migration).toContain('greenfield_signing_key_integrity_guard')
+    expect(migration).toContain('greenfield_revocation_authority_record')
+    expect(migration).toContain('greenfield_quarantine_authority_record')
+    expect(migration).toContain('greenfield_assert_publisher_authority_role_isolation')
+    expect(down093).toMatch(/unsafe automated downgrade of 093 is prohibited/i)
+    expect(down094).toMatch(/unsafe automated downgrade of 094 is prohibited/i)
+    expect(down093).not.toMatch(/GRANT\s+(?:ALL|INSERT|UPDATE|DELETE)/i)
+    expect(down094).not.toMatch(/GRANT\s+(?:ALL|INSERT|UPDATE|DELETE)/i)
+  })
 })
 
-describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
+describeDb('publisher signing governance canonical-role PostgreSQL boundary through 094', () => {
   let admin: ModulaDb
+  let superuser: ModulaDb
   let runner: ModulaDb
   let runnerPeer: ModulaDb
   let approver: ModulaDb
@@ -70,6 +93,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
   let publisherTrust: ModulaDb
   let signingIdentity: ModulaDb
   let quarantineAuthority: ModulaDb
+  let revocationAuthority: ModulaDb
   let api: ModulaDb
   let worker: ModulaDb
   const provider = new DisposableEd25519SigningProvider({allowInsecureTestProvider: true})
@@ -99,6 +123,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
 
   beforeAll(async () => {
     admin = createDb(adminUrl!, undefined, {applicationName: 'r2-boundary-admin'})
+    superuser = createDb(superuserUrl!, undefined, {applicationName: 'r3a3-boundary-superuser'})
     runner = createDb(runnerUrl!, undefined, {max: 1, applicationName: 'r2-boundary-runner-one-slot'})
     runnerPeer = createDb(runnerUrl!, undefined, {max: 1, applicationName: 'r2-boundary-runner-peer'})
     approver = createDb(approverUrl!, undefined, {max: 1, applicationName: 'r2-boundary-approver'})
@@ -107,6 +132,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     publisherTrust = createDb(publisherTrustUrl!, undefined, {max: 1, applicationName: 'r3a-publisher-trust'})
     signingIdentity = createDb(signingIdentityUrl!, undefined, {max: 1, applicationName: 'r3a2-signing-identity'})
     quarantineAuthority = createDb(quarantineAuthorityUrl!, undefined, {max: 1, applicationName: 'r3a2-quarantine-authority'})
+    revocationAuthority = createDb(revocationAuthorityUrl!, undefined, {max: 1, applicationName: 'r3a3-revocation-authority'})
     api = createDb(apiUrl!, undefined, {max: 1, applicationName: 'r3a-api-role'})
     worker = createDb(workerUrl!, undefined, {max: 1, applicationName: 'r3a-worker-role'})
     const now = new Date()
@@ -180,7 +206,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
   afterAll(async () => {
     await Promise.all([
       admin, runner, runnerPeer, approver, verifierDb, publication, publisherTrust,
-      signingIdentity, quarantineAuthority, api, worker,
+      signingIdentity, quarantineAuthority, revocationAuthority, api, worker, superuser,
     ].filter(Boolean).map(db => db.destroy()))
   })
 
@@ -247,11 +273,15 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
           'greenfield_publication_authority_publish_next',
           'greenfield_publisher_trust_authority_set',
           'greenfield_signing_identity_authority_register',
-          'greenfield_quarantine_authority_lift'
+          'greenfield_signing_identity_authority_rotate',
+          'greenfield_signing_identity_authority_revoke',
+          'greenfield_quarantine_authority_record',
+          'greenfield_quarantine_authority_lift',
+          'greenfield_revocation_authority_record'
         )
       ORDER BY proc.proname
     `.execute(admin)
-    expect(functions.rows).toHaveLength(10)
+    expect(functions.rows).toHaveLength(14)
     for (const fn of functions.rows) expect(fn).toMatchObject({
       owner: 'modula_migrator', owner_super: false, security_definer: true,
       search_path: ['search_path=pg_catalog'], public_execute: false,
@@ -266,6 +296,7 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     const workerPrivileges = await sql<{
       publisher_update: boolean; release_update: boolean; signature_update: boolean;
       audit_insert: boolean; catalogue_update: boolean; revocation_delete: boolean;
+      key_update: boolean; key_event_insert: boolean; quarantine_insert: boolean;
     }>`
       SELECT
         has_table_privilege(current_user, 'greenfield_publishers', 'UPDATE') AS publisher_update,
@@ -273,7 +304,10 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
         has_table_privilege(current_user, 'greenfield_module_release_signatures', 'UPDATE') AS signature_update,
         has_table_privilege(current_user, 'greenfield_publisher_signing_audit_events', 'INSERT') AS audit_insert,
         has_table_privilege(current_user, 'greenfield_extension_catalogue', 'UPDATE') AS catalogue_update,
-        has_table_privilege(current_user, 'greenfield_module_revocations', 'DELETE') AS revocation_delete
+        has_table_privilege(current_user, 'greenfield_module_revocations', 'DELETE') AS revocation_delete,
+        has_table_privilege(current_user, 'greenfield_publisher_signing_keys', 'UPDATE') AS key_update,
+        has_table_privilege(current_user, 'greenfield_publisher_signing_key_events', 'INSERT') AS key_event_insert,
+        has_table_privilege(current_user, 'greenfield_module_quarantines', 'INSERT') AS quarantine_insert
     `.execute(worker)
     expect(workerPrivileges.rows[0]).toEqual({
       publisher_update: false,
@@ -282,6 +316,28 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
       audit_insert: false,
       catalogue_update: false,
       revocation_delete: false,
+      key_update: false,
+      key_event_insert: false,
+      quarantine_insert: false,
+    })
+
+    const apiGovernancePrivileges = await sql<{
+      key_insert: boolean; key_update: boolean; key_event_insert: boolean;
+      revocation_insert: boolean; quarantine_insert: boolean;
+    }>`
+      SELECT
+        has_table_privilege(current_user, 'greenfield_publisher_signing_keys', 'INSERT') AS key_insert,
+        has_table_privilege(current_user, 'greenfield_publisher_signing_keys', 'UPDATE') AS key_update,
+        has_table_privilege(current_user, 'greenfield_publisher_signing_key_events', 'INSERT') AS key_event_insert,
+        has_table_privilege(current_user, 'greenfield_module_revocations', 'INSERT') AS revocation_insert,
+        has_table_privilege(current_user, 'greenfield_module_quarantines', 'INSERT') AS quarantine_insert
+    `.execute(api)
+    expect(apiGovernancePrivileges.rows[0]).toEqual({
+      key_insert: false,
+      key_update: false,
+      key_event_insert: false,
+      revocation_insert: false,
+      quarantine_insert: false,
     })
 
     await denied(() => sql`UPDATE greenfield_publishers SET trust_level = 'firstParty' WHERE publisher_id = ${publisherId}`.execute(api))
@@ -309,6 +365,23 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
       details: expect.objectContaining({signingKeyId: keyId, provider: 'DISPOSABLE_TEST', purpose: 'PUBLISHER'}),
     })
     expect(audit.created_at).toBeInstanceOf(Date)
+
+    const registeredKey = await admin.selectFrom('greenfield_publisher_signing_keys')
+      .select(['public_key_pem', 'fingerprint', 'registered_by_account_id', 'created_at'])
+      .where('key_id', '=', keyId).executeTakeFirstOrThrow()
+    expect(registeredKey).toMatchObject({registered_by_account_id: 'r3a2-signing-identity-account'})
+    await denied(() => admin.updateTable('greenfield_publisher_signing_keys').set({
+      public_key_pem: `${registeredKey.public_key_pem}\n`,
+      fingerprint: `sha256:${'f'.repeat(64)}`,
+      created_at: new Date('2000-01-01'),
+    }).where('key_id', '=', keyId).execute())
+    await denied(() => api.updateTable('greenfield_publisher_signing_keys')
+      .set({updated_at: new Date()}).where('key_id', '=', keyId).execute())
+    await denied(() => admin.insertInto('greenfield_publisher_signing_key_events').values({
+      event_id: randomUUID(), key_id: keyId, publisher_id: publisherId,
+      event_type: 'rotated', related_key_id: 'forged-key', reason: 'forged event',
+      actor_account_id: builderId, created_at: new Date('2000-01-01'),
+    }).execute())
 
     await denied(() => sql`INSERT INTO greenfield_publisher_signing_audit_events (
       event_id, event_type, identity_id, publisher_id, actor_account_id, receipt, details, created_at
@@ -464,6 +537,56 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     }
   })
 
+  it('rejects incompatible direct and transitive authority memberships from PostgreSQL membership closure', async () => {
+    const assertIsolation = () => sql`SELECT greenfield_assert_publisher_authority_role_isolation(
+      'r2_signing_runner'::NAME,
+      'r2_release_approver'::NAME,
+      'r2_trust_verifier'::NAME,
+      'r2_publication_authority'::NAME,
+      'r3a_publisher_trust_authority'::NAME,
+      'r3a2_signing_identity_authority'::NAME,
+      'r3a2_quarantine_authority'::NAME,
+      'r3a3_revocation_authority'::NAME
+    )`.execute(admin)
+
+    await sql.raw('GRANT r2_release_approver TO r2_signing_runner').execute(superuser)
+    try {
+      await expect(assertIsolation()).rejects.toMatchObject({code: '42501'})
+    } finally {
+      await sql.raw('REVOKE r2_release_approver FROM r2_signing_runner').execute(superuser)
+    }
+    await expect(assertIsolation()).resolves.toBeDefined()
+
+    const middleRole = `r3a3_membership_middle_${suffix}`
+    await sql.raw(`CREATE ROLE ${middleRole} NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS`).execute(superuser)
+    try {
+      await sql.raw(`GRANT r2_release_approver TO ${middleRole}`).execute(superuser)
+      await sql.raw(`GRANT ${middleRole} TO r2_signing_runner`).execute(superuser)
+      await expect(assertIsolation()).rejects.toMatchObject({code: '42501'})
+    } finally {
+      await sql.raw(`REVOKE ${middleRole} FROM r2_signing_runner`).execute(superuser)
+      await sql.raw(`REVOKE r2_release_approver FROM ${middleRole}`).execute(superuser)
+    }
+    await expect(assertIsolation()).resolves.toBeDefined()
+
+    await sql.raw(`GRANT r2_signing_runner TO ${middleRole}`).execute(superuser)
+    try {
+      await expect(assertIsolation()).rejects.toMatchObject({code: '42501'})
+    } finally {
+      await sql.raw(`REVOKE r2_signing_runner FROM ${middleRole}`).execute(superuser)
+    }
+    await expect(assertIsolation()).resolves.toBeDefined()
+
+    await sql.raw(`GRANT ${middleRole} TO r2_signing_runner`).execute(superuser)
+    try {
+      await expect(assertIsolation()).rejects.toMatchObject({code: '42501'})
+    } finally {
+      await sql.raw(`REVOKE ${middleRole} FROM r2_signing_runner`).execute(superuser)
+      await sql.raw(`DROP ROLE ${middleRole}`).execute(superuser)
+    }
+    await expect(assertIsolation()).resolves.toBeDefined()
+  })
+
   it('does not retain or transfer a claim across commit, rollback, reborrow, or another connection', async () => {
     await expect(sql`SELECT * FROM greenfield_signing_runner_claim('r2-autocommit', 600000)`.execute(runner)).rejects.toThrow(/must be completed or failed/i)
     await sql`SET application_name = 'attacker-selected-context'`.execute(runner)
@@ -502,27 +625,31 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
   })
 
   it('preserves quarantine history, uses an authorized lift, and completes the separated lifecycle', async () => {
-    const revocationId = `r2-revocation-${suffix}`
-    const signingQuarantineId = `r2-signing-quarantine-${suffix}`
-    const publicationQuarantineId = `r2-publication-quarantine-${suffix}`
+    let revocationId: string
+    let signingQuarantineId: string
+    let publicationQuarantineId: string
     const signingRunner = new RestrictedPublisherSigningRunner(runner, provider, {workerId: 'r2-positive-runner'})
-    await admin.transaction().execute(async trx => {
-      await trx.updateTable('greenfield_module_releases').set({release_state: 'quarantined', quarantined_at: new Date(), updated_at: new Date()})
-        .where('release_id', '=', releaseId).execute()
-      await trx.insertInto('greenfield_module_quarantines').values({
-        quarantine_id: signingQuarantineId, release_id: releaseId, reason: 'R3A2 signing quarantine negative test',
-        policy_action: 'block', created_by: 'security-test', created_at: new Date('2000-01-01'), lifted_at: null,
-      }).execute()
-    })
+    const signingQuarantine = await sql<{quarantine_id: string}>`
+      SELECT greenfield_quarantine_authority_record(
+        ${releaseId}, 'R3A3 signing quarantine negative test', 'block'
+      ) AS quarantine_id
+    `.execute(quarantineAuthority)
+    signingQuarantineId = signingQuarantine.rows[0]!.quarantine_id
     expect(await signingRunner.runOnce()).toBe(false)
     const recordedQuarantine = await admin.selectFrom('greenfield_module_quarantines')
-      .select(['reason', 'created_by_database_role', 'created_at'])
+      .select(['reason', 'created_by', 'created_by_database_role', 'created_at'])
       .where('quarantine_id', '=', signingQuarantineId).executeTakeFirstOrThrow()
     expect(recordedQuarantine).toMatchObject({
-      reason: 'R3A2 signing quarantine negative test',
-      created_by_database_role: 'modula_migrator',
+      reason: 'R3A3 signing quarantine negative test',
+      created_by: 'r3a2-quarantine-authority-account',
+      created_by_database_role: 'r3a2_quarantine_authority',
     })
     expect(recordedQuarantine.created_at.getUTCFullYear()).toBeGreaterThan(2025)
+    await denied(() => admin.insertInto('greenfield_module_quarantines').values({
+      quarantine_id: `forged-quarantine-${suffix}`, release_id: releaseId,
+      reason: 'caller supplied actor must not be accepted', policy_action: 'block',
+      created_by: builderId, created_at: new Date('2000-01-01'), lifted_at: null,
+    }).execute())
     await denied(() => api.updateTable('greenfield_module_quarantines').set({lifted_at: new Date()})
       .where('quarantine_id', '=', signingQuarantineId).execute())
     const signingLift = await sql<{state: string}>`
@@ -558,14 +685,12 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     } as never).where('job_id', '=', jobId).execute()
     const publicationQueueId = await enqueueReleaseJobWork(admin, {jobId, workType: RELEASE_JOB_PUBLISH, accountId: builderId, moduleId})
     const publicationRunner = new RestrictedPublisherPublicationAuthority(publication)
-    await admin.transaction().execute(async trx => {
-      await trx.updateTable('greenfield_module_releases').set({release_state: 'quarantined', quarantined_at: new Date(), updated_at: new Date()})
-        .where('release_id', '=', releaseId).execute()
-      await trx.insertInto('greenfield_module_quarantines').values({
-        quarantine_id: publicationQuarantineId, release_id: releaseId, reason: 'R3A2 publication quarantine negative test',
-        policy_action: 'block', created_by: 'security-test', created_at: new Date('2000-01-01'), lifted_at: null,
-      }).execute()
-    })
+    const publicationQuarantine = await sql<{quarantine_id: string}>`
+      SELECT greenfield_quarantine_authority_record(
+        ${releaseId}, 'R3A3 publication quarantine negative test', 'block'
+      ) AS quarantine_id
+    `.execute(quarantineAuthority)
+    publicationQuarantineId = publicationQuarantine.rows[0]!.quarantine_id
     await expect(publicationRunner.runOnce()).rejects.toMatchObject({code: '42501'})
     const publicationLift = await sql<{state: string}>`
       SELECT greenfield_quarantine_authority_lift(
@@ -595,12 +720,16 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     ])
 
     const quarantineEvents = await admin.selectFrom('greenfield_module_quarantine_events')
-      .select(['quarantine_id', 'event_type', 'actor_database_role', 'restored_release_state'])
+      .select(['quarantine_id', 'event_type', 'actor_account_id', 'actor_database_role', 'restored_release_state'])
       .where('release_id', '=', releaseId)
       .orderBy('created_at')
       .execute()
     expect(quarantineEvents).toEqual(expect.arrayContaining([
-      expect.objectContaining({quarantine_id: signingQuarantineId, event_type: 'recorded'}),
+      expect.objectContaining({
+        quarantine_id: signingQuarantineId, event_type: 'recorded',
+        actor_account_id: 'r3a2-quarantine-authority-account',
+        actor_database_role: 'r3a2_quarantine_authority',
+      }),
       expect.objectContaining({
         quarantine_id: signingQuarantineId, event_type: 'lifted',
         actor_database_role: 'r3a2_quarantine_authority', restored_release_state: 'pendingReview',
@@ -611,14 +740,37 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
       }),
     ]))
 
-    await api.insertInto('greenfield_module_revocations').values({
-      revocation_id: revocationId, scope: 'release', target_id: releaseId,
-      reason: 'R3A2 permanent revocation test', created_by: 'security-test', created_at: new Date('2000-01-01'),
-    }).execute()
+    await denied(() => api.insertInto('greenfield_module_revocations').values({
+      revocation_id: `forged-${suffix}`, scope: 'release', target_id: releaseId,
+      reason: 'forged revocation', created_by: builderId, created_at: new Date('2000-01-01'),
+    }).execute())
+    await expect(sql`SELECT greenfield_revocation_authority_record(
+      'unsupported', ${releaseId}, ${publisherId}, 'unsupported target type'
+    )`.execute(revocationAuthority)).rejects.toMatchObject({code: '22023'})
+    await expect(sql`SELECT greenfield_revocation_authority_record(
+      'release', ${releaseId}, 'forged-publisher', 'wrong target ownership'
+    )`.execute(revocationAuthority)).rejects.toMatchObject({code: '42501'})
+    const revocation = await sql<{revocation_id: string}>`SELECT greenfield_revocation_authority_record(
+      'release', ${releaseId}, ${publisherId}, 'R3A3 permanent revocation test'
+    ) AS revocation_id`.execute(revocationAuthority)
+    revocationId = revocation.rows[0]!.revocation_id
+    const repeatedRevocation = await sql<{revocation_id: string}>`SELECT greenfield_revocation_authority_record(
+      'release', ${releaseId}, ${publisherId}, 'R3A3 permanent revocation test'
+    ) AS revocation_id`.execute(revocationAuthority)
+    expect(repeatedRevocation.rows[0]?.revocation_id).toBe(revocationId)
+    await expect(sql`SELECT greenfield_revocation_authority_record(
+      'release', ${releaseId}, ${publisherId}, 'attempted reason replacement'
+    )`.execute(revocationAuthority)).rejects.toMatchObject({code: '23505'})
     const recordedRevocation = await admin.selectFrom('greenfield_module_revocations')
-      .select(['target_id', 'reason', 'created_at'])
+      .select(['target_id', 'publisher_id', 'reason', 'created_by', 'created_by_database_role', 'created_at'])
       .where('revocation_id', '=', revocationId).executeTakeFirstOrThrow()
-    expect(recordedRevocation).toMatchObject({target_id: releaseId, reason: 'R3A2 permanent revocation test'})
+    expect(recordedRevocation).toMatchObject({
+      target_id: releaseId,
+      publisher_id: publisherId,
+      reason: 'R3A3 permanent revocation test',
+      created_by: 'r3a3-revocation-authority-account',
+      created_by_database_role: 'r3a3_revocation_authority',
+    })
     expect(recordedRevocation.created_at.getUTCFullYear()).toBeGreaterThan(2025)
     await denied(() => api.updateTable('greenfield_module_revocations')
       .set({reason: 'rewritten revocation reason', created_at: new Date('2000-01-01')})
@@ -626,18 +778,56 @@ describeDb('migration 092 canonical-role PostgreSQL boundary', () => {
     await denied(() => admin.updateTable('greenfield_module_revocations')
       .set({target_id: 'forged-target'})
       .where('revocation_id', '=', revocationId).execute())
-    await admin.updateTable('greenfield_module_releases')
-      .set({release_state: 'revoked', revoked_at: new Date(), updated_at: new Date()})
-      .where('release_id', '=', releaseId).execute()
+    expect(await admin.selectFrom('greenfield_module_releases').select('release_state')
+      .where('release_id', '=', releaseId).executeTakeFirstOrThrow()).toEqual({release_state: 'revoked'})
     await denied(() => api.updateTable('greenfield_extension_catalogue')
       .set({catalogue_status: 'active', updated_at: new Date()})
       .where('slug', '=', moduleId).execute())
 
-    await admin.updateTable('greenfield_publisher_signing_keys')
-      .set({state: 'REVOKED', revocation_reason: 'R3A2 terminal key revocation', updated_at: new Date()})
-      .where('key_id', '=', keyId).execute()
+    const rotatedKeyId = `r3a3-rotated-key-${suffix}`
+    const rotatedProviderKeyRef = `test/rotated-${suffix}`
+    const rotatedPublicKey = provider.createIdentity({providerKeyRef: rotatedProviderKeyRef})
+    const rotatedAt = new Date()
+    const rotated = await sql<{identity_id: string}>`SELECT greenfield_signing_identity_authority_rotate(
+      ${identityId}, ${rotatedKeyId}, ${rotatedPublicKey.publicKeyPem}, ${rotatedPublicKey.fingerprint},
+      ${rotatedProviderKeyRef}, ${rotatedAt}, ${new Date(rotatedAt.getTime() + 3_600_000)},
+      ${rotatedPublicKey.providerKeyVersion}
+    ) AS identity_id`.execute(signingIdentity)
+    const rotatedIdentityId = rotated.rows[0]!.identity_id
+    expect(rotatedIdentityId).not.toBe(identityId)
+    expect(await admin.selectFrom('greenfield_publisher_online_signing_identities')
+      .select(['identity_id', 'signing_key_id', 'state']).where('identity_id', '=', identityId).executeTakeFirstOrThrow())
+      .toEqual({identity_id: identityId, signing_key_id: keyId, state: 'REVOKED'})
+    expect(await admin.selectFrom('greenfield_publisher_online_signing_identities')
+      .select(['identity_id', 'signing_key_id', 'state']).where('identity_id', '=', rotatedIdentityId).executeTakeFirstOrThrow())
+      .toEqual({identity_id: rotatedIdentityId, signing_key_id: rotatedKeyId, state: 'ACTIVE'})
+    expect(await admin.selectFrom('greenfield_publisher_signing_keys')
+      .select(['state', 'rotated_to_key_id']).where('key_id', '=', keyId).executeTakeFirstOrThrow())
+      .toEqual({state: 'ROTATED', rotated_to_key_id: rotatedKeyId})
+    const rotationEvents = await admin.selectFrom('greenfield_publisher_signing_key_events')
+      .select(['key_id', 'event_type', 'related_key_id', 'actor_account_id'])
+      .where('key_id', 'in', [keyId, rotatedKeyId]).orderBy('created_at').execute()
+    expect(rotationEvents).toEqual(expect.arrayContaining([
+      expect.objectContaining({key_id: rotatedKeyId, event_type: 'registered', related_key_id: keyId, actor_account_id: 'r3a2-signing-identity-account'}),
+      expect.objectContaining({key_id: keyId, event_type: 'rotated', related_key_id: rotatedKeyId, actor_account_id: 'r3a2-signing-identity-account'}),
+    ]))
+
+    await sql`SELECT greenfield_signing_identity_authority_revoke(
+      ${rotatedIdentityId}, 'R3A3 terminal key revocation'
+    )`.execute(signingIdentity)
     await denied(() => admin.updateTable('greenfield_publisher_signing_keys')
       .set({state: 'ACTIVE', revoked_at: null, revocation_reason: null, updated_at: new Date()})
-      .where('key_id', '=', keyId).execute())
+      .where('key_id', '=', rotatedKeyId).execute())
+    await denied(() => admin.updateTable('greenfield_publisher_online_signing_identities')
+      .set({state: 'ACTIVE', revoked_at: null, revocation_reason: null, updated_at: new Date()})
+      .where('identity_id', '=', rotatedIdentityId).execute())
   }, 60_000)
+
+  it('rejects unsafe automated migration rollback without changing the ledger tip', async () => {
+    await expect(migrateDown(adminUrl!)).rejects.toThrow(/unsafe automated downgrade of 094 is prohibited/i)
+    const tip = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(admin)
+    expect(tip.rows[0]?.id).toBe('094_publisher_signing_governance_hardening')
+    const version = await sql<{value: string}>`SELECT value FROM schema_metadata WHERE key = 'schema_version'`.execute(admin)
+    expect(version.rows[0]?.value).toBe('094')
+  })
 })

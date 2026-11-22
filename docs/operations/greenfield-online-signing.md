@@ -77,15 +77,15 @@ For confirmed compromise, revoke rather than suspend. Existing release signature
 ## Feature-flagged rollout
 
 1. Deploy Vault and networking with signing disabled; test HA, snapshot restore, token renewal and emergency policy removal.
-2. Apply migrations `091_greenfield_online_signing_authority`, `092_publisher_release_runner_boundary` and `093_publisher_release_governance_integrity`, then verify API, worker, backup, migrator and authority-role privileges.
-3. Provision seven distinct restricted database logins for the signing runner, release approver, trust verifier, publication authority, publisher-trust authority, signing-identity authority and quarantine authority. Apply `ops/security/publisher-release-runner-grants.sql` with separate operator accounts for approval, publication, publisher trust, identity registration and quarantine lifting.
+2. Apply migrations `091_greenfield_online_signing_authority`, `092_publisher_release_runner_boundary`, `093_publisher_release_governance_integrity` and `094_publisher_signing_governance_hardening`, then verify API, worker, backup, migrator and authority-role privileges.
+3. Provision eight distinct, membership-isolated database logins for the signing runner, release approver, trust verifier, publication authority, publisher-trust authority, signing-identity authority, quarantine authority and revocation authority. Apply `ops/security/publisher-release-runner-grants.sql` with separate operator accounts for approval, publication, publisher trust, signing-key lifecycle, quarantine lifecycle and revocation creation.
 4. Create a new, distinct Modula online Ed25519 key; register its public half and first-party policy through two-person operator review.
 5. Enable a Modula-only pilot for one non-public release candidate. Keep offline verification compatibility and do not replace the offline key.
 6. Review receipts, alerts, latency, retry behavior, revocation drills and audit completeness.
 7. Expand to selected third-party publishers with separate Vault keys, exact product grants and expiration dates.
 8. Expand generally only after security review, operational acceptance and an emergency shutdown exercise.
 
-Rollback the feature flag before rolling back schema. Migration down cancels pending sign work and converts online-signing states to failed; it never publishes a release.
+Roll back the feature flag and application processes before any database recovery. Migrations 093 and 094 are forward-only security boundaries: their automated down migrations fail closed and must not be represented as successful rollback. Recover with an independently reviewed forward migration or a controlled backup restore that preserves governance history. The older 091 down migration remains a destructive, pre-real-data-only procedure as documented below; it never publishes a release.
 
 ## Local verification
 
@@ -178,3 +178,29 @@ Do not restore broad table DML to preserve that older shortcut.
 The 092 down migration restores the 091-era grants and functions so an isolated migration-cycle rehearsal is
 possible. It intentionally preserves the additive audit provenance column and event enum value: rollback must
 not erase already-recorded audit evidence. For any deployed environment with real events, prefer a forward fix.
+
+## GF-SIGNER-R3A3: migration 094 governance hardening
+
+Migration `094_publisher_signing_governance_hardening` is additive and forward-only. It preserves migrations
+091, 092 and 093 and leaves existing signing-key, revocation, quarantine and quarantine-event facts unchanged.
+It adds immutable key- and identity-lifecycle transition evidence, binds key registration, rotation and
+revocation to the signing-identity authority, and makes revoked keys and identities terminal. Ordinary API and
+worker roles have no direct key, key-event, identity, revocation or quarantine mutation privileges.
+
+Revocation and quarantine creation are separate fixed authority operations. PostgreSQL derives actor, database
+role and timestamp facts from the authenticated `SESSION_USER` principal. Revocation targets and ownership are
+validated before an append-only record is created; exact repeated requests are idempotent, while attempts to
+replace actor or reason facts fail. Quarantine creation and lifting remain distinct operations, and multiple
+active quarantines continue to block release restoration.
+
+The restricted-role installer checks PostgreSQL's actual membership closure and effective privileges. Each of
+the eight authority roles must be distinct, restricted and unable to inherit or assume any other role. A
+non-administrative role cannot inherit or assume any protected authority. The installer removes table, column, sequence,
+schema-creation and ambient function privileges, revokes protected functions from `PUBLIC`, grants only each
+role's fixed operations, validates the resulting closure and commits atomically.
+
+Do not automate a downgrade across 094 or 093. Both `.down.sql` files deliberately raise an authorization
+error before changing schema or grants. If application rollback is required, disable online signing and the
+authority consumers while retaining the hardened schema. If schema recovery is unavoidable, use a separately
+reviewed forward correction or restore a verified backup into an isolated environment first; preserve all
+append-only governance evidence and re-run the restricted-role installer before activation.
