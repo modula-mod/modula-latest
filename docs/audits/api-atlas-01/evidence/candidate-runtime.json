@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-21T20:53:10.414Z",
+  "capturedAt": "2026-11-23T10:08:22.425Z",
   "source": {
-    "branch": "forge/ops-gubic-coturn-01",
-    "headAtCapture": "e8e20540098680a297b25a954c90496961473ced",
+    "branch": "integration/gf-signer-r4a-recon-01",
+    "headAtCapture": "31f87958f149002372cbd88cd8c92df450107e4c",
     "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
+    "apiSourceSha256": "a2719877cce8b3954929f62dd7f86604451490273b1533a668c26e662f61bae4"
   },
   "runtimeRoutes": [
     {

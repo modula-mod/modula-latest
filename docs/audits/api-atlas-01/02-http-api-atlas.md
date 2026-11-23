@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-21T20:53:10.414Z for branch `forge/ops-gubic-coturn-01`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-23T10:08:22.425Z for branch `integration/gf-signer-r4a-recon-01`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633
@@ -31686,3 +31686,4 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
+

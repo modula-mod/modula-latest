@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "forge/ops-gubic-coturn-01",
-      "sourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128",
-      "capturedAt": "2026-11-21T20:53:10.414Z",
+      "branch": "integration/gf-signer-r4a-recon-01",
+      "sourceSha256": "a2719877cce8b3954929f62dd7f86604451490273b1533a668c26e662f61bae4",
+      "capturedAt": "2026-11-23T10:08:22.425Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -100891,6 +100891,29 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_module_quarantine_events",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "module registry/runtime state",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "093_publisher_release_governance_integrity.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_module_quarantines",
       "columns": [
         {
@@ -108382,6 +108405,52 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_publisher_identity_lifecycle_transitions",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher identity lifecycle transitions",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "094_publisher_signing_governance_hardening.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_publisher_identity_registration_transitions",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher identity registration transitions",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "093_publisher_release_governance_integrity.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_publisher_namespaces",
       "columns": [
         {
@@ -108906,6 +108975,29 @@
         "POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke"
       ],
       "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_publisher_signing_key_lifecycle_transitions",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher signing key lifecycle transitions",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "094_publisher_signing_governance_hardening.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
     },
