@@ -308,7 +308,7 @@ export class PublisherReleaseConsoleService {
     if (idempotencyKey !== null && (idempotencyKey.length < 1 || idempotencyKey.length > 180)) consoleError('INVALID_REQUEST', 'Idempotency-Key must be 1-180 characters')
     if (job.signing_request_id && ['signing', 'signature_verified', 'ready_for_review', 'publishing', 'published'].includes(job.state)) return this.dto(job)
     if (job.state === 'signing_failed') consoleError('SIGNING_FAILED', 'Signing failed closed; revalidate the release before requesting a new signature', {jobId, state: job.state})
-    if (job.state !== 'ready_for_signing' || !job.approval_sha256 || !job.approved_at || !job.approved_facts) {
+    if (job.state !== 'ready_for_signing' || !job.approval_sha256 || !job.approved_at || !job.approved_facts || !job.approved_by_account_id) {
       consoleError('INVALID_JOB_STATE', `Signing cannot start from ${job.state}; validate an unsigned immutable release first`, {jobId, state: job.state})
     }
     const delta = job.permission_delta as {reviewRequired?: boolean} | null
@@ -330,7 +330,8 @@ export class PublisherReleaseConsoleService {
       const fresh = await trx.selectFrom('greenfield_publisher_release_jobs').selectAll().where('job_id', '=', jobId).forUpdate().executeTakeFirst() as ReleaseJobRow | undefined
       if (!fresh) return undefined
       if (fresh.signing_request_id && ['signing', 'signature_verified', 'ready_for_review', 'publishing', 'published'].includes(fresh.state)) return fresh
-      if (fresh.state !== 'ready_for_signing' || fresh.approval_sha256 !== job.approval_sha256) return undefined
+      if (fresh.state !== 'ready_for_signing' || fresh.approval_sha256 !== job.approval_sha256 || !fresh.approved_by_account_id
+        || fresh.approved_by_account_id === accountId || fresh.approved_by_account_id === fresh.created_by_account_id) return undefined
       const recent = await trx.selectFrom('greenfield_publisher_signing_audit_events').select(({fn}) => fn.countAll().as('count'))
         .where('actor_account_id', '=', accountId).where('event_type', '=', 'signing_requested')
         .where('created_at', '>', new Date(Date.now() - 60 * 60_000)).executeTakeFirstOrThrow()

@@ -1208,8 +1208,9 @@ export interface Database {
   greenfield_module_sync_sources: {sync_source_id: string; provider: 'github'; repository: string; enabled: boolean; config: unknown; created_at: Date; updated_at: Date}
   greenfield_module_sync_runs: {sync_run_id: string; sync_source_id: string | null; status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'; started_at: Date | null; completed_at: Date | null; summary: unknown; created_at: Date}
   greenfield_module_sync_failures: {sync_failure_id: string; sync_run_id: string | null; repository: string | null; code: string; message: string; retryable: boolean; created_at: Date}
-  greenfield_module_quarantines: {quarantine_id: string; release_id: string; reason: string; policy_action: 'warn' | 'disableExecutableContributions' | 'block'; created_by: string | null; created_at: Date; lifted_at: Date | null}
-  greenfield_module_revocations: {revocation_id: string; scope: 'release' | 'module' | 'publisher' | 'signingKey'; target_id: string; reason: string; created_by: string | null; created_at: Date}
+  greenfield_module_quarantines: {quarantine_id: string; release_id: string; reason: string; policy_action: 'warn' | 'disableExecutableContributions' | 'block'; created_by: string | null; created_by_database_role: Generated<string | null>; created_at: Date; lifted_at: Date | null; lifted_by_account_id: Generated<string | null>; lifted_by_database_role: Generated<string | null>; lift_reason: Generated<string | null>}
+  greenfield_module_quarantine_events: {event_id: string; quarantine_id: string; release_id: string; event_type: 'recorded' | 'lifted'; actor_account_id: string | null; actor_database_role: string; reason: string; restored_release_state: 'pendingReview' | 'verified' | 'published' | null; database_transaction_id: string; created_at: Date}
+  greenfield_module_revocations: {revocation_id: string; scope: 'release' | 'module' | 'publisher' | 'signingKey'; target_id: string; publisher_id: Generated<string | null>; reason: string; created_by: string | null; created_by_database_role: Generated<string | null>; created_at: Date}
   greenfield_module_views: {view_id: string; release_id: string; module_id: string; view_key: string; view_kind: GreenfieldModuleViewKind; collection: string | null; title: string; declaration: unknown; required_capabilities: unknown; registration_status: GreenfieldModuleRuntimeRegistrationStatus; created_at: Date; updated_at: Date}
   greenfield_module_actions: {action_row_id: string; release_id: string; module_id: string; action_id: string; action_kind: GreenfieldModuleActionKind; capability: string; declaration: unknown; registration_status: GreenfieldModuleRuntimeRegistrationStatus; created_at: Date; updated_at: Date}
   greenfield_module_record_collections: {collection_id: string; release_id: string; module_id: string; collection: string; schema_ref: string; default_visibility: GreenfieldModuleRuntimeVisibility; fields: unknown; searchable_fields: unknown; filterable_fields: unknown; sortable_fields: unknown; folder_field: string | null; reference_fields: unknown; schema_definition: unknown; retention_policy: GreenfieldModuleRetentionPolicy; registration_status: GreenfieldModuleRuntimeRegistrationStatus; created_at: Date; updated_at: Date}
@@ -1331,6 +1332,13 @@ export interface Database {
     approved_facts: unknown | null
     approval_sha256: string | null
     approved_at: Date | null
+    approval_candidate_facts: unknown | null
+    approval_candidate_sha256: string | null
+    approval_candidate_at: Date | null
+    approved_by_account_id: string | null
+    approval_invalidated_at: Date | null
+    approval_invalidated_by_account_id: string | null
+    approval_invalidation_reason: string | null
     signing_request_id: string | null
     signing_idempotency_key: string | null
     sign_requested_by_account_id: string | null
@@ -1342,6 +1350,8 @@ export interface Database {
     idempotency_key: string | null
     publish_requested_by_account_id: string | null
     publish_started_at: Date | null
+    publication_authorized_by_account_id: string | null
+    publication_authorized_at: Date | null
     revision: Generated<number>
     created_at: Date
     updated_at: Date
@@ -1350,8 +1360,11 @@ export interface Database {
   }
   greenfield_publisher_release_job_logs: {log_id: Generated<number>; job_id: string; level: 'info' | 'warn' | 'error'; step: string | null; message: string; created_at: Generated<Date>}
   greenfield_publisher_online_signing_identities: {identity_id: string; publisher_id: string; signing_key_id: string; provider: 'VAULT_TRANSIT' | 'DISPOSABLE_TEST'; provider_key_ref: string; purpose: 'PUBLISHER' | 'MODULA_FIRST_PARTY'; state: 'ACTIVE' | 'SUSPENDED' | 'REVOKED'; first_party_authorized: Generated<boolean>; valid_from: Date; valid_until: Date; suspended_at: Date | null; suspension_reason: string | null; revoked_at: Date | null; revocation_reason: string | null; created_by_account_id: string | null; created_at: Date; updated_at: Date}
+  greenfield_publisher_identity_registration_transitions: {transition_id: string; identity_id: string; signing_key_id: string; publisher_id: string; actor_account_id: string; actor_database_role: string; database_transaction_id: string; audit_event_id: string; evidence: unknown; occurred_at: Date}
+  greenfield_publisher_signing_key_lifecycle_transitions: {transition_id: string; operation_id: string; event_id: string; event_type: 'registered' | 'rotated' | 'revoked'; key_id: string; publisher_id: string; related_key_id: string | null; identity_id: string; related_identity_id: string | null; reason: string | null; actor_account_id: string; actor_database_role: string; database_transaction_id: string; public_key_fingerprint: string | null; details: unknown; occurred_at: Date}
+  greenfield_publisher_identity_lifecycle_transitions: {transition_id: string; operation_id: string; audit_event_id: string; event_type: 'identity_rotated' | 'identity_revoked'; identity_id: string; publisher_id: string; actor_account_id: string; actor_database_role: string; database_transaction_id: string; details: unknown; occurred_at: Date}
   greenfield_publisher_signing_authorizations: {authorization_id: string; publisher_id: string; product_id: string; account_id: string; state: 'ACTIVE' | 'SUSPENDED' | 'REVOKED'; first_party_authorized: Generated<boolean>; valid_from: Date; valid_until: Date | null; granted_by_account_id: string; suspended_at: Date | null; revoked_at: Date | null; reason: string | null; created_at: Date; updated_at: Date}
-  greenfield_publisher_signing_audit_events: {event_id: string; event_type: 'identity_registered' | 'identity_suspended' | 'identity_resumed' | 'identity_rotated' | 'identity_revoked' | 'signing_requested' | 'signing_started' | 'release_invalidated' | 'signature_created' | 'signature_verified' | 'signing_failed' | 'publication_authorized'; job_id: string | null; identity_id: string | null; publisher_id: string; module_id: string | null; actor_account_id: string | null; approval_sha256: string | null; statement_sha256: string | null; receipt: unknown; details: unknown; created_at: Date}
+  greenfield_publisher_signing_audit_events: {event_id: string; event_type: 'identity_registered' | 'identity_suspended' | 'identity_resumed' | 'identity_rotated' | 'identity_revoked' | 'publisher_trust_assigned' | 'signing_requested' | 'signing_started' | 'release_invalidated' | 'signature_created' | 'signature_verified' | 'signing_failed' | 'publication_authorized'; job_id: string | null; identity_id: string | null; publisher_id: string; module_id: string | null; actor_account_id: string | null; actor_database_role: string | null; approval_sha256: string | null; statement_sha256: string | null; receipt: unknown; details: unknown; created_at: Date}
   greenfield_publisher_owners: {publisher_owner_id: string; publisher_id: string; owner_type: 'ACCOUNT' | 'ORGANISATION'; account_id: string | null; organisation_id: string | null; created_at: Date}
   greenfield_developer_agreements: {agreement_id: string; version: string; document_hash: string; effective_at: Date; superseded_at: Date | null; created_at: Date}
   greenfield_developer_agreement_acceptances: {acceptance_id: string; agreement_id: string; agreement_version: string; accepted_by_account_id: string; accepted_at: Date; document_hash: string}

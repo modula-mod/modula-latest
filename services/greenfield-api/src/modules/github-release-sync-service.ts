@@ -370,12 +370,25 @@ export class GreenfieldGithubReleaseSyncService {
    * publishes. Shared by sync() and the publisher release console runner.
    */
   async applyVerified(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    return this.applyRegistryCandidate(verified, existing, true)
+  }
+
+  /**
+   * Stores an unsigned, fully validated release as pendingReview. This does not
+   * create approval or verified-signature state; those are separate database
+   * authorities in migration 092.
+   */
+  async applyPendingSigningCandidate(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    return this.applyRegistryCandidate(verified, existing, false)
+  }
+
+  private async applyRegistryCandidate(verified: VerifiedGithubRelease, existing: GreenfieldModuleReleaseRecord | null | undefined, verifyPending: boolean) {
     const releases = new GreenfieldModuleReleaseService(this.db)
     const current = existing === undefined ? await releases.getRelease(verified.productId, verified.version) : existing
     if (current) assertStoredProvenance(verified, current)
     let release = current ?? await releases.importPendingReview(verified.manifest, verified.evidence)
     if (release.releaseState === 'quarantined' || release.releaseState === 'revoked') throw moduleError('FORBIDDEN', `Release is ${release.releaseState}; sync will not change it`)
-    if (release.releaseState === 'pendingReview') release = await releases.verifyRelease(verified.productId, verified.version)
+    if (verifyPending && release.releaseState === 'pendingReview') release = await releases.verifyRelease(verified.productId, verified.version)
     await this.storePackageBlob(release.releaseId, verified)
     const ingested = await new GreenfieldMpsIngestService(this.db).ingest({
       filename: 'modula.product.json',

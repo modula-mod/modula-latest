@@ -31686,4 +31686,3 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
-

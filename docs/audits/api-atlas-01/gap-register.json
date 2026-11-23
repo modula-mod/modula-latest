@@ -1021,7 +1021,7 @@
       "domain": "database",
       "type": "orphan table",
       "severity": "P3",
-      "title": "14 tables have no API/worker source reference",
+      "title": "16 tables have no API/worker source reference",
       "evidence": [
         "04-database-api-map.md"
       ],

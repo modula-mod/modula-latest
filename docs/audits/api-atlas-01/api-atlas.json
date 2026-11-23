@@ -13123,6 +13123,7 @@
           "greenfield_release_asset_blobs"
         ],
         "evidence": [
+          "services/greenfield-api/src/modules/github-release-sync-service.ts#applyRegistryCandidate",
           "services/greenfield-api/src/modules/github-release-sync-service.ts#applyVerified",
           "services/greenfield-api/src/modules/github-release-sync-service.ts#fetchVerified",
           "services/greenfield-api/src/modules/github-release-sync-service.ts#storePackageBlob",
@@ -108632,6 +108633,29 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_publisher_release_authority_principals",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher release authority principals",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "092_publisher_release_runner_boundary.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_publisher_release_job_logs",
       "columns": [],
       "primaryKey": [],
@@ -108696,6 +108720,29 @@
         "POST /v1/publisher/modules/:moduleId/release-jobs"
       ],
       "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_publisher_release_signing_claims",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publisher release signing claims",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "092_publisher_release_runner_boundary.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
     },
