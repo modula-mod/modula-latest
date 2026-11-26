@@ -325,13 +325,13 @@ export class GreenfieldModuleReleaseService {
             signature_key_id: signatureInput.keyId,
             signature: signatureInput.value,
             algorithm: 'Ed25519',
-            verified_at: now,
+            verified_at: null,
             revoked_at: null,
             statement: jsonb(signatureCheck.statement),
             statement_sha256: signatureCheck.statementSha256,
-            verification_state: 'verified',
-            verification_detail: signatureCheck.detail,
-            public_key_fingerprint: signatureCheck.publicKeyFingerprint,
+            verification_state: 'pending',
+            verification_detail: 'Awaiting independent trust-verifier settlement',
+            public_key_fingerprint: null,
             observed_at: now,
           })
           .execute()

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-23T10:08:22.425Z",
+  "capturedAt": "2026-11-26T20:44:01.369Z",
   "source": {
-    "branch": "integration/gf-signer-r4a-recon-01",
-    "headAtCapture": "31f87958f149002372cbd88cd8c92df450107e4c",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "a2719877cce8b3954929f62dd7f86604451490273b1533a668c26e662f61bae4"
+    "branch": "integration/greenfield-signer-finish",
+    "headAtCapture": "08a23276fe184d96b2e0a734a82ae57a19e937e6",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "ea2c540ae27dc20d86098b294cc16cff163d92552d26ae4e1bde9df1a3fe8082"
   },
   "runtimeRoutes": [
     {

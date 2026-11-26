@@ -10,6 +10,7 @@ import {GreenfieldModuleReleaseService} from '../../src/modules/release-service.
 import {
   approvalFactsSha256,
   buildPublisherReleaseApprovalFacts,
+  parsePublisherPublicKey,
   statementBytes,
   statementSha256,
   type PublisherReleaseStatement,
@@ -38,6 +39,14 @@ type AuthorityRole = {name: string; password: string}
 export type AuthorizedPublicationRoleFixture = {
   roles: Record<AuthorityName, AuthorityRole>
   urls: Record<AuthorityName, string>
+}
+
+export type AuthorizedSigningIdentityFixture = {
+  identityId: string
+  publisherId: string
+  signingKeyId: string
+  providerKeyRef: string
+  publicKeyFingerprint: string
 }
 
 function identifier(value: string): string {
@@ -165,6 +174,105 @@ export async function dropAuthorizedPublicationRoles(adminPool: pg.Pool, fixture
 }
 
 /**
+ * Registers a disposable signing identity through the fixed database authority.
+ * This is test evidence only: it is never human approval or production key
+ * enrollment, even when the fixture publisher is the built-in `modula` row.
+ */
+export async function registerAuthorizedSigningIdentity(input: {
+  authorityUrl: string
+  publisherId: string
+  signingKeyId: string
+  publicKeyPem: string
+  providerKeyRef: string
+  purpose?: 'PUBLISHER' | 'MODULA_FIRST_PARTY'
+  provider?: 'DISPOSABLE_TEST'
+  validFrom?: Date
+  validUntil?: Date
+}): Promise<AuthorizedSigningIdentityFixture> {
+  const authority = createDb(input.authorityUrl, undefined, {max: 1, applicationName: 'test-signing-identity-authority'})
+  const parsed = parsePublisherPublicKey(input.publicKeyPem)
+  const validFrom = input.validFrom ?? new Date(Date.now() - 60_000)
+  const validUntil = input.validUntil ?? new Date(Date.now() + 3_600_000)
+  const purpose = input.purpose ?? 'PUBLISHER'
+  try {
+    const registered = await sql<{identity_id: string}>`
+      SELECT greenfield_signing_identity_authority_register(
+        ${input.publisherId}, ${input.signingKeyId}, ${parsed.publicKeyPem}, ${parsed.fingerprint},
+        ${input.provider ?? 'DISPOSABLE_TEST'}, ${input.providerKeyRef}, ${purpose},
+        ${purpose === 'MODULA_FIRST_PARTY'}, ${validFrom}, ${validUntil}, NULL
+      ) AS identity_id
+    `.execute(authority)
+    return {
+      identityId: registered.rows[0]!.identity_id,
+      publisherId: input.publisherId,
+      signingKeyId: input.signingKeyId,
+      providerKeyRef: input.providerKeyRef,
+      publicKeyFingerprint: parsed.fingerprint,
+    }
+  } finally {
+    await authority.destroy()
+  }
+}
+
+export async function rotateAuthorizedSigningIdentity(input: {
+  authorityUrl: string
+  identityId: string
+  signingKeyId: string
+  publicKeyPem: string
+  providerKeyRef: string
+  validFrom?: Date
+  validUntil?: Date
+}): Promise<string> {
+  const authority = createDb(input.authorityUrl, undefined, {max: 1, applicationName: 'test-signing-identity-authority'})
+  const parsed = parsePublisherPublicKey(input.publicKeyPem)
+  try {
+    const rotated = await sql<{identity_id: string}>`
+      SELECT greenfield_signing_identity_authority_rotate(
+        ${input.identityId}, ${input.signingKeyId}, ${parsed.publicKeyPem}, ${parsed.fingerprint},
+        ${input.providerKeyRef}, ${input.validFrom ?? new Date(Date.now() - 60_000)},
+        ${input.validUntil ?? new Date(Date.now() + 3_600_000)}, NULL
+      ) AS identity_id
+    `.execute(authority)
+    return rotated.rows[0]!.identity_id
+  } finally {
+    await authority.destroy()
+  }
+}
+
+export async function revokeAuthorizedSigningIdentity(input: {
+  authorityUrl: string
+  identityId: string
+  reason: string
+}): Promise<string> {
+  const authority = createDb(input.authorityUrl, undefined, {max: 1, applicationName: 'test-signing-identity-authority'})
+  try {
+    const revoked = await sql<{identity_id: string}>`
+      SELECT greenfield_signing_identity_authority_revoke(${input.identityId}, ${input.reason}) AS identity_id
+    `.execute(authority)
+    return revoked.rows[0]!.identity_id
+  } finally {
+    await authority.destroy()
+  }
+}
+
+export async function setAuthorizedPublisherTrust(input: {
+  authorityUrl: string
+  publisherId: string
+  expectedCurrentTrustLevel: 'firstParty' | 'verifiedPublisher' | 'reviewedCommunity' | 'untrustedManifest'
+  trustLevel: 'firstParty' | 'verifiedPublisher' | 'reviewedCommunity' | 'untrustedManifest'
+  reason: string
+}): Promise<void> {
+  const authority = createDb(input.authorityUrl, undefined, {max: 1, applicationName: 'test-publisher-trust-authority'})
+  try {
+    await sql`SELECT greenfield_publisher_trust_authority_set(
+      ${input.publisherId}, ${input.expectedCurrentTrustLevel}, ${input.trustLevel}, ${input.reason}
+    )`.execute(authority)
+  } finally {
+    await authority.destroy()
+  }
+}
+
+/**
  * Publishes one valid registry fixture through the authority-separated path.
  * Direct release publication and direct signature verification are deliberately
  * absent: the restricted principals perform those transitions.
@@ -266,7 +374,10 @@ export async function publishAuthorizedRegistryFixture(input: {
     } as never).execute()
 
     const approved = await sql<{greenfield_release_approver_record: string}>`
-      SELECT greenfield_release_approver_record(${jobId}, ${approvalSha256})
+      SELECT greenfield_release_approver_record(
+        ${jobId}, ${approvalSha256}, 'automated-test-policy',
+        ${`test/authorized-publication/${input.suffix}`}, 'AUTOMATED_TEST_POLICY'
+      )
     `.execute(approver)
     expect(approved.rows[0]?.greenfield_release_approver_record).toBe(approvalSha256)
     await input.adminDb.updateTable('greenfield_publisher_release_jobs').set({

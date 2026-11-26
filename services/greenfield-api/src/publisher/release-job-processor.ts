@@ -227,7 +227,10 @@ export class PublisherReleaseJobProcessor {
       const approvedFacts = approvalFactsForVerified(verified)
       const approvalSha256 = approvalFactsSha256(approvedFacts)
       return this.finish(validating, ['validating'], 'awaiting_approval', {
-        validation: record(false),
+        // All release validation and immutable-candidate storage checks have
+        // passed. Signature creation/verification is a separate, deliberately
+        // pending lifecycle gate and must not make the validation result false.
+        validation: record(true),
         signature: {state: 'pending', detail: 'Validated release awaits independent approval'},
         permission_delta: permissionDelta,
         approval_candidate_facts: approvedFacts,
@@ -248,27 +251,39 @@ export class PublisherReleaseJobProcessor {
       return this.finish(validating, ['validating'], to, {validation: record(false), signature, permission_delta: permissionDelta, error: {code, message: signature.detail ?? code}}, 'error', 'signature', `Signature ${signature.state}: ${signature.detail}`)
     }
 
-    const signed = await transitionJob(this.db, jobId, ['validating'], 'signature_verified', {signature, permission_delta: permissionDelta, validation: record(false)})
-    if (!signed) return this.stopped(jobId, 'signature')
-    await appendLog(this.db, jobId, 'info', 'signature', `Publisher signature independently verified (key ${signature.keyId})`)
-
-    // Packaging: registry import (re-verifies the signature), verify, immutable blob store, MPS ingest. Never publishes.
+    // Externally signed evidence is validated here but recorded as pending in
+    // the registry. Approval binds the immutable candidate before the
+    // separately credentialed trust verifier settles Ed25519 verification.
     let release: GreenfieldModuleReleaseRecord
     try {
       const fresh = await loadJob(this.db, jobId)
-      if (fresh?.state !== 'signature_verified') return this.stopped(jobId, 'packaging')
-      release = (await this.sync.applyVerified(verified, existing ?? null)).release
-      if (release.releaseState !== 'verified') throw new ModuleDomainError('VALIDATION_FAILED', `registry release is ${release.releaseState}, expected verified`)
+      if (fresh?.state !== 'validating') return this.stopped(jobId, 'packaging')
+      release = (await this.sync.applyPendingSignatureCandidate(verified, existing ?? null)).release
+      if (release.releaseState !== 'pendingReview') throw new ModuleDomainError('VALIDATION_FAILED', `registry release is ${release.releaseState}, expected pendingReview`)
       const sigRows = await this.db.selectFrom('greenfield_module_release_signatures').select(['verification_state']).where('release_id', '=', release.releaseId).execute()
-      if (!sigRows.length || sigRows.some(row => row.verification_state !== 'verified')) throw new ModuleDomainError('VALIDATION_FAILED', 'registry did not record a verified signature for this release')
-      set('packaging', 'passed', `imported ${release.releaseId}; package blob stored; MPS ingested`)
+      if (!sigRows.length || sigRows.some(row => row.verification_state !== 'pending')) throw new ModuleDomainError('VALIDATION_FAILED', 'registry did not retain pending signature evidence')
+      set('packaging', 'passed', `stored immutable candidate ${release.releaseId}; signature evidence pending independent verification`)
     } catch (error) {
       if (!(error instanceof ModuleDomainError)) throw error
       set('packaging', 'failed', error.message.slice(0, 500), 'VALIDATION_FAILED')
-      return this.finish(signed, ['signature_verified'], 'validation_failed', {validation: record(false), error: {code: 'VALIDATION_FAILED', message: error.message.slice(0, 1000)}}, 'error', 'packaging', `Packaging failed: ${error.message}`)
+      return this.finish(validating, ['validating'], 'validation_failed', {validation: record(false), error: {code: 'VALIDATION_FAILED', message: error.message.slice(0, 1000)}}, 'error', 'packaging', `Packaging failed: ${error.message}`)
     }
-    return this.finish(signed, ['signature_verified'], 'ready_for_review', {validation: record(true), release_id: release.releaseId, error: null}, 'info', 'review',
-      `All checks passed; ready for publication review${permissionDelta.reviewRequired ? ' (permission change acknowledgement required)' : ''}`)
+    const approvedFacts = approvalFactsForVerified(verified)
+    const approvalSha256 = approvalFactsSha256(approvedFacts)
+    return this.finish(validating, ['validating'], 'awaiting_approval', {
+      validation: record(true),
+      signature: {...signature, state: 'pending', detail: 'Signed evidence awaits independent approval and trust verification'},
+      permission_delta: permissionDelta,
+      approval_candidate_facts: approvedFacts,
+      approval_candidate_sha256: approvalSha256,
+      approval_candidate_at: new Date(),
+      approved_facts: null,
+      approval_sha256: null,
+      approved_at: null,
+      approved_by_account_id: null,
+      release_id: release.releaseId,
+      error: null,
+    }, 'info', 'approval', `Signed immutable release candidate recorded for authorized approval (${approvalSha256})`)
   }
 
   // ---- online sign -------------------------------------------------------

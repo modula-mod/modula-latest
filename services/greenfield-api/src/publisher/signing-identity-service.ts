@@ -114,50 +114,47 @@ export class PublisherOnlineSigningIdentityService {
     if (identity.state !== 'ACTIVE') throw moduleError('CONFLICT', 'Only an active online signing identity can be rotated')
     const now = new Date()
     this.assertValidity(now, validUntil)
+    const authorityUrl = this.requireDedicatedAuthorityUrl()
     const rotated = await this.provider.rotateKey(identity)
     // Provider rotation happens first. Until the public registry binding below
     // succeeds, the old binding mismatches and signing therefore fails closed.
-    await this.signingKeys.register(identity.publisherId, {
-      keyId: newSigningKeyId,
-      publicKeyPem: rotated.publicKeyPem,
-      validFrom: now.toISOString(),
-      validUntil: validUntil.toISOString(),
-      rotatesKeyId: identity.signingKeyId,
-    }, actorAccountId)
-    await this.db.transaction().execute(async trx => {
-      await trx.updateTable('greenfield_publisher_online_signing_identities').set({
-        signing_key_id: newSigningKeyId,
-        provider_key_ref: rotated.providerKeyRef,
-        valid_from: now,
-        valid_until: validUntil,
-        updated_at: now,
-      }).where('identity_id', '=', identityId).where('state', '=', 'ACTIVE').executeTakeFirstOrThrow()
-      await appendSigningAudit(trx, {eventType: 'identity_rotated', identityId, publisherId: identity.publisherId,
-        actorAccountId, details: {
-          previousSigningKeyId: identity.signingKeyId, signingKeyId: newSigningKeyId,
-          publicKeyFingerprint: rotated.fingerprint, providerKeyVersion: rotated.providerKeyVersion,
-        }})
+    let publicKey: ReturnType<typeof parsePublisherPublicKey>
+    try {
+      publicKey = parsePublisherPublicKey(rotated.publicKeyPem)
+    } catch {
+      throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing provider returned an invalid rotated public key')
+    }
+    if (publicKey.fingerprint !== rotated.fingerprint) {
+      throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing provider rotated public key metadata is inconsistent')
+    }
+    const newIdentityId = await this.rotateThroughAuthority(authorityUrl, {
+      identityId,
+      signingKeyId: newSigningKeyId,
+      publicKeyPem: publicKey.publicKeyPem,
+      fingerprint: publicKey.fingerprint,
+      providerKeyRef: rotated.providerKeyRef,
+      validFrom: now,
+      validUntil,
+      providerKeyVersion: rotated.providerKeyVersion,
     })
-    return {...identity, signingKeyId: newSigningKeyId, providerKeyRef: rotated.providerKeyRef, validFrom: now, validUntil}
+    return {
+      ...identity,
+      identityId: newIdentityId,
+      signingKeyId: newSigningKeyId,
+      providerKeyRef: rotated.providerKeyRef,
+      validFrom: now,
+      validUntil,
+    }
   }
 
   async revoke(actorAccountId: string, identityId: string, reason: string) {
     await this.requireOperator(actorAccountId)
     const identity = await this.load(identityId)
-    if (identity.state === 'REVOKED') return {state: 'REVOKED' as const, externalActionRequired: false, detail: 'Identity was already revoked'}
     const text = cleanReason(reason)
+    const authorityUrl = this.requireDedicatedAuthorityUrl()
     // Public registry revocation is authoritative and happens before the
     // provider control. A provider outage cannot leave releases authorized.
-    await this.signingKeys.revoke(identity.publisherId, identity.signingKeyId, text, actorAccountId)
-    const now = new Date()
-    await this.db.transaction().execute(async trx => {
-      await trx.updateTable('greenfield_publisher_online_signing_identities').set({
-        state: 'REVOKED', suspended_at: null, suspension_reason: null,
-        revoked_at: now, revocation_reason: text, updated_at: now,
-      }).where('identity_id', '=', identityId).where('state', '!=', 'REVOKED').executeTakeFirstOrThrow()
-      await appendSigningAudit(trx, {eventType: 'identity_revoked', identityId, publisherId: identity.publisherId,
-        actorAccountId, details: {reason: text, signingKeyId: identity.signingKeyId}})
-    })
+    await this.revokeThroughAuthority(authorityUrl, identityId, text)
     return this.provider.revokeKey(identity, text)
   }
 
@@ -220,10 +217,7 @@ export class PublisherOnlineSigningIdentityService {
     fingerprint: string
     providerKeyVersion: number | null
   }): Promise<string> {
-    let authorityDb: ModulaDb | null = null
-    let failed = false
-    try {
-      authorityDb = createDb(authorityUrl, undefined, {max: 1, applicationName: 'modula-signing-identity-authority'})
+    return this.withAuthority(authorityUrl, async authorityDb => {
       const result = await sql<{identity_id: string}>`
         SELECT greenfield_signing_identity_authority_register(
           ${input.publisherId}, ${input.signingKeyId}, ${input.publicKeyPem}, ${input.fingerprint},
@@ -234,9 +228,51 @@ export class PublisherOnlineSigningIdentityService {
       const identityId = result.rows[0]?.identity_id
       if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no identity')
       return identityId
+    })
+  }
+
+  private async rotateThroughAuthority(authorityUrl: string, input: {
+    identityId: string
+    signingKeyId: string
+    publicKeyPem: string
+    fingerprint: string
+    providerKeyRef: string
+    validFrom: Date
+    validUntil: Date
+    providerKeyVersion: number | null
+  }): Promise<string> {
+    return this.withAuthority(authorityUrl, async authorityDb => {
+      const result = await sql<{identity_id: string}>`
+        SELECT greenfield_signing_identity_authority_rotate(
+          ${input.identityId}, ${input.signingKeyId}, ${input.publicKeyPem}, ${input.fingerprint},
+          ${input.providerKeyRef}, ${input.validFrom}, ${input.validUntil},
+          ${input.providerKeyVersion === null ? null : String(input.providerKeyVersion)}
+        ) AS identity_id
+      `.execute(authorityDb)
+      const identityId = result.rows[0]?.identity_id
+      if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no rotated identity')
+      return identityId
+    })
+  }
+
+  private async revokeThroughAuthority(authorityUrl: string, identityId: string, reason: string): Promise<void> {
+    await this.withAuthority(authorityUrl, async authorityDb => {
+      const result = await sql<{identity_id: string}>`
+        SELECT greenfield_signing_identity_authority_revoke(${identityId}, ${reason}) AS identity_id
+      `.execute(authorityDb)
+      if (result.rows[0]?.identity_id !== identityId) throw new Error('Signing identity authority returned an inconsistent identity')
+    })
+  }
+
+  private async withAuthority<T>(authorityUrl: string, operation: (authorityDb: ModulaDb) => Promise<T>): Promise<T> {
+    let authorityDb: ModulaDb | null = null
+    let failed = false
+    try {
+      authorityDb = createDb(authorityUrl, undefined, {max: 1, applicationName: 'modula-signing-identity-authority'})
+      return await operation(authorityDb)
     } catch (error) {
       failed = true
-      throw registrationAuthorityError(error)
+      throw signingIdentityAuthorityError(error)
     } finally {
       if (authorityDb) {
         try {
@@ -289,15 +325,15 @@ function effectivePort(url: URL): string {
   return url.port || (url.protocol === 'postgres:' || url.protocol === 'postgresql:' ? '5432' : '')
 }
 
-function registrationAuthorityError(error: unknown): Error {
+function signingIdentityAuthorityError(error: unknown): Error {
   const code = typeof error === 'object' && error !== null && 'code' in error
     ? String((error as {code?: unknown}).code ?? '')
     : ''
-  if (code === '23505') return moduleError('CONFLICT', 'Signing key ID, public key, provider key, or active identity is already registered')
-  if (code === '23503') return moduleError('NOT_FOUND', 'Signing identity registration target was not found')
+  if (code === '23505') return moduleError('CONFLICT', 'Signing key ID, public key, provider key, or active identity conflicts with an existing identity')
+  if (code === '23503' || code === 'P0002') return moduleError('NOT_FOUND', 'Signing identity lifecycle target was not found')
   if (code === '22023' || code === '23514' || code === '22P02') {
-    return moduleError('VALIDATION_FAILED', 'Signing identity registration facts are invalid')
+    return moduleError('VALIDATION_FAILED', 'Signing identity lifecycle facts are invalid')
   }
-  if (code === '42501') return moduleError('FORBIDDEN', 'Signing identity registration was rejected by authoritative publisher policy')
+  if (code === '42501') return moduleError('FORBIDDEN', 'Signing identity lifecycle operation was rejected by authoritative publisher policy')
   return moduleError('CAPABILITY_UNAVAILABLE', 'Signing identity authority is unavailable')
 }

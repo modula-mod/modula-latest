@@ -382,6 +382,11 @@ export class GreenfieldGithubReleaseSyncService {
     return this.applyRegistryCandidate(verified, existing, false)
   }
 
+  /** Stores externally signed evidence as pending; only the restricted trust verifier may settle it. */
+  async applyPendingSignatureCandidate(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    return this.applyRegistryCandidate(verified, existing, false)
+  }
+
   private async applyRegistryCandidate(verified: VerifiedGithubRelease, existing: GreenfieldModuleReleaseRecord | null | undefined, verifyPending: boolean) {
     const releases = new GreenfieldModuleReleaseService(this.db)
     const current = existing === undefined ? await releases.getRelease(verified.productId, verified.version) : existing

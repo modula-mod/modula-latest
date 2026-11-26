@@ -459,7 +459,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Dependencies: verification ownership
 - Verification: The canonical verifier must pass on reviewed current main at 073_backup_sequence_acl_defaults without weakening exact-SHA production checks.
 
-## API-ATLAS-GAP-037 — P3 — 20 tables have no API/worker source reference
+## API-ATLAS-GAP-037 — P3 — 22 tables have no API/worker source reference
 
 - Domain/type: `database` / `orphan table`
 - Remediation status: **OPEN**
@@ -516,4 +516,4 @@ The JSON form is canonical for remediation tooling and preserves these fields ve
 
 ## TODO / FIXME / placeholder sweep
 
-The literal sweep found 317 marker occurrences; 310 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=36, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=123, possible-runtime-placeholder=66, test-fixture-or-development=7. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.
+The literal sweep found 328 marker occurrences; 321 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=36, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=134, possible-runtime-placeholder=66, test-fixture-or-development=7. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.

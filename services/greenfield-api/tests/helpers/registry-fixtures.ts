@@ -151,17 +151,28 @@ export async function registerAccount(app: any, email: string, handle: string, d
   const clearLimiter = async () => { if (db) await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute() }
   await clearLimiter()
   try {
-    return await registerAccountInner(app, email, handle)
+    return await registerAccountInner(app, email, handle, db)
   } finally {
     await clearLimiter()
   }
 }
 
-async function registerAccountInner(app: any, email: string, handle: string) {
+async function registerAccountInner(app: any, email: string, handle: string, db?: any) {
   const password = 'secure-pass-word-1'
   const register = await app.inject({method: 'POST', url: '/v1/accounts/register', payload: {email, password, handle, displayName: 'Registry Trust Test', acceptedTerms: true}})
   expect(register.statusCode, register.body).toBe(201)
-  await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token: register.json().data.verificationToken}})
+  const verify = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token: register.json().data.verificationToken}})
+  expect(verify.statusCode, verify.body).toBe(200)
+  if (db) {
+    const verified = await db.selectFrom('greenfield_auth_identities as identity')
+      .innerJoin('greenfield_accounts as account', 'account.account_id', 'identity.account_id')
+      .select(['identity.verified_at', 'account.status'])
+      .where('identity.account_id', '=', register.json().data.accountId)
+      .where('identity.kind', '=', 'email')
+      .executeTakeFirstOrThrow()
+    expect(verified.verified_at).not.toBeNull()
+    expect(verified.status).toBe('active')
+  }
   const session = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password}})
   expect(session.statusCode, session.body).toBe(200)
   return {accountId: register.json().data.accountId as string, token: session.json().data.accessToken as string}

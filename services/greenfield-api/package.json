@@ -25,6 +25,7 @@
     "registry:sync-github-release": "tsx scripts/sync-github-release.ts",
     "publisher:release-runner": "node dist/publisher/release-job-runner-main.js",
     "publisher:release-preparer": "node dist/publisher/release-job-preparer-main.js",
+    "publisher:release-approver": "node dist/publisher/release-approver-main.js",
     "publisher:trust-verifier": "node dist/publisher/trust-verifier-main.js",
     "publisher:publication-authority": "node dist/publisher/publication-authority-main.js",
     "registry:backfill-distribution-artifacts": "tsx scripts/backfill-distribution-artifacts.ts",

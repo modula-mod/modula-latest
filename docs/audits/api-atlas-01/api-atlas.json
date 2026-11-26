@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "integration/gf-signer-r4a-recon-01",
-      "sourceSha256": "a2719877cce8b3954929f62dd7f86604451490273b1533a668c26e662f61bae4",
-      "capturedAt": "2026-11-23T10:08:22.425Z",
+      "branch": "integration/greenfield-signer-finish",
+      "sourceSha256": "ea2c540ae27dc20d86098b294cc16cff163d92552d26ae4e1bde9df1a3fe8082",
+      "capturedAt": "2026-11-26T20:44:01.369Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -108405,6 +108405,29 @@
       "readOnlyCandidate": false
     },
     {
+      "name": "greenfield_publication_failure_events",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield publication failure events",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "095_publisher_signing_integration_completion.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
       "name": "greenfield_publisher_identity_lifecycle_transitions",
       "columns": [],
       "primaryKey": [],
@@ -108531,7 +108554,8 @@
         "services/greenfield-api/src/developers/service.ts",
         "services/greenfield-api/src/modules/publisher-service.ts",
         "services/greenfield-api/src/publisher/release-job-processor.ts",
-        "services/greenfield-api/src/publisher/signing-authority.ts"
+        "services/greenfield-api/src/publisher/signing-authority.ts",
+        "services/greenfield-api/src/publisher/signing-identity-service.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/developers/service.ts",
@@ -110339,6 +110363,29 @@
         "POST /v1/accounts/reset-password"
       ],
       "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_release_approval_decisions",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "module release artifact state",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "095_publisher_signing_integration_completion.sql",
+      "sourceReads": [],
+      "sourceWrites": [],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [],
+      "routeWrites": [],
+      "orphanCandidate": true,
       "writeOnlyCandidate": false,
       "readOnlyCandidate": false
     },

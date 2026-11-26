@@ -206,7 +206,7 @@ REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM :"approver_role";
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM :"approver_role";
 REVOKE CREATE ON SCHEMA public FROM :"approver_role";
 GRANT USAGE ON SCHEMA public TO :"approver_role";
-GRANT EXECUTE ON FUNCTION greenfield_release_approver_record(TEXT, TEXT) TO :"approver_role";
+GRANT EXECUTE ON FUNCTION greenfield_release_approver_record(TEXT, TEXT, TEXT, TEXT, TEXT) TO :"approver_role";
 GRANT EXECUTE ON FUNCTION greenfield_release_approver_invalidate(TEXT, TEXT) TO :"approver_role";
 
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"trust_verifier_role";
