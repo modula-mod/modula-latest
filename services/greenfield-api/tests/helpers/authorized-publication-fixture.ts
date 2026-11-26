@@ -159,6 +159,7 @@ export async function provisionAuthorizedPublicationRoles(input: {
 
 export async function dropAuthorizedPublicationRoles(adminPool: pg.Pool, fixture: AuthorizedPublicationRoleFixture): Promise<void> {
   for (const authority of Object.values(fixture.roles).reverse()) {
+    await adminPool.query(`DROP OWNED BY ${identifier(authority.name)}`)
     await adminPool.query(`DROP ROLE IF EXISTS ${identifier(authority.name)}`)
   }
 }

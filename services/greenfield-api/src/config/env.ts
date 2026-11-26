@@ -9,6 +9,7 @@ const envSchema = z.object({
   MODULA_PUBLIC_API_URL: z.string().url(),
   MODULA_PUBLIC_WEB_URL: z.string().url().optional(),
   MODULA_DATABASE_URL: z.string().min(1),
+  MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: z.string().min(1).optional(),
   APNS_BUNDLE_ID: z.string().min(1).default('digital.modula.app.native'),
   MODULA_DATABASE_MIGRATOR_URL: z.string().min(1).optional(),
   MODULA_ALLOWED_ORIGINS: z.string().min(1),
@@ -211,6 +212,8 @@ export type AppConfig = {
   pushBundleId: string
   publicWebUrl: string
   databaseUrl: string
+  /** Dedicated fixed-operation credential; never shared with the ordinary API pool. */
+  signingIdentityAuthorityDatabaseUrl: string | null
   migratorDatabaseUrl: string
   allowedOrigins: string[]
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent'
@@ -513,6 +516,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     pushBundleId: raw.APNS_BUNDLE_ID,
     publicWebUrl,
     databaseUrl: raw.MODULA_DATABASE_URL,
+    signingIdentityAuthorityDatabaseUrl: raw.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL ?? null,
     migratorDatabaseUrl: raw.MODULA_DATABASE_MIGRATOR_URL ?? raw.MODULA_DATABASE_URL,
     allowedOrigins,
     logLevel: raw.MODULA_LOG_LEVEL,

@@ -1,8 +1,8 @@
-import {randomUUID} from 'node:crypto'
+import {sql} from 'kysely'
 import type {AppConfig} from '../config/index.js'
-import type {ModulaDb} from '../database/client.js'
+import {createDb, type ModulaDb} from '../database/client.js'
 import {moduleError} from '../modules/module-errors.js'
-import {GreenfieldPublisherSigningKeyService} from '../modules/release-signing.js'
+import {GreenfieldPublisherSigningKeyService, parsePublisherPublicKey} from '../modules/release-signing.js'
 import {appendSigningAudit} from './release-job-core.js'
 import type {PublisherSigningIdentity, PublisherSigningProvider, PublisherSigningPurpose} from './signing-provider.js'
 
@@ -42,8 +42,9 @@ export class PublisherOnlineSigningIdentityService {
     const validFrom = input.validFrom ?? now
     this.assertValidity(validFrom, input.validUntil)
     await this.assertPurpose(input.publisherId, input.purpose, input.firstPartyAuthorized)
-    const identity: PublisherSigningIdentity = {
-      identityId: `psi_${randomUUID()}`,
+    const authorityUrl = this.requireDedicatedAuthorityUrl()
+    const pendingIdentity: PublisherSigningIdentity = {
+      identityId: 'psi_00000000-0000-0000-0000-000000000000',
       publisherId: input.publisherId,
       signingKeyId: input.signingKeyId,
       provider: this.provider.kind,
@@ -54,42 +55,25 @@ export class PublisherOnlineSigningIdentityService {
       validFrom,
       validUntil: input.validUntil,
     }
-    const publicKey = await this.provider.getPublicKey(identity)
-    await this.signingKeys.register(input.publisherId, {
-      keyId: input.signingKeyId,
+    const providerPublicKey = await this.provider.getPublicKey(pendingIdentity)
+    let publicKey: ReturnType<typeof parsePublisherPublicKey>
+    try {
+      publicKey = parsePublisherPublicKey(providerPublicKey.publicKeyPem)
+    } catch {
+      throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing provider returned an invalid public key')
+    }
+    if (publicKey.fingerprint !== providerPublicKey.fingerprint) {
+      throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing provider public key metadata is inconsistent')
+    }
+
+    const identityId = await this.registerThroughAuthority(authorityUrl, {
+      ...input,
+      validFrom,
       publicKeyPem: publicKey.publicKeyPem,
-      validFrom: validFrom.toISOString(),
-      validUntil: input.validUntil.toISOString(),
-    }, input.actorAccountId)
-    await this.db.transaction().execute(async trx => {
-      await trx.insertInto('greenfield_publisher_online_signing_identities').values({
-        identity_id: identity.identityId,
-        publisher_id: input.publisherId,
-        signing_key_id: input.signingKeyId,
-        provider: this.provider.kind,
-        provider_key_ref: input.providerKeyRef,
-        purpose: input.purpose,
-        state: 'ACTIVE',
-        first_party_authorized: input.firstPartyAuthorized,
-        valid_from: validFrom,
-        valid_until: input.validUntil,
-        suspended_at: null,
-        suspension_reason: null,
-        revoked_at: null,
-        revocation_reason: null,
-        created_by_account_id: input.actorAccountId,
-        created_at: now,
-        updated_at: now,
-      }).execute()
-      await appendSigningAudit(trx, {
-        eventType: 'identity_registered', identityId: identity.identityId, publisherId: input.publisherId,
-        actorAccountId: input.actorAccountId, details: {
-          signingKeyId: input.signingKeyId, provider: this.provider.kind, purpose: input.purpose,
-          publicKeyFingerprint: publicKey.fingerprint, providerKeyVersion: publicKey.providerKeyVersion,
-        },
-      })
+      fingerprint: publicKey.fingerprint,
+      providerKeyVersion: providerPublicKey.providerKeyVersion,
     })
-    return identity
+    return {...pendingIdentity, identityId}
   }
 
   async suspend(actorAccountId: string, identityId: string, reason: string): Promise<void> {
@@ -197,12 +181,70 @@ export class PublisherOnlineSigningIdentityService {
   }
 
   private async assertPurpose(publisherId: string, purpose: PublisherSigningPurpose, firstPartyAuthorized: boolean): Promise<void> {
-    if (purpose === 'PUBLISHER' && !firstPartyAuthorized) return
     const publisher = await this.db.selectFrom('greenfield_publishers').select(['status', 'trust_level', 'revoked_at'])
       .where('publisher_id', '=', publisherId).executeTakeFirst()
-    if (purpose !== 'MODULA_FIRST_PARTY' || !firstPartyAuthorized || publisher?.status !== 'verified'
-      || publisher.trust_level !== 'firstParty' || publisher.revoked_at) {
+    if (!publisher) throw moduleError('NOT_FOUND', 'Publisher not found')
+    if (publisher.status !== 'verified' || publisher.revoked_at) {
+      throw moduleError('FORBIDDEN', 'Online signing identity enrollment requires an active verified publisher')
+    }
+    if (purpose === 'PUBLISHER' && !firstPartyAuthorized) return
+    const namespace = await this.db.selectFrom('greenfield_publisher_namespaces').select('namespace')
+      .where('publisher_id', '=', publisherId).where('verified_at', 'is not', null).where('revoked_at', 'is', null)
+      .executeTakeFirst()
+    if (purpose !== 'MODULA_FIRST_PARTY' || !firstPartyAuthorized
+      || publisher.trust_level !== 'firstParty' || !namespace) {
       throw moduleError('FORBIDDEN', 'First-party online signing identity enrollment requires explicit authoritative first-party policy')
+    }
+  }
+
+  private requireDedicatedAuthorityUrl(): string {
+    const authorityUrl = this.config.signingIdentityAuthorityDatabaseUrl?.trim()
+    if (!authorityUrl) {
+      throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing identity authority is not configured')
+    }
+    if (sameDatabasePrincipal(authorityUrl, this.config.databaseUrl)) {
+      throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing identity authority requires dedicated database credentials')
+    }
+    return authorityUrl
+  }
+
+  private async registerThroughAuthority(authorityUrl: string, input: {
+    publisherId: string
+    signingKeyId: string
+    providerKeyRef: string
+    purpose: PublisherSigningPurpose
+    firstPartyAuthorized: boolean
+    validFrom: Date
+    validUntil: Date
+    publicKeyPem: string
+    fingerprint: string
+    providerKeyVersion: number | null
+  }): Promise<string> {
+    let authorityDb: ModulaDb | null = null
+    let failed = false
+    try {
+      authorityDb = createDb(authorityUrl, undefined, {max: 1, applicationName: 'modula-signing-identity-authority'})
+      const result = await sql<{identity_id: string}>`
+        SELECT greenfield_signing_identity_authority_register(
+          ${input.publisherId}, ${input.signingKeyId}, ${input.publicKeyPem}, ${input.fingerprint},
+          ${this.provider.kind}, ${input.providerKeyRef}, ${input.purpose}, ${input.firstPartyAuthorized},
+          ${input.validFrom}, ${input.validUntil}, ${input.providerKeyVersion === null ? null : String(input.providerKeyVersion)}
+        ) AS identity_id
+      `.execute(authorityDb)
+      const identityId = result.rows[0]?.identity_id
+      if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no identity')
+      return identityId
+    } catch (error) {
+      failed = true
+      throw registrationAuthorityError(error)
+    } finally {
+      if (authorityDb) {
+        try {
+          await authorityDb.destroy()
+        } catch {
+          if (!failed) throw moduleError('CAPABILITY_UNAVAILABLE', 'Signing identity authority connection could not be released')
+        }
+      }
     }
   }
 
@@ -218,4 +260,44 @@ function cleanReason(reason: string): string {
   const text = String(reason ?? '').trim().replace(/[\r\n\t]+/g, ' ').slice(0, 500)
   if (!text) throw moduleError('VALIDATION_FAILED', 'A signing identity lifecycle reason is required')
   return text
+}
+
+function sameDatabasePrincipal(left: string, right: string): boolean {
+  const leftPrincipal = databasePrincipal(left)
+  const rightPrincipal = databasePrincipal(right)
+  // A non-URL connection string cannot be compared safely. Registration is a
+  // rare control-plane operation, so ambiguous credential separation fails closed.
+  return !leftPrincipal || !rightPrincipal || leftPrincipal === rightPrincipal
+}
+
+function databasePrincipal(value: string): string | null {
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'postgres:' && url.protocol !== 'postgresql:') return null
+    return [
+      url.hostname.toLowerCase(),
+      effectivePort(url),
+      url.pathname,
+      decodeURIComponent(url.username),
+    ].join('\n')
+  } catch {
+    return null
+  }
+}
+
+function effectivePort(url: URL): string {
+  return url.port || (url.protocol === 'postgres:' || url.protocol === 'postgresql:' ? '5432' : '')
+}
+
+function registrationAuthorityError(error: unknown): Error {
+  const code = typeof error === 'object' && error !== null && 'code' in error
+    ? String((error as {code?: unknown}).code ?? '')
+    : ''
+  if (code === '23505') return moduleError('CONFLICT', 'Signing key ID, public key, provider key, or active identity is already registered')
+  if (code === '23503') return moduleError('NOT_FOUND', 'Signing identity registration target was not found')
+  if (code === '22023' || code === '23514' || code === '22P02') {
+    return moduleError('VALIDATION_FAILED', 'Signing identity registration facts are invalid')
+  }
+  if (code === '42501') return moduleError('FORBIDDEN', 'Signing identity registration was rejected by authoritative publisher policy')
+  return moduleError('CAPABILITY_UNAVAILABLE', 'Signing identity authority is unavailable')
 }
