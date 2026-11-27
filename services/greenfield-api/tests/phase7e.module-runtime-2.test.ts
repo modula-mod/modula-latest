@@ -17,7 +17,7 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp, migrateDown} from '../src/database/migrate.js'
 import {GreenfieldModuleDependencyResolver} from '../src/modules/dependency-resolver.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {GreenfieldModuleRuntime2Service} from '../src/modules/runtime2-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
@@ -385,7 +385,7 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
   }
 
   async function ensurePublishedRelease(manifest: GreenfieldModuleManifest) {
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const existing = await releases.getRelease(manifest.moduleId, manifest.version)
     if (existing) return existing
     await releases.importPendingReview(manifest)

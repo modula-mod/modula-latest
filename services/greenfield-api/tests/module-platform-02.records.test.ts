@@ -6,11 +6,11 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import type {Database} from '../src/database/types.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
 import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
 import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -295,7 +295,7 @@ async function seedModule(
     ...['read', 'write'].map(operation => `media:module.${moduleId}.${collection.collection}:${operation}`),
   ]
   const manifest = moduleManifest(moduleId, collection, permissions)
-  const releases = new GreenfieldModuleReleaseService(db)
+  const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
   const imported = await releases.importPendingReview(manifest)
   const published = await releases.publishRelease(moduleId, manifest.version)
   const installationId = `mp02-installation:${moduleId}:${accountId}`
@@ -345,7 +345,7 @@ async function seedModule(
 async function seedCompatibleModuleUpdate(db: Kysely<Database>, fixture: ModuleFixture): Promise<string> {
   const collection = alphaCollection()
   const manifest = moduleManifest(fixture.moduleId, collection, fixture.permissions, '1.1.0')
-  const releases = new GreenfieldModuleReleaseService(db)
+  const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
   await releases.importPendingReview(manifest)
   const published = await releases.publishRelease(fixture.moduleId, manifest.version)
   await db.insertInto('greenfield_module_record_collections').values({

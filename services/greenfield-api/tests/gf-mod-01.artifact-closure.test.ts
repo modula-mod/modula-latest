@@ -18,9 +18,10 @@ import {createDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldArtifactClosureService} from '../src/modules/artifact-closure-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
-import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
+import {buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256, storeFixturePackageArtifact} from './helpers/registry-fixtures.js'
+import {authorizedRegistryAuthorityFromEnv, registerAuthorizedSigningIdentity, revokeAuthorizedSigningIdentity} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
@@ -52,6 +53,7 @@ describeIfDb('GF-MOD-01 artifact closure and fail-closed install preview', () =>
   let accountId = ''
   const keys = generateKeyPairSync('ed25519')
   const keyId = `test-modula-gf-mod-01-${suffix}`
+  let signingIdentityId = ''
   let n = 0
   const nextId = () => `test.modula.gf-mod-01-${suffix}-${++n}`
 
@@ -120,14 +122,25 @@ describeIfDb('GF-MOD-01 artifact closure and fail-closed install preview', () =>
     app = created.app
     db = created.db
     await app.ready()
-    releases = new GreenfieldModuleReleaseService(db)
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
+    signingIdentityId = (await registerAuthorizedSigningIdentity({
+      authorityUrl: process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL!,
+      publisherId: 'modula',
+      signingKeyId: keyId,
+      publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString(),
+      providerKeyRef: `test/gf-mod-01/${suffix}`,
+    })).identityId
     const account = await registerAccount(app, `gf-mod-01-${suffix}@example.com`, `gfmod01${suffix}`.slice(0, 20), db)
     token = account.token
     accountId = account.accountId
   })
 
   afterAll(async () => {
+    if (signingIdentityId) await revokeAuthorizedSigningIdentity({
+      authorityUrl: process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL!,
+      identityId: signingIdentityId,
+      reason: 'GF-MOD-01 disposable fixture cleanup',
+    })
     await app?.close()
     await db?.destroy()
   })

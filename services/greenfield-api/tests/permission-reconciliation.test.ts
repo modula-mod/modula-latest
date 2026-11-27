@@ -4,12 +4,12 @@ import {sql} from 'kysely'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {GreenfieldInstallDescriptorService} from '../src/modules/install-descriptor-service.js'
 import {GreenfieldModuleRegistryService} from '../src/modules/registry-service.js'
 import {GreenfieldModulePermissionReconciliationService} from '../src/modules/permission-reconciliation-service.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount} from './helpers/registry-fixtures.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -52,7 +52,7 @@ describeIfDb.sequential('generic historical permission reconciliation', () => {
     const manifest = adapterManifest(moduleId, version, {
       permissions: permissions.map(permission => ({permission, risk: permission.includes('delete') ? 'high' : 'medium', reason: `Fixture ${permission}`})) as any,
     })
-    const service = new GreenfieldModuleReleaseService(db)
+    const service = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     await service.importPendingReview(manifest, evidenceFor(manifest))
     const release = await service.publishRelease(moduleId, version)
     const product = fixtureProduct(moduleId, version)

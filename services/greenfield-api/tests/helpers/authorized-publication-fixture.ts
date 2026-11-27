@@ -7,6 +7,7 @@ import {sql} from 'kysely'
 import {expect} from 'vitest'
 import {createDb, type ModulaDb} from '../../src/database/client.js'
 import {GreenfieldModuleReleaseService} from '../../src/modules/release-service.js'
+import {GreenfieldRegistryAuthorityService, type RegistryAuthorityConfig} from '../../src/modules/registry-authority-service.js'
 import {
   approvalFactsSha256,
   buildPublisherReleaseApprovalFacts,
@@ -47,6 +48,119 @@ export type AuthorizedSigningIdentityFixture = {
   signingKeyId: string
   providerKeyRef: string
   publicKeyFingerprint: string
+}
+
+export function authorizedRegistryAuthorityConfig(
+  databaseUrl: string,
+  fixture: AuthorizedPublicationRoleFixture,
+): RegistryAuthorityConfig {
+  return {
+    databaseUrl,
+    trustVerifierDatabaseUrl: fixture.urls.trustVerifier,
+    publicationAuthorityDatabaseUrl: fixture.urls.publicationAuthority,
+    quarantineAuthorityDatabaseUrl: fixture.urls.quarantineAuthority,
+    revocationAuthorityDatabaseUrl: fixture.urls.revocationAuthority,
+  }
+}
+
+/**
+ * Builds the production authority adapter from the fixed disposable principals
+ * configured by the database-backed CI job. Missing credentials are a setup
+ * failure, never a reason to fall back to ordinary database mutation.
+ */
+export function authorizedRegistryAuthorityFromEnv(
+  adminDb: ModulaDb,
+  databaseUrl: string,
+): GreenfieldRegistryAuthorityService {
+  const required = (name: string): string => {
+    const value = process.env[name]?.trim()
+    if (!value) throw new Error(`${name} is required for authority-separated registry fixtures`)
+    return value
+  }
+  return new GreenfieldRegistryAuthorityService(adminDb, {
+    databaseUrl,
+    trustVerifierDatabaseUrl: required('MODULA_TRUST_VERIFIER_DATABASE_URL'),
+    publicationAuthorityDatabaseUrl: required('MODULA_PUBLICATION_AUTHORITY_DATABASE_URL'),
+    quarantineAuthorityDatabaseUrl: required('MODULA_QUARANTINE_AUTHORITY_DATABASE_URL'),
+    revocationAuthorityDatabaseUrl: required('MODULA_REVOCATION_AUTHORITY_DATABASE_URL'),
+  })
+}
+
+export function authorizedReleaseServiceFromEnv(
+  adminDb: ModulaDb,
+  databaseUrl: string,
+): GreenfieldModuleReleaseService {
+  return new GreenfieldModuleReleaseService(
+    adminDb,
+    authorizedRegistryAuthorityFromEnv(adminDb, databaseUrl),
+  )
+}
+
+export function configureAuthorizedRegistryAuthorityEnv(fixture: AuthorizedPublicationRoleFixture): void {
+  process.env.MODULA_TRUST_VERIFIER_DATABASE_URL = fixture.urls.trustVerifier
+  process.env.MODULA_PUBLICATION_AUTHORITY_DATABASE_URL = fixture.urls.publicationAuthority
+  process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL = fixture.urls.signingIdentityAuthority
+  process.env.MODULA_QUARANTINE_AUTHORITY_DATABASE_URL = fixture.urls.quarantineAuthority
+  process.env.MODULA_REVOCATION_AUTHORITY_DATABASE_URL = fixture.urls.revocationAuthority
+}
+
+export function clearAuthorizedRegistryAuthorityEnv(): void {
+  delete process.env.MODULA_TRUST_VERIFIER_DATABASE_URL
+  delete process.env.MODULA_PUBLICATION_AUTHORITY_DATABASE_URL
+  delete process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL
+  delete process.env.MODULA_QUARANTINE_AUTHORITY_DATABASE_URL
+  delete process.env.MODULA_REVOCATION_AUTHORITY_DATABASE_URL
+}
+
+export async function verifyAuthorizedExternalSignature(input: {
+  adminDb: ModulaDb
+  targetDatabaseUrl: string
+  fixture: AuthorizedPublicationRoleFixture
+  releaseId: string
+}) {
+  return new GreenfieldRegistryAuthorityService(
+    input.adminDb,
+    authorizedRegistryAuthorityConfig(input.targetDatabaseUrl, input.fixture),
+  ).verifyPendingSignature(input.releaseId)
+}
+
+export async function publishAuthorizedRelease(input: {
+  adminDb: ModulaDb
+  targetDatabaseUrl: string
+  fixture: AuthorizedPublicationRoleFixture
+  releaseId: string
+}) {
+  return new GreenfieldRegistryAuthorityService(
+    input.adminDb,
+    authorizedRegistryAuthorityConfig(input.targetDatabaseUrl, input.fixture),
+  ).publishRelease(input.releaseId)
+}
+
+export async function quarantineAuthorizedRelease(input: {
+  adminDb: ModulaDb
+  targetDatabaseUrl: string
+  fixture: AuthorizedPublicationRoleFixture
+  releaseId: string
+  reason: string
+  policyAction?: 'warn' | 'disableExecutableContributions' | 'block'
+}) {
+  return new GreenfieldRegistryAuthorityService(
+    input.adminDb,
+    authorizedRegistryAuthorityConfig(input.targetDatabaseUrl, input.fixture),
+  ).quarantineRelease(input.releaseId, input.reason, input.policyAction)
+}
+
+export async function revokeAuthorizedRelease(input: {
+  adminDb: ModulaDb
+  targetDatabaseUrl: string
+  fixture: AuthorizedPublicationRoleFixture
+  releaseId: string
+  reason: string
+}) {
+  return new GreenfieldRegistryAuthorityService(
+    input.adminDb,
+    authorizedRegistryAuthorityConfig(input.targetDatabaseUrl, input.fixture),
+  ).revokeRelease(input.releaseId, input.reason)
 }
 
 function identifier(value: string): string {

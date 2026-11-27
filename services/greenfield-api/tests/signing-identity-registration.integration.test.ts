@@ -18,6 +18,7 @@ import {
 import {configureRegistryTestEnv} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? databaseUrl
 const describeDb = databaseUrl ? describe : describe.skip
 
 describeDb('GF-SIGNER-R4A2-02A signing identity authority integration', () => {
@@ -43,7 +44,8 @@ describeDb('GF-SIGNER-R4A2-02A signing identity authority integration', () => {
     process.env.MODULA_ADMIN_HANDLES = operatorHandle
     await migrateUp(databaseUrl!)
     adminDb = createDb(databaseUrl!, undefined, {applicationName: 'r4a2-02a-admin'})
-    adminPool = new pg.Pool({connectionString: databaseUrl!, max: 2, application_name: 'r4a2-02a-role-admin'})
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for authority role fixtures')
+    adminPool = new pg.Pool({connectionString: adminDatabaseUrl, max: 2, application_name: 'r4a2-02a-role-admin'})
 
     const now = new Date()
     await adminDb.insertInto('greenfield_accounts').values([

@@ -39,6 +39,7 @@ import {
 } from './helpers/builder-release-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? databaseUrl
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
@@ -144,7 +145,8 @@ describeIfDb('BUILDER-01 publisher release console', () => {
     await migrateUp(databaseUrl!)
     source = new FixtureGithubSource()
     const bootstrapDb = createDb(databaseUrl!, undefined, {applicationName: 'builder-authority-bootstrap'})
-    authorityAdminPool = new pg.Pool({connectionString: databaseUrl!, max: 2, application_name: 'builder-authority-admin'})
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for authority role fixtures')
+    authorityAdminPool = new pg.Pool({connectionString: adminDatabaseUrl, max: 2, application_name: 'builder-authority-admin'})
     authorityRoles = await provisionAuthorizedPublicationRoles({
       adminPool: authorityAdminPool,
       targetDatabaseUrl: databaseUrl!,

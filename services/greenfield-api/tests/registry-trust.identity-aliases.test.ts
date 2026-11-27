@@ -16,6 +16,7 @@ import {classifyBetaModule} from '../src/modules/beta-catalogue-policy.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct} from './helpers/registry-fixtures.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -72,7 +73,7 @@ describeIfDb('registry trust pipeline: aliases come from modula.product.json, no
     app = created.app
     db = created.db
     await app.ready()
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     const manifest = adapterManifest(productId, '1.0.0')
     await releases.importPendingReview(manifest, evidenceFor(manifest))
     const release = await releases.publishRelease(productId, '1.0.0')
@@ -100,7 +101,7 @@ describeIfDb('registry trust pipeline: aliases come from modula.product.json, no
 
   it('refuses another product claiming an existing alias', async () => {
     const other = `digital.modula.alias-thief-${suffix}`
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     const manifest = adapterManifest(other, '1.0.0')
     await releases.importPendingReview(manifest, evidenceFor(manifest))
     const release = await releases.publishRelease(other, '1.0.0')

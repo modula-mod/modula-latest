@@ -4,20 +4,35 @@ import {join} from 'node:path'
 import {gzipSync} from 'node:zlib'
 import {sql} from 'kysely'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import pg from 'pg'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
+import {createDb} from '../src/database/client.js'
 import {readTarGz} from '../src/lib/tar-gz.js'
 import {GreenfieldGithubReleaseSyncService, verifyOptionalArchive, verifyWebGameArchive, type GithubRelease, type GithubReleaseAsset, type GithubReleaseSource} from '../src/modules/github-release-sync-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
-import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
+import {buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, fixtureProduct, fixtureRoot, registerAccount, sha256} from './helpers/registry-fixtures.js'
 import {createDb as createWorkerDb} from '../../greenfield-worker/src/database.js'
 import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
 import {handleModuleInstall} from '../../greenfield-worker/src/modules/installation-handler.js'
 import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
+import {
+  authorizedRegistryAuthorityConfig,
+  clearAuthorizedRegistryAuthorityEnv,
+  configureAuthorizedRegistryAuthorityEnv,
+  dropAuthorizedPublicationRoles,
+  provisionAuthorizedPublicationRoles,
+  registerAuthorizedSigningIdentity,
+  revokeAuthorizedRelease,
+  revokeAuthorizedSigningIdentity,
+  rotateAuthorizedSigningIdentity,
+  type AuthorizedPublicationRoleFixture,
+} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 const REPOSITORY = 'modula-mod/registry-trust-fixtures'
@@ -206,13 +221,68 @@ describe('release tarball reader', () => {
 describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
+  let adminPool: pg.Pool | null = null
+  let authorities: AuthorizedPublicationRoleFixture | null = null
   let n = 0
   const nextId = () => `digital.modula.sync-${suffix}-${++n}`
+  const identityIds = new Map<string, {identityId: string; publisherId: string}>()
+  const activeIdentityIds = new Map<string, string>()
+
+  const syncService = (source: GithubReleaseSource) => new GreenfieldGithubReleaseSyncService(
+    db,
+    source,
+    authorizedRegistryAuthorityConfig(databaseUrl!, authorities!),
+  )
+
+  async function registerKey(publisherId: string, keyId: string, publicKeyPem: string) {
+    const providerKeyRef = `test/github-sync/${suffix}/${keyId}`
+    const activeIdentityId = activeIdentityIds.get(publisherId)
+    const identity = activeIdentityId
+      ? {
+          identityId: await rotateAuthorizedSigningIdentity({
+            authorityUrl: authorities!.urls.signingIdentityAuthority,
+            identityId: activeIdentityId,
+            signingKeyId: keyId,
+            publicKeyPem,
+            providerKeyRef,
+          }),
+        }
+      : await registerAuthorizedSigningIdentity({
+          authorityUrl: authorities!.urls.signingIdentityAuthority,
+          publisherId, signingKeyId: keyId, publicKeyPem, providerKeyRef,
+          purpose: 'PUBLISHER',
+        })
+    identityIds.set(keyId, {identityId: identity.identityId, publisherId})
+    activeIdentityIds.set(publisherId, identity.identityId)
+    return identity
+  }
+
+  async function revokeKey(keyId: string, reason: string) {
+    const identity = identityIds.get(keyId)
+    if (!identity) throw new Error(`Missing signing identity for ${keyId}`)
+    await revokeAuthorizedSigningIdentity({
+      authorityUrl: authorities!.urls.signingIdentityAuthority,
+      identityId: identity.identityId,
+      reason,
+    })
+    if (activeIdentityIds.get(identity.publisherId) === identity.identityId) {
+      activeIdentityIds.delete(identity.publisherId)
+    }
+  }
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
     process.env.MODULA_ADMIN_HANDLES = `gubicadmin${suffix},gubicreview${suffix},gubicenable${suffix}`
     await migrateUp(databaseUrl!)
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for authority fixtures')
+    adminPool = new pg.Pool({connectionString: adminDatabaseUrl, max: 1})
+    const bootstrapDb = createDb(databaseUrl!)
+    try {
+      authorities = await provisionAuthorizedPublicationRoles({adminPool, targetDatabaseUrl: databaseUrl!, targetDb: bootstrapDb, suffix: `github-${suffix}`})
+    } finally {
+      await bootstrapDb.destroy()
+    }
+    configureAuthorizedRegistryAuthorityEnv(authorities)
     const created = await createServer(loadConfig())
     app = created.app
     db = created.db
@@ -220,13 +290,25 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
   })
 
   afterAll(async () => {
+    if (authorities) {
+      for (const identityId of activeIdentityIds.values()) {
+        await revokeAuthorizedSigningIdentity({
+          authorityUrl: authorities.urls.signingIdentityAuthority,
+          identityId,
+          reason: 'GitHub synchronization fixture cleanup',
+        })
+      }
+    }
     await app?.close()
     await db?.destroy()
+    if (adminPool && authorities) await dropAuthorizedPublicationRoles(adminPool, authorities)
+    await adminPool?.end()
+    clearAuthorizedRegistryAuthorityEnv()
   })
 
   it('dry-runs by default: verifies everything and writes nothing', async () => {
     const built = buildRelease(nextId(), '1.0.0')
-    const result = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({repository: REPOSITORY, releaseTag: built.tag})
+    const result = await syncService(built.source).sync({repository: REPOSITORY, releaseTag: built.tag})
     expect(result).toMatchObject({mode: 'DRY_RUN', action: 'import', productId: built.productId, packageSha256: sha256(built.packageBytes)})
     expect(result.checks).toEqual(expect.arrayContaining(['provenance.identity', 'tag.commit', 'package.sha256', 'productManifest.sha256', 'adapterManifest.sha256', 'identity.consistent', 'frontend.sha256']))
     expect(await new GreenfieldModuleReleaseService(db).getRelease(built.productId, '1.0.0')).toBeUndefined()
@@ -234,7 +316,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
 
   it('imports, verifies, publishes and ingests a release; serves its package and media; re-sync is a backfill', async () => {
     const built = buildRelease(nextId(), '1.0.0')
-    const service = new GreenfieldGithubReleaseSyncService(db, built.source)
+    const service = syncService(built.source)
     const result = await service.sync({repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false})
     expect(result).toMatchObject({mode: 'APPLIED', action: 'import', releaseState: 'published', packageStored: true, signed: false})
     const run = await db.selectFrom('greenfield_module_sync_runs').select(['status']).where('sync_run_id', '=', (result as {syncRunId: string}).syncRunId).executeTakeFirstOrThrow()
@@ -261,16 +343,16 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
 
   it('leaves the release verified (unpublished) unless publish is requested', async () => {
     const built = buildRelease(nextId(), '1.0.0')
-    const result = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({repository: REPOSITORY, releaseTag: built.tag, dryRun: false})
+    const result = await syncService(built.source).sync({repository: REPOSITORY, releaseTag: built.tag, dryRun: false})
     expect(result).toMatchObject({mode: 'APPLIED', releaseState: 'verified'})
   })
 
   it('verifies a publisher signature carried in the provenance sidecar', async () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `sync-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    await registerKey('modula', keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const built = buildRelease(nextId(), '1.0.0', {sign: {keyId, privateKey: keys.privateKey}})
-    const result = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false})
+    const result = await syncService(built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false})
     expect(result).toMatchObject({signed: true, releaseState: 'published'})
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${built.productId}`})
     expect(detail.json().data.registryTrust.signature).toMatchObject({state: 'verified', keyId})
@@ -327,7 +409,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       },
       manifestOverrides: {permissions: [{permission: 'search:index', risk: 'medium', reason: 'Synthetic permission delta'}] as any},
     })
-    await new GreenfieldGithubReleaseSyncService(db, beta.source).sync({repository: REPOSITORY, releaseTag: beta.tag, publish: true, dryRun: false})
+    await syncService(beta.source).sync({repository: REPOSITORY, releaseTag: beta.tag, publish: true, dryRun: false})
     const stablePlan = await app.inject({
       method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
       headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
@@ -377,7 +459,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       sign: {keyId, privateKey: keys.privateKey},
       mutateProduct: (_mps, frontend) => { frontend.capabilities = {required: ['ui.graph@1']} },
     })
-    const futureResult = await new GreenfieldGithubReleaseSyncService(db, future.source).sync({repository: REPOSITORY, releaseTag: future.tag, publish: true, dryRun: false})
+    const futureResult = await syncService(future.source).sync({repository: REPOSITORY, releaseTag: future.tag, publish: true, dryRun: false})
     const incompatible = await app.inject({
       method: 'POST', url: `/v1/modules/${built.productId}/update-plan`,
       headers: {authorization: `Bearer ${account.token}`}, payload: {platform: 'ios', hostCapabilities: []},
@@ -394,7 +476,13 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const futureReleaseId = (futureResult as {releaseId: string}).releaseId
     const futureDescriptor = await app.inject({method: 'GET', url: `/v1/registry/releases/${futureReleaseId}/descriptor`})
     const futurePackage = futureDescriptor.json().data.artifacts.find((artifact: any) => artifact.kind === 'module-package')
-    await new GreenfieldModuleReleaseService(db).revokeRelease(futureReleaseId, 'synthetic failed rollout')
+    await revokeAuthorizedRelease({
+      adminDb: db,
+      targetDatabaseUrl: databaseUrl!,
+      fixture: authorities!,
+      releaseId: futureReleaseId,
+      reason: 'synthetic failed rollout',
+    })
     const revokedDescriptor = await app.inject({method: 'GET', url: `/v1/registry/releases/${futureReleaseId}/descriptor`})
     expect(revokedDescriptor.statusCode, revokedDescriptor.body).toBe(200)
     expect(revokedDescriptor.json().data).toMatchObject({revoked: true, trust: {verified: false}})
@@ -459,7 +547,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     await expect(db.deleteFrom('greenfield_module_releases').where('release_id', '=', releaseId).execute())
       .rejects.toThrow(/published releases are immutable/)
 
-    await new GreenfieldPublisherSigningKeyService(db).revoke('modula', keyId, 'synthetic signer revocation', null)
+    await revokeKey(keyId, 'synthetic signer revocation')
     const afterRevocation = await app.inject({
       method: 'GET', url: `/v1/modules/${built.productId}/installation-descriptor`,
       headers: {authorization: `Bearer ${account.token}`, 'if-none-match': descriptorEtag},
@@ -494,11 +582,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
   it('plans and installs a signed content-only module package with entitlement and tamper gates', async () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `module-package-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register(
-      'modula',
-      {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()},
-      null,
-    )
+    await registerKey('modula', keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const moduleId = nextId()
     const content = Buffer.from('{"schemaVersion":"1.0.0","views":[]}')
     const inventory = Buffer.from(JSON.stringify({
@@ -526,7 +610,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       },
       mutateFiles: files => { files[packagePath] = packageBytes },
     })
-    const synced = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({
+    const synced = await syncService(built.source).sync({
       repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false,
     })
     expect(synced).toMatchObject({signed: true, releaseState: 'published'})
@@ -656,11 +740,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
 
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register(
-      publisherId,
-      {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()},
-      owner.accountId,
-    )
+    await registerKey(publisherId, keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'">')
     const javascript = Buffer.from('document.title="Asteroid Run"')
     const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
@@ -694,7 +774,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       },
       mutateFiles: files => { files['game/game.tgz'] = gameBytes },
     })
-    const synced = await new GreenfieldGithubReleaseSyncService(db, built.source).sync({
+    const synced = await syncService(built.source).sync({
       repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false,
     })
     expect(synced).toMatchObject({signed: true, releaseState: 'published'})
@@ -821,7 +901,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       payload: {publicationStatus: 'published', availability: 'available', featured: false, reason: 'Signer revocation acceptance setup'},
     })
     expect(republish.statusCode, republish.body).toBe(200)
-    await new GreenfieldPublisherSigningKeyService(db).revoke(publisherId, keyId, 'Synthetic revoked-game proof', admin.accountId)
+    await revokeKey(keyId, 'Synthetic revoked-game proof')
     expect((await app.inject({method: 'GET', url: `/v1/gubic/games?q=${encodeURIComponent(gameId)}`})).json().data.items).toEqual([])
     const revokedInstall = await app.inject({
       method: 'POST', url: `/v1/modules/${gameId}/install`, headers: {...headers, 'idempotency-key': `revoked-${suffix}`},
@@ -837,7 +917,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     const namespace = `test.modula.gubic-p1-${suffix}`
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-p1-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    await registerKey('modula', keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'"><canvas></canvas><script src="main.js"></script>')
     const javascript = Buffer.from('document.querySelector("canvas").getContext("2d").fillRect(0,0,1,1)')
     const inventory = Buffer.from(JSON.stringify({schema: 'modula.game-files.1', files: {'index.html': sha256(html), 'main.js': sha256(javascript)}}))
@@ -857,10 +937,10 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
       mutateFiles: files => { files['game/game.tgz'] = gameBytes },
     })
     const html5 = build(`${namespace}.reference-tap`, 'html5')
-    const synced = await new GreenfieldGithubReleaseSyncService(db, html5.source).sync({repository: REPOSITORY, releaseTag: html5.tag, publish: true, dryRun: false})
+    const synced = await syncService(html5.source).sync({repository: REPOSITORY, releaseTag: html5.tag, publish: true, dryRun: false})
     expect(synced).toMatchObject({signed: true, releaseState: 'published'})
     const unknown = build(`${namespace}.unknown-engine`, 'unity')
-    await expect(new GreenfieldGithubReleaseSyncService(db, unknown.source).sync({repository: REPOSITORY, releaseTag: unknown.tag, publish: true, dryRun: false}))
+    await expect(syncService(unknown.source).sync({repository: REPOSITORY, releaseTag: unknown.tag, publish: true, dryRun: false}))
       .rejects.toThrow(/Web game runtime artifact contract is invalid/)
     expect(await new GreenfieldModuleReleaseService(db).getRelease(`${namespace}.unknown-engine`, '0.1.0')).toBeUndefined()
   }, 60_000)
@@ -876,7 +956,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     }).execute()
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-p2-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    await registerKey('modula', keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'">')
     const build = (version: string) => {
       const javascript = Buffer.from(`document.title="Reference Tap ${version}"`)
@@ -905,8 +985,8 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     }
     const first = build('1.0.0')
     const second = build('1.1.0')
-    const firstResult = await new GreenfieldGithubReleaseSyncService(db, first.source).sync({repository: REPOSITORY, releaseTag: first.tag, publish: true, dryRun: false}) as {releaseId: string}
-    const secondResult = await new GreenfieldGithubReleaseSyncService(db, second.source).sync({repository: REPOSITORY, releaseTag: second.tag, publish: true, dryRun: false}) as {releaseId: string}
+    const firstResult = await syncService(first.source).sync({repository: REPOSITORY, releaseTag: first.tag, publish: true, dryRun: false}) as {releaseId: string}
+    const secondResult = await syncService(second.source).sync({repository: REPOSITORY, releaseTag: second.tag, publish: true, dryRun: false}) as {releaseId: string}
     const headers = {authorization: `Bearer ${owner.token}`}
     // test.modula.* products are hidden from the beta Product Hub, so the admin
     // review route (which requires a hub-visible trusted release) cannot publish
@@ -1018,12 +1098,12 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
   it('performs a governed rollback to the advertised trusted release', async () => {
     const keys = generateKeyPairSync('ed25519')
     const keyId = `rollback-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    await registerKey('modula', keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const moduleId = nextId()
     const first = buildRelease(moduleId, '1.0.0', {sign: {keyId, privateKey: keys.privateKey}})
     const second = buildRelease(moduleId, '1.1.0', {sign: {keyId, privateKey: keys.privateKey}})
-    const firstResult = await new GreenfieldGithubReleaseSyncService(db, first.source).sync({repository: REPOSITORY, releaseTag: first.tag, publish: true, dryRun: false})
-    const secondResult = await new GreenfieldGithubReleaseSyncService(db, second.source).sync({repository: REPOSITORY, releaseTag: second.tag, publish: true, dryRun: false})
+    const firstResult = await syncService(first.source).sync({repository: REPOSITORY, releaseTag: first.tag, publish: true, dryRun: false})
+    const secondResult = await syncService(second.source).sync({repository: REPOSITORY, releaseTag: second.tag, publish: true, dryRun: false})
     const account = await registerAccount(app, `rollback-${suffix}@example.com`, `rollback${suffix}`, db)
     const headers = {authorization: `Bearer ${account.token}`}
     const install = await app.inject({
@@ -1091,7 +1171,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     ['a package without modula.product.json', {mutateFiles: (f: Record<string, Buffer>) => { delete f['modula.product.json'] }, mutateProvenance: (p: Record<string, unknown>) => { delete p.productManifestChecksum }}, /no modula\.product\.json/],
   ])('rejects %s and records the failure', async (_label, options, pattern) => {
     const built = buildRelease(nextId(), '1.0.0', options as any)
-    await expect(new GreenfieldGithubReleaseSyncService(db, built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false})).rejects.toThrow(pattern)
+    await expect(syncService(built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish: true, dryRun: false})).rejects.toThrow(pattern)
     expect(await new GreenfieldModuleReleaseService(db).getRelease(built.productId, '1.0.0')).toBeUndefined()
     const failures = await db.selectFrom('greenfield_module_sync_failures').select(['message']).where('repository', '=', REPOSITORY).orderBy('created_at', 'desc').limit(1).execute()
     expect(failures[0]?.message).toMatch(pattern)
@@ -1115,7 +1195,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     }).execute()
     const keys = generateKeyPairSync('ed25519')
     const keyId = `gubic-${label}-${suffix}`
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: keys.publicKey.export({format: 'pem', type: 'spki'}).toString()}, null)
+    await registerKey('modula', keyId, keys.publicKey.export({format: 'pem', type: 'spki'}).toString())
     const html = Buffer.from('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; connect-src \'none\'; base-uri \'none\'; worker-src \'none\'; object-src \'none\'">')
     const sync = async (gameId: string, version: string, publish = true) => {
       const javascript = Buffer.from(`document.title="${gameId} ${version}"`)
@@ -1141,7 +1221,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
         },
         mutateFiles: files => { files['game/game.tgz'] = gameBytes },
       })
-      return await new GreenfieldGithubReleaseSyncService(db, built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish, dryRun: false}) as {releaseId: string}
+      return await syncService(built.source).sync({repository: REPOSITORY, releaseTag: built.tag, publish, dryRun: false}) as {releaseId: string}
     }
     const headers = {authorization: `Bearer ${owner.token}`}
     const register = async (gameId: string) => {
@@ -1278,7 +1358,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
     // Non-game modules are not affected by the gate (no game projection).
     const plain = nextId()
     const plainBuilt = buildRelease(plain, '1.0.0')
-    await new GreenfieldGithubReleaseSyncService(db, plainBuilt.source).sync({repository: REPOSITORY, releaseTag: plainBuilt.tag, publish: true, dryRun: false})
+    await syncService(plainBuilt.source).sync({repository: REPOSITORY, releaseTag: plainBuilt.tag, publish: true, dryRun: false})
     const plainEnable = await app.inject({method: 'POST', url: `/v1/modules/${plain}/enable`, headers: {...headers, 'idempotency-key': `gubic-enable-plain-${suffix}`}, payload: {}})
     expect(plainEnable.json().error?.message ?? '').not.toMatch(/catalogue|entitlement/)
   }, 120_000)

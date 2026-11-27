@@ -218,6 +218,10 @@ GRANT EXECUTE ON FUNCTION greenfield_trust_verifier_claim(TEXT)
   TO :"trust_verifier_role";
 GRANT EXECUTE ON FUNCTION greenfield_trust_verifier_record(TEXT, TEXT, BOOLEAN, TEXT, TEXT)
   TO :"trust_verifier_role";
+GRANT EXECUTE ON FUNCTION greenfield_external_trust_verifier_claim(TEXT)
+  TO :"trust_verifier_role";
+GRANT EXECUTE ON FUNCTION greenfield_external_trust_verifier_record(TEXT, TEXT, BOOLEAN, TEXT, TEXT)
+  TO :"trust_verifier_role";
 
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"publication_authority_role";
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM :"publication_authority_role";
@@ -225,6 +229,8 @@ REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM :"publication_authority_role";
 REVOKE CREATE ON SCHEMA public FROM :"publication_authority_role";
 GRANT USAGE ON SCHEMA public TO :"publication_authority_role";
 GRANT EXECUTE ON FUNCTION greenfield_publication_authority_publish_next()
+  TO :"publication_authority_role";
+GRANT EXECUTE ON FUNCTION greenfield_registry_publication_authority_publish(TEXT)
   TO :"publication_authority_role";
 
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"publisher_trust_authority_role";
@@ -323,6 +329,10 @@ SELECT greenfield_assert_publisher_authority_role_isolation(
   :'signing_identity_authority_role'::NAME,
   :'quarantine_authority_role'::NAME,
   :'revocation_authority_role'::NAME
+);
+SELECT greenfield_assert_registry_integration_authority_isolation(
+  :'trust_verifier_role'::NAME,
+  :'publication_authority_role'::NAME
 );
 
 COMMIT;

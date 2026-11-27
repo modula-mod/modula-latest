@@ -459,7 +459,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Dependencies: verification ownership
 - Verification: The canonical verifier must pass on reviewed current main at 073_backup_sequence_acl_defaults without weakening exact-SHA production checks.
 
-## API-ATLAS-GAP-037 — P3 — 22 tables have no API/worker source reference
+## API-ATLAS-GAP-037 — P3 — 23 tables have no API/worker source reference
 
 - Domain/type: `database` / `orphan table`
 - Remediation status: **OPEN**

@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import pg from 'pg'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
@@ -7,8 +8,15 @@ import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleMarketplaceService} from '../src/modules/marketplace-service.js'
 import {isInstalledStatus} from '../src/modules/installation-status.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount} from './helpers/registry-fixtures.js'
+import {
+  dropAuthorizedPublicationRoles,
+  provisionAuthorizedPublicationRoles,
+  publishAuthorizedRelease,
+  type AuthorizedPublicationRoleFixture,
+} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
@@ -24,6 +32,8 @@ describeIfDb('registry trust pipeline: listInstalled excludes uninstalled rows',
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let token = ''
   let accountId = ''
+  let adminPool: pg.Pool | null = null
+  let authorities: AuthorizedPublicationRoleFixture | null = null
   const statuses = ['enabled', 'disabled', 'uninstalled', 'removed', 'notInstalled'] as const
   const ids = Object.fromEntries(statuses.map(status => [status, `digital.modula.state-${status.toLowerCase()}-${suffix}`])) as Record<(typeof statuses)[number], string>
 
@@ -34,6 +44,9 @@ describeIfDb('registry trust pipeline: listInstalled excludes uninstalled rows',
     app = created.app
     db = created.db
     await app.ready()
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for authority fixtures')
+    adminPool = new pg.Pool({connectionString: adminDatabaseUrl, max: 1})
+    authorities = await provisionAuthorizedPublicationRoles({adminPool, targetDatabaseUrl: databaseUrl!, targetDb: db, suffix: `state-${suffix}`})
     const account = await registerAccount(app, `state-${suffix}@example.com`, `state${suffix}`, db)
     token = account.token
     accountId = account.accountId
@@ -41,7 +54,10 @@ describeIfDb('registry trust pipeline: listInstalled excludes uninstalled rows',
     for (const status of statuses) {
       const manifest = adapterManifest(ids[status], '1.0.0')
       await releases.importPendingReview(manifest, evidenceFor(manifest))
-      const release = await releases.publishRelease(ids[status], '1.0.0')
+      const verified = await releases.verifyRelease(ids[status], '1.0.0')
+      const release = await publishAuthorizedRelease({
+        adminDb: db, targetDatabaseUrl: databaseUrl!, fixture: authorities!, releaseId: verified.releaseId,
+      })
       const row = await db.selectFrom('greenfield_module_releases').select('extension_version_id').where('release_id', '=', release.releaseId).executeTakeFirstOrThrow()
       await db.insertInto('greenfield_extension_installations').values({
         installation_id: randomUUID(), extension_version_id: row.extension_version_id!, account_id: accountId, status, config: JSON.stringify({}), created_at: new Date(), updated_at: new Date(),
@@ -50,6 +66,8 @@ describeIfDb('registry trust pipeline: listInstalled excludes uninstalled rows',
   })
 
   afterAll(async () => {
+    if (adminPool && authorities) await dropAuthorizedPublicationRoles(adminPool, authorities)
+    await adminPool?.end()
     await app?.close()
     await db?.destroy()
   })

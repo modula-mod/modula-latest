@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-26T20:44:01.369Z",
+  "capturedAt": "2026-11-27T19:37:26.300Z",
   "source": {
     "branch": "integration/greenfield-signer-finish",
-    "headAtCapture": "08a23276fe184d96b2e0a734a82ae57a19e937e6",
+    "headAtCapture": "7457e9017e6ccd4db220eb38ba12d96b9ef468a2",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "ea2c540ae27dc20d86098b294cc16cff163d92552d26ae4e1bde9df1a3fe8082"
+    "apiSourceSha256": "fda46241346b4939aaa0c80f7f91bc7211a6ad21e2c7e77334ce93ad92569274"
   },
   "runtimeRoutes": [
     {

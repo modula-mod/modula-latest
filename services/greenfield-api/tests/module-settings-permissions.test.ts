@@ -11,6 +11,7 @@ import {GreenfieldModuleSettingsService} from '../src/modules/settings-service.j
 import {statusForError} from '../src/transport/envelope.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount} from './helpers/registry-fixtures.js'
 import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -145,7 +146,7 @@ describeIfDb.sequential('neutral module settings authorization matrix', () => {
       contributions: {settings: [{id: `${moduleId}.settings.installation`, title: 'Neutral settings', schemaRef: 'schemas/settings.json', scope: 'installation'}]},
       extensions: {settingsDefaults: {theme: 'system', secretToken: ''}},
     })
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     const imported = await releases.importPendingReview(manifest, evidenceFor(manifest))
     const published = await releases.publishRelease(moduleId, '1.0.0')
     const installationId = `settings-installation:${moduleId}:${accountId}`

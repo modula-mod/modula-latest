@@ -19,6 +19,7 @@ import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config
 import {handleModuleInstall} from '../../greenfield-worker/src/modules/installation-handler.js'
 import {handleModuleEnable} from '../../greenfield-worker/src/modules/enable-handler.js'
 import {handleModuleDisable} from '../../greenfield-worker/src/modules/disable-handler.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -47,7 +48,7 @@ describeIfDb('MPS product-owned frontend exact-release runtime', () => {
     await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute()
 
     const manifest = productManifest(productId, version)
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     let release = await releases.getRelease(productId, version)
     if (!release) {
       await releases.importPendingReview(manifest, releaseEvidence(manifest))
@@ -134,7 +135,7 @@ describeIfDb('MPS product-owned frontend exact-release runtime', () => {
     const legacyId = `digital.modula.legacy-frontend-${suffix}`
     const legacyVersion = '1.0.0'
     const manifest = productManifest(legacyId, legacyVersion)
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     await releases.importPendingReview(manifest, releaseEvidence(manifest))
     const release = await releases.publishRelease(legacyId, legacyVersion)
     await installAndEnable(legacyId, legacyVersion, release.releaseId, `legacy-${suffix}`)

@@ -287,6 +287,427 @@ END;
 $$;
 REVOKE ALL ON FUNCTION greenfield_publication_authority_publish_next() FROM PUBLIC;
 
+-- Signed registry imports and historical signature retrofits are proposals,
+-- not verified facts. The ordinary API may insert only pending evidence; this
+-- fixed-operation verifier independently checks the Ed25519 bytes and the
+-- database revalidates every authoritative release/key/projection fact before
+-- accepting the result.
+CREATE TABLE greenfield_registry_authority_events (
+  event_id TEXT PRIMARY KEY CHECK (event_id ~ '^grae_[0-9a-f-]{36}$'),
+  event_type TEXT NOT NULL CHECK (event_type IN (
+    'external_signature_verified', 'external_signature_invalid', 'registry_release_published'
+  )),
+  release_id TEXT NOT NULL REFERENCES greenfield_module_releases(release_id),
+  signature_id TEXT NULL REFERENCES greenfield_module_release_signatures(signature_id),
+  actor_account_id TEXT NULL REFERENCES greenfield_accounts(account_id),
+  actor_database_role NAME NOT NULL,
+  details JSONB NOT NULL DEFAULT '{}'::JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT pg_catalog.clock_timestamp()
+);
+REVOKE ALL ON greenfield_registry_authority_events FROM PUBLIC, modula_api, modula_worker;
+
+CREATE FUNCTION greenfield_registry_authority_event_guard()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $$
+BEGIN
+  IF TG_OP <> 'INSERT' THEN
+    RAISE EXCEPTION 'registry authority evidence is append-only' USING ERRCODE = '42501';
+  END IF;
+  IF NEW.event_type IN ('external_signature_verified', 'external_signature_invalid') THEN
+    IF NOT public.greenfield_publisher_authority_has('TRUST_VERIFIER')
+       OR NEW.signature_id IS NULL
+       OR NOT EXISTS (
+         SELECT 1 FROM public.greenfield_module_release_signatures AS signature_row
+         WHERE signature_row.signature_id = NEW.signature_id
+           AND signature_row.release_id = NEW.release_id
+           AND signature_row.verification_state = CASE
+             WHEN NEW.event_type = 'external_signature_verified' THEN 'verified' ELSE 'invalid' END
+       ) THEN
+      RAISE EXCEPTION 'external signature audit does not match a trust-verifier transition'
+        USING ERRCODE = '42501';
+    END IF;
+    NEW.actor_account_id := NULL;
+  ELSIF NEW.event_type = 'registry_release_published' THEN
+    IF NOT public.greenfield_publisher_authority_has('PUBLICATION_AUTHORITY')
+       OR NOT EXISTS (
+         SELECT 1 FROM public.greenfield_module_releases AS release
+         WHERE release.release_id = NEW.release_id AND release.release_state = 'published'
+       ) THEN
+      RAISE EXCEPTION 'registry publication audit does not match an authority transition'
+        USING ERRCODE = '42501';
+    END IF;
+    NEW.actor_account_id := public.greenfield_publisher_authority_actor('PUBLICATION_AUTHORITY');
+    NEW.signature_id := NULL;
+  END IF;
+  NEW.actor_database_role := SESSION_USER::NAME;
+  NEW.created_at := pg_catalog.clock_timestamp();
+  RETURN NEW;
+END;
+$$;
+CREATE TRIGGER greenfield_registry_authority_event_guard
+  BEFORE INSERT OR UPDATE OR DELETE ON greenfield_registry_authority_events
+  FOR EACH ROW EXECUTE FUNCTION greenfield_registry_authority_event_guard();
+
+CREATE FUNCTION greenfield_external_trust_verifier_claim(requested_release_id TEXT)
+RETURNS TABLE (
+  release_id TEXT,
+  signature_id TEXT,
+  statement JSONB,
+  statement_sha256 TEXT,
+  signature TEXT,
+  algorithm TEXT,
+  public_key_pem TEXT,
+  public_key_fingerprint TEXT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $$
+BEGIN
+  IF NOT public.greenfield_publisher_authority_has('TRUST_VERIFIER') THEN
+    RAISE EXCEPTION 'trust verifier database authority is not active' USING ERRCODE = '42501';
+  END IF;
+  RETURN QUERY
+  SELECT release.release_id, signature_row.signature_id, signature_row.statement,
+         signature_row.statement_sha256, signature_row.signature, signature_row.algorithm,
+         signing_key.public_key_pem, signing_key.fingerprint
+  FROM public.greenfield_module_releases AS release
+  JOIN public.greenfield_module_release_signatures AS signature_row
+    ON signature_row.release_id = release.release_id
+  JOIN public.greenfield_publisher_signing_keys AS signing_key
+    ON signing_key.key_id = signature_row.signature_key_id
+   AND signing_key.publisher_id = release.publisher_id
+   AND signing_key.state = 'ACTIVE'
+   AND signing_key.revoked_at IS NULL
+  WHERE release.release_id = requested_release_id
+    AND release.release_state IN ('pendingReview', 'published')
+    AND signature_row.verification_state IN ('pending', 'verified')
+    AND signature_row.revoked_at IS NULL
+    AND NOT EXISTS (
+      SELECT 1 FROM public.greenfield_publisher_release_jobs AS release_job
+      WHERE release_job.release_id = release.release_id
+        AND release_job.signing_request_id IS NOT NULL
+    )
+  ORDER BY signature_row.observed_at, signature_row.signature_id
+  FOR UPDATE OF signature_row
+  LIMIT 1;
+END;
+$$;
+
+CREATE FUNCTION greenfield_external_trust_verifier_record(
+  requested_release_id TEXT,
+  requested_signature_id TEXT,
+  verification_succeeded BOOLEAN,
+  verification_detail TEXT,
+  verified_public_key_fingerprint TEXT
+)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $$
+DECLARE
+  observed_now TIMESTAMPTZ := pg_catalog.clock_timestamp();
+  clean_detail TEXT := pg_catalog.btrim(verification_detail);
+  release_row RECORD;
+  signature_row RECORD;
+  target_state TEXT;
+BEGIN
+  IF NOT public.greenfield_publisher_authority_has('TRUST_VERIFIER') THEN
+    RAISE EXCEPTION 'trust verifier database authority is not active' USING ERRCODE = '42501';
+  END IF;
+  IF clean_detail IS NULL OR pg_catalog.length(clean_detail) NOT BETWEEN 1 AND 1000 THEN
+    RAISE EXCEPTION 'verification detail must contain 1 to 1000 characters' USING ERRCODE = '22023';
+  END IF;
+  IF verification_succeeded AND verified_public_key_fingerprint !~ '^sha256:[0-9a-f]{64}$' THEN
+    RAISE EXCEPTION 'verified public key fingerprint is malformed' USING ERRCODE = '22023';
+  END IF;
+
+  SELECT release.*, source.release_tag, integrity.manifest_sha256 AS integrity_manifest_sha256,
+         integrity.release_sha256 AS integrity_release_sha256,
+         integrity.source_commit AS integrity_source_commit,
+         integrity.mismatch_at,
+         ingestion.manifest_sha256 AS product_manifest_sha256,
+         frontend.artifact_sha256 AS frontend_sha256
+  INTO STRICT release_row
+  FROM public.greenfield_module_releases AS release
+  JOIN public.greenfield_module_sources AS source ON source.release_id = release.release_id
+  JOIN public.greenfield_module_release_integrity AS integrity ON integrity.release_id = release.release_id
+  LEFT JOIN public.greenfield_mps_ingestions AS ingestion ON ingestion.release_id = release.release_id
+  LEFT JOIN public.greenfield_release_frontends AS frontend ON frontend.release_id = release.release_id
+  WHERE release.release_id = requested_release_id
+    AND release.release_state IN ('pendingReview', 'published')
+  FOR UPDATE OF release;
+
+  SELECT pending_signature.*, signing_key.publisher_id AS key_publisher_id,
+         signing_key.fingerprint AS expected_public_key_fingerprint,
+         signing_key.state AS key_state, signing_key.revoked_at AS key_revoked_at,
+         signing_key.valid_from AS key_valid_from, signing_key.valid_until AS key_valid_until
+  INTO STRICT signature_row
+  FROM public.greenfield_module_release_signatures AS pending_signature
+  JOIN public.greenfield_publisher_signing_keys AS signing_key
+    ON signing_key.key_id = pending_signature.signature_key_id
+  WHERE pending_signature.signature_id = requested_signature_id
+    AND pending_signature.release_id = requested_release_id
+    AND pending_signature.verification_state IN ('pending', 'verified')
+    AND pending_signature.revoked_at IS NULL
+  FOR UPDATE OF pending_signature;
+
+  IF NOT verification_succeeded
+     OR signature_row.key_publisher_id IS DISTINCT FROM release_row.publisher_id
+     OR signature_row.key_state <> 'ACTIVE'
+     OR signature_row.key_revoked_at IS NOT NULL
+     OR signature_row.observed_at < signature_row.key_valid_from
+     OR (signature_row.key_valid_until IS NOT NULL AND signature_row.observed_at > signature_row.key_valid_until)
+     OR verified_public_key_fingerprint IS DISTINCT FROM signature_row.expected_public_key_fingerprint
+     OR release_row.mismatch_at IS NOT NULL
+     OR release_row.integrity_manifest_sha256 IS DISTINCT FROM release_row.manifest_sha256
+     OR release_row.integrity_release_sha256 IS DISTINCT FROM release_row.release_sha256
+     OR release_row.integrity_source_commit IS DISTINCT FROM release_row.source_commit
+     OR signature_row.statement ->> 'schemaVersion' IS DISTINCT FROM '1.0.0'
+     OR signature_row.statement ->> 'statementType' IS DISTINCT FROM 'modula.publisher-release.v1'
+     OR signature_row.statement ->> 'productId' IS DISTINCT FROM release_row.module_id
+     OR signature_row.statement ->> 'version' IS DISTINCT FROM release_row.version
+     OR signature_row.statement ->> 'publisherId' IS DISTINCT FROM release_row.publisher_id
+     OR signature_row.statement ->> 'sourceRepository' IS DISTINCT FROM release_row.source_repository
+     OR signature_row.statement ->> 'sourceSha' IS DISTINCT FROM release_row.source_commit
+     OR signature_row.statement ->> 'releaseTag' IS DISTINCT FROM release_row.release_tag
+     OR signature_row.statement ->> 'artifactSha256' IS DISTINCT FROM release_row.release_sha256
+     OR signature_row.statement ->> 'manifestSha256' IS DISTINCT FROM release_row.manifest_sha256
+     OR (release_row.product_manifest_sha256 IS NOT NULL
+       AND signature_row.statement ->> 'productManifestSha256' IS DISTINCT FROM release_row.product_manifest_sha256)
+     OR (release_row.frontend_sha256 IS NOT NULL
+       AND signature_row.statement ->> 'frontendSha256' IS DISTINCT FROM release_row.frontend_sha256)
+     OR signature_row.statement ->> 'signingKeyId' IS DISTINCT FROM signature_row.signature_key_id
+     OR EXISTS (
+       SELECT 1 FROM public.greenfield_module_quarantines AS quarantine
+       WHERE quarantine.release_id = requested_release_id AND quarantine.lifted_at IS NULL
+     )
+     OR EXISTS (
+       SELECT 1 FROM public.greenfield_module_revocations AS revocation
+       WHERE (revocation.scope = 'release' AND revocation.target_id = requested_release_id)
+          OR (revocation.scope = 'module' AND revocation.target_id = release_row.module_id)
+          OR (revocation.scope = 'publisher' AND revocation.target_id = release_row.publisher_id)
+          OR (revocation.scope = 'signingKey' AND revocation.target_id = signature_row.signature_key_id)
+     ) THEN
+    verification_succeeded := FALSE;
+    clean_detail := 'Database revalidation refused the pending external signature evidence';
+  END IF;
+
+  target_state := CASE WHEN verification_succeeded THEN 'verified' ELSE 'invalid' END;
+  UPDATE public.greenfield_module_release_signatures
+  SET verification_state = target_state,
+      verified_at = CASE WHEN verification_succeeded THEN observed_now ELSE NULL END,
+      verification_detail = pg_catalog.left(clean_detail, 1000),
+      public_key_fingerprint = CASE WHEN verification_succeeded THEN verified_public_key_fingerprint ELSE NULL END
+  WHERE signature_id = requested_signature_id;
+
+  IF verification_succeeded AND release_row.release_state = 'pendingReview' THEN
+    UPDATE public.greenfield_module_releases
+    SET release_state = 'verified', updated_at = observed_now
+    WHERE release_id = requested_release_id AND release_state = 'pendingReview';
+  ELSIF NOT verification_succeeded AND release_row.release_state = 'pendingReview' THEN
+    UPDATE public.greenfield_module_releases
+    SET release_state = 'quarantined', quarantined_at = COALESCE(quarantined_at, observed_now), updated_at = observed_now
+    WHERE release_id = requested_release_id AND release_state = 'pendingReview';
+  END IF;
+
+  INSERT INTO public.greenfield_registry_authority_events (
+    event_id, event_type, release_id, signature_id, actor_account_id,
+    actor_database_role, details, created_at
+  ) VALUES (
+    'grae_' || pg_catalog.gen_random_uuid()::TEXT,
+    CASE WHEN verification_succeeded THEN 'external_signature_verified' ELSE 'external_signature_invalid' END,
+    requested_release_id, requested_signature_id, NULL, SESSION_USER::NAME,
+    pg_catalog.jsonb_build_object('detail', pg_catalog.left(clean_detail, 1000)), observed_now
+  );
+  RETURN target_state;
+END;
+$$;
+
+-- Registry synchronization and historical fixtures publish through this fixed
+-- operation. It accepts only an already verified release, rechecks publisher,
+-- integrity, signature, quarantine, revocation and presentation-blob facts,
+-- and derives the catalogue projection from immutable registry records.
+CREATE FUNCTION greenfield_registry_publication_authority_publish(requested_release_id TEXT)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $$
+DECLARE
+  actor_id TEXT;
+  observed_now TIMESTAMPTZ := pg_catalog.clock_timestamp();
+  release_row RECORD;
+BEGIN
+  actor_id := public.greenfield_publisher_authority_actor('PUBLICATION_AUTHORITY');
+  SELECT release.*, module_version.manifest,
+         publisher.display_name AS publisher_display_name,
+         publisher.status AS publisher_status,
+         publisher.trust_level AS publisher_trust_level,
+         publisher.revoked_at AS publisher_revoked_at
+  INTO STRICT release_row
+  FROM public.greenfield_module_releases AS release
+  JOIN public.greenfield_module_versions AS module_version
+    ON module_version.module_version_id = release.module_version_id
+  JOIN public.greenfield_publishers AS publisher
+    ON publisher.publisher_id = release.publisher_id
+  WHERE release.release_id = requested_release_id
+  FOR UPDATE OF release;
+
+  IF release_row.release_state NOT IN ('verified', 'published')
+     OR release_row.publisher_status <> 'verified'
+     OR release_row.publisher_revoked_at IS NOT NULL
+     OR release_row.trust_level IS DISTINCT FROM release_row.publisher_trust_level
+     OR NOT EXISTS (
+       SELECT 1 FROM public.greenfield_module_release_integrity AS integrity
+       WHERE integrity.release_id = requested_release_id
+         AND integrity.manifest_sha256 = release_row.manifest_sha256
+         AND integrity.release_sha256 = release_row.release_sha256
+         AND integrity.source_commit = release_row.source_commit
+         AND integrity.mismatch_at IS NULL
+     )
+     OR EXISTS (
+       SELECT 1 FROM public.greenfield_release_presentation_assets AS asset
+       LEFT JOIN public.greenfield_release_asset_blobs AS blob ON blob.sha256 = asset.sha256
+       WHERE asset.release_id = requested_release_id AND blob.sha256 IS NULL
+     )
+     OR EXISTS (
+       SELECT 1 FROM public.greenfield_module_quarantines AS quarantine
+       WHERE quarantine.release_id = requested_release_id AND quarantine.lifted_at IS NULL
+     )
+     OR EXISTS (
+       SELECT 1 FROM public.greenfield_module_revocations AS revocation
+       WHERE (revocation.scope = 'release' AND revocation.target_id = requested_release_id)
+          OR (revocation.scope = 'module' AND revocation.target_id = release_row.module_id)
+          OR (revocation.scope = 'publisher' AND revocation.target_id = release_row.publisher_id)
+          OR (revocation.scope = 'signingKey' AND EXISTS (
+            SELECT 1 FROM public.greenfield_module_release_signatures AS signature_row
+            WHERE signature_row.release_id = requested_release_id
+              AND signature_row.signature_key_id = revocation.target_id
+          ))
+     )
+     OR (
+       EXISTS (SELECT 1 FROM public.greenfield_module_release_signatures WHERE release_id = requested_release_id)
+       AND NOT EXISTS (
+         SELECT 1 FROM public.greenfield_module_release_signatures AS signature_row
+         JOIN public.greenfield_publisher_signing_keys AS signing_key
+           ON signing_key.key_id = signature_row.signature_key_id
+          AND signing_key.publisher_id = release_row.publisher_id
+         WHERE signature_row.release_id = requested_release_id
+           AND signature_row.verification_state = 'verified'
+           AND signature_row.verified_at IS NOT NULL
+           AND signature_row.revoked_at IS NULL
+           AND signing_key.state IN ('ACTIVE', 'ROTATED')
+           AND signing_key.revoked_at IS NULL
+       )
+     ) THEN
+    RAISE EXCEPTION 'registry publication revalidation refused the release transition'
+      USING ERRCODE = '42501';
+  END IF;
+
+  IF release_row.release_state = 'published' THEN RETURN requested_release_id; END IF;
+
+  UPDATE public.greenfield_module_releases
+  SET release_state = 'published', published_at = observed_now, updated_at = observed_now
+  WHERE release_id = requested_release_id AND release_state = 'verified';
+  UPDATE public.greenfield_module_versions
+  SET status = 'published', updated_at = observed_now
+  WHERE module_version_id = release_row.module_version_id;
+  UPDATE public.greenfield_extension_versions
+  SET status = 'published'
+  WHERE extension_version_id = release_row.extension_version_id;
+  UPDATE public.greenfield_extensions
+  SET status = 'published', updated_at = observed_now
+  WHERE extension_id = release_row.extension_id;
+
+  INSERT INTO public.greenfield_extension_catalogue (
+    extension_id, slug, kind, name, description, version, publisher, trust,
+    permissions, compatibility, manifest, catalogue_status, executable,
+    distribution_model, entitlement_id, created_at, updated_at
+  ) VALUES (
+    release_row.module_id, release_row.module_id, release_row.product_kind,
+    release_row.manifest ->> 'name', release_row.manifest ->> 'description',
+    release_row.version, release_row.publisher_display_name, release_row.trust_level,
+    COALESCE(release_row.manifest -> 'permissions', '[]'::JSONB),
+    release_row.compatibility, release_row.manifest, 'active',
+    release_row.trust_level = 'firstParty'
+      AND COALESCE(release_row.manifest #>> '{lifecycle,executionMode}', '') <> 'declarative',
+    'free', NULL, observed_now, observed_now
+  )
+  ON CONFLICT (slug) DO UPDATE SET
+    kind = EXCLUDED.kind, name = EXCLUDED.name, description = EXCLUDED.description,
+    version = EXCLUDED.version, publisher = EXCLUDED.publisher, trust = EXCLUDED.trust,
+    permissions = EXCLUDED.permissions, compatibility = EXCLUDED.compatibility,
+    manifest = EXCLUDED.manifest, catalogue_status = EXCLUDED.catalogue_status,
+    executable = EXCLUDED.executable, distribution_model = EXCLUDED.distribution_model,
+    entitlement_id = EXCLUDED.entitlement_id, updated_at = EXCLUDED.updated_at;
+
+  INSERT INTO public.greenfield_registry_authority_events (
+    event_id, event_type, release_id, signature_id, actor_account_id,
+    actor_database_role, details, created_at
+  ) VALUES (
+    'grae_' || pg_catalog.gen_random_uuid()::TEXT, 'registry_release_published',
+    requested_release_id, NULL, actor_id, SESSION_USER::NAME,
+    pg_catalog.jsonb_build_object('moduleId', release_row.module_id, 'version', release_row.version),
+    observed_now
+  );
+  RETURN requested_release_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION greenfield_external_trust_verifier_claim(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION greenfield_external_trust_verifier_record(TEXT, TEXT, BOOLEAN, TEXT, TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION greenfield_registry_publication_authority_publish(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION greenfield_registry_authority_event_guard() FROM PUBLIC;
+
+CREATE FUNCTION greenfield_assert_registry_integration_authority_isolation(
+  trust_verifier_role NAME,
+  publication_authority_role NAME
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $$
+DECLARE
+  protected_functions TEXT[] := ARRAY[
+    'greenfield_external_trust_verifier_claim',
+    'greenfield_external_trust_verifier_record',
+    'greenfield_registry_publication_authority_publish'
+  ];
+BEGIN
+  IF trust_verifier_role = publication_authority_role
+     OR pg_catalog.pg_has_role(trust_verifier_role, publication_authority_role, 'MEMBER')
+     OR pg_catalog.pg_has_role(publication_authority_role, trust_verifier_role, 'MEMBER') THEN
+    RAISE EXCEPTION 'registry trust and publication authorities must remain isolated'
+      USING ERRCODE = '42501';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM pg_catalog.pg_proc AS procedure_row
+    WHERE procedure_row.pronamespace = 'public'::pg_catalog.regnamespace
+      AND procedure_row.proname = ANY(protected_functions)
+      AND pg_catalog.has_function_privilege('public', procedure_row.oid, 'EXECUTE')
+  ) THEN
+    RAISE EXCEPTION 'PUBLIC can execute a registry integration authority function'
+      USING ERRCODE = '42501';
+  END IF;
+  IF NOT pg_catalog.has_function_privilege(trust_verifier_role, 'public.greenfield_external_trust_verifier_claim(text)', 'EXECUTE')
+     OR NOT pg_catalog.has_function_privilege(trust_verifier_role, 'public.greenfield_external_trust_verifier_record(text,text,boolean,text,text)', 'EXECUTE')
+     OR pg_catalog.has_function_privilege(trust_verifier_role, 'public.greenfield_registry_publication_authority_publish(text)', 'EXECUTE')
+     OR NOT pg_catalog.has_function_privilege(publication_authority_role, 'public.greenfield_registry_publication_authority_publish(text)', 'EXECUTE')
+     OR pg_catalog.has_function_privilege(publication_authority_role, 'public.greenfield_external_trust_verifier_claim(text)', 'EXECUTE')
+     OR pg_catalog.has_function_privilege(publication_authority_role, 'public.greenfield_external_trust_verifier_record(text,text,boolean,text,text)', 'EXECUTE') THEN
+    RAISE EXCEPTION 'registry integration authority function grants are incomplete or cross-wired'
+      USING ERRCODE = '42501';
+  END IF;
+END;
+$$;
+REVOKE ALL ON FUNCTION greenfield_assert_registry_integration_authority_isolation(NAME, NAME) FROM PUBLIC;
+
 CREATE OR REPLACE FUNCTION greenfield_revocation_authority_record(
   requested_scope TEXT,
   requested_target_id TEXT,

@@ -11,9 +11,9 @@ import {ModuleBackendGatewayService} from '../src/modules/backend/gateway-servic
 import {ModuleBackendRepository} from '../src/modules/backend/repository.js'
 import {ModuleBackendTokenService} from '../src/modules/backend/token-service.js'
 import {ModuleBackendWebhookService} from '../src/modules/backend/webhook-service.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -187,8 +187,9 @@ describeIfDb('Phase 7E module backend runtime substrate', () => {
   async function seedInstalledBackendModule() {
     const version = '1.0.0'
     const manifest = backendManifest(moduleId, version)
-    const release = await new GreenfieldModuleReleaseService(db).importPendingReview(manifest)
-    const published = await new GreenfieldModuleReleaseService(db).publishRelease(moduleId, version)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
+    const release = await releases.importPendingReview(manifest)
+    const published = await releases.publishRelease(moduleId, version)
     releaseId = published.releaseId
     await db
       .insertInto('greenfield_extension_installations')

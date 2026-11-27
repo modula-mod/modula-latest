@@ -11,7 +11,7 @@ import {
 } from '@modula/greenfield-module-manifest'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {GreenfieldModuleRuntimeAccessService, type GreenfieldModuleRuntimeContext} from '../src/modules/runtime-access.js'
 import {GreenfieldDataLedgerService} from '../src/data-ledger/service.js'
 import {GreenfieldBackendEventJobService} from '../src/backend-fabric/event-job-service.js'
@@ -24,6 +24,7 @@ import {
 } from '../../../fixtures/modules/module-owned-backend/backend/service.mjs'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const fixtureRoot = resolve(process.cwd(), '../../fixtures/modules/module-owned-backend')
 const manifestPath = join(fixtureRoot, 'module.manifest.json')
@@ -50,9 +51,10 @@ describeIfDb('Greenfield Backend V1 TEST_ONLY module-owned backend', () => {
 
   beforeAll(async () => {
     configureTestEnv()
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for dedicated database fixtures')
     await migrateUp(databaseUrl!)
     db = createDb(databaseUrl!)
-    admin = new Client({connectionString: databaseWithName(databaseUrl!, 'postgres')})
+    admin = new Client({connectionString: databaseWithName(adminDatabaseUrl, 'postgres')})
     await admin.connect()
     await provisionDedicatedDatabases(admin)
     modulePool = new Pool({connectionString: databaseWithCredentials(databaseUrl!, moduleDatabase, moduleRole, modulePassword), max: 2})
@@ -63,7 +65,7 @@ describeIfDb('Greenfield Backend V1 TEST_ONLY module-owned backend', () => {
     const manifest = fixtureManifest()
     const validation = validateGreenfieldModuleManifest(manifest)
     expect(validation.issues).toEqual([])
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const imported = await releases.importPendingReview(manifest)
     const published = await releases.publishRelease(fixtureProductId, manifest.version)
     releaseId = published.releaseId

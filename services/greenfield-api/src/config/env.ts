@@ -10,6 +10,10 @@ const envSchema = z.object({
   MODULA_PUBLIC_WEB_URL: z.string().url().optional(),
   MODULA_DATABASE_URL: z.string().min(1),
   MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: z.string().min(1).optional(),
+  MODULA_TRUST_VERIFIER_DATABASE_URL: z.string().min(1).optional(),
+  MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: z.string().min(1).optional(),
+  MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: z.string().min(1).optional(),
+  MODULA_REVOCATION_AUTHORITY_DATABASE_URL: z.string().min(1).optional(),
   APNS_BUNDLE_ID: z.string().min(1).default('digital.modula.app.native'),
   MODULA_DATABASE_MIGRATOR_URL: z.string().min(1).optional(),
   MODULA_ALLOWED_ORIGINS: z.string().min(1),
@@ -214,6 +218,14 @@ export type AppConfig = {
   databaseUrl: string
   /** Dedicated fixed-operation credential; never shared with the ordinary API pool. */
   signingIdentityAuthorityDatabaseUrl: string | null
+  /** Dedicated fixed-operation credential for independent external-signature settlement. */
+  trustVerifierDatabaseUrl: string | null
+  /** Dedicated fixed-operation credential for registry publication transitions. */
+  publicationAuthorityDatabaseUrl: string | null
+  /** Dedicated fixed-operation credential for release quarantine transitions. */
+  quarantineAuthorityDatabaseUrl: string | null
+  /** Dedicated fixed-operation credential for release revocation transitions. */
+  revocationAuthorityDatabaseUrl: string | null
   migratorDatabaseUrl: string
   allowedOrigins: string[]
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent'
@@ -517,6 +529,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     publicWebUrl,
     databaseUrl: raw.MODULA_DATABASE_URL,
     signingIdentityAuthorityDatabaseUrl: raw.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL ?? null,
+    trustVerifierDatabaseUrl: raw.MODULA_TRUST_VERIFIER_DATABASE_URL ?? null,
+    publicationAuthorityDatabaseUrl: raw.MODULA_PUBLICATION_AUTHORITY_DATABASE_URL ?? null,
+    quarantineAuthorityDatabaseUrl: raw.MODULA_QUARANTINE_AUTHORITY_DATABASE_URL ?? null,
+    revocationAuthorityDatabaseUrl: raw.MODULA_REVOCATION_AUTHORITY_DATABASE_URL ?? null,
     migratorDatabaseUrl: raw.MODULA_DATABASE_MIGRATOR_URL ?? raw.MODULA_DATABASE_URL,
     allowedOrigins,
     logLevel: raw.MODULA_LOG_LEVEL,

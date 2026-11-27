@@ -5825,7 +5825,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "8310ae8c4c86cbdcd914c56a7fdff7d1a94a8d6c2db7ce3f582a0e36f000575d"
+      "sourceContractSha256": "2552b2ea05f8550c163a85699766f3400f64937375473fe153bc649324413423"
     },
     {
       "id": "POST /v1/admin/registry/releases/:releaseId/quarantine",
@@ -5884,7 +5884,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "ccb869f8e461368f3fffbafa39bcbbbcc1563011dfd4c98ee11b2817a2c4b945"
+      "sourceContractSha256": "b8034a8233e910618e174476b068a9349c5c9f699da6516920e418916b665ec9"
     },
     {
       "id": "POST /v1/admin/registry/releases/:releaseId/revoke",
@@ -5943,7 +5943,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "89db926982704455f3a63e072cf0e0f65a885bed28ce29658903a0c5c004617e"
+      "sourceContractSha256": "f6bcd2cff5e4725878ef0496192f9f5bfb5238ff3d1b14ed640f2c74239a5c5e"
     },
     {
       "id": "POST /v1/admin/registry/releases/:releaseId/signature",
@@ -6002,7 +6002,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "c6515ccb1e4bcafc92279a06b643d2d9b5a6971e1278f3acdd2205a87c9133dc"
+      "sourceContractSha256": "7d61d162c528206a87c96f9e2f3edd140cf16f53f6578631755a7b28267e522a"
     },
     {
       "id": "POST /v1/admin/registry/releases/:releaseId/verify",

@@ -54,6 +54,17 @@ export type GreenfieldModuleReleaseEvidence = {
   signature?: unknown
 }
 
+export type GreenfieldReleaseGovernanceAuthority = {
+  verifyPendingSignature(releaseId: string): Promise<unknown>
+  publishRelease(releaseId: string): Promise<unknown>
+  quarantineRelease(
+    releaseId: string,
+    reason: string,
+    policyAction?: 'warn' | 'disableExecutableContributions' | 'block',
+  ): Promise<unknown>
+  revokeRelease(releaseId: string, reason?: string): Promise<unknown>
+}
+
 const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, ContributionType> = {
   routes: 'route',
   profileTabs: 'profileTab',
@@ -71,7 +82,10 @@ const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, Co
 }
 
 export class GreenfieldModuleReleaseService {
-  constructor(private readonly db: ModulaDb) {}
+  constructor(
+    private readonly db: ModulaDb,
+    private readonly governanceAuthority: GreenfieldReleaseGovernanceAuthority | null = null,
+  ) {}
 
   async importPendingReview(manifest: GreenfieldModuleManifest, evidence?: GreenfieldModuleReleaseEvidence): Promise<GreenfieldModuleReleaseRecord> {
     // Registry core never rewrites a publisher's manifest. A release declared
@@ -513,16 +527,19 @@ export class GreenfieldModuleReleaseService {
       if (verified.state !== 'verified') {
         throw moduleError('VALIDATION_FAILED', `Release signature rejected (${verified.state}): ${verified.detail}`)
       }
-      if (existing || release.signature_key_id || release.signature) {
+      if (!existing && (release.signature_key_id || release.signature)) {
+        throw moduleError('CONFLICT', 'Release signature facts are inconsistent with signature evidence')
+      }
+      if (existing) {
         if (existing?.signature_key_id === signature.keyId && existing.signature === signature.value
-          && existing.statement_sha256 === verified.statementSha256 && existing.verification_state === 'verified'
-          && release.signature_key_id === signature.keyId && release.signature === signature.value) {
+          && existing.statement_sha256 === verified.statementSha256
+          && ['pending', 'verified'].includes(existing.verification_state ?? '')) {
           return {
             releaseId,
             keyId: signature.keyId,
-            verificationState: verified.state,
+            verificationState: existing.verification_state,
             statementSha256: verified.statementSha256,
-            publicKeyFingerprint: verified.publicKeyFingerprint,
+            publicKeyFingerprint: existing.verification_state === 'verified' ? verified.publicKeyFingerprint : null,
             alreadyAttached: true,
           }
         }
@@ -534,29 +551,27 @@ export class GreenfieldModuleReleaseService {
         signature_key_id: signature.keyId,
         signature: signature.value,
         algorithm: 'Ed25519',
-        verified_at: now,
+        verified_at: null,
         revoked_at: null,
         statement: jsonb(statement),
         statement_sha256: verified.statementSha256,
-        verification_state: 'verified',
-        verification_detail: verified.detail,
-        public_key_fingerprint: verified.publicKeyFingerprint,
+        verification_state: 'pending',
+        verification_detail: 'Awaiting independent trust-verifier settlement',
+        public_key_fingerprint: null,
         observed_at: now,
       }).execute()
-      await trx.updateTable('greenfield_module_releases')
-        .set({signature_key_id: signature.keyId, signature: signature.value, updated_at: now})
-        .where('release_id', '=', releaseId).execute()
-      await new AuditRepository(trx).append('module.release.signature_attached', {
+      await new AuditRepository(trx).append('module.release.signature_staged', {
         keyId: signature.keyId,
         statementSha256: verified.statementSha256,
-        publicKeyFingerprint: verified.publicKeyFingerprint,
+        verificationState: 'pending',
       }, {type: 'moduleRelease', id: releaseId}, {accountId: actorAccountId, requestId})
       return {
         releaseId,
         keyId: signature.keyId,
-        verificationState: verified.state,
+        verificationState: 'pending' as const,
         statementSha256: verified.statementSha256,
-        publicKeyFingerprint: verified.publicKeyFingerprint,
+        publicKeyFingerprint: null,
+        alreadyAttached: false,
       }
     })
   }
@@ -568,6 +583,14 @@ export class GreenfieldModuleReleaseService {
     if (!declaredManifestSha || declaredManifestSha !== release.manifestSha256 || computedManifestSha !== release.manifestSha256) {
       await this.quarantineRelease(release.releaseId, 'checksum mismatch', 'block')
       throw moduleError('VALIDATION_FAILED', 'Manifest checksum mismatch quarantined release')
+    }
+    const recordedSignature = await this.db.selectFrom('greenfield_module_release_signatures')
+      .select('signature_id')
+      .where('release_id', '=', release.releaseId)
+      .executeTakeFirst()
+    if (recordedSignature && this.governanceAuthority) {
+      await this.governanceAuthority.verifyPendingSignature(release.releaseId)
+      return this.requireRelease(moduleId, version)
     }
     await this.verifyReleaseSignatures(release)
     await this.setReleaseState(release.releaseId, 'verified')
@@ -630,6 +653,10 @@ export class GreenfieldModuleReleaseService {
     const presentationGaps = await presentationAssetsMissingBlobs(this.db, {releaseId: release.releaseId})
     if (presentationGaps.length) {
       throw moduleError('VALIDATION_FAILED', `Release ${moduleId}@${version} has presentation assets without stored bytes: ${presentationGaps.map(gap => gap.path).join(', ')}`)
+    }
+    if (this.governanceAuthority) {
+      await this.governanceAuthority.publishRelease(release.releaseId)
+      return this.requireRelease(moduleId, version)
     }
     const now = new Date()
     const sourceVersion = Math.floor(now.getTime() / 1000)
@@ -717,6 +744,10 @@ export class GreenfieldModuleReleaseService {
   }
 
   async quarantineRelease(releaseId: string, reason: string, policyAction: 'warn' | 'disableExecutableContributions' | 'block' = 'block') {
+    if (this.governanceAuthority) {
+      await this.governanceAuthority.quarantineRelease(releaseId, reason, policyAction)
+      return
+    }
     const now = new Date()
     const sourceVersion = Math.floor(now.getTime() / 1000)
     const release = await this.db
@@ -775,6 +806,10 @@ export class GreenfieldModuleReleaseService {
   }
 
   async revokeRelease(releaseId: string, reason = 'administrative revocation') {
+    if (this.governanceAuthority) {
+      await this.governanceAuthority.revokeRelease(releaseId, reason)
+      return
+    }
     const now = new Date()
     const sourceVersion = Math.floor(now.getTime() / 1000)
     const release = await this.db

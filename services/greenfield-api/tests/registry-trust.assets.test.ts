@@ -6,6 +6,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, sha256} from './helpers/registry-fixtures.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -30,7 +31,7 @@ describeIfDb('registry trust pipeline: immutable release media', () => {
         sha256: '371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b', alt: 'Reference screenshot', developmentAsset: true,
       }]
     })
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     const manifest = adapterManifest(productId, '0.1.0')
     await releases.importPendingReview(manifest, evidenceFor(manifest))
     releaseId = (await releases.publishRelease(productId, '0.1.0')).releaseId
