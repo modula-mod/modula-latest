@@ -25,7 +25,29 @@ export async function registerIntelligenceRoutes(app: FastifyInstance, db: Modul
   app.get('/v1/intelligence/missions', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
-    return reply.send(successEnvelope(await intelligence.listMissions(auth.accountId), request.id))
+    try {
+      const query = request.query as {status?: unknown; limit?: unknown; cursor?: unknown}
+      // No query params: the historical bare-array shape, unchanged.
+      // Any of status/limit/cursor opts into the paginated shape
+      // {items, nextCursor, limit, total} for the native missions list.
+      if (query.status !== undefined || query.limit !== undefined || query.cursor !== undefined) {
+        return reply.send(successEnvelope(await intelligence.listMissionsPage(auth.accountId, query), request.id))
+      }
+      return reply.send(successEnvelope(await intelligence.listMissions(auth.accountId), request.id))
+    } catch (error) { return sendIntelligenceError(reply, error, request.id) }
+  })
+
+  // Cross-mission approvals queue for the native approvals screen.
+  // Always paginated ({items, nextCursor, limit, total}); `status`
+  // defaults to pending. Each item carries its mission and proposal so
+  // the queue renders from this one call — no per-mission fan-out.
+  app.get('/v1/intelligence/approvals', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const query = request.query as {status?: unknown; limit?: unknown; cursor?: unknown}
+      return reply.send(successEnvelope(await intelligence.approvalsQueue(auth.accountId, query), request.id))
+    } catch (error) { return sendIntelligenceError(reply, error, request.id) }
   })
 
   app.get('/v1/intelligence/missions/:missionId', routeConfig.profileConfig, async (request, reply) => {
@@ -52,8 +74,16 @@ export async function registerIntelligenceRoutes(app: FastifyInstance, db: Modul
   app.get('/v1/intelligence/missions/:missionId/ledger', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
-    try { return reply.send(successEnvelope(await intelligence.ledger(auth.accountId, param(request, 'missionId')), request.id)) }
-    catch (error) { return sendIntelligenceError(reply, error, request.id) }
+    try {
+      const query = request.query as {limit?: unknown; cursor?: unknown; order?: unknown}
+      // No query params: the historical bare-array shape (chronological),
+      // unchanged. Any of limit/cursor/order opts into the paginated shape
+      // {items, nextCursor, limit, total} for the native Ledger view.
+      if (query.limit !== undefined || query.cursor !== undefined || query.order !== undefined) {
+        return reply.send(successEnvelope(await intelligence.ledgerPage(auth.accountId, param(request, 'missionId'), query), request.id))
+      }
+      return reply.send(successEnvelope(await intelligence.ledger(auth.accountId, param(request, 'missionId')), request.id))
+    } catch (error) { return sendIntelligenceError(reply, error, request.id) }
   })
 
   app.get('/v1/intelligence/missions/:missionId/decisions', routeConfig.profileConfig, async (request, reply) => {

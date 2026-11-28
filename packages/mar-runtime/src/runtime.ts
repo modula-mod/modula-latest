@@ -36,6 +36,13 @@ export const DEFAULT_MISSION_RUNTIME_BUDGET: MissionRuntimeBudget = {
   maxDurationMs: 30_000,
 }
 
+// Approvals expire 24h after request — the same TTL the Greenfield
+// repository's createApproval uses and resolveApproval enforces.
+// requestApproval must set it: without expiresAt the stored approval
+// never expires (expires_at NULL), so the 24h expiry the docs and the
+// approvals-queue UI rely on silently never fired.
+export const APPROVAL_EXPIRY_MS = 24 * 60 * 60_000
+
 export type CapabilityCatalog = {
   list(accountId: string, workspaceId?: string): Promise<GaiaAvailableAction[]>
 }
@@ -433,6 +440,7 @@ export class MissionRuntime {
       reason,
       status: 'pending',
       requestedAt: now,
+      expiresAt: new Date(this.clock.nowMs() + APPROVAL_EXPIRY_MS).toISOString(),
     }
     await this.store.writeApproval(approval)
     await this.record(cycle, mission, 'approval.requested', {reason, status: 'pending'}, {proposalId: proposal.id, approvalId: approval.id})

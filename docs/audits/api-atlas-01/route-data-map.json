@@ -6086,6 +6086,16 @@
       "services/greenfield-api/src/domains/messaging/service.ts#replyInMail"
     ]
   },
+  "GET /v1/intelligence/approvals": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#approvalsQueue"
+    ]
+  },
   "GET /v1/intelligence/missions": {
     "reads": [],
     "writes": [],
@@ -6093,7 +6103,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/intelligence/service.ts#listMissions"
+      "services/greenfield-api/src/intelligence/service.ts#listMissions",
+      "services/greenfield-api/src/intelligence/service.ts#listMissionsPage"
     ]
   },
   "POST /v1/intelligence/missions": {
@@ -6186,7 +6197,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
-      "services/greenfield-api/src/intelligence/service.ts#ledger"
+      "services/greenfield-api/src/intelligence/service.ts#ledger",
+      "services/greenfield-api/src/intelligence/service.ts#ledgerPage"
     ]
   },
   "POST /v1/intelligence/missions/:missionId/proposals/:proposalId/execute": {
