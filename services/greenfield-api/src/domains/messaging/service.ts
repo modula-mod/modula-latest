@@ -18,6 +18,17 @@ export type ConversationDto = {
   updatedAt: string
   muted?: boolean
   archived?: boolean
+  /** Manually marked unread by the viewer (capability `markUnread`). */
+  markedUnread?: boolean
+  /** Synced pin (capability `chatPins`). */
+  pinned?: boolean
+  pinnedAt?: string | null
+  /** Per-chat push level (capability `notificationLevels`). */
+  notificationLevel?: 'all' | 'mentions' | 'none'
+  /** Shared chat theme id (capability `chatThemes`), null for default. */
+  theme?: string | null
+  /** Disappearing timer in seconds (capability `disappearingMessages`), null when off. */
+  disappearingTtlSeconds?: number | null
 }
 export type StartConversationResult = {conversation: ConversationDto; created: boolean}
 export type MessageDto = {
@@ -40,6 +51,10 @@ export type MessageDto = {
   editedAt?: string | null
   deleted?: boolean
   storyContext?: StoryMessageContext
+  /** Forward attribution (capability `forwarding`). `sender` is null when hidden by a block. */
+  forwardedFrom?: {sender: ParticipantDto | null; sentAt: string | null} | null
+  /** Set when the chat had a disappearing timer when this was sent. */
+  expiresAt?: string | null
 }
 export type StoryMessageContext = {
   type: 'story'
@@ -86,6 +101,8 @@ export type MentionDto = {actorId: string; handle: string}
 export type GroupSummaryDto = {title: string; description: string | null; memberCount: number; myRole: GroupRole}
 export type GroupRole = 'owner' | 'admin' | 'member'
 type MessageExtras = {
+  /** Original senders whose attribution the viewer may not see (blocks). */
+  hiddenForwardSenders?: Set<string>
   reactions: Map<string, ReactionDto[]>
   replies: Map<string, ReplyPreviewDto>
   attachments?: Map<string, MessageAttachmentDto[]>
@@ -101,6 +118,9 @@ type MessageRow = {
   reply_to_message_id?: string | null
   edited_at?: Date | null
   deleted_at?: Date | null
+  forwarded_from_actor_id?: string | null
+  forwarded_from_sent_at?: Date | null
+  expires_at?: Date | null
   message_kind?: MessageKind
   client_message_id?: string | null
 }
@@ -178,7 +198,7 @@ export class MessagingService {
 
   // ---- shared helpers -------------------------------------------------
 
-  private async participants(actorIds: string[]): Promise<Map<string, ParticipantDto>> {
+  protected async participants(actorIds: string[]): Promise<Map<string, ParticipantDto>> {
     const map = new Map<string, ParticipantDto>()
     if (actorIds.length === 0) return map
     const rows = await this.db
@@ -212,7 +232,7 @@ export class MessagingService {
     return row.actor_id
   }
 
-  private async isBlockedEitherWay(a: string, b: string): Promise<boolean> {
+  protected async isBlockedEitherWay(a: string, b: string): Promise<boolean> {
     return this.isBlockedEitherWayWith(this.db, a, b)
   }
 
@@ -240,7 +260,7 @@ export class MessagingService {
     const row = await this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['m.state', 'm.role', 'm.last_read_at', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_by_actor_id'])
+      .select(['m.state', 'm.role', 'm.last_read_at', 'm.marked_unread_at', 'm.pinned_at', 'm.notify_level', 'c.theme', 'c.disappearing_ttl_seconds', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_by_actor_id'])
       .where('m.conversation_id', '=', conversationId)
       .where('m.actor_id', '=', actorId)
       .executeTakeFirst()
@@ -289,6 +309,7 @@ export class MessagingService {
       .select(['conversation_id', 'message_id', 'body', 'created_at', 'sender_actor_id', 'deleted_at', 'message_kind'])
       .distinctOn('conversation_id')
       .where('conversation_id', 'in', conversationIds)
+      .where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', new Date())]))
     if (hiddenSenders.length > 0) query = query.where('sender_actor_id', 'not in', hiddenSenders)
     const rows = await query
       .orderBy('conversation_id')
@@ -335,6 +356,7 @@ export class MessagingService {
         .select(eb => eb.fn.countAll<number>().as('count'))
         .where('conversation_id', '=', row.conversation_id)
         .where('sender_actor_id', '!=', viewer)
+        .where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', new Date())]))
       if (row.kind === 'group' && hidden.length > 0) query = query.where('sender_actor_id', 'not in', hidden)
       if (row.last_read_at) query = query.where('created_at', '>', row.last_read_at)
       const result = await query.executeTakeFirst()
@@ -355,6 +377,8 @@ export class MessagingService {
       attachments?: Array<{attachmentId: string; durationMs: number | null; waveform: number[] | null}>
       mentions?: string[]
       senderAccountId?: string
+      forwardedFrom?: {messageId: string; actorId: string; sentAt: Date} | null
+      ttlSeconds?: number | null
     } = {},
   ) {
     const now = new Date()
@@ -365,6 +389,10 @@ export class MessagingService {
         .values({
           message_id: messageId, conversation_id: conversationId, sender_actor_id: sender, subject, body, created_at: now,
           reply_to_message_id: replyTo, message_kind: extra.kind ?? 'text', client_message_id: extra.clientMessageId ?? null,
+          forwarded_from_message_id: extra.forwardedFrom?.messageId ?? null,
+          forwarded_from_actor_id: extra.forwardedFrom?.actorId ?? null,
+          forwarded_from_sent_at: extra.forwardedFrom?.sentAt ?? null,
+          expires_at: extra.ttlSeconds ? new Date(now.getTime() + extra.ttlSeconds * 1000) : null,
         })
         .execute()
       for (const [position, item] of (extra.attachments ?? []).entries()) {
@@ -442,7 +470,7 @@ export class MessagingService {
     let query = this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['c.conversation_id', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_at', 'm.last_read_at', 'm.muted_until', 'm.archived_at', 'm.role'])
+      .select(['c.conversation_id', 'c.kind', 'c.subject', 'c.title', 'c.description', 'c.last_message_at', 'c.created_at', 'c.theme', 'c.disappearing_ttl_seconds', 'm.last_read_at', 'm.muted_until', 'm.archived_at', 'm.role', 'm.marked_unread_at', 'm.pinned_at', 'm.notify_level'])
       .where('m.actor_id', '=', viewer)
       .where('m.state', '=', state)
       .where('c.kind', 'in', kind === 'chat' ? ['direct', 'group'] : ['inmail'])
@@ -495,16 +523,22 @@ export class MessagingService {
         updatedAt: row.last_message_at.toISOString(),
         muted: Boolean(row.muted_until && row.muted_until.getTime() > Date.now()),
         archived: Boolean(row.archived_at),
+        markedUnread: Boolean(row.marked_unread_at),
+        pinned: Boolean(row.pinned_at),
+        pinnedAt: row.pinned_at ? row.pinned_at.toISOString() : null,
+        notificationLevel: row.notify_level,
+        theme: row.theme,
+        disappearingTtlSeconds: row.disappearing_ttl_seconds,
       }
     })
     return {items, nextCursor, hasMore}
   }
 
-  async unreadSummary(viewer: string): Promise<{unreadCount: number}> {
+  async unreadSummary(viewer: string): Promise<{unreadCount: number; markedUnreadCount: number}> {
     const rows = await this.db
       .selectFrom('greenfield_conversation_members as m')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'm.conversation_id')
-      .select(['m.conversation_id', 'm.last_read_at'])
+      .select(['m.conversation_id', 'm.last_read_at', 'm.marked_unread_at'])
       .where('m.actor_id', '=', viewer)
       .where('m.state', '=', 'active')
       .where('c.kind', 'in', ['direct', 'group'])
@@ -513,7 +547,9 @@ export class MessagingService {
     const counts = await this.unreadCounts(rows, viewer)
     let total = 0
     for (const value of counts.values()) total += value
-    return {unreadCount: total}
+    // Conversations marked unread that have no unread messages still need a badge.
+    const markedUnreadCount = rows.filter(row => row.marked_unread_at && (counts.get(row.conversation_id) ?? 0) === 0).length
+    return {unreadCount: total, markedUnreadCount}
   }
 
   /** Resolve a public handle, then atomically create or reuse its direct conversation. */
@@ -634,6 +670,12 @@ export class MessagingService {
         : null,
       unreadCount: unread.get(conversationId) ?? 0,
       updatedAt: member.last_message_at.toISOString(),
+      markedUnread: Boolean(member.marked_unread_at),
+      pinned: Boolean(member.pinned_at),
+      pinnedAt: member.pinned_at ? member.pinned_at.toISOString() : null,
+      notificationLevel: member.notify_level,
+      theme: member.theme,
+      disappearingTtlSeconds: member.disappearing_ttl_seconds,
     }
   }
 
@@ -645,6 +687,8 @@ export class MessagingService {
       .selectFrom('greenfield_conversation_messages')
       .selectAll()
       .where('conversation_id', '=', conversationId)
+      // Disappearing messages vanish at expiry even before the sweeper wipes them.
+      .where(eb => eb.or([eb('expires_at', 'is', null), eb('expires_at', '>', new Date())]))
     if (member.kind === 'group') {
       // Blocks are respected inside groups: content from an actor the viewer
       // blocked (or who blocked the viewer) is not delivered to the viewer.
@@ -666,10 +710,11 @@ export class MessagingService {
     const others = await this.otherMembers([conversationId], viewer)
     const othersReadAt = await this.visibleReadTimes(viewer, conversationId)
     const [people, contexts, extras] = await Promise.all([
-      this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id)]),
+      this.participants([viewer, ...(others.get(conversationId) ?? []), ...page.map(r => r.sender_actor_id), ...page.flatMap(r => r.forwarded_from_actor_id ? [r.forwarded_from_actor_id] : [])]),
       this.storyContexts(page.map(row => row.message_id)),
       this.messageExtras(page, viewer),
     ])
+    if (page.some(row => row.forwarded_from_actor_id)) extras.hiddenForwardSenders = await this.blockedSet(viewer)
     const items = page.reverse().map(row => this.messageDto(row, viewer, people, othersReadAt, extras, contexts.get(row.message_id)))
     return {items, nextCursor: hasMore && oldest ? encodeCursor(oldest.created_at, oldest.message_id) : null, hasMore}
   }
@@ -696,7 +741,7 @@ export class MessagingService {
     return rows.map(r => r.last_read_at?.getTime() ?? 0)
   }
 
-  private messageDto(
+  protected messageDto(
     row: MessageRow,
     viewer: string,
     people: Map<string, ParticipantDto>,
@@ -726,6 +771,13 @@ export class MessagingService {
       editedAt: row.edited_at ? row.edited_at.toISOString() : null,
       deleted,
       ...(storyContext ? {storyContext} : {}),
+      ...(row.forwarded_from_actor_id && !deleted
+        ? {forwardedFrom: {
+          sender: extras?.hiddenForwardSenders?.has(row.forwarded_from_actor_id) ? null : (people.get(row.forwarded_from_actor_id) ?? null),
+          sentAt: row.forwarded_from_sent_at ? row.forwarded_from_sent_at.toISOString() : null,
+        }}
+        : {}),
+      ...(row.expires_at ? {expiresAt: row.expires_at.toISOString()} : {}),
     }
   }
 
@@ -748,7 +800,7 @@ export class MessagingService {
     viewer: string,
     conversationId: string,
     input: {text?: unknown; replyToMessageId?: unknown; clientMessageId?: unknown; kind?: unknown; attachments?: unknown},
-    context: {accountId?: string; mediaEnabled?: boolean} = {},
+    context: {accountId?: string; mediaEnabled?: boolean; forwardedFrom?: {messageId: string; actorId: string; sentAt: Date} | null; disappearingEnabled?: boolean} = {},
   ): Promise<{message: MessageDto; created: boolean; conversationKind: 'direct' | 'group'; mentionedActorIds: string[]}> {
     const member = await this.membership(conversationId, viewer, 'chat')
     if (member.state !== 'active') fail('FORBIDDEN', 'Accept this request before replying')
@@ -795,6 +847,8 @@ export class MessagingService {
     try {
       inserted = await this.insertMessage(conversationId, viewer, text, null, replyTo, {
         kind, clientMessageId, attachments, mentions: mentionedActorIds, senderAccountId: context.accountId,
+        forwardedFrom: context.forwardedFrom ?? null,
+        ttlSeconds: context.disappearingEnabled === false ? null : member.disappearing_ttl_seconds,
       })
     } catch (error: any) {
       // Concurrent retry with the same clientMessageId: return the winner.
@@ -807,6 +861,12 @@ export class MessagingService {
     const row: MessageRow = {
       message_id: inserted.messageId, conversation_id: conversationId, sender_actor_id: viewer, subject: null, body: text,
       created_at: inserted.now, reply_to_message_id: replyTo, message_kind: kind, client_message_id: clientMessageId,
+      forwarded_from_actor_id: context.forwardedFrom?.actorId ?? null, forwarded_from_sent_at: context.forwardedFrom?.sentAt ?? null,
+      expires_at: context.disappearingEnabled !== false && member.disappearing_ttl_seconds ? new Date(inserted.now.getTime() + member.disappearing_ttl_seconds * 1000) : null,
+    }
+    if (context.forwardedFrom) {
+      const original = (await this.participants([context.forwardedFrom.actorId])).get(context.forwardedFrom.actorId)
+      if (original) people.set(context.forwardedFrom.actorId, original)
     }
     return {
       message: this.messageDto(row, viewer, people, [], await this.messageExtras([row], viewer)),
@@ -874,7 +934,7 @@ export class MessagingService {
 
   // ---- messaging v2: reactions, edit, unsend, typing, mute, archive ----
 
-  private async messageExtras(rows: Array<{message_id: string; reply_to_message_id?: string | null}>, viewer: string): Promise<MessageExtras> {
+  protected async messageExtras(rows: Array<{message_id: string; reply_to_message_id?: string | null}>, viewer: string): Promise<MessageExtras> {
     const reactions = new Map<string, ReactionDto[]>()
     const replies = new Map<string, ReplyPreviewDto>()
     const ids = rows.map(row => row.message_id)
@@ -955,7 +1015,7 @@ export class MessagingService {
     return {reactions, replies, attachments, mentions}
   }
 
-  private async liveMessage(viewer: string, conversationId: string, messageId: string) {
+  protected async liveMessage(viewer: string, conversationId: string, messageId: string) {
     const member = await this.membership(conversationId, viewer, 'chat')
     const row = await this.db
       .selectFrom('greenfield_conversation_messages')
@@ -973,11 +1033,18 @@ export class MessagingService {
     if (Date.now() - row.created_at.getTime() > EDIT_WINDOW_MS) fail('CONFLICT', 'This message can no longer be edited')
     const text = cleanText(input.text, MESSAGE_MAX, 'Message')
     const now = new Date()
-    await this.db
-      .updateTable('greenfield_conversation_messages')
-      .set({body: text, edited_at: now})
-      .where('message_id', '=', messageId)
-      .execute()
+    await this.db.transaction().execute(async trx => {
+      // Keep the previous version for the edit history (capability `editHistory`).
+      if (row.body !== text) {
+        await trx.insertInto('greenfield_message_edits')
+          .values({edit_id: randomUUID(), message_id: messageId, previous_body: row.body, edited_at: now}).execute()
+      }
+      await trx
+        .updateTable('greenfield_conversation_messages')
+        .set({body: text, edited_at: now})
+        .where('message_id', '=', messageId)
+        .execute()
+    })
     const people = await this.participants([viewer])
     const updated = {...row, body: text, edited_at: now}
     return this.messageDto(updated, viewer, people, [], await this.messageExtras([updated], viewer))
@@ -994,6 +1061,9 @@ export class MessagingService {
         .where('message_id', '=', messageId)
         .execute()
       await trx.deleteFrom('greenfield_message_reactions').where('message_id', '=', messageId).execute()
+      await trx.deleteFrom('greenfield_message_edits').where('message_id', '=', messageId).execute()
+      await trx.deleteFrom('greenfield_message_pins').where('message_id', '=', messageId).execute()
+      await trx.deleteFrom('greenfield_saved_messages').where('message_id', '=', messageId).execute()
     })
   }
 
@@ -1084,10 +1154,27 @@ export class MessagingService {
     const now = new Date()
     await this.db
       .updateTable('greenfield_conversation_members')
-      .set({last_read_at: now, updated_at: now})
+      .set({last_read_at: now, marked_unread_at: null, updated_at: now})
       .where('conversation_id', '=', conversationId)
       .where('actor_id', '=', viewer)
       .execute()
+  }
+
+  /**
+   * Per-member manual unread marker. Only active members of a direct or group
+   * conversation may set it; it never touches last_read_at.
+   */
+  async setMarkedUnread(viewer: string, conversationId: string, unread: boolean): Promise<{markedUnread: boolean}> {
+    const member = await this.membership(conversationId, viewer, 'chat')
+    if (member.state !== 'active') throw Object.assign(new Error('Conversation not found'), {code: 'NOT_FOUND'})
+    const now = new Date()
+    await this.db
+      .updateTable('greenfield_conversation_members')
+      .set({marked_unread_at: unread ? now : null, updated_at: now})
+      .where('conversation_id', '=', conversationId)
+      .where('actor_id', '=', viewer)
+      .execute()
+    return {markedUnread: unread}
   }
 
   // ---- messaging v3: groups, privacy, receipts, reactors, search, presence ----
@@ -1421,6 +1508,7 @@ export class MessagingService {
       .where('m.state', '=', 'active')
       .where('c.kind', 'in', ['direct', 'group'])
       .where('msg.deleted_at', 'is', null)
+      .where(eb => eb.or([eb('msg.expires_at', 'is', null), eb('msg.expires_at', '>', new Date())]))
       .where(eb => eb.or([
         sql<boolean>`to_tsvector('simple', msg.body) @@ websearch_to_tsquery('simple', ${q})`,
         eb('msg.body', 'ilike', pattern),
@@ -1557,10 +1645,11 @@ export class MessagingService {
       .innerJoin('greenfield_conversation_messages as msg', 'msg.message_id', 'ma.message_id')
       .innerJoin('greenfield_conversations as c', 'c.conversation_id', 'msg.conversation_id')
       .innerJoin('greenfield_conversation_members as m', join => join.onRef('m.conversation_id', '=', 'msg.conversation_id').on('m.actor_id', '=', actorId))
-      .select(['msg.sender_actor_id', 'msg.deleted_at', 'c.kind', 'm.state'])
+      .select(['msg.sender_actor_id', 'msg.deleted_at', 'msg.expires_at', 'c.kind', 'm.state'])
       .where('ma.attachment_id', '=', attachmentId)
       .executeTakeFirst()
     if (!binding || binding.deleted_at || binding.state !== 'active') return false
+    if (binding.expires_at && binding.expires_at <= new Date()) return false
     if (binding.sender_actor_id === actorId) return true
     if (binding.kind === 'group' && (await this.blockedSet(actorId)).has(binding.sender_actor_id)) return false
     return true
@@ -1582,7 +1671,7 @@ export class MessagingService {
     if (!convo) return []
     const members = await this.db
       .selectFrom('greenfield_conversation_members')
-      .select(['actor_id', 'state', 'muted_until'])
+      .select(['actor_id', 'state', 'muted_until', 'notify_level'])
       .where('conversation_id', '=', conversationId)
       .where('actor_id', '<>', senderActorId)
       .where('state', 'in', ['active', 'pending'])
@@ -1607,6 +1696,9 @@ export class MessagingService {
       const muted = Boolean(m.muted_until && m.muted_until > new Date())
       // Muted chats stay quiet until the mute ends; a direct @mention still notifies.
       if (muted && !isMention) continue
+      // Per-chat level (capability `notificationLevels`): none silences everything, mentions only @mentions.
+      if (m.notify_level === 'none') continue
+      if (m.notify_level === 'mentions' && !isMention) continue
       if (isGroup && m.state === 'pending') continue
       const preference = privacy.get(m.actor_id)!.notificationPreview
       let title: string

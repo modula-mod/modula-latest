@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-28T13:35:27.611Z",
+  "capturedAt": "2026-11-28T18:59:22.331Z",
   "source": {
-    "branch": "audit/totp-stepup-rate-limit",
-    "headAtCapture": "20561ad64454098c70e1c7e990038e34e64fe9fa",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "f2410d95450ddcd0ab72189e2484fbe666ed51fc62547cb4f62a5f17398f4e89"
+    "branch": "recert-213",
+    "headAtCapture": "73e8c1b868df6113b56eeac506847284b81c0061",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "00167bec2b834603e1b967b616fcedbe1e2dfba444dce6a62c3c47e31b1cbb38"
   },
   "runtimeRoutes": [
     {
@@ -7489,6 +7489,159 @@
     },
     {
       "method": "GET",
+      "url": "/v1/stories/capabilities",
+      "path": "/v1/stories/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/capabilities",
+      "path": "/v1/stories/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stories/archive",
+      "path": "/v1/stories/archive",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/archive",
+      "path": "/v1/stories/archive",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stories/items/:itemId/viewers",
+      "path": "/v1/stories/items/:itemId/viewers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/items/:itemId/viewers",
+      "path": "/v1/stories/items/:itemId/viewers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stories/items/:itemId/reactions",
+      "path": "/v1/stories/items/:itemId/reactions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/items/:itemId/reactions",
+      "path": "/v1/stories/items/:itemId/reactions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/stories/items/:itemId/reaction",
+      "path": "/v1/stories/items/:itemId/reaction",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/stories/items/:itemId/reaction",
+      "path": "/v1/stories/items/:itemId/reaction",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/stories/highlights",
+      "path": "/v1/stories/highlights",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stories/highlights/:highlightId",
+      "path": "/v1/stories/highlights/:highlightId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/highlights/:highlightId",
+      "path": "/v1/stories/highlights/:highlightId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/stories/highlights/:highlightId",
+      "path": "/v1/stories/highlights/:highlightId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/stories/highlights/:highlightId",
+      "path": "/v1/stories/highlights/:highlightId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/profiles/:handle/highlights",
+      "path": "/v1/profiles/:handle/highlights",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/profiles/:handle/highlights",
+      "path": "/v1/profiles/:handle/highlights",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/stories/rail",
       "path": "/v1/stories/rail",
       "prefix": "",
@@ -7609,6 +7762,708 @@
       "path": "/v1/media/stories/:mediaFile",
       "prefix": "",
       "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/messages/:messageId/pin",
+      "path": "/v1/conversations/:id/messages/:messageId/pin",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/conversations/:id/messages/:messageId/pin",
+      "path": "/v1/conversations/:id/messages/:messageId/pin",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/conversations/:id/pins",
+      "path": "/v1/conversations/:id/pins",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/conversations/:id/pins",
+      "path": "/v1/conversations/:id/pins",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/conversations/:id/messages/:messageId/saved",
+      "path": "/v1/conversations/:id/messages/:messageId/saved",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/conversations/:id/messages/:messageId/saved",
+      "path": "/v1/conversations/:id/messages/:messageId/saved",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/messages/saved",
+      "path": "/v1/messages/saved",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/messages/saved",
+      "path": "/v1/messages/saved",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/conversations/:id/messages/:messageId/edits",
+      "path": "/v1/conversations/:id/messages/:messageId/edits",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/conversations/:id/messages/:messageId/edits",
+      "path": "/v1/conversations/:id/messages/:messageId/edits",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/scheduled",
+      "path": "/v1/conversations/:id/scheduled",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/conversations/:id/scheduled",
+      "path": "/v1/conversations/:id/scheduled",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/conversations/:id/scheduled",
+      "path": "/v1/conversations/:id/scheduled",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/messages/scheduled",
+      "path": "/v1/messages/scheduled",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/messages/scheduled",
+      "path": "/v1/messages/scheduled",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/conversations/:id/scheduled/:scheduledId",
+      "path": "/v1/conversations/:id/scheduled/:scheduledId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "scheduledId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "scheduledId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/conversations/:id/scheduled/:scheduledId",
+      "path": "/v1/conversations/:id/scheduled/:scheduledId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "scheduledId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "scheduledId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/scheduled/:scheduledId/send-now",
+      "path": "/v1/conversations/:id/scheduled/:scheduledId/send-now",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "scheduledId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "scheduledId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/disappearing",
+      "path": "/v1/conversations/:id/disappearing",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/theme",
+      "path": "/v1/conversations/:id/theme",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/pin",
+      "path": "/v1/conversations/:id/pin",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/notifications",
+      "path": "/v1/conversations/:id/notifications",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/messaging/folders",
+      "path": "/v1/messaging/folders",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/messaging/folders",
+      "path": "/v1/messaging/folders",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/messaging/folders",
+      "path": "/v1/messaging/folders",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/messaging/folders/:folderId",
+      "path": "/v1/messaging/folders/:folderId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "folderId"
+          ],
+          "properties": {
+            "folderId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/messaging/folders/:folderId",
+      "path": "/v1/messaging/folders/:folderId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "folderId"
+          ],
+          "properties": {
+            "folderId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/messaging/quick-replies",
+      "path": "/v1/messaging/quick-replies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/messaging/quick-replies",
+      "path": "/v1/messaging/quick-replies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/messaging/quick-replies",
+      "path": "/v1/messaging/quick-replies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/messaging/quick-replies/:replyId",
+      "path": "/v1/messaging/quick-replies/:replyId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "replyId"
+          ],
+          "properties": {
+            "replyId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/messaging/quick-replies/:replyId",
+      "path": "/v1/messaging/quick-replies/:replyId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "replyId"
+          ],
+          "properties": {
+            "replyId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/messages/:messageId/forward",
+      "path": "/v1/conversations/:id/messages/:messageId/forward",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "messageId"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "messageId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },
@@ -7752,6 +8607,30 @@
       "method": "POST",
       "url": "/v1/conversations/:id/read",
       "path": "/v1/conversations/:id/read",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/conversations/:id/unread",
+      "path": "/v1/conversations/:id/unread",
       "prefix": "",
       "schema": {
         "params": {

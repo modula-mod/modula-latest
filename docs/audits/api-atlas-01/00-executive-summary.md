@@ -6,19 +6,19 @@ API service: `modula-production-greenfield-api-1` (healthy)
 Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no Docker healthcheck)
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
-HTTP routes discovered: 633 application / 900 runtime method routes
-Route evidence: local-candidate-runtime for feature branch audit/totp-stepup-rate-limit; not deployed
-Public routes: 151
-Authenticated routes: 378
+HTTP routes discovered: 671 application / 951 runtime method routes
+Route evidence: local-candidate-runtime for feature branch recert-213; not deployed
+Public routes: 170
+Authenticated routes: 397
 Admin/internal routes: 104
-Mutating routes: 367
-Read-only routes: 266
-Routes with request schemas: 107
+Mutating routes: 392
+Read-only routes: 279
+Routes with request schemas: 128
 Routes with response schemas: 0
-Routes with automated tests: 551
+Routes with automated tests: 590
 Routes live-probed: 26 unique routes
-Routes with known callers: 251
-Database tables: 392
+Routes with known callers: 257
+Database tables: 402
 Workers: 1 GreenField worker
 Queues: PostgreSQL outbox plus background job tables
 Scheduled jobs: 0 module schedules; worker poll/reap loops are process timers
@@ -39,13 +39,13 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 | --- | --- | --- | --- | --- | --- |
 | Auth | 55 | 5 | 0 | 1 | 0 |
 | Account | 17 | 4 | 1 | 0 | 0 |
-| Profile | 8 | 4 | 1 | 1 | 0 |
+| Profile | 9 | 4 | 1 | 1 | 0 |
 | Social | 10 | 0 | 0 | 0 | 0 |
 | Feed | 4 | 2 | 1 | 0 | 0 |
 | Posts | 7 | 11 | 0 | 2 | 0 |
 | Comments | 12 | 0 | 0 | 0 | 0 |
 | Reactions | 8 | 0 | 0 | 0 | 0 |
-| Media | 13 | 0 | 0 | 0 | 0 |
+| Media | 23 | 0 | 0 | 0 | 0 |
 | Search | 9 | 4 | 0 | 0 | 0 |
 | Discover | 1 | 1 | 4 | 0 | 0 |
 | Activity | 4 | 1 | 1 | 1 | 0 |
@@ -58,7 +58,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 ## Candidate and production conclusions
 
 - The running API and worker are the same OCI revision, `f05d03c237c62d1b0946a760610d1155f02a8520`; that revision exactly matches captured `origin/main`.
-- Candidate source/runtime reconciliation is exact: 900 = 633 application routes + 267 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
+- Candidate source/runtime reconciliation is exact: 951 = 671 application routes + 280 automatic framework routes; there are no unexplained source-only or runtime-only application routes. Production remains separately observed at 630 runtime method routes on f05d03c237c62d1b0946a760610d1155f02a8520.
 - API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
@@ -117,7 +117,7 @@ Every item above is expanded with evidence, impact, dependency and verification 
 ## Existing GreenField Capabilities Not Currently Used
 
 - Complete passkey/TOTP/recovery/session security APIs, developer/build coordination, module installation descriptors, generic verified MPS ModuleHost execution, and governed intelligence mission routes exist beyond current observed client usage.
-- 416 registered routes have no statically observed product-client caller; 346 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
+- 449 registered routes have no statically observed product-client caller; 380 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
 - Real AI provider adapters exist, but all real providers are unconfigured; only a development mock is available and excluded by the production resolver.
 
 ## Duplicate or Competing Implementations

@@ -1,1 +1,1 @@
-export {loadConfig, type AppConfig} from './env.js'
+export {loadConfig, socialFeatures, type AppConfig, type SocialFeaturesConfig} from './env.js'
