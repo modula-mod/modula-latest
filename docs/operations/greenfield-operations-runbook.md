@@ -117,3 +117,22 @@ deletion semantics. Installation history, release provenance, signer/revocation
 evidence, and deletion tombstones are retained independently of user content.
 Backups target 14 daily, 8 weekly, and 12 monthly recovery points, subject to
 measured capacity and an independent encrypted copy.
+## Native endpoints enablement (Nodus model download, Reels by id)
+
+Two main-only read routes answer 404 in production until an operator enables
+them; see `docs/operations/native-endpoints-enablement.md` for the full steps
+(including the Nodus descriptor template at
+`docs/operations/nodus-release-ios.template.json` and the pre-deploy validator
+`pnpm --filter @modula/greenfield-api nodus:validate-release`):
+
+- Nodus: set `MODULA_NODUS_RELEASE_IOS_JSON` (single-line JSON descriptor) in
+  `/etc/modula/greenfield-api.env`, recreate the API container, then verify
+  `GET /v1/intelligence/nodus/releases/latest?platform=ios` returns 200. The
+  descriptor content (which R7 build) is Andrei's call; the template ships
+  with placeholders and must never be deployed as-is.
+- Reels: set `MODULA_REELS_BY_ID_ENABLED=true` in the same file, recreate the
+  API container, then verify an unauthenticated `GET /v1/reels/:id` returns
+  401 and an authenticated one returns 200.
+
+Both need the post-#208 production deploy first; neither writes any data, and
+removing the setting returns the route to 404.

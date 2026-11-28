@@ -1,0 +1,22 @@
+{
+  "_comment": "TEMPLATE ONLY - never deploy as-is. Copy this file, replace every PLACEHOLDER value with the real R7 release values (Andrei decides which R7 build), then validate with: pnpm --filter @modula/greenfield-api nodus:validate-release -- <your-file>.json. The validator rejects anything Native would reject; it also warns while PLACEHOLDER/example.test values remain.",
+  "schemaVersion": 1,
+  "nodusVersion": "0.0.0-PLACEHOLDER",
+  "artifactHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "manifestURL": "https://cdn.example.test/nodus/PLACEHOLDER/nodus-manifest.json",
+  "manifestSHA256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "files": [
+    {
+      "path": "weights/model.safetensors",
+      "url": "https://cdn.example.test/nodus/PLACEHOLDER/weights/model.safetensors",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "bytes": 1
+    },
+    {
+      "path": "config.json",
+      "url": "https://cdn.example.test/nodus/PLACEHOLDER/config.json",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "bytes": 1
+    }
+  ]
+}
