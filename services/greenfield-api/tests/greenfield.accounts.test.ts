@@ -936,6 +936,72 @@ describeIf('Greenfield native accounts integration', () => {
     )
   })
 
+  it('rate-limits TOTP step-up attempts per account', async () => {
+    const enrollTotp = async (account: {session: {accessToken: string}}) => {
+      const headers = {authorization: `Bearer ${account.session.accessToken}`}
+      const enroll = await app.inject({method: 'POST', url: '/v1/auth/totp/enroll', headers, payload: {label: 'iPhone'}})
+      expect(enroll.statusCode).toBe(200)
+      const enrollment = enroll.json().data
+      const enable = await app.inject({
+        method: 'POST',
+        url: '/v1/auth/totp/verify',
+        headers,
+        payload: {challengeId: enrollment.challengeId, code: await generateTotpFromProvisioningUri(enrollment.provisioningUri)},
+      })
+      expect(enable.statusCode).toBe(200)
+      return {headers, provisioningUri: enrollment.provisioningUri}
+    }
+    const wrongCodeFor = (provisioningUri: string) => {
+      const secret = new URL(provisioningUri).searchParams.get('secret')!
+      const now = Date.now()
+      const valid = new Set(
+        [-30_000, 0, 30_000].map(delta => generate({secret, algorithm: 'sha1', digits: 6, period: 30, epoch: now + delta})),
+      )
+      for (const candidate of ['000000', '111111', '222222', '333333']) {
+        if (!valid.has(candidate)) return candidate
+      }
+      throw new Error('could not pick a wrong TOTP code')
+    }
+    const stepUp = (headers: Record<string, string>, code: string) =>
+      app.inject({method: 'POST', url: '/v1/auth/step-up/totp', headers, payload: {code}})
+
+    // Five wrong guesses are 401s; the sixth -- even with the right code -- is 429.
+    const accountA = await enrollTotp(await createVerifiedAccountWithSession(app, db, {prefix: 'totplim-a'}))
+    const wrongA = wrongCodeFor(accountA.provisioningUri)
+    for (let i = 0; i < 5; i++) {
+      const attempt = await stepUp(accountA.headers, wrongA)
+      expect(attempt.statusCode).toBe(401)
+      expect(attempt.json().error.code).toBe('INVALID_CREDENTIALS')
+    }
+    const blocked = await stepUp(accountA.headers, await generateTotpFromProvisioningUri(accountA.provisioningUri))
+    expect(blocked.statusCode).toBe(429)
+    expect(blocked.json().error.code).toBe('RATE_LIMITED')
+
+    // The limit is per account: another account is unaffected.
+    const accountB = await enrollTotp(await createVerifiedAccountWithSession(app, db, {prefix: 'totplim-b'}))
+    const wrongB = await stepUp(accountB.headers, wrongCodeFor(accountB.provisioningUri))
+    expect(wrongB.statusCode).toBe(401)
+    const okB = await stepUp(accountB.headers, await generateTotpFromProvisioningUri(accountB.provisioningUri))
+    expect(okB.statusCode).toBe(200)
+    expect(okB.json().data).toMatchObject({stepUp: true})
+
+    // A success clears the counter: four wrong, one right, then five more wrong
+    // are all 401s and only the sixth is 429.
+    const accountC = await enrollTotp(await createVerifiedAccountWithSession(app, db, {prefix: 'totplim-c'}))
+    const wrongC = wrongCodeFor(accountC.provisioningUri)
+    for (let i = 0; i < 4; i++) {
+      expect((await stepUp(accountC.headers, wrongC)).statusCode).toBe(401)
+    }
+    const okC = await stepUp(accountC.headers, await generateTotpFromProvisioningUri(accountC.provisioningUri))
+    expect(okC.statusCode).toBe(200)
+    for (let i = 0; i < 5; i++) {
+      expect((await stepUp(accountC.headers, wrongC)).statusCode).toBe(401)
+    }
+    const blockedC = await stepUp(accountC.headers, wrongC)
+    expect(blockedC.statusCode).toBe(429)
+    expect(blockedC.json().error.code).toBe('RATE_LIMITED')
+  })
+
   it('queues and provisions Modula Mail identity only after verified contact email', async () => {
     const account = await createVerifiedAccountWithSession(app, db, {prefix: 'mailid'})
     const headers = {authorization: `Bearer ${account.session.accessToken}`}
