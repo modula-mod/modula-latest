@@ -867,6 +867,69 @@
       "services/greenfield-api/src/gubic/play-service.ts#submissionRow"
     ]
   },
+  "GET /v1/admin/intelligence/nodus/releases": {
+    "reads": [
+      "greenfield_nodus_model_release_signatures"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/app/nodus-model-releases.ts#adminView",
+      "services/greenfield-api/src/app/nodus-model-releases.ts#listAdmin"
+    ]
+  },
+  "POST /v1/admin/intelligence/nodus/releases": {
+    "reads": [
+      "greenfield_nodus_model_release_signatures",
+      "greenfield_nodus_model_releases",
+      "greenfield_publisher_signing_keys"
+    ],
+    "writes": [
+      "greenfield_nodus_model_release_signatures",
+      "greenfield_nodus_model_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/app/nodus-model-releases.ts#adminView",
+      "services/greenfield-api/src/app/nodus-model-releases.ts#createDraft"
+    ]
+  },
+  "POST /v1/admin/intelligence/nodus/releases/:version/publish": {
+    "reads": [
+      "greenfield_nodus_model_release_signatures",
+      "greenfield_nodus_model_releases"
+    ],
+    "writes": [
+      "greenfield_nodus_model_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/app/nodus-model-releases.ts#adminView",
+      "services/greenfield-api/src/app/nodus-model-releases.ts#publish"
+    ]
+  },
+  "POST /v1/admin/intelligence/nodus/releases/:version/rollback": {
+    "reads": [
+      "greenfield_nodus_model_release_signatures",
+      "greenfield_nodus_model_releases"
+    ],
+    "writes": [
+      "greenfield_nodus_model_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/app/nodus-model-releases.ts#adminView",
+      "services/greenfield-api/src/app/nodus-model-releases.ts#rollback"
+    ]
+  },
   "GET /v1/admin/moderation/reports": {
     "reads": [
       "reports"
@@ -6214,6 +6277,38 @@
       "services/greenfield-api/src/intelligence/service.ts#start"
     ]
   },
+  "GET /v1/intelligence/nodus/releases": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "unresolved",
+    "evidence": []
+  },
+  "GET /v1/intelligence/nodus/releases/:version": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/intelligence/nodus/releases/:version/files/*": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "unresolved",
+    "evidence": []
+  },
+  "GET /v1/intelligence/nodus/releases/:version/manifest": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
   "GET /v1/intelligence/nodus/releases/latest": {
     "reads": [
       "the"
@@ -6221,7 +6316,7 @@
     "writes": [],
     "emits": [],
     "jobs": [],
-    "confidence": "method-level-static",
+    "confidence": "direct-handler-only",
     "evidence": []
   },
   "POST /v1/internal/build-service/builds/:buildId/result": {

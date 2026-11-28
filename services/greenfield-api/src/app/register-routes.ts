@@ -92,7 +92,8 @@ import {registerComposerRoutes} from './register-composer-routes.js'
 import {registerCommunitiesRoutes} from './register-communities-routes.js'
 import {registerCollectionsDraftsRoutes} from './register-collections-drafts-routes.js'
 import {registerMolibooRoutes} from './register-moliboo-routes.js'
-import {registerNativeEndpointRoutes} from './register-native-endpoint-routes.js'
+import {nativeEndpointOptionsFromEnv, registerNativeEndpointRoutes} from './register-native-endpoint-routes.js'
+import {createNodusModelReleaseStore, registerNodusModelReleaseRoutes} from './nodus-model-releases.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -2732,7 +2733,11 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   await registerPushRoutes(app, db, {bundleId: config.pushBundleId, profileConfig, writeConfig})
   await registerMolibooRoutes(app, db, config, {feedConfig, writeConfig})
-  await registerNativeEndpointRoutes(app, db, config.publicApiUrl, {feedConfig})
+  await registerNativeEndpointRoutes(app, db, config.publicApiUrl, {feedConfig}, {
+    ...nativeEndpointOptionsFromEnv(),
+    nodusReleaseStore: createNodusModelReleaseStore(db),
+  })
+  await registerNodusModelReleaseRoutes(app, db, config, greenfieldSessions, {feedConfig, profileConfig, writeConfig})
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig}, {appleVerifier: options.premiumAppleVerifier})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})

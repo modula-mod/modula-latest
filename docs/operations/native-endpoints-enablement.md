@@ -75,7 +75,76 @@ Remove `MODULA_NODUS_RELEASE_IOS_JSON` from `/etc/modula/greenfield-api.env`
 and recreate the API container. The endpoint returns to 404 and the app falls
 back to Apple Foundation Models. No data migration is involved.
 
-## 2. Single reel — `GET /v1/reels/:id`
+## 2. Nodus model releases — the registry channel (migration 103)
+
+The env descriptor above is the fallback. The registry channel is the
+versioned, signed pipeline: releases live in the database
+(`greenfield_nodus_model_releases` + `greenfield_nodus_model_release_signatures`),
+`/latest` serves the published release stripped to the v1 shape, and the
+server proxies model bytes resumably with full HTTP Range support. The
+operator steps below are admin-only (an allowlisted handle in
+`MODULA_ADMIN_HANDLES`, bearer token required). No step signs anything: the
+Ed25519 manifest signature is made offline by whoever holds the private key,
+and the server only verifies it against a registered ACTIVE publisher key.
+
+### Which R7 build — still open
+
+No R7 build is publishable today. The only R7 artifact is the experimental
+candidate (NODUS-01C checkpoint, packaged by NODUS-01D for diagnostics):
+lifecycle `experimentalCandidate`, `shippingAllowed = false`, Debug-only.
+A publishable first release needs an **accepted** build — the full promotion
+suite passing (general retention within 5 points per category, Modula
+improvement ≥ +0.15, compatible ECE below 0.4400, freshness / abstention /
+hallucination-resistance / unknown-capability / false-premise gates,
+runtime / integrity / licensing) followed by explicit review — plus artifact
+hosting and an offline signature over the canonical manifest. Do not publish
+the experimental candidate. Until then the pipeline is proven with test
+descriptors only.
+
+### Publication flow
+
+1. Build the v2 descriptor. It is the v1 shape plus `releaseNumber` (the next
+   number for the platform: 1 for the first release), `signature` (base64url
+   Ed25519 over the canonical manifest bytes — the canonical JSON of
+   `{schemaVersion: 2, nodusVersion, artifactHash, files[]}` with files as
+   `{path, sha256, bytes}`), `signingKeyId`, `publishedAt` (ISO timestamp;
+   replaced by the real publication time at publish), and `supersedes`
+   (the previous version, or `null` for the first release).
+   `manifestURL` and every `files[].url` must be this server's own endpoints:
+   `https://api.modula.digital/v1/intelligence/nodus/releases/<version>/manifest`
+   and `.../files/<path>`. Validate it first:
+   `pnpm --filter @modula/greenfield-api nodus:validate-release -- <file>.json`
+   (exit 0 + `VALID:`; it also accepts v1 descriptors).
+2. Create a draft (the server verifies the signature and the manifest hash
+   and rejects anything else — fail closed):
+   `curl -s -X POST -H 'Authorization: Bearer <admin-token>' -H 'Content-Type: application/json' -d '{"descriptor": <v2 descriptor object>, "originUrl": "https://<artifact-origin>"}' https://api.modula.digital/v1/admin/intelligence/nodus/releases`
+   → `201` with the draft. `originUrl` is the artifact origin base (CDN /
+   object storage); it is never served to the client. The draft is not
+   served publicly: `/latest`, the list, and the per-version endpoints all
+   still 404 / return the previous release.
+3. Publish the draft:
+   `curl -s -X POST -H 'Authorization: Bearer <admin-token>' https://api.modula.digital/v1/admin/intelligence/nodus/releases/<version>/publish`
+   → `200`. The previously published release (if any) becomes `superseded`;
+   `/latest` now serves the new release stripped to v1. Verify:
+   `curl -s https://api.modula.digital/v1/intelligence/nodus/releases?platform=ios`
+   and `curl -s https://api.modula.digital/v1/intelligence/nodus/releases/<version>/manifest`
+   (the manifest bytes must hash to the descriptor's `manifestSHA256`).
+4. Roll back by republishing a previous version (rows are never deleted):
+   `curl -s -X POST -H 'Authorization: Bearer <admin-token>' https://api.modula.digital/v1/admin/intelligence/nodus/releases/<previous-version>/rollback`
+   → `200`. The bad version becomes `deprecated` and is no longer served;
+   `/latest` points at the previous version again, and clients downgrade.
+   Superseded versions stay downloadable (rollback needs their bytes).
+5. List everything including drafts (admin-only):
+   `curl -s -H 'Authorization: Bearer <admin-token>' https://api.modula.digital/v1/admin/intelligence/nodus/releases`
+
+### Rollback (env channel)
+
+If a release was served from the env descriptor instead, remove
+`MODULA_NODUS_RELEASE_IOS_JSON` as in §1. Note a DB-published release takes
+precedence over the env descriptor: removing the env setting does not
+unpublish a registry release — use the rollback endpoint above.
+
+## 3. Single reel — `GET /v1/reels/:id`
 
 `GET /v1/reels` (the list) already works in production. The single-reel route
 the app calls when opening a reel detail is disabled unless

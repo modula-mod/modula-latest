@@ -11,12 +11,31 @@
  * Usage:
  *   pnpm --filter @modula/greenfield-api nodus:validate-release -- <descriptor.json>
  *
+ * Accepts v1 descriptors (the MODULA_NODUS_RELEASE_IOS_JSON shape) and v2
+ * descriptors (the registry shape: releaseNumber, signature, signingKeyId,
+ * publishedAt, supersedes). For v2 it also reports the release number and
+ * signing key id — never the signature value.
+ *
  * Exit code: 0 = valid, 1 = invalid, 2 = usage / file error.
  * Nothing from the descriptor is printed except the release version, the
  * file count, the total bytes and the manifest host (no digests, no URLs).
  */
 import {readFileSync} from 'node:fs'
-import {nodusReleaseDescriptorProblem, parseNodusReleaseDescriptor} from '../src/app/register-native-endpoint-routes.js'
+import {
+  nodusReleaseDescriptorProblem,
+  nodusReleaseDescriptorV2Problem,
+  parseNodusReleaseDescriptor,
+  parseNodusReleaseDescriptorV2,
+} from '../src/app/nodus-release-descriptor.js'
+
+function isV2Descriptor(raw: string): boolean {
+  try {
+    const value = JSON.parse(raw)
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value) && value.schemaVersion === 2
+  } catch {
+    return false
+  }
+}
 
 function main(argv: string[]): number {
   // pnpm forwards a `--` separator to the script; tolerate it.
@@ -33,13 +52,13 @@ function main(argv: string[]): number {
     console.error(`cannot read ${path}: ${(error as Error).message}`)
     return 2
   }
-  const problem = nodusReleaseDescriptorProblem(raw)
+  const problem = isV2Descriptor(raw) ? nodusReleaseDescriptorV2Problem(raw) : nodusReleaseDescriptorProblem(raw)
   if (problem !== null) {
     console.error(`INVALID: ${problem}`)
     console.error('Fix the descriptor and re-run; the endpoint stays 404 until it validates.')
     return 1
   }
-  const descriptor = parseNodusReleaseDescriptor(raw)
+  const descriptor = isV2Descriptor(raw) ? parseNodusReleaseDescriptorV2(raw) : parseNodusReleaseDescriptor(raw)
   if (!descriptor) {
     // Unreachable: the problem check above already passed.
     console.error('INVALID: descriptor failed validation')
@@ -53,8 +72,11 @@ function main(argv: string[]): number {
   }
   const totalBytes = descriptor.files.reduce((sum, file) => sum + file.bytes, 0)
   const manifestHost = new URL(descriptor.manifestURL).hostname
+  const releaseNote = descriptor.schemaVersion === 2
+    ? ` release ${descriptor.releaseNumber}, signed by ${descriptor.signingKeyId}`
+    : ''
   console.log(
-    `VALID: Nodus iOS release ${descriptor.nodusVersion} (${descriptor.files.length} files, ${totalBytes} bytes, manifest host ${manifestHost})`,
+    `VALID: Nodus iOS release ${descriptor.nodusVersion} (${descriptor.files.length} files, ${totalBytes} bytes, manifest host ${manifestHost}${releaseNote})`,
   )
   if (placeholders.length > 0) {
     console.log(

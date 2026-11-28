@@ -1,12 +1,20 @@
+import {createPublicKey, verify} from 'node:crypto'
 import Fastify from 'fastify'
 import {describe, expect, it} from 'vitest'
+import {
+  nodusModelManifestBytes,
+  nodusModelManifestSha256,
+  nodusReleaseDescriptorV2Problem,
+  parseNodusReleaseDescriptorV2,
+  stripNodusReleaseDescriptorV2ToV1,
+} from '../src/app/nodus-release-descriptor.js'
 import {
   nativeEndpointOptionsFromEnv,
   nodusReleaseDescriptorProblem,
   parseNodusReleaseDescriptor,
   registerNativeEndpointRoutes,
 } from '../src/app/register-native-endpoint-routes.js'
-import {hex, validDescriptor} from './helpers/nodus-release-fixture.js'
+import {buildSignedV2Descriptor, hex, makeNodusTestKey, validDescriptor, validDescriptorV2} from './helpers/nodus-release-fixture.js'
 
 async function appWith(options: Parameters<typeof registerNativeEndpointRoutes>[4]) {
   const app = Fastify()
@@ -171,5 +179,106 @@ describe('GF native endpoints: Nodus release descriptor problems (operator-facin
       expect(parseNodusReleaseDescriptor(JSON.stringify(bad))).toBeNull()
       expect(nodusReleaseDescriptorProblem(JSON.stringify(bad))).not.toBeNull()
     }
+  })
+})
+
+describe('GF native endpoints: Nodus release descriptor v2 (model-as-patch registry)', () => {
+  it('accepts a valid v2 descriptor and its manifest hash is self-consistent', () => {
+    const descriptor = validDescriptorV2()
+    expect(nodusReleaseDescriptorV2Problem(JSON.stringify(descriptor))).toBeNull()
+    expect(parseNodusReleaseDescriptorV2(JSON.stringify(descriptor))).toEqual(descriptor)
+    expect(nodusModelManifestSha256(descriptor)).toBe(descriptor.manifestSHA256)
+  })
+
+  it('rejects every v2 shape the registry would reject', () => {
+    const descriptor = validDescriptorV2()
+    const bad: unknown[] = [
+      {...descriptor, schemaVersion: 1},
+      {...descriptor, releaseNumber: 0},
+      {...descriptor, releaseNumber: 1.5},
+      {...descriptor, signature: 'x'},
+      {...descriptor, signature: 'A'.repeat(85)},
+      {...descriptor, signingKeyId: ''},
+      {...descriptor, signingKeyId: 'x'},
+      {...descriptor, publishedAt: 'not-a-date'},
+      {...descriptor, supersedes: 'x'.repeat(65)},
+      {...descriptor, supersedes: 3},
+      {...descriptor, manifestSHA256: hex('F')},
+      {...descriptor, files: []},
+    ]
+    for (const candidate of bad) {
+      expect(parseNodusReleaseDescriptorV2(JSON.stringify(candidate)), JSON.stringify(candidate)).toBeNull()
+      expect(nodusReleaseDescriptorV2Problem(JSON.stringify(candidate))).not.toBeNull()
+    }
+  })
+
+  it('names the first v2 problem', () => {
+    const descriptor = validDescriptorV2()
+    expect(nodusReleaseDescriptorV2Problem(JSON.stringify({...descriptor, releaseNumber: 0}))).toMatch(/releaseNumber/)
+    expect(nodusReleaseDescriptorV2Problem(JSON.stringify({...descriptor, signature: 'bad'}))).toMatch(/signature/)
+    expect(nodusReleaseDescriptorV2Problem(JSON.stringify({...descriptor, signingKeyId: ''}))).toMatch(/signingKeyId/)
+    expect(nodusReleaseDescriptorV2Problem(JSON.stringify({...descriptor, publishedAt: 'nope'}))).toMatch(/publishedAt/)
+  })
+
+  it('strips a v2 descriptor to the v1 shape today\u2019s client decodes', () => {
+    const descriptor = validDescriptorV2()
+    const stripped = stripNodusReleaseDescriptorV2ToV1(descriptor)
+    expect(stripped).toEqual({
+      schemaVersion: 1,
+      nodusVersion: descriptor.nodusVersion,
+      artifactHash: descriptor.artifactHash,
+      manifestURL: descriptor.manifestURL,
+      manifestSHA256: descriptor.manifestSHA256,
+      files: descriptor.files,
+    })
+    expect(stripped).not.toHaveProperty('releaseNumber')
+    expect(stripped).not.toHaveProperty('signature')
+    expect(stripped).not.toHaveProperty('signingKeyId')
+  })
+
+  it('the fixture signature really verifies over the canonical manifest bytes', () => {
+    const key = makeNodusTestKey()
+    const descriptor = buildSignedV2Descriptor({
+      key,
+      publicApiUrl: 'https://api.test.modula.digital',
+      version: '2.0.0',
+      files: [{path: 'weights/model.safetensors', bytes: Buffer.alloc(64, 9)}],
+    })
+    const publicKey = createPublicKey(key.publicKeyPem)
+    expect(verify(null, nodusModelManifestBytes(descriptor), publicKey, Buffer.from(descriptor.signature, 'base64url'))).toBe(true)
+    // One flipped manifest byte breaks the signature.
+    const tampered = {...descriptor, nodusVersion: '2.0.1'}
+    expect(verify(null, nodusModelManifestBytes(tampered), publicKey, Buffer.from(descriptor.signature, 'base64url'))).toBe(false)
+  })
+})
+
+describe('GF native endpoints: GET /v1/intelligence/nodus/releases/latest fallback order (DB > env > 404)', () => {
+  it('serves the DB release stripped to v1 before the env descriptor', async () => {
+    const app = await appWith({
+      nodusReleaseIosJson: JSON.stringify(validDescriptor),
+      nodusReleaseStore: {findPublished: async () => validDescriptorV2()},
+    })
+    const res = await app.inject({method: 'GET', url: '/v1/intelligence/nodus/releases/latest?platform=ios'})
+    expect(res.statusCode).toBe(200)
+    expect(res.json()).toEqual(stripNodusReleaseDescriptorV2ToV1(validDescriptorV2()))
+    expect(res.json()).not.toHaveProperty('releaseNumber')
+    await app.close()
+  })
+
+  it('falls back to the env descriptor when the store has no release', async () => {
+    const app = await appWith({
+      nodusReleaseIosJson: JSON.stringify(validDescriptor),
+      nodusReleaseStore: {findPublished: async () => null},
+    })
+    const res = await app.inject({method: 'GET', url: '/v1/intelligence/nodus/releases/latest?platform=ios'})
+    expect(res.statusCode).toBe(200)
+    expect(res.json()).toEqual(validDescriptor)
+    await app.close()
+  })
+
+  it('answers 404 when neither the store nor the env has a release', async () => {
+    const app = await appWith({nodusReleaseStore: {findPublished: async () => null}})
+    expect((await app.inject({method: 'GET', url: '/v1/intelligence/nodus/releases/latest?platform=ios'})).statusCode).toBe(404)
+    await app.close()
   })
 })

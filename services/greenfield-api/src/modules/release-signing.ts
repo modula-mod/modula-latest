@@ -114,6 +114,23 @@ export function approvalFactsSha256(facts: PublisherReleaseApprovalFacts): strin
   return createHash('sha256').update(Buffer.from(canonicalJsonStringify(facts), 'utf8')).digest('hex')
 }
 
+export type CanonicalStatementVerificationResult = {
+  state: SignatureVerificationState
+  detail: string
+  keyId: string
+  publicKeyFingerprint: string | null
+  statement: unknown
+  statementSha256: string
+}
+
+export function canonicalStatementBytes(statement: unknown): Buffer {
+  return Buffer.from(canonicalJsonStringify(statement), 'utf8')
+}
+
+export function canonicalStatementSha256(statement: unknown): string {
+  return createHash('sha256').update(canonicalStatementBytes(statement)).digest('hex')
+}
+
 export function statementBytes(statement: PublisherReleaseStatement): Buffer {
   return Buffer.from(canonicalJsonStringify(statement), 'utf8')
 }
@@ -223,17 +240,30 @@ export class GreenfieldPublisherSigningKeyService {
 
   /** Verifies a signature over the registry-rebuilt statement at `observedAt` (the time the registry first saw it). */
   async verify(statement: PublisherReleaseStatement, signature: ReleaseSignatureInput, observedAt: Date, lockKey = false): Promise<SignatureVerificationResult> {
-    const base = {keyId: signature.keyId, statement, statementSha256: statementSha256(statement)}
+    const result = await this.verifyCanonicalStatement(statement, statement.publisherId, signature, observedAt, lockKey)
+    return {...result, statement}
+  }
+
+  /**
+   * Verifies an Ed25519 signature over the canonical JSON bytes of any
+   * statement the registry rebuilt itself, against a key registered to the
+   * given publisher. Same key checks as verify(): unknown key, wrong
+   * publisher, revoked key, validity window, and rotated-key observation.
+   * Nodus model releases use this with the canonical manifest statement;
+   * module releases keep using verify() above.
+   */
+  async verifyCanonicalStatement(statement: unknown, publisherId: string, signature: ReleaseSignatureInput, observedAt: Date, lockKey = false): Promise<CanonicalStatementVerificationResult> {
+    const base = {keyId: signature.keyId, statement, statementSha256: canonicalStatementSha256(statement)}
     const keyQuery = this.db.selectFrom('greenfield_publisher_signing_keys').selectAll().where('key_id', '=', signature.keyId)
     const key = await (lockKey ? keyQuery.forShare() : keyQuery).executeTakeFirst()
     if (!key) return {...base, state: 'unknownKey', detail: 'No registered public key has this key ID', publicKeyFingerprint: null}
     const fingerprint = key.fingerprint
-    if (key.publisher_id !== statement.publisherId) return {...base, state: 'unknownKey', detail: 'The key is registered to a different publisher', publicKeyFingerprint: fingerprint}
+    if (key.publisher_id !== publisherId) return {...base, state: 'unknownKey', detail: 'The key is registered to a different publisher', publicKeyFingerprint: fingerprint}
     if (key.state === 'REVOKED' || key.revoked_at) return {...base, state: 'revokedKey', detail: `Signing key revoked${key.revocation_reason ? `: ${key.revocation_reason}` : ''}`, publicKeyFingerprint: fingerprint}
     if (observedAt < key.valid_from || (key.valid_until && observedAt > key.valid_until)) return {...base, state: 'invalid', detail: 'Signature observed outside the key validity window', publicKeyFingerprint: fingerprint}
     if (key.state === 'ROTATED' && key.rotated_at && observedAt > key.rotated_at) return {...base, state: 'invalid', detail: 'Signing key was rotated before this signature was observed', publicKeyFingerprint: fingerprint}
     let ok = false
-    try { ok = verify(null, statementBytes(statement), createPublicKey(key.public_key_pem), Buffer.from(signature.value, 'base64url')) } catch { ok = false }
+    try { ok = verify(null, canonicalStatementBytes(statement), createPublicKey(key.public_key_pem), Buffer.from(signature.value, 'base64url')) } catch { ok = false }
     return ok
       ? {...base, state: 'verified', detail: 'Ed25519 signature verified against the registered publisher key', publicKeyFingerprint: fingerprint}
       : {...base, state: 'invalid', detail: 'Ed25519 signature does not match the registry-verified release statement', publicKeyFingerprint: fingerprint}
