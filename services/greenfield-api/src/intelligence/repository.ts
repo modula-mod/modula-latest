@@ -1,14 +1,17 @@
 import type {
   AkiCheck,
   AkiDecision,
+  ApprovalStatus,
   EvidenceReference,
   GaiaPlan,
   GovernorDecision,
   IntelligenceApproval,
+  IntelligenceApprovalQueueItem,
   IntelligenceArtifact,
   IntelligenceExecution,
   IntelligenceLedgerEvent,
   IntelligenceLedgerEventType,
+  IntelligenceListPage,
   IntelligenceMission,
   IntelligenceMissionStatus,
   LedgerActor,
@@ -38,6 +41,85 @@ export class IntelligenceRepository {
   async listMissions(accountId: string): Promise<IntelligenceMission[]> {
     const rows = await this.db.selectFrom('intelligence_missions').selectAll().where('owner_account_id', '=', accountId).orderBy('created_at', 'desc').execute()
     return rows.map(toMission)
+  }
+
+  /**
+   * Cursor-paginated missions list for the native missions screen.
+   * Index-backed: `intelligence_missions_owner_status_idx`
+   * (owner_account_id, status, created_at DESC). Reads one page past the
+   * limit to detect the next page; `total` counts the filtered set.
+   */
+  async listMissionsPage(accountId: string, input: {status?: IntelligenceMissionStatus; limit: number; offset: number}): Promise<IntelligenceListPage<IntelligenceMission>> {
+    let countQuery = this.db.selectFrom('intelligence_missions').select(sql<number>`count(*)::int`.as('count')).where('owner_account_id', '=', accountId)
+    if (input.status) countQuery = countQuery.where('status', '=', input.status)
+    const totalRow = await countQuery.executeTakeFirstOrThrow()
+    let rowsQuery = this.db.selectFrom('intelligence_missions').selectAll().where('owner_account_id', '=', accountId)
+    if (input.status) rowsQuery = rowsQuery.where('status', '=', input.status)
+    const rows = await rowsQuery.orderBy('created_at', 'desc').limit(input.limit + 1).offset(input.offset).execute()
+    const items = rows.slice(0, input.limit).map(toMission)
+    return {items, nextCursor: rows.length > input.limit ? String(input.offset + input.limit) : null, limit: input.limit, total: Number(totalRow.count)}
+  }
+
+  /**
+   * Cross-mission approvals queue for the native approvals screen:
+   * every approval belonging to the account, oldest first (most urgent —
+   * approvals expire 24h after request). One row carries the mission
+   * objective/status and the proposal family/capability so the queue
+   * renders from this one call. Index-backed:
+   * `intelligence_approvals_owner_status_idx`
+   * (requested_account_id, status, requested_at DESC).
+   */
+  async listApprovalsQueue(accountId: string, input: {status: ApprovalStatus; limit: number; offset: number}): Promise<IntelligenceListPage<IntelligenceApprovalQueueItem>> {
+    const totalRow = await this.db.selectFrom('intelligence_approvals').select(sql<number>`count(*)::int`.as('count')).where('requested_account_id', '=', accountId).where('status', '=', input.status).executeTakeFirstOrThrow()
+    const rows = await this.db
+      .selectFrom('intelligence_approvals as approval')
+      .innerJoin('intelligence_missions as mission', 'mission.mission_id', 'approval.mission_id')
+      .innerJoin('intelligence_proposals as proposal', 'proposal.proposal_id', 'approval.proposal_id')
+      .select([
+        'approval.approval_id as approval_id',
+        'approval.mission_id as mission_id',
+        'approval.proposal_id as proposal_id',
+        'approval.requested_account_id as requested_account_id',
+        'approval.resolver_account_id as resolver_account_id',
+        'approval.reason as reason',
+        'approval.status as status',
+        'approval.requested_at as requested_at',
+        'approval.resolved_at as resolved_at',
+        'approval.expires_at as expires_at',
+        'mission.objective as mission_objective',
+        'mission.status as mission_status',
+        'proposal.family as proposal_family',
+        'proposal.capability as proposal_capability',
+        'proposal.module_id as proposal_module_id',
+      ])
+      .where('approval.requested_account_id', '=', accountId)
+      .where('approval.status', '=', input.status)
+      .orderBy('approval.requested_at', 'asc')
+      .limit(input.limit + 1)
+      .offset(input.offset)
+      .execute()
+    const page = rows.slice(0, input.limit)
+    return {
+      items: page.map(row => ({
+        approval: {
+          id: row.approval_id,
+          missionId: row.mission_id,
+          proposalId: row.proposal_id,
+          requestedUserId: row.requested_account_id,
+          resolverUserId: row.resolver_account_id ?? undefined,
+          reason: row.reason,
+          status: row.status as ApprovalStatus,
+          requestedAt: row.requested_at.toISOString(),
+          resolvedAt: row.resolved_at?.toISOString(),
+          expiresAt: row.expires_at?.toISOString(),
+        },
+        mission: {id: row.mission_id, objective: row.mission_objective, status: row.mission_status as IntelligenceMissionStatus},
+        proposal: {id: row.proposal_id, family: row.proposal_family, capability: row.proposal_capability, moduleId: row.proposal_module_id ?? undefined},
+      })),
+      nextCursor: rows.length > input.limit ? String(input.offset + input.limit) : null,
+      limit: input.limit,
+      total: Number(totalRow.count),
+    }
   }
 
   async ownedMission(accountId: string, missionId: string): Promise<IntelligenceMission> {
@@ -249,6 +331,25 @@ export class IntelligenceRepository {
   async ledger(accountId: string, missionId: string) {
     await this.ownedMission(accountId, missionId)
     return (await this.db.selectFrom('intelligence_ledger_events').selectAll().where('mission_id', '=', missionId).orderBy('occurred_at').orderBy('event_id').execute()).map(toLedgerEvent)
+  }
+
+  /**
+   * Cursor-paginated Ledger for the native Ledger view. Default order is
+   * chronological ascending (the pre-existing order); `order=desc` gives
+   * newest-first for infinite scroll. Index-backed:
+   * `intelligence_ledger_mission_time_idx`
+   * (mission_id, occurred_at, event_id).
+   */
+  async ledgerPage(accountId: string, missionId: string, input: {limit: number; offset: number; order: 'asc' | 'desc'}): Promise<IntelligenceListPage<IntelligenceLedgerEvent>> {
+    await this.ownedMission(accountId, missionId)
+    const totalRow = await this.db.selectFrom('intelligence_ledger_events').select(sql<number>`count(*)::int`.as('count')).where('mission_id', '=', missionId).executeTakeFirstOrThrow()
+    let rowsQuery = this.db.selectFrom('intelligence_ledger_events').selectAll().where('mission_id', '=', missionId)
+    rowsQuery = input.order === 'desc'
+      ? rowsQuery.orderBy('occurred_at', 'desc').orderBy('event_id', 'desc')
+      : rowsQuery.orderBy('occurred_at', 'asc').orderBy('event_id', 'asc')
+    const rows = await rowsQuery.limit(input.limit + 1).offset(input.offset).execute()
+    const items = rows.slice(0, input.limit).map(toLedgerEvent)
+    return {items, nextCursor: rows.length > input.limit ? String(input.offset + input.limit) : null, limit: input.limit, total: Number(totalRow.count)}
   }
 
   async decisions(accountId: string, missionId: string) {

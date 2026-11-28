@@ -250,6 +250,32 @@ export type IntelligenceLedgerEvent = {
 
 export type CircuitState = 'draft' | 'validating' | 'active' | 'deprecated' | 'quarantined'
 
+/**
+ * Cursor-paginated list page, following the backend-fabric records
+ * convention (`{items, nextCursor}` + `limit`/`total`). The cursor is an
+ * opaque offset string: pass `nextCursor` back as `cursor` for the next
+ * page. A cursor is only valid for the same endpoint, filter and order
+ * it was issued for. `nextCursor: null` means the last page.
+ */
+export type IntelligenceListPage<T> = {
+  items: T[]
+  nextCursor: string | null
+  limit: number
+  total: number
+}
+
+/**
+ * One row of the cross-mission approvals queue
+ * (`GET /v1/intelligence/approvals`). The nested `mission` and `proposal`
+ * give the queue screen everything it needs to render a row without a
+ * second call per approval.
+ */
+export type IntelligenceApprovalQueueItem = {
+  approval: IntelligenceApproval
+  mission: {id: string; objective: string; status: IntelligenceMissionStatus}
+  proposal: {id: string; family: string; capability: string; moduleId?: string}
+}
+
 export type CircuitCard = {
   id: string
   userId: string
