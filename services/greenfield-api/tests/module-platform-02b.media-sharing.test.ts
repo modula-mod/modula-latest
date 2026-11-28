@@ -6,9 +6,9 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import type {Database} from '../src/database/types.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleMediaBindingService} from '../src/modules/media-binding-service.js'
 import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -217,7 +217,7 @@ async function seedModule(db: Kysely<Database>, accountIds: string[], moduleId: 
     ...['read', 'write'].map(operation => `sharing:module.${moduleId}.${collection.collection}:${operation}`),
   ]
   const manifest = moduleManifest(moduleId, collection, permissions)
-  const releases = new GreenfieldModuleReleaseService(db)
+  const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
   const imported = await releases.importPendingReview(manifest)
   const published = await releases.publishRelease(moduleId, manifest.version)
   await db.insertInto('greenfield_module_record_collections').values({collection_id: `collection:${published.releaseId}:item`, release_id: published.releaseId, module_id: moduleId, collection: 'item', schema_ref: collection.schemaRef, default_visibility: 'private', fields: jsonb(collection.fields), searchable_fields: jsonb(collection.searchableFields), filterable_fields: jsonb([]), sortable_fields: jsonb(collection.sortableFields), folder_field: null, reference_fields: jsonb([]), schema_definition: jsonb({}), retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: new Date(), updated_at: new Date()}).execute()

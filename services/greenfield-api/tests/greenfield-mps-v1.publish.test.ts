@@ -6,6 +6,7 @@ import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfiel
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService, type GreenfieldModuleReleaseEvidence} from '../src/modules/release-service.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const apiDatabaseUrl = process.env.MODULA_TEST_API_DATABASE_URL ?? databaseUrl
@@ -19,7 +20,26 @@ describeIfDb('generic MPS release publication', () => {
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
     db = createDb(apiDatabaseUrl!)
-    releases = new GreenfieldModuleReleaseService(db)
+    const now = new Date()
+    await db.insertInto('greenfield_publishers').values({
+      publisher_id: 'example.publisher',
+      display_name: 'example.publisher',
+      website: null,
+      status: 'verified',
+      trust_level: 'untrustedManifest',
+      created_at: now,
+      updated_at: now,
+      verified_at: now,
+      suspended_at: null,
+      revoked_at: null,
+    }).onConflict(oc => oc.column('publisher_id').doUpdateSet({
+      status: 'verified',
+      trust_level: 'untrustedManifest',
+      verified_at: now,
+      revoked_at: null,
+      updated_at: now,
+    })).execute()
+    releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
   })
 
   afterAll(async () => db?.destroy())

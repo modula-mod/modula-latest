@@ -15,7 +15,7 @@ import {
   GreenfieldExtensionFabricService,
   frontendContributionTargetsExtensionPoint,
 } from '../src/modules/extension-fabric-service.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {executeWithBoundedRetry} from '../src/modules/backend/gateway-service.js'
 import {ModuleBackendTokenService} from '../src/modules/backend/token-service.js'
@@ -465,7 +465,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
 
   it('quarantines an artifact whose manifest changes after checksum capture', async () => {
     const tampered = manifest(`digital.modula.tamper-${suffix}`, '1.0.0', {})
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const imported = await releases.importPendingReview(tampered, releaseEvidence(tampered))
     await db.updateTable('greenfield_module_versions')
       .set({manifest: {...tampered, description: 'tampered after checksum'}})
@@ -479,7 +479,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
   })
 
   async function publish(manifest: GreenfieldModuleManifest) {
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const existing = await releases.getRelease(manifest.moduleId, manifest.version)
     if (existing) return existing
     await releases.importPendingReview(manifest, releaseEvidence(manifest))

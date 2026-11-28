@@ -14,8 +14,8 @@ import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import type {Database} from '../src/database/types.js'
 import {advanceActionLineage, GreenfieldInterModuleActionService} from '../src/modules/inter-module-action-service.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {authorizeFirstPartyPublisherFixture} from './helpers/first-party-publisher.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -390,7 +390,7 @@ async function seedBeta(db: Kysely<Database>, accountId: string, moduleId: strin
 
 async function installModule(db: Kysely<Database>, accountId: string, manifest: GreenfieldModuleManifestV1, permissions: string[]): Promise<ModuleFixture> {
   manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
-  const releases = new GreenfieldModuleReleaseService(db)
+  const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
   const imported = await releases.importPendingReview(manifest)
   const published = await releases.publishRelease(manifest.moduleId, manifest.version)
   const installationId = `mp02b-installation:${manifest.moduleId}:${accountId}`

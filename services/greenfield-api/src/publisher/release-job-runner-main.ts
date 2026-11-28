@@ -1,33 +1,27 @@
 import {hostname} from 'node:os'
-import {loadConfig} from '../config/env.js'
 import {createDb} from '../database/client.js'
-import {HttpGithubReleaseSource} from '../modules/github-release-sync-service.js'
-import {PublisherReleaseJobProcessor} from './release-job-processor.js'
-import {PublisherReleaseJobRunner} from './release-job-runner.js'
+import {RestrictedPublisherSigningRunner} from './restricted-signing-runner.js'
 import {vaultTransitProviderFromEnvironment} from './signing-provider.js'
 
 /**
- * Publisher release console runner process (built into the API image:
- * `node dist/publisher/release-job-runner-main.js`). Not started by any deploy
- * manifest in this change; see the BUILDER-01 report.
+ * Signing-only runner. It deliberately refuses the general API database URL:
+ * deployment must provide the dedicated migration-092 runner credential.
  */
 async function main() {
-  const config = loadConfig()
-  const db = createDb(config.databaseUrl)
+  const databaseUrl = process.env.MODULA_SIGNING_RUNNER_DATABASE_URL?.trim()
+  if (!databaseUrl) throw new Error('MODULA_SIGNING_RUNNER_DATABASE_URL is required for the signing-only runner')
   const signingProvider = vaultTransitProviderFromEnvironment()
-  const processor = new PublisherReleaseJobProcessor(db, {
-    source: new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}),
-    config,
-    githubEnabled: config.moduleGithubSyncEnabled,
-    signingProvider: signingProvider ?? undefined,
+  if (!signingProvider) throw new Error('A configured Vault Transit signing provider is required')
+  const db = createDb(databaseUrl, error => console.error('signing runner database pool error', error.message), {
+    applicationName: 'modula-signing-runner',
+    max: 2,
   })
-  const runner = new PublisherReleaseJobRunner(db, processor, {workerId: `publisher-release-runner:${hostname()}:${process.pid}`})
+  const runner = new RestrictedPublisherSigningRunner(db, signingProvider, {workerId: `publisher-signing-runner:${hostname()}:${process.pid}`})
   let stopping = false
   const stop = () => { stopping = true }
   process.on('SIGTERM', stop)
   process.on('SIGINT', stop)
   while (!stopping) {
-    await runner.reapExpiredLeases()
     const worked = await runner.runOnce().catch(error => { console.error('publisher release runner error', (error as Error).message); return false })
     if (!worked) await new Promise(resolve => setTimeout(resolve, 2_000))
   }

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-21T20:53:10.414Z",
+  "capturedAt": "2026-11-27T19:37:26.300Z",
   "source": {
-    "branch": "forge/ops-gubic-coturn-01",
-    "headAtCapture": "e8e20540098680a297b25a954c90496961473ced",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "80209bb341ac607d4d1d02450c21377b14f8cda87d902a9c3d205615554d2128"
+    "branch": "integration/greenfield-signer-finish",
+    "headAtCapture": "7457e9017e6ccd4db220eb38ba12d96b9ef468a2",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "fda46241346b4939aaa0c80f7f91bc7211a6ad21e2c7e77334ce93ad92569274"
   },
   "runtimeRoutes": [
     {

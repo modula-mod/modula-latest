@@ -9,6 +9,7 @@ import {GreenfieldSearchService} from '../src/domains/search/index.js'
 import {PostWriteService} from '../src/domains/posts/writes.js'
 import {ProfileWriteService} from '../src/domains/profiles/writes.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {processOneEventDelivery} from '../../greenfield-worker/src/events/runner.js'
 import type {WorkerConfig} from '../../greenfield-worker/src/config.js'
@@ -38,7 +39,7 @@ describeIfDb('Phase 7E unified search platform', () => {
     search = new GreenfieldSearchService(db, config)
     posts = new PostWriteService(db, config)
     profiles = new ProfileWriteService(db)
-    modules = new GreenfieldModuleReleaseService(db)
+    modules = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     await seedProfileAccount(db, ownerAccountId, ownerActorId, `srchowner${suffix}`.slice(0, 24), 'Search Owner')
     await seedProfileAccount(db, otherAccountId, otherActorId, `srchother${suffix}`.slice(0, 24), 'Search Other')
   })

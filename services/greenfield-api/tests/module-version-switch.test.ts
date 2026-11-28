@@ -3,7 +3,6 @@ import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {descriptorDigest} from '../src/modules/install-descriptor-service.js'
 import {compareVersions, dataSchemaDiff, directionOf} from '../src/modules/version-switch-service.js'
@@ -13,6 +12,7 @@ import {handleModuleInstall} from '../../greenfield-worker/src/modules/installat
 import {handleModuleEnable} from '../../greenfield-worker/src/modules/enable-handler.js'
 import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount} from './helpers/registry-fixtures.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -58,7 +58,7 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
     state: 'published' | 'superseded' = 'published',
     channel: 'stable' | 'beta' | 'rc' | 'dev' = 'stable',
   ) {
-    const service = new GreenfieldModuleReleaseService(db)
+    const service = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const manifest = adapterManifest(moduleId, version, {
       permissions: permissions.map(name => permission(name, name === 'functions:register' ? 'high' : 'medium')) as any,
       contributions: {schemas: schemas.map(item => ({id: `${moduleId}.schemas.${item.collection}`, title: item.collection, schemaRef: `schemas/${item.collection}.json`, collection: item.collection, defaultVisibility: 'private', ...(item.version ? {version: item.version} : {})}))} as any,
@@ -239,11 +239,11 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
   })
 
   it('refuses revoked and quarantined targets', async () => {
-    await new GreenfieldModuleReleaseService(db).revokeRelease(releases['1.3.0']!, 'fixture revocation')
+    await authorizedReleaseServiceFromEnv(db, databaseUrl!).revokeRelease(releases['1.3.0']!, 'fixture revocation')
     const revoked = await switchTo('1.3.0')
     expect(revoked.statusCode, revoked.body).toBe(403)
     expect(revoked.body).toContain('RELEASE_REVOKED')
-    await new GreenfieldModuleReleaseService(db).quarantineRelease(releases['1.4.0']!, 'fixture quarantine')
+    await authorizedReleaseServiceFromEnv(db, databaseUrl!).quarantineRelease(releases['1.4.0']!, 'fixture quarantine')
     const quarantined = await switchTo('1.4.0')
     expect(quarantined.statusCode, quarantined.body).toBe(403)
     expect(quarantined.body).toContain('RELEASE_QUARANTINED')

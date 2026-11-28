@@ -9,7 +9,7 @@ import {
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -43,7 +43,7 @@ describeIfDb('Greenfield Backend V1 generic provider fabric', () => {
 
     for (const productId of products) {
       const manifest = providerManifest(productId)
-      const releases = new GreenfieldModuleReleaseService(db)
+      const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
       let release = await releases.getRelease(productId, manifest.version)
       if (!release) {
         await releases.importPendingReview(manifest)

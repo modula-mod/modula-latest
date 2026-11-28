@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import pg from 'pg'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
@@ -7,8 +8,15 @@ import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {descriptorDigest} from '../src/modules/install-descriptor-service.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
+import {
+  dropAuthorizedPublicationRoles,
+  provisionAuthorizedPublicationRoles,
+  publishAuthorizedRelease,
+  type AuthorizedPublicationRoleFixture,
+} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
@@ -16,6 +24,8 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let token = ''
+  let adminPool: pg.Pool | null = null
+  let authorities: AuthorizedPublicationRoleFixture | null = null
   const productId = `digital.modula.install-${suffix}`
   const facts: Record<string, {releaseId: string; artifactSha: string; frontendSha: string; mpsSha: string; manifestSha: string}> = {}
 
@@ -25,7 +35,10 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
     const manifest = adapterManifest(id, version)
     const evidence = evidenceFor(manifest)
     await releases.importPendingReview(manifest, evidence)
-    const release = await releases.publishRelease(id, version)
+    const verified = await releases.verifyRelease(id, version)
+    const release = await publishAuthorizedRelease({
+      adminDb: db, targetDatabaseUrl: databaseUrl!, fixture: authorities!, releaseId: verified.releaseId,
+    })
     await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: release.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
     facts[`${id}@${version}`] = {releaseId: release.releaseId, artifactSha: evidence.artifactSha256, frontendSha: sha256(product.frontend.bytes), mpsSha: sha256(product.mpsBytes), manifestSha: manifest.integrity.manifestSha256}
   }
@@ -41,12 +54,17 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
     app = created.app
     db = created.db
     await app.ready()
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for authority fixtures')
+    adminPool = new pg.Pool({connectionString: adminDatabaseUrl, max: 1})
+    authorities = await provisionAuthorizedPublicationRoles({adminPool, targetDatabaseUrl: databaseUrl!, targetDb: db, suffix: `descriptor-${suffix}`})
     await publish(productId, '0.1.0')
     await publish(productId, '0.2.0')
     token = (await registerAccount(app, `install-${suffix}@example.com`, `inst${suffix}`, db)).token
   })
 
   afterAll(async () => {
+    if (adminPool && authorities) await dropAuthorizedPublicationRoles(adminPool, authorities)
+    await adminPool?.end()
     await app?.close()
     await db?.destroy()
   })

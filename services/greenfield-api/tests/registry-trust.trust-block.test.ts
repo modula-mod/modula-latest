@@ -8,6 +8,7 @@ import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service
 import {GreenfieldModuleVersionSwitchService} from '../src/modules/version-switch-service.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -31,10 +32,11 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
   let accountId = ''
   const productId = `digital.modula.trust-${suffix}`
   const releases: Record<string, {releaseId: string; mpsBytes: string; frontendSha: string; artifactSha: string; manifestSha: string}> = {}
+  let releaseService: GreenfieldModuleReleaseService
 
   async function publish(version: string) {
     const product = fixtureProduct(productId, version)
-    const service = new GreenfieldModuleReleaseService(db)
+    const service = releaseService
     const manifest = adapterManifest(productId, version)
     const evidence = evidenceFor(manifest)
     await service.importPendingReview(manifest, evidence)
@@ -51,6 +53,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     app = created.app
     db = created.db
     await app.ready()
+    releaseService = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     await publish('0.1.0')
     const account = await registerAccount(app, `unsigned-${suffix}@example.com`, `unsigned${suffix}`.slice(0, 20), db)
     token = account.token
@@ -109,7 +112,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
 
   it('distinguishes the latest stable release from the newest published prerelease', async () => {
     const channelProductId = `digital.modula.channels-${suffix}`
-    const service = new GreenfieldModuleReleaseService(db)
+    const service = releaseService
     for (const [version, channel] of [['1.2.0', 'stable'], ['1.8.0', 'beta']] as const) {
       const manifest = adapterManifest(channelProductId, version)
       const pending = await service.importPendingReview(manifest, evidenceFor(manifest))
@@ -185,7 +188,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     const older = (await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}/versions/0.1.0`})).json().data
     expect(older.registryTrust.update).toEqual({latestPublishedVersion: '0.2.0', updateAvailable: true})
     expect(older.registryTrust.registryReleaseId).toBe(releases['0.1.0']!.releaseId)
-    await new GreenfieldModuleReleaseService(db).revokeRelease(releases['0.1.0']!.releaseId, 'test revocation')
+    await releaseService.revokeRelease(releases['0.1.0']!.releaseId, 'test revocation')
     const revoked = (await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}/versions/0.1.0`})).json().data.registryTrust
     expect(revoked).toMatchObject({verified: false, releaseState: 'revoked', revocation: {revoked: true, scope: 'release', reason: 'test revocation'}})
     expect(revoked.warnings.map((warning: {code: string}) => warning.code)).toContain('RELEASE_REVOKED')

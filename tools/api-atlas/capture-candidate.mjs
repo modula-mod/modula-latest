@@ -29,7 +29,7 @@ const evidence = {
   source: {
     branch,
     headAtCapture: command('git', ['rev-parse', 'HEAD']),
-    worktreeDirtyAtCapture: Boolean(command('git', ['status', '--short', '--', 'services/greenfield-api/src'])),
+    worktreeDirtyAtCapture: Boolean(command('git', ['status', '--short'])),
     apiSourceSha256: sourceFingerprint,
   },
   runtimeRoutes,

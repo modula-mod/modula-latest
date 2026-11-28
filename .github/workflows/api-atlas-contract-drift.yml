@@ -201,12 +201,89 @@ jobs:
           MODULA_WORKER_PASSWORD: modula_ci_worker
           MODULA_READONLY_PASSWORD: modula_ci_readonly
           MODULA_BACKUP_PASSWORD: modula_ci_backup
+          MODULA_SIGNING_RUNNER_PASSWORD: modula_ci_signing_runner
+          MODULA_RELEASE_APPROVER_PASSWORD: modula_ci_release_approver
+          MODULA_TRUST_VERIFIER_PASSWORD: modula_ci_trust_verifier
+          MODULA_PUBLICATION_AUTHORITY_PASSWORD: modula_ci_publication_authority
+          MODULA_PUBLISHER_TRUST_AUTHORITY_PASSWORD: modula_ci_publisher_trust
+          MODULA_SIGNING_IDENTITY_AUTHORITY_PASSWORD: modula_ci_signing_identity
+          MODULA_QUARANTINE_AUTHORITY_PASSWORD: modula_ci_quarantine
+          MODULA_REVOCATION_AUTHORITY_PASSWORD: modula_ci_revocation
         run: bash ops/docker/postgres/init-roles.sh
+      - name: Apply migrations before authority grant installation
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec tsx -e
+          "import {migrateUp} from './src/database/migrate.ts';
+          void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied =>
+          console.log(JSON.stringify({applied, tip: applied.at(-1) ?? 'already-current'})))"
+      - name: Bind restricted publisher authority principals
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+        run: |
+          psql --no-psqlrc --set=ON_ERROR_STOP=1 --dbname "${MODULA_TEST_DATABASE_URL}" <<'SQL'
+          INSERT INTO greenfield_accounts (account_id, primary_handle, status, created_at, updated_at) VALUES
+            ('r2-approver-account', 'r2approver', 'active', pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp()),
+            ('r2-publication-account', 'r2publication', 'active', pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp()),
+            ('r3a-publisher-trust-account', 'r3apublishertrust', 'active', pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp()),
+            ('r3a2-signing-identity-account', 'r3a2signingidentity', 'active', pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp()),
+            ('r3a2-quarantine-authority-account', 'r3a2quarantineauthority', 'active', pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp()),
+            ('r3a3-revocation-authority-account', 'r3a3revocationauthority', 'active', pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp())
+          ON CONFLICT (account_id) DO NOTHING;
+          SQL
+          psql --no-psqlrc --dbname "${MODULA_TEST_DATABASE_URL}" \
+            --set=runner_role=r2_signing_runner \
+            --set=approver_role=r2_release_approver \
+            --set=approver_account_id=r2-approver-account \
+            --set=trust_verifier_role=r2_trust_verifier \
+            --set=publication_authority_role=r2_publication_authority \
+            --set=publication_authority_account_id=r2-publication-account \
+            --set=publisher_trust_authority_role=r3a_publisher_trust_authority \
+            --set=publisher_trust_authority_account_id=r3a-publisher-trust-account \
+            --set=signing_identity_authority_role=r3a2_signing_identity_authority \
+            --set=signing_identity_authority_account_id=r3a2-signing-identity-account \
+            --set=quarantine_authority_role=r3a2_quarantine_authority \
+            --set=quarantine_authority_account_id=r3a2-quarantine-authority-account \
+            --set=revocation_authority_role=r3a3_revocation_authority \
+            --set=revocation_authority_account_id=r3a3-revocation-authority-account \
+            --file ops/security/publisher-release-runner-grants.sql
+      - name: Publisher signing canonical boundary (17 tests, zero skips)
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_DATABASE_ADMIN_URL: postgresql://postgres:postgres@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_RUNNER_DATABASE_URL: postgresql://r2_signing_runner:modula_ci_signing_runner@127.0.0.1:5432/modula_test
+          MODULA_RELEASE_APPROVER_DATABASE_URL: postgresql://r2_release_approver:modula_ci_release_approver@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_PUBLISHER_TRUST_AUTHORITY_DATABASE_URL: postgresql://r3a_publisher_trust_authority:modula_ci_publisher_trust@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
+          MODULA_API_DATABASE_URL: postgresql://modula_api:modula_ci_api@127.0.0.1:5432/modula_test
+          MODULA_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/publisher-release-runner-boundary.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/publisher-signing-boundary-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs
+          /tmp/publisher-signing-boundary-vitest.json
+          tests/publisher-release-runner-boundary.test.ts
+          && node -e "const report=require('/tmp/publisher-signing-boundary-vitest.json');
+          if(report.numTotalTests!==17||report.numPassedTests!==17||report.numPendingTests!==0||report.numFailedTests!==0)
+          {console.error('Expected canonical publisher boundary result 17 passed, 0 skipped, 0 failed');process.exit(1)}"
       - name: Full migration chain and API-FIX-01 database regressions
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/settings-v2.integration.test.ts
@@ -215,11 +292,34 @@ jobs:
           tests/api-fix-01.reaction-dead-letter-retry.test.ts
           tests/api-baseline-02.security-acceptance.test.ts
           tests/api-fix-01.follow-privacy.test.ts
-          tests/registry-trust.signing.test.ts
-          tests/registry-release-retrofit-signing.test.ts
-          tests/registry-trust.trust-block.test.ts
           tests/module-version-switch.test.ts
           --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/full-migration-regressions-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/full-migration-regressions-vitest.json
+          tests/settings-v2.integration.test.ts
+          tests/greenfield-backend-v1.migration-ledger-security.test.ts
+          tests/api-fix-01.migration.test.ts
+          tests/api-fix-01.reaction-dead-letter-retry.test.ts
+          tests/api-baseline-02.security-acceptance.test.ts
+          tests/api-fix-01.follow-privacy.test.ts
+          tests/module-version-switch.test.ts
+      - name: Forward-only migration protections (093-095, zero skips)
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/publisher-forward-only-migrations.test.ts
+          --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/publisher-forward-only-migrations-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs
+          /tmp/publisher-forward-only-migrations-vitest.json
+          tests/publisher-forward-only-migrations.test.ts
+          && node -e "const report=require('/tmp/publisher-forward-only-migrations-vitest.json');
+          if(report.numTotalTests!==3||report.numPassedTests!==3||report.numPendingTests!==0||report.numFailedTests!==0)
+          {console.error('Expected forward-only migration result 3 passed, 0 skipped, 0 failed');process.exit(1)}"
       - name: API-FIX-01 worker database regressions
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
@@ -233,6 +333,14 @@ jobs:
           tests/legacy-installation-data-migration.test.ts
           tests/phase7e.vault-notes-search-projector.test.ts
           --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/api-fix-worker-regressions-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/api-fix-worker-regressions-vitest.json
+          tests/phase7e.notifications.test.ts
+          tests/media-cleanup.test.ts
+          tests/module-trust-guard.test.ts
+          tests/legacy-installation-data-migration.test.ts
+          tests/phase7e.vault-notes-search-projector.test.ts
       - name: Dedicated backup role logical dump
         env:
           PGPASSWORD: modula_ci_backup
@@ -240,17 +348,61 @@ jobs:
           pg_dump --format=custom --no-owner --no-privileges
           --dbname postgresql://modula_backup@127.0.0.1:5432/modula_test
           --file /tmp/modula-backup-role-validation.dump
-      - name: Pre-write MP02 migration down and reapply proof
+      - name: Historical MP02 migration cycle through schema 091
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          historical_database=modula_mp02_historical
+          historical_migrations="$(mktemp -d)"
+          cleanup() {
+            dropdb --host=127.0.0.1 --port=5432 --username=postgres --force --if-exists "${historical_database}"
+            find "${historical_migrations}" -mindepth 1 -delete
+            rmdir "${historical_migrations}"
+          }
+          trap cleanup EXIT
+
+          createdb --host=127.0.0.1 --port=5432 --username=postgres \
+            --owner=modula_migrator "${historical_database}"
+          while IFS= read -r migration; do
+            migration_name="${migration##*/}"
+            migration_number="${migration_name:0:3}"
+            if [ "$((10#${migration_number}))" -le 91 ]; then
+              cp "${migration}" "${historical_migrations}/${migration_name}"
+            fi
+          done < <(find services/greenfield-api/migrations -maxdepth 1 -type f -name '*.sql' -print | sort)
+
+          test -f "${historical_migrations}/091_greenfield_online_signing_authority.sql"
+          test ! -e "${historical_migrations}/092_publisher_release_runner_boundary.sql"
+          while IFS= read -r migration; do
+            case "${migration}" in
+              *.down.sql) continue ;;
+            esac
+            test -f "${migration%.sql}.down.sql"
+          done < <(find "${historical_migrations}" -maxdepth 1 -type f -name '*.sql' -print | sort)
+
+          export MODULA_TEST_DATABASE_URL="postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/${historical_database}"
+          CI=true pnpm --filter @modula/greenfield-api exec tsx \
+            scripts/verify-migration-cycle.ts 068_module_platform_records \
+            --migrations-dir "${historical_migrations}" \
+            --expected-tip 091_greenfield_online_signing_authority \
+            --apply-baseline
+      - name: Primary CI database remains at schema 095
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec tsx
-          scripts/verify-migration-cycle.ts 068_module_platform_records
-      - name: MP02 and MP02B database acceptance
+          scripts/verify-migration-tip.ts 095_publisher_signing_integration_completion
+      - name: Current-schema MP02 and MP02B database acceptance
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/module-platform-02.records.test.ts
@@ -260,6 +412,15 @@ jobs:
           tests/module-platform-02b.search-contract.test.ts
           tests/module-platform-02b.canonical-mutations.test.ts
           --maxWorkers=1 --no-file-parallelism
+          --reporter=default --reporter=json
+          --outputFile.json=/tmp/mp02-current-schema-vitest.json
+          && node scripts/assert-vitest-db-suites-ran.mjs /tmp/mp02-current-schema-vitest.json
+          tests/module-platform-02.records.test.ts
+          tests/permission-reconciliation.test.ts
+          tests/module-platform-02b.media-sharing.test.ts
+          tests/module-platform-02b.functions-actions.test.ts
+          tests/module-platform-02b.search-contract.test.ts
+          tests/module-platform-02b.canonical-mutations.test.ts
       # GF-CALL-01: these suites are describe.skip without MODULA_TEST_DATABASE_URL,
       # so the JSON report is checked to prove every test ran (none skipped).
       - name: Messaging v3 and calls v1 database integration
@@ -337,6 +498,11 @@ jobs:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/greenfield.accounts.test.ts
@@ -380,6 +546,12 @@ jobs:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_PUBLISHER_TRUST_AUTHORITY_DATABASE_URL: postgresql://r3a_publisher_trust_authority:modula_ci_publisher_trust@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/greenfield-backend-v1.ai-engine.test.ts
@@ -411,8 +583,14 @@ jobs:
       - name: GF-TEST-DB-01 module, registry and product database integration
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_DATABASE_ADMIN_URL: postgresql://postgres:postgres@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/module-settings-permissions.test.ts
@@ -422,6 +600,10 @@ jobs:
           tests/registry-trust.identity-aliases.test.ts
           tests/registry-trust.install-descriptor.test.ts
           tests/registry-trust.installed-state.test.ts
+          tests/registry-trust.signing.test.ts
+          tests/registry-release-retrofit-signing.test.ts
+          tests/registry-trust.trust-block.test.ts
+          tests/signing-identity-registration.integration.test.ts
           tests/publisher-console.release-jobs.test.ts
           tests/publisher-first-party-policy.test.ts
           tests/moliboo-game.integration.test.ts
@@ -441,6 +623,10 @@ jobs:
           tests/registry-trust.identity-aliases.test.ts
           tests/registry-trust.install-descriptor.test.ts
           tests/registry-trust.installed-state.test.ts
+          tests/registry-trust.signing.test.ts
+          tests/registry-release-retrofit-signing.test.ts
+          tests/registry-trust.trust-block.test.ts
+          tests/signing-identity-registration.integration.test.ts
           tests/publisher-console.release-jobs.test.ts
           tests/publisher-first-party-policy.test.ts
           tests/moliboo-game.integration.test.ts
@@ -456,6 +642,11 @@ jobs:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+          MODULA_TRUST_VERIFIER_DATABASE_URL: postgresql://r2_trust_verifier:modula_ci_trust_verifier@127.0.0.1:5432/modula_test
+          MODULA_PUBLICATION_AUTHORITY_DATABASE_URL: postgresql://r2_publication_authority:modula_ci_publication_authority@127.0.0.1:5432/modula_test
+          MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL: postgresql://r3a2_signing_identity_authority:modula_ci_signing_identity@127.0.0.1:5432/modula_test
+          MODULA_QUARANTINE_AUTHORITY_DATABASE_URL: postgresql://r3a2_quarantine_authority:modula_ci_quarantine@127.0.0.1:5432/modula_test
+          MODULA_REVOCATION_AUTHORITY_DATABASE_URL: postgresql://r3a3_revocation_authority:modula_ci_revocation@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/phase7b.module-runtime.test.ts
@@ -498,3 +689,9 @@ jobs:
           tests/pvp-platform-2.extension-fabric.test.ts
           tests/support-status.integration.test.ts
           tests/synthetic-module-intelligence.integration.test.ts
+      - name: Final primary migration tip and ledger acceptance
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec tsx
+          scripts/verify-migration-tip.ts 095_publisher_signing_integration_completion

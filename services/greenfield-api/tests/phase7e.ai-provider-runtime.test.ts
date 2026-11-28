@@ -13,7 +13,7 @@ import {GreenfieldAIProviderAdapterRegistry} from '../src/ai/providers/registry.
 import {MockGreenfieldAIProviderAdapter} from '../src/ai/providers/mock-provider.js'
 import {ProviderExecutionError, type ProviderExecutionContext, type ProviderExecutionRequest, type ProviderExecutionResult} from '../src/ai/providers/contract.js'
 import {parseAndValidateStructuredOutput, validateStructuredOutput} from '../src/ai/schema-validator.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
@@ -400,8 +400,9 @@ describeIfDb('Phase 7E AI provider runtime', () => {
   async function seedInstalledAiModule(): Promise<{manifest: GreenfieldModuleManifestV1; grantedPermissions: string[]}> {
     const version = '1.0.0'
     const moduleManifest = aiModuleManifest(moduleId, version)
-    const imported = await new GreenfieldModuleReleaseService(db).importPendingReview(moduleManifest)
-    const published = await new GreenfieldModuleReleaseService(db).publishRelease(moduleId, version)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
+    const imported = await releases.importPendingReview(moduleManifest)
+    const published = await releases.publishRelease(moduleId, version)
     await db
       .insertInto('greenfield_extension_installations')
       .values({

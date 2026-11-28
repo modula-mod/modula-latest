@@ -4,6 +4,7 @@ import {loadConfig} from '../src/config/env.js'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {DeveloperService} from '../src/developers/service.js'
+import {setAuthorizedPublisherTrust} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -76,7 +77,16 @@ describeIfDb('Greenfield Backend V1 developer domain', () => {
     const source = await service.connectSource(owner.accountId, privateProductId, {provider: 'github', repository: 'example/private', credentialRef: `secret://developer.${suffix}/github`})
     expect(source.credential_ref).toMatch(/^secret:\/\/developer\./)
 
-    await db.updateTable('greenfield_publishers').set({status: 'verified', trust_level: 'verifiedPublisher', verified_at: new Date(), updated_at: new Date()}).where('publisher_id', '=', publisherId).execute()
+    const verifiedAt = new Date()
+    await db.updateTable('greenfield_publishers').set({status: 'verified', verified_at: verifiedAt, updated_at: verifiedAt})
+      .where('publisher_id', '=', publisherId).execute()
+    await setAuthorizedPublisherTrust({
+      authorityUrl: process.env.MODULA_PUBLISHER_TRUST_AUTHORITY_DATABASE_URL!,
+      publisherId,
+      expectedCurrentTrustLevel: 'untrustedManifest',
+      trustLevel: 'verifiedPublisher',
+      reason: 'Automated developer-domain fixture verification',
+    })
     const publicProductId = `${namespace}.public-product`
     expect((await service.createProduct(owner.accountId, {productId: publicProductId, publisherId, kind: 'backend-service', displayName: 'Public Product', visibility: 'PUBLIC'})).visibility).toBe('PUBLIC')
     await service.createTestGroup(owner.accountId, publicProductId, {name: 'Beta testers', kind: 'BETA'})

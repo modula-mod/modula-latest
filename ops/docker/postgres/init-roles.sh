@@ -5,6 +5,14 @@ set -euo pipefail
 : "${MODULA_WORKER_PASSWORD:?}"
 : "${MODULA_READONLY_PASSWORD:?}"
 : "${MODULA_BACKUP_PASSWORD:?}"
+: "${MODULA_SIGNING_RUNNER_PASSWORD:?}"
+: "${MODULA_RELEASE_APPROVER_PASSWORD:?}"
+: "${MODULA_TRUST_VERIFIER_PASSWORD:?}"
+: "${MODULA_PUBLICATION_AUTHORITY_PASSWORD:?}"
+: "${MODULA_PUBLISHER_TRUST_AUTHORITY_PASSWORD:?}"
+: "${MODULA_SIGNING_IDENTITY_AUTHORITY_PASSWORD:?}"
+: "${MODULA_QUARANTINE_AUTHORITY_PASSWORD:?}"
+: "${MODULA_REVOCATION_AUTHORITY_PASSWORD:?}"
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<SQL
 DO \$\$
@@ -24,6 +32,30 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'modula_worker') THEN
     CREATE ROLE modula_worker LOGIN PASSWORD '${MODULA_WORKER_PASSWORD}';
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r2_signing_runner') THEN
+    CREATE ROLE r2_signing_runner LOGIN PASSWORD '${MODULA_SIGNING_RUNNER_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r2_release_approver') THEN
+    CREATE ROLE r2_release_approver LOGIN PASSWORD '${MODULA_RELEASE_APPROVER_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r2_trust_verifier') THEN
+    CREATE ROLE r2_trust_verifier LOGIN PASSWORD '${MODULA_TRUST_VERIFIER_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r2_publication_authority') THEN
+    CREATE ROLE r2_publication_authority LOGIN PASSWORD '${MODULA_PUBLICATION_AUTHORITY_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r3a_publisher_trust_authority') THEN
+    CREATE ROLE r3a_publisher_trust_authority LOGIN PASSWORD '${MODULA_PUBLISHER_TRUST_AUTHORITY_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r3a2_signing_identity_authority') THEN
+    CREATE ROLE r3a2_signing_identity_authority LOGIN PASSWORD '${MODULA_SIGNING_IDENTITY_AUTHORITY_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r3a2_quarantine_authority') THEN
+    CREATE ROLE r3a2_quarantine_authority LOGIN PASSWORD '${MODULA_QUARANTINE_AUTHORITY_PASSWORD}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'r3a3_revocation_authority') THEN
+    CREATE ROLE r3a3_revocation_authority LOGIN PASSWORD '${MODULA_REVOCATION_AUTHORITY_PASSWORD}';
+  END IF;
 END
 \$\$;
 
@@ -33,7 +65,19 @@ ALTER ROLE modula_readonly NOSUPERUSER NOCREATEDB NOCREATEROLE;
 -- Backup must read FORCE RLS tables (e.g. post_saves) for pg_dump.
 ALTER ROLE modula_backup NOSUPERUSER NOCREATEDB NOCREATEROLE BYPASSRLS;
 ALTER ROLE modula_worker NOSUPERUSER NOCREATEDB NOCREATEROLE;
-GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO modula_migrator, modula_api, modula_readonly, modula_backup, modula_worker;
+ALTER ROLE r2_signing_runner NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r2_release_approver NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r2_trust_verifier NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r2_publication_authority NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r3a_publisher_trust_authority NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r3a2_signing_identity_authority NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r3a2_quarantine_authority NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+ALTER ROLE r3a3_revocation_authority NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO
+  modula_migrator, modula_api, modula_readonly, modula_backup, modula_worker,
+  r2_signing_runner, r2_release_approver, r2_trust_verifier, r2_publication_authority,
+  r3a_publisher_trust_authority, r3a2_signing_identity_authority,
+  r3a2_quarantine_authority, r3a3_revocation_authority;
 GRANT ALL ON SCHEMA public TO modula_migrator;
 GRANT CREATE ON SCHEMA public TO modula_migrator;
 ALTER DATABASE ${POSTGRES_DB} OWNER TO modula_migrator;

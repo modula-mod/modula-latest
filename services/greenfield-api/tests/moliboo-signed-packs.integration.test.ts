@@ -9,11 +9,11 @@ import {validateMolibooArtifact} from '../src/domains/moliboos/service.js'
 import {GreenfieldModulePublisherService} from '../src/modules/publisher-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {
-  GreenfieldPublisherSigningKeyService,
   buildPublisherReleaseStatement,
   statementBytes,
 } from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, registerAccount} from './helpers/registry-fixtures.js'
+import {authorizedRegistryAuthorityFromEnv, registerAuthorizedSigningIdentity, revokeAuthorizedSigningIdentity} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -84,6 +84,7 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
   const keys = generateKeyPairSync('ed25519')
   const publicPem = keys.publicKey.export({format: 'pem', type: 'spki'}).toString()
   const keyId = createHash('sha256').update(keys.publicKey.export({format: 'der', type: 'spki'})).digest('hex')
+  let signingIdentityId = ''
   const artifacts = new Map<string, Buffer>()
 
   async function publishPack(number: number, version: string, options: {signature?: Buffer; wearable?: boolean} = {}) {
@@ -170,8 +171,14 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
     db = createDb(databaseUrl!)
     const bootstrapManifest = adapterManifest(`moliboo.character.${900 + Number.parseInt(suffix.slice(0, 2), 16)}`, '1.0.0')
     await new GreenfieldModulePublisherService(db).ensurePublisherForManifest(bootstrapManifest)
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: publicPem}, null)
-    releases = new GreenfieldModuleReleaseService(db)
+    signingIdentityId = (await registerAuthorizedSigningIdentity({
+      authorityUrl: process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL!,
+      publisherId: 'modula',
+      signingKeyId: keyId,
+      publicKeyPem: publicPem,
+      providerKeyRef: `test/moliboo-signed-packs/${suffix}`,
+    })).identityId
+    releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     const created = await createServer(loadConfig())
     app = created.app
     await app.ready()
@@ -192,6 +199,11 @@ describeIfDb('Moliboo signed pack delivery, withdrawal, ownership, and outfits',
   })
 
   afterAll(async () => {
+    if (signingIdentityId) await revokeAuthorizedSigningIdentity({
+      authorityUrl: process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL!,
+      identityId: signingIdentityId,
+      reason: 'Moliboo disposable fixture cleanup',
+    })
     await app?.close()
     await db?.destroy()
   })

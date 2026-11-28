@@ -1,6 +1,7 @@
 import {generateKeyPairSync, randomUUID, sign} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
 import {sql} from 'kysely'
+import pg from 'pg'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {createDb} from '../src/database/client.js'
@@ -9,11 +10,22 @@ import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleUpdateService} from '../src/modules/update-service.js'
 import {addStateCounts, completedLegacyUpgradeStates} from '../src/modules/legacy-upgrade-progress.js'
 import {GreenfieldGithubReleaseSyncService, type VerifiedGithubRelease} from '../src/modules/github-release-sync-service.js'
-import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes, statementSha256} from '../src/modules/release-signing.js'
+import {buildPublisherReleaseStatement, statementBytes, statementSha256} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount, sha256} from './helpers/registry-fixtures.js'
+import {
+  clearAuthorizedRegistryAuthorityEnv,
+  configureAuthorizedRegistryAuthorityEnv,
+  dropAuthorizedPublicationRoles,
+  provisionAuthorizedPublicationRoles,
+  publishAuthorizedRelease,
+  registerAuthorizedSigningIdentity,
+  revokeAuthorizedSigningIdentity,
+  verifyAuthorizedExternalSignature,
+  type AuthorizedPublicationRoleFixture,
+} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
-const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
+const adminDatabaseUrl = process.env.MODULA_TEST_DATABASE_ADMIN_URL ?? process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
@@ -23,6 +35,9 @@ describeIfDb('retrospective publisher release signatures', () => {
   let releases: GreenfieldModuleReleaseService
   let adminToken = ''
   let ordinaryToken = ''
+  let adminPool: pg.Pool | null = null
+  let authorities: AuthorizedPublicationRoleFixture | null = null
+  let signingIdentityId: string | null = null
   const adminHandle = `sigadmin${suffix}`
   const keyId = `modula-retro-${suffix}`
   const signer = generateKeyPairSync('ed25519')
@@ -45,6 +60,41 @@ describeIfDb('retrospective publisher release signatures', () => {
     }
   }
 
+  async function tamperSigningKey(state: 'ACTIVE' | 'REVOKED', revokedAt: Date | null) {
+    const privilegedDb = createDb(adminDatabaseUrl!)
+    try {
+      await privilegedDb.transaction().execute(async trx => {
+        await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+        await trx.updateTable('greenfield_publisher_signing_keys')
+          .set({state, revoked_at: revokedAt}).where('key_id', '=', keyId).execute()
+      })
+    } finally {
+      await privilegedDb.destroy()
+    }
+  }
+
+  async function tamperSignatureStatement(signatureId: string, statement: unknown) {
+    const privilegedDb = createDb(adminDatabaseUrl!)
+    try {
+      await privilegedDb.transaction().execute(async trx => {
+        await sql`SET LOCAL session_replication_role = replica`.execute(trx)
+        await trx.updateTable('greenfield_module_release_signatures')
+          .set({statement}).where('signature_id', '=', signatureId).execute()
+      })
+    } finally {
+      await privilegedDb.destroy()
+    }
+  }
+
+  async function publish(releaseId: string) {
+    const release = await releases.getReleaseById(releaseId)
+    if (!release) throw new Error(`Missing release ${releaseId}`)
+    const verified = release.releaseState === 'pendingReview'
+      ? await releases.verifyRelease(release.moduleId, release.version)
+      : release
+    return publishAuthorizedRelease({adminDb: db, targetDatabaseUrl: databaseUrl!, fixture: authorities!, releaseId: verified.releaseId})
+  }
+
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!, '4071')
     fetchVerified.mockImplementation(async input => {
@@ -54,22 +104,44 @@ describeIfDb('retrospective publisher release signatures', () => {
     })
     process.env.MODULA_ADMIN_HANDLES = adminHandle
     await migrateUp(databaseUrl!)
+    if (!adminDatabaseUrl) throw new Error('MODULA_TEST_DATABASE_ADMIN_URL is required for authority fixtures')
+    adminPool = new pg.Pool({connectionString: adminDatabaseUrl, max: 1})
+    const bootstrapDb = createDb(databaseUrl!)
+    try {
+      authorities = await provisionAuthorizedPublicationRoles({adminPool, targetDatabaseUrl: databaseUrl!, targetDb: bootstrapDb, suffix: `retrofit-${suffix}`})
+    } finally {
+      await bootstrapDb.destroy()
+    }
+    configureAuthorizedRegistryAuthorityEnv(authorities)
     const created = await createServer(loadConfig())
     app = created.app
     db = created.db
     await app.ready()
     releases = new GreenfieldModuleReleaseService(db)
-    await new GreenfieldPublisherSigningKeyService(db).register('modula', {
-      keyId,
+    signingIdentityId = (await registerAuthorizedSigningIdentity({
+      authorityUrl: authorities.urls.signingIdentityAuthority,
+      publisherId: 'modula', signingKeyId: keyId,
       publicKeyPem: signer.publicKey.export({format: 'pem', type: 'spki'}).toString(),
-    }, null)
+      providerKeyRef: `test/retrofit/${suffix}`,
+      purpose: 'MODULA_FIRST_PARTY',
+    })).identityId
     adminToken = (await registerAccount(app, `sigadmin-${suffix}@example.com`, adminHandle, db)).token
     ordinaryToken = (await registerAccount(app, `siguser-${suffix}@example.com`, `siguser${suffix}`, db)).token
   })
 
   afterAll(async () => {
+    if (authorities && signingIdentityId) {
+      await revokeAuthorizedSigningIdentity({
+        authorityUrl: authorities.urls.signingIdentityAuthority,
+        identityId: signingIdentityId,
+        reason: 'Retrofit signing fixture cleanup',
+      })
+    }
     await app?.close()
     await db?.destroy()
+    if (adminPool && authorities) await dropAuthorizedPublicationRoles(adminPool, authorities)
+    await adminPool?.end()
+    clearAuthorizedRegistryAuthorityEnv()
     fetchVerified.mockRestore()
   })
 
@@ -78,7 +150,8 @@ describeIfDb('retrospective publisher release signatures', () => {
     const manifest = adapterManifest(moduleId, '1.0.0')
     const evidence = evidenceFor(manifest)
     await releases.importPendingReview(manifest, evidence)
-    const release = await releases.publishRelease(moduleId, '1.0.0')
+    const pending = await releases.getRelease(moduleId, '1.0.0')
+    const release = await publish(pending!.releaseId)
     verifiedPackages.set(manifest.source.releaseTag!, {
       productId: moduleId,
       version: '1.0.0',
@@ -197,14 +270,12 @@ describeIfDb('retrospective publisher release signatures', () => {
     const {moduleId, release, payload} = await unsignedRelease()
     const attached = await app.inject({method: 'POST', url: endpoint(release.releaseId), headers: auth(adminToken), payload})
     expect(attached.statusCode, attached.body).toBe(200)
-    await db.updateTable('greenfield_publisher_signing_keys')
-      .set({state: 'REVOKED', revoked_at: new Date()}).where('key_id', '=', keyId).execute()
+    await tamperSigningKey('REVOKED', new Date())
     try {
       const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
       expect(detail.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'revokedKey'}})
     } finally {
-      await db.updateTable('greenfield_publisher_signing_keys')
-        .set({state: 'ACTIVE', revoked_at: null}).where('key_id', '=', keyId).execute()
+      await tamperSigningKey('ACTIVE', null)
     }
   })
 
@@ -214,13 +285,10 @@ describeIfDb('retrospective publisher release signatures', () => {
     expect(attached.statusCode, attached.body).toBe(200)
     const signatureRow = await db.selectFrom('greenfield_module_release_signatures')
       .select(['signature_id', 'statement']).where('release_id', '=', release.releaseId).executeTakeFirstOrThrow()
-    await db.updateTable('greenfield_module_release_signatures')
-      .set({statement: {...(signatureRow.statement as object), productManifestSha256: 'c'.repeat(64)}})
-      .where('signature_id', '=', signatureRow.signature_id).execute()
+    await tamperSignatureStatement(signatureRow.signature_id, {...(signatureRow.statement as object), productManifestSha256: 'c'.repeat(64)})
     const projectionMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
     expect(projectionMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
-    await db.updateTable('greenfield_module_release_signatures')
-      .set({statement: signatureRow.statement}).where('signature_id', '=', signatureRow.signature_id).execute()
+    await tamperSignatureStatement(signatureRow.signature_id, signatureRow.statement)
     await tamperPublishedRelease(release.releaseId, sha256('different release bytes'))
     const releaseMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
     expect(releaseMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
@@ -233,12 +301,15 @@ describeIfDb('retrospective publisher release signatures', () => {
       permissions: [{permission: 'records:write', risk: 'high', reason: 'New target capability'}],
     })
     await releases.importPendingReview(sourceManifest, evidenceFor(sourceManifest))
-    const source = await releases.publishRelease(moduleId, '0.2.0')
+    const sourcePending = await releases.getRelease(moduleId, '0.2.0')
+    const source = await publish(sourcePending!.releaseId)
     const olderManifest = adapterManifest(moduleId, '0.1.0')
     await releases.importPendingReview(olderManifest, evidenceFor(olderManifest))
-    const older = await releases.publishRelease(moduleId, '0.1.0')
+    const olderPending = await releases.getRelease(moduleId, '0.1.0')
+    const older = await publish(olderPending!.releaseId)
     await releases.importPendingReview(targetManifest, evidenceFor(targetManifest))
-    const target = await releases.publishRelease(moduleId, '1.8.0')
+    const targetPending = await releases.getRelease(moduleId, '1.8.0')
+    const target = await publish(targetPending!.releaseId)
     const targetEvidence = evidenceFor(targetManifest)
     const verified: VerifiedGithubRelease = {
       productId: moduleId, version: '1.8.0', repository: targetEvidence.repository,
@@ -268,6 +339,9 @@ describeIfDb('retrospective publisher release signatures', () => {
       statementSha256: statementSha256(statement),
       signature: {algorithm: 'Ed25519', keyId, value: sign(null, statementBytes(statement), signer.privateKey).toString('base64url')},
     }, verified, null)
+    await verifyAuthorizedExternalSignature({
+      adminDb: db, targetDatabaseUrl: databaseUrl!, fixture: authorities!, releaseId: target.releaseId,
+    })
     const queued = await updates.migrateLegacyInstallation(account.accountId, moduleId, request)
     expect(queued).toMatchObject({installationId, status: 'updating', toVersion: '1.8.0'})
     expect(queued.descriptor.permissions.granted).toEqual([])

@@ -8,7 +8,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldAIProductActionService} from '../src/ai/product-action-service.js'
 import {GreenfieldModuleInstallationService} from '../src/modules/installation-service.js'
 import {GreenfieldModuleRecordService} from '../src/modules/record-service.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -166,8 +166,9 @@ describeIfDb('Phase 7E AI product actions', () => {
 
   async function seedModuleRelease() {
     const manifest = moduleManifest(moduleId, version)
-    const imported = await new GreenfieldModuleReleaseService(db).importPendingReview(manifest)
-    const published = await new GreenfieldModuleReleaseService(db).publishRelease(moduleId, version)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
+    const imported = await releases.importPendingReview(manifest)
+    const published = await releases.publishRelease(moduleId, version)
     releaseId = published.releaseId
     await db
       .insertInto('greenfield_module_record_collections')

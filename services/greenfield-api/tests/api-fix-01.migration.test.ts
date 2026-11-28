@@ -21,22 +21,26 @@ function expectMediaTypes(definition: string | undefined, expected: readonly str
   for (const mediaType of expected) expect(definition).toContain(mediaType)
 }
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 091', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 095', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
+  const rollbackDatabase = `modula_api_fix_01_rollback_${suffix}`
   const qaDatabase = `modula_api_fix_01_qa_${suffix}`
   let adminPool: pg.Pool
   let predecessorUrl: string
   let freshUrl: string
+  let rollbackUrl: string
   let qaUrl: string
   let predecessorMigrationsDir: string
+  let migrationsThrough091: string
   let qaMigrationsDir: string
 
   beforeAll(async () => {
     adminPool = new pg.Pool({connectionString: adminDatabaseUrl!})
     await adminPool.query(`CREATE DATABASE "${predecessorDatabase}" OWNER modula_migrator`)
     await adminPool.query(`CREATE DATABASE "${freshDatabase}" OWNER modula_migrator`)
+    await adminPool.query(`CREATE DATABASE "${rollbackDatabase}" OWNER modula_migrator`)
     await adminPool.query(`CREATE DATABASE "${qaDatabase}" OWNER modula_migrator`)
     const predecessor = new URL(databaseUrl!)
     predecessor.pathname = `/${predecessorDatabase}`
@@ -44,11 +48,15 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     const fresh = new URL(databaseUrl!)
     fresh.pathname = `/${freshDatabase}`
     freshUrl = fresh.toString()
+    const rollback = new URL(databaseUrl!)
+    rollback.pathname = `/${rollbackDatabase}`
+    rollbackUrl = rollback.toString()
     const qa = new URL(databaseUrl!)
     qa.pathname = `/${qaDatabase}`
     qaUrl = qa.toString()
 
     predecessorMigrationsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'modula-migrations-065-'))
+    migrationsThrough091 = await fs.mkdtemp(path.join(os.tmpdir(), 'modula-migrations-091-'))
     qaMigrationsDir = await fs.mkdtemp(path.join(os.tmpdir(), 'modula-migrations-qa-076-'))
     for (const migration of await listMigrationFiles()) {
       if (Number(migration.id.slice(0, 3)) > 65) continue
@@ -57,6 +65,12 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     for (const migration of await listMigrationFiles()) {
       if (Number(migration.id.slice(0, 3)) > 75) continue
       await fs.copyFile(migration.file, path.join(qaMigrationsDir, migration.name))
+    }
+    for (const migration of await listMigrationFiles()) {
+      if (Number(migration.id.slice(0, 3)) > 91) continue
+      await fs.copyFile(migration.file, path.join(migrationsThrough091, migration.name))
+      const downName = migration.name.replace(/\.sql$/, '.down.sql')
+      await fs.copyFile(migration.file.replace(/\.sql$/, '.down.sql'), path.join(migrationsThrough091, downName))
     }
     const optionalMediaMigration = (await listMigrationFiles()).find(migration => migration.id === '077_optional_package_media')
     if (!optionalMediaMigration) throw new Error('Canonical optional-package migration is missing')
@@ -69,13 +83,14 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
 
   afterAll(async () => {
     if (adminPool) {
-      for (const database of [predecessorDatabase, freshDatabase, qaDatabase]) {
+      for (const database of [predecessorDatabase, freshDatabase, rollbackDatabase, qaDatabase]) {
         await adminPool.query('SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1', [database])
         await adminPool.query(`DROP DATABASE IF EXISTS "${database}"`)
       }
       await adminPool.end()
     }
     if (predecessorMigrationsDir) await fs.rm(predecessorMigrationsDir, {recursive: true, force: true})
+    if (migrationsThrough091) await fs.rm(migrationsThrough091, {recursive: true, force: true})
     if (qaMigrationsDir) await fs.rm(qaMigrationsDir, {recursive: true, force: true})
   }, 120_000)
 
@@ -123,7 +138,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_publisher_release_runner_boundary', '093_publisher_release_governance_integrity', '094_publisher_signing_governance_hardening', '095_publisher_signing_integration_completion',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -131,7 +146,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('091')
+    expect(version.rows[0]?.value).toBe('095')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -140,7 +155,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('091_greenfield_online_signing_authority')
+    expect(applied.at(-1)).toBe('095_publisher_signing_integration_completion')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -164,9 +179,18 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
 
+    await expect(migrateDown(freshUrl)).rejects.toThrow(/unsafe automated downgrade of 095 is prohibited/i)
+    const hardened = new pg.Client({connectionString: freshUrl})
+    await hardened.connect()
+    const hardenedTip = await hardened.query(`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`)
+    const hardenedVersion = await hardened.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
+    expect(hardenedTip.rows[0]?.id).toBe('095_publisher_signing_integration_completion')
+    expect(hardenedVersion.rows[0]?.value).toBe('095')
+    await hardened.end()
 
-    expect(await migrateDown(freshUrl)).toBe('091_greenfield_online_signing_authority')
-    const rolledBackOnlineSigning = new pg.Client({connectionString: freshUrl})
+    expect((await migrateUp(rollbackUrl, migrationsThrough091)).at(-1)).toBe('091_greenfield_online_signing_authority')
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('091_greenfield_online_signing_authority')
+    const rolledBackOnlineSigning = new pg.Client({connectionString: rollbackUrl})
     await rolledBackOnlineSigning.connect()
     const signingIdentities = await rolledBackOnlineSigning.query(`SELECT to_regclass('public.greenfield_publisher_online_signing_identities') AS name`)
     const signingAudit = await rolledBackOnlineSigning.query(`SELECT to_regclass('public.greenfield_publisher_signing_audit_events') AS name`)
@@ -178,8 +202,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(callsStillPresent.rows[0]?.name).toBe('greenfield_calls')
     await rolledBackOnlineSigning.end()
 
-    expect(await migrateDown(freshUrl)).toBe('090_calls_v1')
-    const rolledBackCalls = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('090_calls_v1')
+    const rolledBackCalls = new pg.Client({connectionString: rollbackUrl})
     await rolledBackCalls.connect()
     const callsTable = await rolledBackCalls.query(`SELECT to_regclass('public.greenfield_calls') AS name`)
     const voipTable = await rolledBackCalls.query(`SELECT to_regclass('public.greenfield_call_push_tokens') AS name`)
@@ -189,8 +213,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter090.rows[0]?.value).toBe('089')
     await rolledBackCalls.end()
 
-    expect(await migrateDown(freshUrl)).toBe('089_messaging_v3')
-    const rolledBackMessagingV3 = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('089_messaging_v3')
+    const rolledBackMessagingV3 = new pg.Client({connectionString: rollbackUrl})
     await rolledBackMessagingV3.connect()
     const messagingPrivacy = await rolledBackMessagingV3.query(`SELECT to_regclass('public.greenfield_messaging_privacy') AS name`)
     const versionAfter089 = await rolledBackMessagingV3.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
@@ -200,8 +224,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(reactionsStillPresent.rows[0]?.name).toBe('greenfield_message_reactions')
     await rolledBackMessagingV3.end()
 
-    expect(await migrateDown(freshUrl)).toBe('088_greenfield_premium_apple_sandbox')
-    const rolledBackApplePremium = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('088_greenfield_premium_apple_sandbox')
+    const rolledBackApplePremium = new pg.Client({connectionString: rollbackUrl})
     await rolledBackApplePremium.connect()
     const appleTransactions = await rolledBackApplePremium.query(`SELECT to_regclass('public.greenfield_premium_apple_transactions') AS name`)
     const versionAfter088 = await rolledBackApplePremium.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
@@ -211,8 +235,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(collectionsStillPresentAfter088.rows[0]?.name).toBe('greenfield_saved_collections')
     await rolledBackApplePremium.end()
 
-    expect(await migrateDown(freshUrl)).toBe('087_greenfield_collections_and_drafts')
-    const rolledBackCollections = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('087_greenfield_collections_and_drafts')
+    const rolledBackCollections = new pg.Client({connectionString: rollbackUrl})
     await rolledBackCollections.connect()
     const collectionsTable = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_saved_collections') AS name`)
     const draftsTable = await rolledBackCollections.query(`SELECT to_regclass('public.greenfield_post_drafts') AS name`)
@@ -224,8 +248,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(communitiesStillPresent.rows[0]?.name).toBe('greenfield_communities')
     await rolledBackCollections.end()
 
-    expect(await migrateDown(freshUrl)).toBe('086_greenfield_communities')
-    const rolledBackCommunities = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('086_greenfield_communities')
+    const rolledBackCommunities = new pg.Client({connectionString: rollbackUrl})
     await rolledBackCommunities.connect()
     const communitiesTable = await rolledBackCommunities.query(`SELECT to_regclass('public.greenfield_communities') AS name`)
     const versionAfter086 = await rolledBackCommunities.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
@@ -235,8 +259,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(publisherStillPresent.rows[0]?.jobs).toBe('greenfield_publisher_release_jobs')
     await rolledBackCommunities.end()
 
-    expect(await migrateDown(freshUrl)).toBe('085_publisher_release_console')
-    const rolledBackConsole = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('085_publisher_release_console')
+    const rolledBackConsole = new pg.Client({connectionString: rollbackUrl})
     await rolledBackConsole.connect()
     const consoleTables = await rolledBackConsole.query(`SELECT to_regclass('public.greenfield_publisher_release_jobs') AS jobs, to_regclass('public.greenfield_publisher_release_job_logs') AS logs`)
     const dispatchCheck = await rolledBackConsole.query(`SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conname = 'background_jobs_dispatch_mode_check'`)
@@ -258,8 +282,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expectMediaTypes(mediaAfterPublisher.rows[0]?.definition, mediaTypesAfter084)
     await rolledBackConsole.end()
 
-    expect(await migrateDown(freshUrl)).toBe('084_moliboo_signed_packs')
-    const rolledBackMoliboo = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('084_moliboo_signed_packs')
+    const rolledBackMoliboo = new pg.Client({connectionString: rollbackUrl})
     await rolledBackMoliboo.connect()
     const molibooTable = await rolledBackMoliboo.query(`SELECT to_regclass('public.greenfield_moliboo_characters') AS name`)
     const canonicalTables = await rolledBackMoliboo.query(`
@@ -286,9 +310,9 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter084.rows[0]?.value).toBe('083')
     await rolledBackMoliboo.end()
 
-    expect(await migrateDown(freshUrl)).toBe('083_moliboo_game_systems')
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('083_moliboo_game_systems')
 
-    const rolledBackMolibooGame = new pg.Client({connectionString: freshUrl})
+    const rolledBackMolibooGame = new pg.Client({connectionString: rollbackUrl})
 
     await rolledBackMolibooGame.connect()
 
@@ -303,9 +327,9 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     await rolledBackMolibooGame.end()
 
 
-    expect(await migrateDown(freshUrl)).toBe('082_gubic_play_platform')
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('082_gubic_play_platform')
 
-    const rolledBackGubicPlay = new pg.Client({connectionString: freshUrl})
+    const rolledBackGubicPlay = new pg.Client({connectionString: rollbackUrl})
 
     await rolledBackGubicPlay.connect()
 
@@ -320,11 +344,11 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     await rolledBackGubicPlay.end()
 
 
-    expect(await migrateDown(freshUrl)).toBe('081_messaging_v2')
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('081_messaging_v2')
 
-    expect(await migrateDown(freshUrl)).toBe('080_push_notifications')
-    expect(await migrateDown(freshUrl)).toBe('079_story_attachment_pipeline')
-    const rolledBackStoryAttachments = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('080_push_notifications')
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('079_story_attachment_pipeline')
+    const rolledBackStoryAttachments = new pg.Client({connectionString: rollbackUrl})
     await rolledBackStoryAttachments.connect()
     const attachmentColumn = await rolledBackStoryAttachments.query(`
       SELECT count(*)::int AS count FROM information_schema.columns
@@ -335,8 +359,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter079.rows[0]?.value).toBe('078')
     await rolledBackStoryAttachments.end()
 
-    expect(await migrateDown(freshUrl)).toBe('078_gubic_game_catalogue')
-    const rolledBackGubic = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('078_gubic_game_catalogue')
+    const rolledBackGubic = new pg.Client({connectionString: rollbackUrl})
     await rolledBackGubic.connect()
     const gubicTable = await rolledBackGubic.query(`SELECT to_regclass('public.greenfield_game_catalogue_entries') AS name`)
     const versionAfter078 = await rolledBackGubic.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
@@ -344,8 +368,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter078.rows[0]?.value).toBe('077')
     await rolledBackGubic.end()
 
-    expect(await migrateDown(freshUrl)).toBe('077_optional_package_media')
-    const rolledBackOptionalMedia = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('077_optional_package_media')
+    const rolledBackOptionalMedia = new pg.Client({connectionString: rollbackUrl})
     await rolledBackOptionalMedia.connect()
     const oldMediaConstraint = await rolledBackOptionalMedia.query(`
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
@@ -356,8 +380,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter077.rows[0]?.value).toBe('076')
     await rolledBackOptionalMedia.end()
 
-    expect(await migrateDown(freshUrl)).toBe('076_greenfield_premium_entitlements')
-    const rolledBackPremium = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('076_greenfield_premium_entitlements')
+    const rolledBackPremium = new pg.Client({connectionString: rollbackUrl})
     await rolledBackPremium.connect()
     const premiumTable = await rolledBackPremium.query(`SELECT to_regclass('public.greenfield_premium_memberships') AS name`)
     const verificationTable = await rolledBackPremium.query(`SELECT to_regclass('public.greenfield_verification_statuses') AS name`)
@@ -367,8 +391,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter076.rows[0]?.value).toBe('075')
     await rolledBackPremium.end()
 
-    expect(await migrateDown(freshUrl)).toBe('075_greenfield_messaging')
-    const rolledBackMessaging = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('075_greenfield_messaging')
+    const rolledBackMessaging = new pg.Client({connectionString: rollbackUrl})
     await rolledBackMessaging.connect()
     const messagingTable = await rolledBackMessaging.query(`SELECT to_regclass('public.greenfield_conversations') AS name`)
     const versionAfter075 = await rolledBackMessaging.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
@@ -376,8 +400,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter075.rows[0]?.value).toBe('074')
     await rolledBackMessaging.end()
 
-    expect(await migrateDown(freshUrl)).toBe('074_greenfield_v1_query_indexes')
-    const rolledBack = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('074_greenfield_v1_query_indexes')
+    const rolledBack = new pg.Client({connectionString: rollbackUrl})
     await rolledBack.connect()
     const recordIndex = await rolledBack.query(`SELECT to_regclass('public.greenfield_module_records_active_list_idx') AS name`)
     const versionAfter074 = await rolledBack.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
@@ -385,8 +409,8 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(versionAfter074.rows[0]?.value).toBe('073')
     await rolledBack.end()
 
-    expect(await migrateDown(freshUrl)).toBe('073_backup_sequence_acl_defaults')
-    const rolledBackBackupAcl = new pg.Client({connectionString: freshUrl})
+    expect(await migrateDown(rollbackUrl, migrationsThrough091)).toBe('073_backup_sequence_acl_defaults')
+    const rolledBackBackupAcl = new pg.Client({connectionString: rollbackUrl})
     await rolledBackBackupAcl.connect()
     const sequencePrivilege = await rolledBackBackupAcl.query(
       `SELECT has_sequence_privilege(
@@ -400,13 +424,13 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(version.rows[0]?.value).toBe('072')
     await rolledBackBackupAcl.end()
 
-    expect(await migrateUp(freshUrl)).toEqual([
+    expect(await migrateUp(rollbackUrl, migrationsThrough091)).toEqual([
       '073_backup_sequence_acl_defaults', '074_greenfield_v1_query_indexes',
       '075_greenfield_messaging', '076_greenfield_premium_entitlements',
       '077_optional_package_media', '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
       '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority',
     ])
-    const reapplied = new pg.Client({connectionString: freshUrl})
+    const reapplied = new pg.Client({connectionString: rollbackUrl})
     await reapplied.connect()
     const restoredPrivilege = await reapplied.query(
       `SELECT has_sequence_privilege(
@@ -434,7 +458,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_publisher_release_runner_boundary', '093_publisher_release_governance_integrity', '094_publisher_signing_governance_hardening', '095_publisher_signing_integration_completion',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
@@ -449,7 +473,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(version.rows[0]?.value).toBe('091')
+    expect(version.rows[0]?.value).toBe('095')
     expect(account.rows[0]?.count).toBe(1)
     expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     await after.end()

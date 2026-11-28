@@ -48,6 +48,7 @@ import {GreenfieldModuleDistributionService, type DistributionHostContext} from 
 import {PackageResolutionError} from '../package-closure-resolver.js'
 import {validateHostCapabilityDescriptor, type HostCapabilityDescriptor} from '@modula/greenfield-module-ui-contracts'
 import {GreenfieldGubicService} from '../gubic-service.js'
+import {GreenfieldRegistryAuthorityService} from '../registry-authority-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -127,8 +128,20 @@ export async function registerModuleRoutes(
   const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl, log: app.log})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
   const signingKeys = new GreenfieldPublisherSigningKeyService(db)
-  const githubSync = new GreenfieldGithubReleaseSyncService(db, options.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}))
-  const releases = new GreenfieldModuleReleaseService(db)
+  const registryAuthorityConfig = {
+    databaseUrl: config.databaseUrl,
+    trustVerifierDatabaseUrl: config.trustVerifierDatabaseUrl,
+    publicationAuthorityDatabaseUrl: config.publicationAuthorityDatabaseUrl,
+    quarantineAuthorityDatabaseUrl: config.quarantineAuthorityDatabaseUrl,
+    revocationAuthorityDatabaseUrl: config.revocationAuthorityDatabaseUrl,
+  }
+  const registryAuthority = new GreenfieldRegistryAuthorityService(db, registryAuthorityConfig)
+  const githubSync = new GreenfieldGithubReleaseSyncService(
+    db,
+    options.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}),
+    registryAuthorityConfig,
+  )
+  const releases = new GreenfieldModuleReleaseService(db, registryAuthority)
   const publishers = new GreenfieldModulePublisherService(db, config)
   const installations = new GreenfieldModuleInstallationService(db, config)
   const updates = new GreenfieldModuleUpdateService(db, config)
@@ -1810,19 +1823,21 @@ export async function registerModuleRoutes(
         repository: release.sourceRepository,
         releaseTag: release.manifest.source.releaseTag,
       })
-      return reply.send(successEnvelope(await releases.attachPublishedSignature(releaseId, body, verifiedArtifact, auth.accountId, request.id), request.id))
+      const staged = await releases.attachPublishedSignature(releaseId, body, verifiedArtifact, auth.accountId, request.id)
+      const settled = await registryAuthority.verifyPendingSignature(releaseId)
+      return reply.send(successEnvelope({...staged, ...settled, alreadyAttached: staged.alreadyAttached || settled.alreadyVerified}, request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Release signature attachment failed')
     }
   })
   app.post('/v1/admin/registry/releases/:releaseId/publish', routeConfig.writeConfig, releaseAdminAction(sessions, publishers, request =>
-    publishByReleaseId(releases, (request.params as any).releaseId),
+    registryAuthority.publishRelease((request.params as any).releaseId),
   ))
   app.post('/v1/admin/registry/releases/:releaseId/quarantine', routeConfig.writeConfig, releaseAdminAction(sessions, publishers, request =>
-    releases.quarantineRelease((request.params as any).releaseId, ((request.body as any)?.reason ?? 'administrative quarantine') as string, ((request.body as any)?.policyAction ?? 'block') as any),
+    registryAuthority.quarantineRelease((request.params as any).releaseId, ((request.body as any)?.reason ?? 'administrative quarantine') as string, ((request.body as any)?.policyAction ?? 'block') as any),
   ))
   app.post('/v1/admin/registry/releases/:releaseId/revoke', routeConfig.writeConfig, releaseAdminAction(sessions, publishers, request =>
-    releases.revokeRelease((request.params as any).releaseId, ((request.body as any)?.reason ?? 'administrative revocation') as string),
+    registryAuthority.revokeRelease((request.params as any).releaseId, ((request.body as any)?.reason ?? 'administrative revocation') as string),
   ))
 
   app.post('/v1/admin/registry/publishers/:publisherId/verify', routeConfig.writeConfig, publisherAdminAction(sessions, publishers, request =>
@@ -1858,12 +1873,6 @@ export async function registerModuleRoutes(
       return sendMapped(reply, error, request.id, 'Signing key revocation failed')
     }
   })
-}
-
-async function publishByReleaseId(releases: GreenfieldModuleReleaseService, releaseId: string) {
-  const release = await releases.getReleaseById(releaseId)
-  if (!release) throw moduleError('NOT_FOUND', 'Release not found')
-  return releases.publishRelease(release.moduleId, release.version)
 }
 
 function releaseAdminAction(

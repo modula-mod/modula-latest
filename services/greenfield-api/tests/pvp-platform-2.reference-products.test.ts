@@ -7,7 +7,7 @@ import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {ModuleBackendTokenService} from '../src/modules/backend/token-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
@@ -69,7 +69,7 @@ describeIfDb('PVP Platform 2 immutable reference products', () => {
       const provenance = JSON.parse(readFileSync(join(roots[product], 'release', provenanceName), 'utf8'))
       expect(manifest.moduleId).toBe(ids[product])
       expect(manifest.version).toBe(versions[product])
-      const service = new GreenfieldModuleReleaseService(db)
+      const service = authorizedReleaseServiceFromEnv(db, databaseUrl!)
       let release = await service.getRelease(manifest.moduleId, manifest.version)
       if (!release) {
         await service.importPendingReview(manifest, {

@@ -30,7 +30,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldSearchService} from '../src/domains/search/index.js'
 import {canonicalizeVaultNotesManifest} from '../src/modules/canonical-manifest.js'
 import {GreenfieldModuleInstallationService} from '../src/modules/installation-service.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 import {allRuntimePermissionKeys} from '../src/modules/runtime2-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {processOneEventDelivery} from '../../greenfield-worker/src/events/runner.js'
@@ -592,7 +592,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       payload: {version: moduleVersion},
     })
     expect(update.statusCode).toBe(202)
-    const current = await new GreenfieldModuleReleaseService(db).getRelease(moduleId, moduleVersion)
+    const current = await authorizedReleaseServiceFromEnv(db, databaseUrl!).getRelease(moduleId, moduleVersion)
     await handleModuleUpdate(workerDb, loadWorkerConfig(), {
       installationId: disposableInstallationId,
       targetReleaseId: current!.releaseId,
@@ -619,7 +619,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
 
   async function importVaultNotesRelease() {
     const manifest = manifestForTest()
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const existing = await releases.getRelease(moduleId, moduleVersion)
     if (existing) {
       await registerRuntimeSurface(existing.releaseId, manifest)
@@ -636,7 +636,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     manifest.version = '0.2.0'
     if (manifest.extensionProduct) manifest.extensionProduct.version = '0.2.0'
     manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
-    const releases = new GreenfieldModuleReleaseService(db)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const existing = await releases.getRelease(moduleId, '0.2.0')
     if (existing) {
       await registerRuntimeSurface(existing.releaseId, manifest)

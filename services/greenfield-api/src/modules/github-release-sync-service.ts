@@ -9,6 +9,7 @@ import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModuleManifestService} from './manifest-service.js'
 import {GreenfieldModuleReleaseService, type GreenfieldModuleReleaseEvidence} from './release-service.js'
+import {GreenfieldRegistryAuthorityService, type RegistryAuthorityConfig} from './registry-authority-service.js'
 import {assertWebGameContentPolicy, WebGameContentPolicyError} from '../gubic/web-game-csp.js'
 
 /**
@@ -150,7 +151,15 @@ export type VerifiedGithubRelease = {
 }
 
 export class GreenfieldGithubReleaseSyncService {
-  constructor(private readonly db: ModulaDb, private readonly source: GithubReleaseSource) {}
+  private readonly registryAuthority: GreenfieldRegistryAuthorityService | null
+
+  constructor(
+    private readonly db: ModulaDb,
+    private readonly source: GithubReleaseSource,
+    authorityConfig: RegistryAuthorityConfig | null = null,
+  ) {
+    this.registryAuthority = authorityConfig ? new GreenfieldRegistryAuthorityService(db, authorityConfig) : null
+  }
 
   /** Fetches and verifies a release without touching the database. */
   async fetchVerified(input: GithubSyncRequest): Promise<VerifiedGithubRelease> {
@@ -349,7 +358,10 @@ export class GreenfieldGithubReleaseSyncService {
       const applied = await this.applyVerified(verified, existing ?? null)
       let release = applied.release
       const channel = applied.channel
-      if (input.publish && release.releaseState === 'verified') release = await releases.publishRelease(verified.productId, verified.version)
+      if (input.publish && release.releaseState === 'verified') {
+        if (!this.registryAuthority) throw moduleError('CAPABILITY_UNAVAILABLE', 'Registry publication authority is not configured')
+        release = await this.registryAuthority.publishRelease(release.releaseId)
+      }
       const summary = {...base, releaseId: release.releaseId, releaseState: release.releaseState, releaseChannel: channel, packageStored: true, assetsStored: verified.assets.length}
       await this.db.updateTable('greenfield_module_sync_runs').set({status: 'completed', completed_at: new Date(), summary: JSON.stringify(summary)}).where('sync_run_id', '=', runId).execute()
       return {mode: 'APPLIED' as const, syncRunId: runId, ...summary}
@@ -370,12 +382,29 @@ export class GreenfieldGithubReleaseSyncService {
    * publishes. Shared by sync() and the publisher release console runner.
    */
   async applyVerified(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    return this.applyRegistryCandidate(verified, existing, true)
+  }
+
+  /**
+   * Stores an unsigned, fully validated release as pendingReview. This does not
+   * create approval or verified-signature state; those are separate database
+   * authorities in migration 092.
+   */
+  async applyPendingSigningCandidate(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    return this.applyRegistryCandidate(verified, existing, false)
+  }
+
+  /** Stores externally signed evidence as pending; only the restricted trust verifier may settle it. */
+  async applyPendingSignatureCandidate(verified: VerifiedGithubRelease, existing?: GreenfieldModuleReleaseRecord | null) {
+    return this.applyRegistryCandidate(verified, existing, false)
+  }
+
+  private async applyRegistryCandidate(verified: VerifiedGithubRelease, existing: GreenfieldModuleReleaseRecord | null | undefined, verifyPending: boolean) {
     const releases = new GreenfieldModuleReleaseService(this.db)
     const current = existing === undefined ? await releases.getRelease(verified.productId, verified.version) : existing
     if (current) assertStoredProvenance(verified, current)
     let release = current ?? await releases.importPendingReview(verified.manifest, verified.evidence)
     if (release.releaseState === 'quarantined' || release.releaseState === 'revoked') throw moduleError('FORBIDDEN', `Release is ${release.releaseState}; sync will not change it`)
-    if (release.releaseState === 'pendingReview') release = await releases.verifyRelease(verified.productId, verified.version)
     await this.storePackageBlob(release.releaseId, verified)
     const ingested = await new GreenfieldMpsIngestService(this.db).ingest({
       filename: 'modula.product.json',
@@ -393,6 +422,15 @@ export class GreenfieldGithubReleaseSyncService {
       if (release.releaseChannel !== channel) throw moduleError('CONFLICT', 'Published release channel is immutable')
     } else {
       await this.db.updateTable('greenfield_module_releases').set({release_channel: channel}).where('release_id', '=', release.releaseId).execute()
+    }
+    if (verifyPending && release.releaseState === 'pendingReview') {
+      if (verified.evidence.signature) {
+        if (!this.registryAuthority) throw moduleError('CAPABILITY_UNAVAILABLE', 'Registry trust verifier is not configured')
+        await this.registryAuthority.verifyPendingSignature(release.releaseId)
+        release = (await releases.getRelease(verified.productId, verified.version))!
+      } else {
+        release = await releases.verifyRelease(verified.productId, verified.version)
+      }
     }
     return {release, channel}
   }

@@ -15,6 +15,7 @@ import {presentationAssetsMissingBlobs} from '../src/modules/presentation-blob-g
 import {GreenfieldRegistryPresentationService} from '../src/modules/registry-presentation-service.js'
 import {GreenfieldMpsIngestService, assertPresentationAssetBlobsAvailable} from '../src/product-standard/ingest-service.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
+import {authorizedRegistryAuthorityFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -80,7 +81,7 @@ describeIfDb('GF-MOD-02 presentation bytes required at ingestion and publication
     db = created.db
     await app.ready()
     ingest = new GreenfieldMpsIngestService(db)
-    releases = new GreenfieldModuleReleaseService(db)
+    releases = new GreenfieldModuleReleaseService(db, authorizedRegistryAuthorityFromEnv(db, databaseUrl!))
     adminToken = (await registerAccount(app, `gf-mod-02-admin-${suffix}@example.com`, adminHandle, db)).token
     userToken = (await registerAccount(app, `gf-mod-02-user-${suffix}@example.com`, `gfmod02u${suffix}`.slice(0, 20), db)).token
   })

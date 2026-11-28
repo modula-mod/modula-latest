@@ -46,6 +46,42 @@ Supported configuration is disabled by default:
 - `MODULA_SIGNING_VAULT_MOUNT=transit` (optional)
 - `MODULA_SIGNING_VAULT_NAMESPACE=...` (optional)
 
+The PostgreSQL authorization boundary uses eight mutually isolated login roles.
+Store each URL in the environment-specific secret source; never place a literal
+credential in this document, source control, an image, or a shared process
+environment:
+
+- `MODULA_SIGNING_RUNNER_DATABASE_URL` (`r2_signing_runner`)
+- `MODULA_RELEASE_APPROVER_DATABASE_URL` (`r2_release_approver`)
+- `MODULA_TRUST_VERIFIER_DATABASE_URL` (`r2_trust_verifier`)
+- `MODULA_PUBLICATION_AUTHORITY_DATABASE_URL` (`r2_publication_authority`)
+- `MODULA_PUBLISHER_TRUST_AUTHORITY_DATABASE_URL` (`r3a_publisher_trust_authority`)
+- `MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL` (`r3a2_signing_identity_authority`)
+- `MODULA_QUARANTINE_AUTHORITY_DATABASE_URL` (`r3a2_quarantine_authority`)
+- `MODULA_REVOCATION_AUTHORITY_DATABASE_URL` (`r3a3_revocation_authority`)
+
+The API, generic worker, migrator, backup and readonly URLs remain separate from
+all eight authority URLs. The release approver, signing runner, trust verifier
+and publication authority run with only their corresponding connection. The
+publisher-trust, signing-identity, quarantine and revocation connections are
+operator/control-plane credentials and must not be inherited by the API or
+generic worker. Production readiness checks report each secret-backed value only
+as `PRESENT`, `MISSING` or `DISABLED`; this local mission does not create them.
+
+Fresh development and CI database bootstrap supplies the matching provisioning
+inputs `MODULA_SIGNING_RUNNER_PASSWORD`, `MODULA_RELEASE_APPROVER_PASSWORD`,
+`MODULA_TRUST_VERIFIER_PASSWORD`, `MODULA_PUBLICATION_AUTHORITY_PASSWORD`,
+`MODULA_PUBLISHER_TRUST_AUTHORITY_PASSWORD`,
+`MODULA_SIGNING_IDENTITY_AUTHORITY_PASSWORD`,
+`MODULA_QUARANTINE_AUTHORITY_PASSWORD` and
+`MODULA_REVOCATION_AUTHORITY_PASSWORD` to
+`ops/docker/postgres/init-roles.sh`. They must be eight distinct generated
+values outside disposable CI. The bootstrap creates restricted logins only;
+after migrations, an operator seeds the authority actor accounts and applies
+`ops/security/publisher-release-runner-grants.sql`. Do not place production
+values in a Compose file or use CI fixture credentials outside its disposable
+PostgreSQL service.
+
 The Vault key must be `ed25519`, `exportable=false` and `allow_plaintext_backup=false`. Transit receives base64-encoded canonical statement bytes with `prehashed=false`, producing standard Ed25519 signatures compatible with existing offline releases.
 
 ## Enrollment and rotation
@@ -77,14 +113,15 @@ For confirmed compromise, revoke rather than suspend. Existing release signature
 ## Feature-flagged rollout
 
 1. Deploy Vault and networking with signing disabled; test HA, snapshot restore, token renewal and emergency policy removal.
-2. Apply migration `091_greenfield_online_signing_authority` and verify API, worker, backup and migrator privileges.
-3. Create a new, distinct Modula online Ed25519 key; register its public half and first-party policy through two-person operator review.
-4. Enable a Modula-only pilot for one non-public release candidate. Keep offline verification compatibility and do not replace the offline key.
-5. Review receipts, alerts, latency, retry behavior, revocation drills and audit completeness.
-6. Expand to selected third-party publishers with separate Vault keys, exact product grants and expiration dates.
-7. Expand generally only after security review, operational acceptance and an emergency shutdown exercise.
+2. Apply migrations `091_greenfield_online_signing_authority`, `092_publisher_release_runner_boundary`, `093_publisher_release_governance_integrity`, `094_publisher_signing_governance_hardening` and `095_publisher_signing_integration_completion`, then verify API, worker, backup, migrator and authority-role privileges.
+3. Provision eight distinct, membership-isolated database logins for the signing runner, release approver, trust verifier, publication authority, publisher-trust authority, signing-identity authority, quarantine authority and revocation authority. Apply `ops/security/publisher-release-runner-grants.sql` with separate operator accounts for approval, publication, publisher trust, signing-key lifecycle, quarantine lifecycle and revocation creation.
+4. Create a new, distinct Modula online Ed25519 key; register its public half and first-party policy through two-person operator review.
+5. Enable a Modula-only pilot for one non-public release candidate. Keep offline verification compatibility and do not replace the offline key.
+6. Review receipts, alerts, latency, retry behavior, revocation drills and audit completeness.
+7. Expand to selected third-party publishers with separate Vault keys, exact product grants and expiration dates.
+8. Expand generally only after security review, operational acceptance and an emergency shutdown exercise.
 
-Rollback the feature flag before rolling back schema. Migration down cancels pending sign work and converts online-signing states to failed; it never publishes a release.
+Roll back the feature flag and application processes before any database recovery. Migrations 093 through 095 are forward-only security boundaries: their automated down migrations fail closed and must not be represented as successful rollback. Recover with an independently reviewed forward migration or a controlled backup restore that preserves governance history. The older 091 down migration remains a destructive, pre-real-data-only procedure as documented below; it never publishes a release.
 
 ## Local verification
 
@@ -103,7 +140,23 @@ MODULA_TEST_DATABASE_URL=postgresql://... CI=true pnpm --filter @modula/greenfie
 ```
 
 ```sh
-MODULA_TEST_DATABASE_URL=postgresql://... CI=true pnpm --filter @modula/greenfield-api exec tsx scripts/verify-migration-cycle.ts 091_greenfield_online_signing_authority
+MODULA_TEST_DATABASE_URL=postgresql://... MODULA_TEST_ADMIN_DATABASE_URL=postgresql://... CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/api-fix-01.migration.test.ts tests/greenfield-backend-v1.migration-ledger-security.test.ts --maxWorkers=1 --no-file-parallelism
+```
+
+After a disposable database has been migrated, provision the eight restricted
+roles, seed the six non-production authority actor accounts, and apply
+`ops/security/publisher-release-runner-grants.sql`. Then supply all twelve test
+connections (`MODULA_TEST_DATABASE_URL`, `MODULA_TEST_DATABASE_ADMIN_URL`, the
+eight authority URLs, `MODULA_API_DATABASE_URL`, and
+`MODULA_WORKER_DATABASE_URL`) and run the canonical boundary with the zero-skip
+report guard:
+
+```sh
+CI=true pnpm --filter @modula/greenfield-api exec vitest run tests/publisher-release-runner-boundary.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --outputFile.json=/tmp/publisher-signing-boundary-vitest.json
+```
+
+```sh
+node scripts/assert-vitest-db-suites-ran.mjs /tmp/publisher-signing-boundary-vitest.json tests/publisher-release-runner-boundary.test.ts
 ```
 
 ## Vault Notes compatibility fixture
@@ -147,3 +200,79 @@ moves `ready_for_signing`, `signing` and `signing_failed` jobs to `failed`. It n
 Registry public keys, signing-key events and release-signature rows from earlier migrations are retained.
 After any real online signature exists, prefer a forward-fix migration. The down migration does not recover
 audit facts, and only the backup in step 2 preserves them.
+
+## GF-SIGNER-R3A: migration 092 authority boundary
+
+Migration `092_publisher_release_runner_boundary` removes release-governance authority from the legacy
+`modula_api` and `modula_worker` roles. The API retains the ordinary publisher operations required to create
+pending release facts. The worker retains read access required for unrelated background processing. Neither
+role can assign publisher trust, publish registry projections, mark signature evidence verified, write release
+approvals or manufacture authorization-class signing audit events.
+
+The migration exposes only fixed `SECURITY DEFINER` transitions to five distinct login roles:
+
+- the release approver binds approval to the current immutable release facts;
+- the signing runner claims approved work and may submit only pending signing evidence;
+- the trust verifier independently records the verification decision;
+- the publication authority publishes only verified work and its registry projections;
+- the publisher-trust authority changes publisher trust under optimistic state checks and verified namespace policy.
+
+Audit event timestamps and database-role provenance are generated by PostgreSQL. Authorization-class event
+identities must match the underlying transition, and the audit table remains append-only to ordinary services.
+The authority grant script rejects superuser, role-creator, database-creator, replication and `BYPASSRLS`
+roles, and binds authority to `SESSION_USER`; `SET ROLE` does not confer the boundary.
+
+Legacy synchronous release and retrofit-signing code that writes a pre-verified signature or published state
+through the shared API connection is intentionally rejected after 092. Integrate those entry points with the
+approval, pending-evidence, independent-verification and publication-authority stages before enabling them.
+Do not restore broad table DML to preserve that older shortcut.
+
+The 092 down migration restores the 091-era grants and functions so an isolated migration-cycle rehearsal is
+possible. It intentionally preserves the additive audit provenance column and event enum value: rollback must
+not erase already-recorded audit evidence. For any deployed environment with real events, prefer a forward fix.
+
+## GF-SIGNER-R3A3: migration 094 governance hardening
+
+Migration `094_publisher_signing_governance_hardening` is additive and forward-only. It preserves migrations
+091, 092 and 093 and leaves existing signing-key, revocation, quarantine and quarantine-event facts unchanged.
+It adds immutable key- and identity-lifecycle transition evidence, binds key registration, rotation and
+revocation to the signing-identity authority, and makes revoked keys and identities terminal. Ordinary API and
+worker roles have no direct key, key-event, identity, revocation or quarantine mutation privileges.
+
+Revocation and quarantine creation are separate fixed authority operations. PostgreSQL derives actor, database
+role and timestamp facts from the authenticated `SESSION_USER` principal. Revocation targets and ownership are
+validated before an append-only record is created; exact repeated requests are idempotent, while attempts to
+replace actor or reason facts fail. Quarantine creation and lifting remain distinct operations, and multiple
+active quarantines continue to block release restoration.
+
+The restricted-role installer checks PostgreSQL's actual membership closure and effective privileges. Each of
+the eight authority roles must be distinct, restricted and unable to inherit or assume any other role. A
+non-administrative role cannot inherit or assume any protected authority. The installer removes table, column, sequence,
+schema-creation and ambient function privileges, revokes protected functions from `PUBLIC`, grants only each
+role's fixed operations, validates the resulting closure and commits atomically.
+
+Do not automate a downgrade across 095, 094 or 093. All three `.down.sql` files deliberately raise an authorization
+error before changing schema or grants. If application rollback is required, disable online signing and the
+authority consumers while retaining the hardened schema. If schema recovery is unavoidable, use a separately
+reviewed forward correction or restore a verified backup into an isolated environment first; preserve all
+append-only governance evidence and re-run the restricted-role installer before activation.
+
+## GREENFIELD-SIGNER-FINISH: migration 095 and PR #205 ownership
+
+Migration `095_publisher_signing_integration_completion` is a forward-only
+correction for atomic, concurrent revocation replay. It serializes only the
+immutable revocation target key and preserves the 092-094 authorization model.
+Its down migration deliberately fails before changing the ledger or boundary.
+
+At the integration baseline, main ends at 091 and the signer candidate owns
+092-095. Open PR #205 independently owns `092_social_gaps_v1`,
+`093_messaging_features_4` and `094_messaging_expiry_index_concurrently`; it is
+not part of this candidate and must not be merged as numbered. If the signer
+candidate lands first, the PR #205 owner must reconcile its migrations as the
+next free sequence, 096-098, preserving the exact no-transaction directive on
+the concurrent-index migration. The current signer runner has no
+no-transaction migration because this candidate contains no `CREATE INDEX
+CONCURRENTLY`; before a later 098 can be applied, port and verify PR #205's
+session-lock/no-transaction runner support and its unit and PostgreSQL tests.
+Never rename an already-applied ledger row, overwrite a merged migration, or
+alter PR #205 as part of signer activation.

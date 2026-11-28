@@ -11,7 +11,7 @@ import {
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {authorizedRegistryAuthorityFromEnv, authorizedReleaseServiceFromEnv} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -209,14 +209,18 @@ describeIf('Phase 7B module runtime API', () => {
     expect(disabled.statusCode).toBe(403)
 
     await db.updateTable('greenfield_extension_installations').set({status: 'enabled'}).where('installation_id', '=', installationId).execute()
-    await db.updateTable('greenfield_module_releases').set({release_state: 'quarantined'}).where('release_id', '=', releaseId).execute()
+    const authority = authorizedRegistryAuthorityFromEnv(db, databaseUrl!)
+    await authority.quarantineRelease(releaseId, 'disposable runtime quarantine coverage')
     const quarantined = await app.inject({
       method: 'GET',
       url: `/v1/modules/${moduleId}/records/note`,
       headers: {authorization: `Bearer ${token}`},
     })
     expect(quarantined.statusCode).toBe(403)
-    await db.updateTable('greenfield_module_releases').set({release_state: 'published'}).where('release_id', '=', releaseId).execute()
+    await authority.liftReleaseQuarantine(
+      releaseId,
+      'restore the disposable runtime fixture after quarantine coverage',
+    )
   })
 
   it('validates module settings and keeps retained data visible after reinstall', async () => {
@@ -277,8 +281,9 @@ describeIf('Phase 7B module runtime API', () => {
   async function seedModule(seedAccountId: string, seedModuleId: string) {
     const version = '0.2.0'
     const manifest = moduleManifest(seedModuleId, version)
-    const imported = await new GreenfieldModuleReleaseService(db).importPendingReview(manifest)
-    const published = await new GreenfieldModuleReleaseService(db).publishRelease(seedModuleId, version)
+    const releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
+    const imported = await releases.importPendingReview(manifest)
+    const published = await releases.publishRelease(seedModuleId, version)
     releaseId = published.releaseId
     installationId = `test-installation:${seedModuleId}:${seedAccountId}`
     await db

@@ -8,8 +8,9 @@ import {migrateUp} from '../src/database/migrate.js'
 import {normalizeCommentMedia} from '../src/domains/comments/media.js'
 import {GreenfieldModulePublisherService} from '../src/modules/publisher-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
-import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
+import {buildPublisherReleaseStatement, statementBytes} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, registerAccount} from './helpers/registry-fixtures.js'
+import {authorizedReleaseServiceFromEnv, registerAuthorizedSigningIdentity, revokeAuthorizedSigningIdentity} from './helpers/authorized-publication-fixture.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -31,6 +32,7 @@ describeIfDb('signed sticker pack catalogue and composer integration', () => {
   const keys = generateKeyPairSync('ed25519')
   const publicPem = keys.publicKey.export({format: 'pem', type: 'spki'}).toString()
   const keyId = sha256(keys.publicKey.export({format: 'der', type: 'spki'}))
+  let signingIdentityId = ''
   const packId = `qa-stickers-${suffix}`
   const stickerId = `qa_${suffix}_1`
   let manifestSha = ''
@@ -117,9 +119,14 @@ describeIfDb('signed sticker pack catalogue and composer integration', () => {
     db = createDb(databaseUrl!)
     const bootstrap = adapterManifest(`digital.modula.stickers.bootstrap-${suffix}`, '1.0.0')
     await new GreenfieldModulePublisherService(db).ensurePublisherForManifest(bootstrap)
-    const existing = await db.selectFrom('greenfield_publisher_signing_keys').select('key_id').where('key_id', '=', keyId).executeTakeFirst()
-    if (!existing) await new GreenfieldPublisherSigningKeyService(db).register('modula', {keyId, publicKeyPem: publicPem}, null)
-    releases = new GreenfieldModuleReleaseService(db)
+    signingIdentityId = (await registerAuthorizedSigningIdentity({
+      authorityUrl: process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL!,
+      publisherId: 'modula',
+      signingKeyId: keyId,
+      publicKeyPem: publicPem,
+      providerKeyRef: `test/sticker-packs/${suffix}`,
+    })).identityId
+    releases = authorizedReleaseServiceFromEnv(db, databaseUrl!)
     const server = await createServer(loadConfig())
     app = server.app
     await app.ready()
@@ -129,6 +136,11 @@ describeIfDb('signed sticker pack catalogue and composer integration', () => {
   })
 
   afterAll(async () => {
+    if (signingIdentityId) await revokeAuthorizedSigningIdentity({
+      authorityUrl: process.env.MODULA_SIGNING_IDENTITY_AUTHORITY_DATABASE_URL!,
+      identityId: signingIdentityId,
+      reason: 'Sticker pack disposable fixture cleanup',
+    })
     await app?.close()
     await db?.destroy()
   })
