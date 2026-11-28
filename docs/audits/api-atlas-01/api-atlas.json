@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "integration/greenfield-signer-finish",
-      "sourceSha256": "fda46241346b4939aaa0c80f7f91bc7211a6ad21e2c7e77334ce93ad92569274",
-      "capturedAt": "2026-11-27T19:37:26.300Z",
+      "branch": "serverfix/records-contains-operator",
+      "sourceSha256": "31b6eb40a6a388656e3d1168097605982da23f7542fb4fa0b7d2cf382538c17e",
+      "capturedAt": "2026-11-28T16:17:39.617Z",
       "routeCount": 900
     },
     "status": "PASS"

@@ -91,6 +91,7 @@ describeIf('MODULE-PLATFORM-02 generic Tasks records', () => {
         status: 'todo',
         dueDate: '2030-01-01T12:00:00.000Z',
         link: {record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}},
+        tags: ['founder', 'launch'],
       },
     }
     const invalidTask = await request('POST', `/v1/modules/${alpha.moduleId}/records/tasks`, {
@@ -127,7 +128,14 @@ describeIf('MODULE-PLATFORM-02 generic Tasks records', () => {
     const secondCreate = await request('POST', `/v1/modules/${alpha.moduleId}/records/tasks`, {
       mutationId: 'alpha-create-2',
       recordId: alphaSecondRecordId,
-      data: {title: 'Beta follow-up', description: 'Second task', status: 'todo', dueDate: '2030-01-02T12:00:00.000Z'},
+      data: {
+        title: 'Beta follow-up',
+        description: 'Second task',
+        status: 'todo',
+        dueDate: '2030-01-02T12:00:00.000Z',
+        tags: ['follow-up'],
+        related: [{record: {moduleId: beta.moduleId, recordType: 'entity', recordId: betaRecordId}}],
+      },
     })
     expect(secondCreate.statusCode).toBe(201)
 
@@ -144,6 +152,25 @@ describeIf('MODULE-PLATFORM-02 generic Tasks records', () => {
     const todoFilter = encodeURIComponent(JSON.stringify('todo'))
     const filtered = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?filter.status=${todoFilter}&sort=dueDate&direction=asc`)
     expect(filtered.json().data.items.map((item: {record_id: string}) => item.record_id)).toEqual([alphaRecordId, alphaSecondRecordId])
+
+    // contains.<field>: array membership, as the native renderer sends it for
+    // membership bindings (ProductUIRenderer.recordQueryPath). Plain-string
+    // elements match by value; reference-array elements match by recordId.
+    const byFounder = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?contains.tags=${encodeURIComponent(JSON.stringify('founder'))}&sort=dueDate&direction=asc`)
+    expect(byFounder.statusCode).toBe(200)
+    expect(byFounder.json().data.items.map((item: {record_id: string}) => item.record_id)).toEqual([alphaRecordId])
+    const byFollowUp = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?contains.tags=${encodeURIComponent(JSON.stringify('follow-up'))}`)
+    expect(byFollowUp.json().data.items.map((item: {record_id: string}) => item.record_id)).toEqual([alphaSecondRecordId])
+    const byRelated = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?contains.related=${encodeURIComponent(JSON.stringify(betaRecordId))}`)
+    expect(byRelated.json().data.items.map((item: {record_id: string}) => item.record_id)).toEqual([alphaSecondRecordId])
+    const byMissing = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?contains.tags=${encodeURIComponent(JSON.stringify('missing'))}`)
+    expect(byMissing.json().data.items).toEqual([])
+    // A non-array field never matches membership, even when it holds the value.
+    const byLinkObject = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?contains.link=${encodeURIComponent(JSON.stringify(betaRecordId))}`)
+    expect(byLinkObject.json().data.items).toEqual([])
+    const badContains = await request('GET', `/v1/modules/${alpha.moduleId}/records/tasks?contains.unknown=${encodeURIComponent(JSON.stringify('x'))}`)
+    expect(badContains.statusCode).toBe(400)
+    expect(badContains.json().error.code).toBe('VALIDATION_FAILED')
 
     const foreignGet = await requestAs(otherToken, 'GET', `/v1/modules/${alpha.moduleId}/records/tasks/${alphaRecordId}`)
     expect(foreignGet.statusCode).toBe(404)
@@ -495,9 +522,11 @@ function alphaCollection(): GreenfieldModuleCollectionDefinition {
       ]},
       {fieldId: 'dueDate', name: 'dueDate', type: 'dateTime', label: 'Due date', required: true},
       {fieldId: 'link', name: 'link', type: 'recordReference', label: 'Linked record', required: false},
+      {fieldId: 'tags', name: 'tags', type: 'tags', label: 'Tags', required: false},
+      {fieldId: 'related', name: 'related', type: 'recordReference', label: 'Related records', required: false},
     ],
     searchableFields: ['title', 'description'],
-    filterableFields: ['status', 'link'],
+    filterableFields: ['status', 'link', 'tags', 'related'],
     sortableFields: ['createdAt', 'updatedAt', 'title', 'dueDate'],
     referenceFields: ['link'],
     retentionPolicy: 'keepOnUninstall',

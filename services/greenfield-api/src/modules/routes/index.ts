@@ -1953,8 +1953,20 @@ function withRecordMutationId(body: Record<string, unknown>, request: FastifyReq
 function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery {
   const reserved = new Set(['cursor', 'limit', 'sort', 'direction', 'q', 'folder', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo', 'recordState'])
   const filters: Record<string, unknown> = {}
+  const contains: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(query ?? {})) {
-    if (key.startsWith('filter.')) {
+    if (key.startsWith('contains.')) {
+      const field = key.slice('contains.'.length)
+      if (!field || typeof value !== 'string') throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
+      let decoded: unknown
+      try {
+        decoded = JSON.parse(value)
+      } catch {
+        throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
+      }
+      if (decoded === null || !['string', 'number', 'boolean'].includes(typeof decoded)) throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
+      contains[field] = decoded
+    } else if (key.startsWith('filter.')) {
       const field = key.slice('filter.'.length)
       if (!field || typeof value !== 'string') throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
       let decoded: unknown
@@ -1982,6 +1994,7 @@ function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery
     updatedTo: stringOrUndefined(query.updatedTo),
     recordState: query.recordState === 'deleted' ? 'deleted' : query.recordState === 'active' ? 'active' : undefined,
     filters,
+    contains,
   }
 }
 
