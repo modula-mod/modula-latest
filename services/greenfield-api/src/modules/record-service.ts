@@ -49,6 +49,7 @@ export type ModuleRecordQuery = {
   updatedFrom?: string
   updatedTo?: string
   filters?: Record<string, unknown>
+  contains?: Record<string, unknown>
   recordState?: 'active' | 'deleted'
 }
 
@@ -82,6 +83,10 @@ export class GreenfieldModuleRecordService {
     for (const key of Object.keys(filters)) {
       if (!definition.filterableFields.includes(key)) throw moduleError('VALIDATION_FAILED', `Unsupported filter field ${key}`)
     }
+    const contains = input.contains ?? {}
+    for (const key of Object.keys(contains)) {
+      if (!definition.filterableFields.includes(key)) throw moduleError('VALIDATION_FAILED', `Unsupported filter field ${key}`)
+    }
 
     let query = this.db
       .selectFrom('greenfield_module_records')
@@ -98,6 +103,20 @@ export class GreenfieldModuleRecordService {
       query = value === null
         ? query.where(sql`greenfield_module_records.data ->> ${field}`, 'is', null) as typeof query
         : query.where(sql`greenfield_module_records.data ->> ${field}`, '=', String(value)) as typeof query
+    }
+    for (const [field, value] of Object.entries(contains)) {
+      // Membership: the field holds an array; a record matches when an element
+      // equals the value, or (for string values) when an element is a record
+      // reference {record: {recordId: value}}. This mirrors the native
+      // renderer's offline visibleRecords() check, so server and client agree
+      // on what a membership filter means. Scalar or object fields never match.
+      const element = JSON.stringify([value])
+      if (typeof value === 'string') {
+        const referenceElement = JSON.stringify([{record: {recordId: value}}])
+        query = query.where(sql<boolean>`((greenfield_module_records.data -> ${field}) @> ${element}::jsonb OR (greenfield_module_records.data -> ${field}) @> ${referenceElement}::jsonb)`) as typeof query
+      } else {
+        query = query.where(sql<boolean>`((greenfield_module_records.data -> ${field}) @> ${element}::jsonb)`) as typeof query
+      }
     }
     if (input.q) {
       if (definition.searchableFields.length === 0) throw moduleError('VALIDATION_FAILED', 'Collection is not searchable')
