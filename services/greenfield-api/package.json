@@ -39,7 +39,8 @@
     "permissions:reconcile": "tsx scripts/reconcile-module-permissions.ts",
     "ops:api-fix-01d-crypto-acceptance": "tsx scripts/api-fix-01d-crypto-acceptance.ts",
     "ops:replay-reaction-dead-letters": "tsx scripts/replay-reaction-dead-letters.ts",
-    "ops:closeout-terminal-jobs": "tsx scripts/closeout-terminal-jobs.ts"
+    "ops:closeout-terminal-jobs": "tsx scripts/closeout-terminal-jobs.ts",
+    "nodus:validate-release": "tsx scripts/validate-nodus-release-descriptor.ts"
   },
   "dependencies": {
     "@apple/app-store-server-library": "3.1.0",

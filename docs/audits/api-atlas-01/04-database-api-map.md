@@ -1,13 +1,13 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 95 ordered up migrations, latest `095_publisher_signing_integration_completion.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 96 ordered up migrations, latest `103_nodus_model_releases.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 392
-- Tables with API/worker source references: 369
+- Production tables: 394
+- Tables with API/worker source references: 371
 - Orphan candidates requiring manual confirmation: 23
 - Write-only candidates: 40
 - Read-only candidates: 35
@@ -4213,6 +4213,40 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/product-standard/ingest-service.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_nodus_model_release_signatures`
+
+- Purpose: application state for greenfield nodus model release signatures
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `103_nodus_model_releases.sql`
+- Routes reading: `GET /v1/admin/intelligence/nodus/releases`, `POST /v1/admin/intelligence/nodus/releases`, `POST /v1/admin/intelligence/nodus/releases/:version/publish`, `POST /v1/admin/intelligence/nodus/releases/:version/rollback`
+- Routes writing: `POST /v1/admin/intelligence/nodus/releases`
+- API/worker source reads: `services/greenfield-api/src/app/nodus-model-releases.ts`
+- API/worker source writes: `services/greenfield-api/src/app/nodus-model-releases.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_nodus_model_releases`
+
+- Purpose: application state for greenfield nodus model releases
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `103_nodus_model_releases.sql`
+- Routes reading: `POST /v1/admin/intelligence/nodus/releases`, `POST /v1/admin/intelligence/nodus/releases/:version/publish`, `POST /v1/admin/intelligence/nodus/releases/:version/rollback`
+- Routes writing: `POST /v1/admin/intelligence/nodus/releases`, `POST /v1/admin/intelligence/nodus/releases/:version/publish`, `POST /v1/admin/intelligence/nodus/releases/:version/rollback`
+- API/worker source reads: `services/greenfield-api/src/app/nodus-model-releases.ts`
+- API/worker source writes: `services/greenfield-api/src/app/nodus-model-releases.ts`
+- Disposition: active read/write or ledger/schema table
+
 ### `greenfield_notification_batches`
 
 - Purpose: application state for greenfield notification batches
@@ -4904,9 +4938,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `rotated_at`, `revoked_at`, `created_at`, `updated_at`
 - Migration introduced: `061_registry_publisher_signing_keys.sql`
-- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/registry/publishers/:publisherId/signing-keys`
+- Routes reading: `POST /v1/admin/intelligence/nodus/releases`, `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/registry/publishers/:publisherId/signing-keys`
 - Routes writing: `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
-- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/publisher/signing-authority.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/app/nodus-model-releases.ts`, `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/publisher/signing-authority.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
 

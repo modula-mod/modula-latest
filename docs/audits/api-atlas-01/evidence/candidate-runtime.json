@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-28T13:35:27.611Z",
+  "capturedAt": "2026-11-28T19:22:33.532Z",
   "source": {
-    "branch": "audit/totp-stepup-rate-limit",
-    "headAtCapture": "20561ad64454098c70e1c7e990038e34e64fe9fa",
+    "branch": "serverfix/nodus-model-patch",
+    "headAtCapture": "ccf5c09c95d74306962e1144bb35e644eb889e28",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "f2410d95450ddcd0ab72189e2484fbe666ed51fc62547cb4f62a5f17398f4e89"
+    "apiSourceSha256": "c8f9a54ae45d554c0ddc372a2505c46a9b5f25d200e7ab71166bb2060ec81095"
   },
   "runtimeRoutes": [
     {
@@ -9580,6 +9580,145 @@
       "method": "HEAD",
       "url": "/v1/reels/:id",
       "path": "/v1/reels/:id",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/nodus/releases",
+      "path": "/v1/intelligence/nodus/releases",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/nodus/releases",
+      "path": "/v1/intelligence/nodus/releases",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/nodus/releases/:version",
+      "path": "/v1/intelligence/nodus/releases/:version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/nodus/releases/:version",
+      "path": "/v1/intelligence/nodus/releases/:version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/nodus/releases/:version/manifest",
+      "path": "/v1/intelligence/nodus/releases/:version/manifest",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/nodus/releases/:version/manifest",
+      "path": "/v1/intelligence/nodus/releases/:version/manifest",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/nodus/releases/:version/files/*",
+      "path": "/v1/intelligence/nodus/releases/:version/files/*",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/nodus/releases/:version/files/*",
+      "path": "/v1/intelligence/nodus/releases/:version/files/*",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/intelligence/nodus/releases",
+      "path": "/v1/admin/intelligence/nodus/releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/intelligence/nodus/releases",
+      "path": "/v1/admin/intelligence/nodus/releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/intelligence/nodus/releases",
+      "path": "/v1/admin/intelligence/nodus/releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/intelligence/nodus/releases/:version/publish",
+      "path": "/v1/admin/intelligence/nodus/releases/:version/publish",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/intelligence/nodus/releases/:version/rollback",
+      "path": "/v1/admin/intelligence/nodus/releases/:version/rollback",
       "prefix": "",
       "schema": null,
       "config": null,
