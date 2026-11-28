@@ -141,7 +141,7 @@ function propertyValue(property) {
   return property && ts.isShorthandPropertyAssignment(property) ? property.name : property?.initializer
 }
 
-function routeAuth(handlerText, path, file) {
+function routeAuth(handlerText, path, file, extraCapabilities = []) {
   const capabilities = [...handlerText.matchAll(/requireCapability\s*\([^,]+,[^,]+,\s*['"]([^'"]+)['"]/g)].map(match => match[1])
   const serviceOperations = [...handlerText.matchAll(/requireAssertionOperation\s*\([^,]+,\s*['"]([^'"]+)['"]/g)].map(match => match[1])
   const admin = path.startsWith('/v1/admin') || capabilities.some(value => value.startsWith('admin:'))
@@ -152,31 +152,41 @@ function routeAuth(handlerText, path, file) {
   const internalBuildService = path.startsWith('/v1/internal/build-service/')
   const greenfield = /requireGreenfieldAuth/.test(handlerText) || wrappedGreenfield || adminWrapper
   const legacy = /requireAuth\s*\(|requireCapability\s*\(/.test(handlerText)
+  // A wrapper that answers 401 when no session could be resolved enforces a
+  // session just as surely as requireAuth/requireCapability do. The Moliboo
+  // game routes (handle()) and the Gubic routes (authed()) both hide their
+  // auth inside such a wrapper, so the Atlas read them as anonymous.
+  const mandatorySession = /if\s*\(\s*!auth\b[\s\S]{0,200}?\.code\(\s*401\s*\)/.test(handlerText)
   const moduleInstallation = /runtimeAccess\.resolve|requireInstallation|installationId|assertInstalled/.test(handlerText)
   const modulePermission = /permission|capabilit|requireAssertionOperation/.test(handlerText) && path.includes('/modules/')
   const verifiedEmail = /verified_at|emailVerified|requireVerified/.test(handlerText)
   const serviceAssertion = backendAssertion || signedModuleIngress || internalBuildService
-  const optional = !greenfield && !legacy && !serviceAssertion && /request\.auth\?/.test(handlerText)
-  const sessionRequired = greenfield || legacy
+  const optional = !greenfield && !legacy && !mandatorySession && !serviceAssertion && /request\.auth\?/.test(handlerText)
+  const sessionRequired = greenfield || legacy || mandatorySession
+  const sessionKind = greenfield
+    ? 'greenfield bearer access session'
+    : legacy
+      ? 'legacy or bridged bearer session'
+      : mandatorySession && /resolveAccess/.test(handlerText)
+        ? 'greenfield bearer access session'
+        : mandatorySession
+          ? 'bearer session'
+          : signedModuleIngress
+            ? 'module backend bearer token plus HMAC signature'
+            : internalBuildService
+              ? 'build-service id plus request signature'
+              : backendAssertion
+                ? 'signed service assertion'
+                : 'none'
   return {
     anonymousAllowed: !sessionRequired && !serviceAssertion,
     optionalSession: optional,
     sessionRequired,
-    sessionKind: greenfield
-      ? 'greenfield bearer access session'
-      : legacy
-        ? 'legacy or bridged bearer session'
-        : signedModuleIngress
-          ? 'module backend bearer token plus HMAC signature'
-          : internalBuildService
-            ? 'build-service id plus request signature'
-            : backendAssertion
-              ? 'signed service assertion'
-              : 'none',
+    sessionKind,
     serviceAssertionRequired: serviceAssertion,
     verifiedEmailRequired: verifiedEmail,
     adminRequired: admin,
-    capabilities: [...new Set(capabilities)].sort(),
+    capabilities: [...new Set([...capabilities, ...extraCapabilities])].sort(),
     serviceOperations: [...new Set(serviceOperations)].sort(),
     moduleInstallationRequired: moduleInstallation,
     modulePermissionRequired: modulePermission,
@@ -188,7 +198,11 @@ function ownershipFor(handlerText, path, auth, file) {
   const account = wrappedAccount || /auth\.accountId|auth\.session|accountId\s*===\s*auth|account_id|resolveSearchActorContext/.test(handlerText)
   const actor = /auth\.actorId|actorId\s*===\s*auth|owner_actor_id/.test(handlerText)
   const workspace = /workspaceId|workspace_id/.test(handlerText)
-  const resourceId = /request\.params|param\(request/.test(handlerText)
+  // A parameterized resource is a property of the route path (/:param),
+  // not of the handler text: a shared wrapper may mention request.params
+  // for a sibling route that has the parameter (build-service claims
+  // shares the internal() wrapper with the :buildId result route).
+  const resourceId = path.includes('/:')
   return {
     rule: auth.adminRequired
           ? 'admin capability is the resource boundary; per-user ownership is not applicable'
@@ -368,10 +382,100 @@ function findAncestor(node, predicate) {
   return null
 }
 
+
+// Resolve a route handler that delegates to a locally-defined wrapper
+// (for example `handle(...)` in register-moliboo-game-routes.ts or
+// `authed(...)` in gubic/routes.ts). The Atlas reads only the handler
+// argument's own text, so auth enforced inside the wrapper was invisible
+// and the route was labelled anonymous. The wrapper's definition -- and,
+// one level deeper, the helpers it calls (for example the `resolve` that
+// answers the session) -- is appended to the text the auth analysis sees.
+// Nothing about the route's runtime behaviour changes: this only widens
+// what the static analysis can observe.
+//
+// When the wrapper forwards a capability to requireCapability through one
+// of its own parameters (handle('social:read', ...) -> requireCapability
+// (request, reply, cap)), the call-site literal is recovered as the
+// capability, because the parameter name alone carries no value.
+const wrapperDeclarationsCache = new WeakMap()
+function wrapperDeclarations(sourceFile) {
+  if (wrapperDeclarationsCache.has(sourceFile)) return wrapperDeclarationsCache.get(sourceFile)
+  const declarations = new Map()
+  const collect = node => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer
+      && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) {
+      declarations.set(node.name.text, node.initializer)
+    }
+    if (ts.isFunctionDeclaration(node) && node.name) declarations.set(node.name.text, node)
+    ts.forEachChild(node, collect)
+  }
+  collect(sourceFile)
+  wrapperDeclarationsCache.set(sourceFile, declarations)
+  return declarations
+}
+
+function resolveWrapperAuth(sourceFile, handler, referenceText = '') {
+  const declarations = wrapperDeclarations(sourceFile)
+  if (!declarations.size) return {text: '', capabilities: []}
+  const capabilities = []
+  const seen = new Set()
+  const texts = []
+  const appendDeclaration = (name, callArguments) => {
+    if (seen.has(name)) return
+    const declaration = declarations.get(name)
+    if (!declaration) return
+    seen.add(name)
+    texts.push(declaration.getText(sourceFile))
+    // Map requireCapability(request, reply, <param>) to the call-site literal.
+    const parameters = (declaration.parameters ?? []).map(parameter => parameter.name.getText(sourceFile))
+    const visit = node => {
+      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'requireCapability') {
+        const capabilityArg = node.arguments[2]
+        if (capabilityArg && ts.isIdentifier(capabilityArg)) {
+          const index = parameters.indexOf(capabilityArg.text)
+          const callSiteArg = index >= 0 ? callArguments?.[index] : null
+          const value = callSiteArg ? literal(callSiteArg, sourceFile) : null
+          if (value) capabilities.push(value)
+        }
+      }
+      ts.forEachChild(node, visit)
+    }
+    visit(declaration)
+    // One level deeper: helpers the wrapper itself calls (for example `resolve`).
+    const bodyText = declaration.body?.getText(sourceFile) ?? ''
+    for (const helperName of declarations.keys()) {
+      if (helperName !== name && new RegExp(`(^|[^\\w$.])${helperName}\\s*\\(`).test(bodyText)) appendDeclaration(helperName)
+    }
+  }
+  const handlerNode = unwrapExpression(handler)
+  if (handlerNode && ts.isCallExpression(handlerNode) && ts.isIdentifier(handlerNode.expression)) {
+    appendDeclaration(handlerNode.expression.text, handlerNode.arguments)
+  } else if (handlerNode && ts.isIdentifier(handlerNode)) {
+    appendDeclaration(handlerNode.text)
+  }
+  // Also resolve helpers the handler or its config merely calls (for
+  // example a websocket route preValidation calling resolve()): the
+  // auth they enforce is the route auth too. Bare calls only -- a
+  // method call such as builds.authenticate() must not resolve the
+  // local authenticate() helper (see the guard above).
+  for (const helperName of declarations.keys()) {
+    if (!seen.has(helperName) && new RegExp(`(^|[^\\w$.])${helperName}\\s*\\(`).test(referenceText)) appendDeclaration(helperName)
+  }
+  return {text: texts.join('\n'), capabilities: [...new Set(capabilities)].sort()}
+}
+
 function sourceRoute({file, sourceFile, node, methods, path, handler, config, sourceRepoRoot = repoRoot}) {
   const handlerText = handler?.getText(sourceFile) ?? ''
   const relativeFile = relative(sourceRepoRoot, file)
-  const auth = routeAuth(handlerText, path, relativeFile)
+  // Auth evidence also lives in the route's config (for example a websocket
+  // route's preValidation) and in a locally-defined handler wrapper (see
+  // resolveWrapperAuth). Only the auth/ownership analysis sees the widened
+  // text; tables, services, success codes and request shape still use the
+  // handler's own text.
+  const configText = config?.getText(sourceFile) ?? ''
+  const wrapperAuth = resolveWrapperAuth(sourceFile, handler, `${handlerText}\n${configText}`)
+  const authText = [handlerText, configText, wrapperAuth.text].filter(Boolean).join('\n')
+  const auth = routeAuth(authText, path, relativeFile, wrapperAuth.capabilities)
   const tables = operationTables(handlerText)
   const asyncEffects = eventsAndJobs(handlerText)
   return {
@@ -383,7 +487,7 @@ function sourceRoute({file, sourceFile, node, methods, path, handler, config, so
     handlerText,
     configExpression: config?.getText(sourceFile).slice(0, 300) ?? null,
     auth,
-    ownership: ownershipFor(handlerText, path, auth, relativeFile),
+    ownership: ownershipFor(authText, path, auth, relativeFile),
     requestShape: requestShape(handlerText),
     directTables: tables,
     serviceCalls: servicesFrom(handlerText),

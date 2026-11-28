@@ -282,9 +282,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:45` | candidate-registered-not-production-probed |
 | Developer | GET | `/v1/developer/board` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:38` | candidate-registered-not-production-probed |
 | Developer | PUT | `/v1/developer/gubic/games/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:50` | candidate-registered-not-production-probed |
-| Developer | GET | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:119` | candidate-registered-not-production-probed |
-| Developer | POST | `/v1/developer/gubic/submissions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:118` | candidate-registered-not-production-probed |
-| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:120` | candidate-registered-not-production-probed |
+| Developer | GET | `/v1/developer/gubic/submissions` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:119` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:118` | candidate-registered-not-production-probed |
+| Developer | POST | `/v1/developer/gubic/submissions/:submissionId/withdraw` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:120` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:40` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/invitations/accept` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:42` | candidate-registered-not-production-probed |
 | Developer | POST | `/v1/developer/organisations/:organisationId/members` | AUTHENTICATED | none | `services/greenfield-api/src/developers/routes.ts:41` | candidate-registered-not-production-probed |
@@ -338,7 +338,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/groups/:id/members` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:385` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/groups/:id/members/:actorId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:399` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/groups/:id/members/:actorId/role` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:413` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/capabilities` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:51` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:51` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/categories` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:230` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/featured` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:212` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:203` | candidate-registered-not-production-probed |
@@ -346,27 +346,27 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/gubic/games/:gameId/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:62` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId/eligibility` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:266` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/gubic/games/:gameId/install-plan` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:279` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/games/:gameId/lobbies` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:69` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/games/:gameId/lobbies` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:70` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/games/:gameId/sessions` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:57` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/games/:gameId/lobbies` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:69` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/games/:gameId/lobbies` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:70` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/games/:gameId/sessions` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:57` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/games/:gameId/versions` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:257` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/library` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:53` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/gubic/library/:gameId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:55` | candidate-registered-not-production-probed |
-| Platform | PUT | `/v1/gubic/library/:gameId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:54` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/lobbies/:lobbyId` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:72` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/lobbies/:lobbyId/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:73` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/lobbies/:lobbyId/leave` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:74` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/lobbies/:lobbyId/ready` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:75` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:84` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/lobbies/:lobbyId/start` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:76` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/lobbies/join` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:71` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/gubic/me/achievements` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:67` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/library` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:53` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/gubic/library/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:55` | candidate-registered-not-production-probed |
+| Platform | PUT | `/v1/gubic/library/:gameId` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:54` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/lobbies/:lobbyId` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:72` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/join` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:73` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/leave` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:74` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/ready` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:75` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/lobbies/:lobbyId/socket` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:84` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/:lobbyId/start` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:76` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/lobbies/join` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:71` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/gubic/me/achievements` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:67` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/my-games` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:298` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/new-releases` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:221` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/gubic/publishers/:publisherId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:239` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/sessions/:sessionId/achievements/:key` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:60` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/sessions/:sessionId/end` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:59` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/gubic/sessions/:sessionId/heartbeat` | PUBLIC | none | `services/greenfield-api/src/gubic/routes.ts:58` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/sessions/:sessionId/achievements/:key` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:60` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/sessions/:sessionId/end` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:59` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/gubic/sessions/:sessionId/heartbeat` | AUTHENTICATED | none | `services/greenfield-api/src/gubic/routes.ts:58` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/hashtags/suggest` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:84` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/live` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:277` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/health/ready` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:281` | candidate-registered-not-production-probed |
@@ -429,7 +429,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/messaging/capabilities` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:302` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/messaging/privacy` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:328` | candidate-registered-not-production-probed |
 | Platform | PATCH | `/v1/messaging/privacy` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:338` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/messaging/socket` | PUBLIC | none | `services/greenfield-api/src/app/register-messaging-routes.ts:502` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/messaging/socket` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:502` | candidate-registered-not-production-probed |
 | Operations | GET | `/v1/meta` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:293` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:529` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/module-runtime/actions/:targetModuleId/:actionId/:version` | SERVICE/WORKER | none | `services/greenfield-api/src/modules/routes/index.ts:1647` | candidate-registered-not-production-probed |
@@ -514,20 +514,20 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Modules | GET | `/v1/modules/installed` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:515` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/modules/installed/:moduleId` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:521` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/modules/updates` | AUTHENTICATED | none | `services/greenfield-api/src/modules/routes/index.ts:894` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/moliboo/activities/complete` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:64` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/moliboo/catalogue/items` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:50` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/moliboo/catalogue/outfits` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:51` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/moliboo/characters/:characterId/care` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:61` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/moliboo/characters/:characterId/equip` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:60` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/moliboo/characters/:characterId/skills/:skillId/use` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:62` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/moliboo/characters/:characterId/state` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:59` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/moliboo/inventory` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:52` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/moliboo/outfits` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:54` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/moliboo/outfits` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:55` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/moliboo/outfits/:outfitId` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:57` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/moliboo/outfits/:outfitId` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:56` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/moliboo/quests` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:65` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/moliboo/quests/:questId/claim` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:66` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/moliboo/activities/complete` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:64` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboo/catalogue/items` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:50` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboo/catalogue/outfits` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:51` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/moliboo/characters/:characterId/care` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:61` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/moliboo/characters/:characterId/equip` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:60` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/moliboo/characters/:characterId/skills/:skillId/use` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:62` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboo/characters/:characterId/state` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:59` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboo/inventory` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:52` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboo/outfits` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:54` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/moliboo/outfits` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:55` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/moliboo/outfits/:outfitId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:57` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/moliboo/outfits/:outfitId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:56` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/moliboo/quests` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:65` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/moliboo/quests/:questId/claim` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-moliboo-game-routes.ts:66` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/moliboos/packs` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:42` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/moliboos/packs/:packId/download` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:84` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/moliboos/packs/:packId/manifest` | PUBLIC | none | `services/greenfield-api/src/app/register-moliboo-routes.ts:71` | candidate-registered-not-production-probed |
@@ -2494,7 +2494,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:235`
 - Handler: inline
 - Controller/service calls: `repository.upsertModel`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -2506,7 +2506,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_ai_models`, `greenfield_ai_providers`
 - Database writes: `greenfield_ai_models`
 - Storage: none observed
@@ -2520,11 +2520,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -2543,7 +2543,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:239`
 - Handler: inline
 - Controller/service calls: `repository.registerPrompt`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -2555,7 +2555,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_ai_prompts`
 - Database writes: `greenfield_ai_prompts`
 - Storage: none observed
@@ -2569,11 +2569,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -2592,7 +2592,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:231`
 - Handler: inline
 - Controller/service calls: `repository.upsertProvider`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -2604,7 +2604,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_ai_providers`
 - Database writes: `greenfield_ai_providers`
 - Storage: none observed
@@ -2618,11 +2618,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -2641,7 +2641,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:243`
 - Handler: inline
 - Controller/service calls: `tools.declareTool`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -2653,7 +2653,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -2667,11 +2667,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3082,7 +3082,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:121`
 - Handler: inline
 - Controller/service calls: `play.reviewQueue`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3094,7 +3094,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `403`, `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_accounts`, `greenfield_gubic_submissions`
 - Database writes: none observed
 - Storage: none observed
@@ -3108,11 +3108,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 403, 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3131,7 +3131,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:122`
 - Handler: inline
 - Controller/service calls: `play.decide`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3143,7 +3143,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_accounts`, `greenfield_gubic_submissions`
 - Database writes: `greenfield_gubic_achievements`, `greenfield_gubic_submissions`
 - Storage: none observed
@@ -3157,11 +3157,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3376,7 +3376,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:282`
 - Handler: inline
 - Controller/service calls: `providerRuntime.diagnostics`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3388,7 +3388,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `403`, `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3402,11 +3402,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 403, 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3425,7 +3425,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:247`
 - Handler: inline
 - Controller/service calls: `repository.listProviders`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3437,7 +3437,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `403`, `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_ai_providers`
 - Database writes: none observed
 - Storage: none observed
@@ -3451,11 +3451,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 403, 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3474,7 +3474,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:271`
 - Handler: inline
 - Controller/service calls: `credentials.store`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3486,7 +3486,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3500,11 +3500,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3523,7 +3523,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:263`
 - Handler: inline
 - Controller/service calls: `providerRuntime.setProviderEnabled`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3535,7 +3535,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3549,11 +3549,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3572,7 +3572,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:267`
 - Handler: inline
 - Controller/service calls: `providerRuntime.setProviderEnabled`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3584,7 +3584,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3598,11 +3598,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3621,7 +3621,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:251`
 - Handler: inline
 - Controller/service calls: `providerRuntime.verifyProvider`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3633,7 +3633,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `403`, `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3647,11 +3647,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 403, 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3670,7 +3670,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:255`
 - Handler: inline
 - Controller/service calls: `providerRuntime.verifyProvider`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3682,7 +3682,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3696,11 +3696,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 403, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -3719,7 +3719,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/ai/routes.ts:286`
 - Handler: inline
 - Controller/service calls: `providerRuntime.diagnostics`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
 - Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
@@ -3731,7 +3731,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `403`, `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: none observed
@@ -3745,11 +3745,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Admin
-- Contract authentication: none
+- Contract authentication: greenfield bearer access session
 - Contract authorization: ADMIN
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 403, 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -9258,7 +9258,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.snapshot`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `social:read`
 - Rate limit: none registered
@@ -9307,7 +9307,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -9356,7 +9356,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -9405,7 +9405,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -9454,7 +9454,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -9503,7 +9503,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.mediaCredentials`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `social:read`
 - Rate limit: none registered
@@ -9601,7 +9601,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.issueTicket`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `social:read`
 - Rate limit: none registered
@@ -11904,7 +11904,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.start`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -12833,9 +12833,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:119`
 - Handler: inline
 - Controller/service calls: `play.listSubmissions`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -12845,7 +12845,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `greenfield_developer_organisation_memberships`, `greenfield_gubic_submissions`, `greenfield_publisher_owners`
 - Database writes: none observed
 - Storage: none observed
@@ -12859,11 +12859,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Developer
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -12882,9 +12882,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:118`
 - Handler: inline
 - Controller/service calls: `play.submit`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -12894,7 +12894,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_developer_organisation_memberships`, `greenfield_gubic_submissions`, `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_tiers`, `greenfield_publisher_owners`
 - Database writes: `greenfield_game_catalogue_entries`, `greenfield_game_catalogue_events`, `greenfield_gubic_submissions`
 - Storage: none observed
@@ -12908,11 +12908,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Developer
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 201; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -12931,9 +12931,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:120`
 - Handler: inline
 - Controller/service calls: `play.withdraw`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -12943,7 +12943,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_developer_organisation_memberships`, `greenfield_gubic_submissions`, `greenfield_publisher_owners`
 - Database writes: `greenfield_gubic_submissions`
 - Storage: none observed
@@ -12957,11 +12957,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Developer
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -15577,9 +15577,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:51`
 - Handler: inline
 - Controller/service calls: `play.capabilities`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -15589,7 +15589,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_tiers`
 - Database writes: none observed
 - Storage: none observed
@@ -15603,11 +15603,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -15969,9 +15969,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:69`
 - Handler: inline
 - Controller/service calls: `play.listLobbies`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -15981,7 +15981,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: none observed
 - Storage: none observed
@@ -15995,11 +15995,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16018,9 +16018,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:70`
 - Handler: inline
 - Controller/service calls: `play.createLobby`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16030,7 +16030,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`, `greenfield_premium_capabilities`, `greenfield_premium_catalogue_versions`, `greenfield_premium_memberships`, `greenfield_premium_tiers`
 - Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Storage: none observed
@@ -16044,11 +16044,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16067,9 +16067,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:57`
 - Handler: inline
 - Controller/service calls: `play.startSession`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16079,7 +16079,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_lobby_members`, `greenfield_gubic_play_sessions`, `the`
 - Database writes: `greenfield_gubic_library_items`, `greenfield_gubic_play_sessions`
 - Storage: none observed
@@ -16093,11 +16093,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16165,9 +16165,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:53`
 - Handler: inline
 - Controller/service calls: `play.library`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16177,7 +16177,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_library_items`
 - Database writes: none observed
 - Storage: none observed
@@ -16191,11 +16191,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16214,9 +16214,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:55`
 - Handler: inline
 - Controller/service calls: `play.removeLibraryItem`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16226,7 +16226,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_play_sessions`
 - Database writes: `greenfield_gubic_library_items`
 - Storage: none observed
@@ -16240,11 +16240,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16263,9 +16263,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:54`
 - Handler: inline
 - Controller/service calls: `play.upsertLibraryItem`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16275,7 +16275,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_library_items`
 - Database writes: `failed`, `greenfield_gubic_library_items`
 - Storage: none observed
@@ -16289,11 +16289,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16312,9 +16312,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:72`
 - Handler: inline
 - Controller/service calls: `play.getLobby`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16324,7 +16324,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: none observed
 - Storage: none observed
@@ -16338,11 +16338,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16361,9 +16361,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:73`
 - Handler: inline
 - Controller/service calls: `play.joinLobby`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16373,7 +16373,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `code`, `failed`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Storage: none observed
@@ -16387,11 +16387,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16410,9 +16410,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:74`
 - Handler: inline
 - Controller/service calls: `play.leaveLobby`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16422,7 +16422,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Storage: none observed
@@ -16436,11 +16436,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16459,9 +16459,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:75`
 - Handler: inline
 - Controller/service calls: `play.setReady`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16471,7 +16471,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Storage: none observed
@@ -16485,11 +16485,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16508,8 +16508,8 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:84`
 - Handler: inline
 - Controller/service calls: `hub.relay`, `hub.subscribe`, `play.isActiveMember`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`, `socketAuth.get`
-- Authentication: none
-- Authorization: PUBLIC
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
@@ -16520,7 +16520,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `greenfield_gubic_lobby_members`
 - Database writes: none observed
 - Storage: none observed
@@ -16534,11 +16534,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16557,9 +16557,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:76`
 - Handler: inline
 - Controller/service calls: `play.startLobby`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16569,7 +16569,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `code`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: `greenfield_gubic_lobbies`
 - Storage: none observed
@@ -16583,11 +16583,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16606,9 +16606,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:71`
 - Handler: inline
 - Controller/service calls: `play.joinLobby`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16618,7 +16618,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `code`, `failed`, `greenfield_accounts`, `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Database writes: `greenfield_gubic_lobbies`, `greenfield_gubic_lobby_members`
 - Storage: none observed
@@ -16632,11 +16632,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16655,9 +16655,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:67`
 - Handler: inline
 - Controller/service calls: `play.myAchievements`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16667,7 +16667,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `404`, `500`
 - Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_achievements`
 - Database writes: none observed
 - Storage: none observed
@@ -16681,11 +16681,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16851,9 +16851,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:60`
 - Handler: inline
 - Controller/service calls: `play.unlockAchievement`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16863,7 +16863,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_achievement_unlocks`, `greenfield_gubic_achievements`, `greenfield_gubic_play_sessions`
 - Database writes: `greenfield_gubic_achievement_unlocks`
 - Storage: none observed
@@ -16877,11 +16877,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16900,9 +16900,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:59`
 - Handler: inline
 - Controller/service calls: `play.endSession`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16912,7 +16912,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_play_sessions`
 - Database writes: `greenfield_gubic_library_items`, `greenfield_gubic_play_sessions`
 - Storage: none observed
@@ -16926,11 +16926,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -16949,9 +16949,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/gubic/routes.ts:58`
 - Handler: inline
 - Controller/service calls: `play.heartbeat`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -16961,7 +16961,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `404`, `409`, `500`
 - Database reads: `greenfield_gubic_play_sessions`
 - Database writes: `greenfield_gubic_play_sessions`
 - Storage: none observed
@@ -16975,11 +16975,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: greenfield bearer access session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -18225,7 +18225,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.getSettings`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `social:read`
 - Rate limit: none registered
@@ -18274,7 +18274,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.updateSettings`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -18323,7 +18323,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.history`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `social:read`
 - Rate limit: none registered
@@ -20036,11 +20036,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-messaging-routes.ts:502`
 - Handler: inline
 - Controller/service calls: `at.toISOString`, `hub.connectionCount`, `hub.isOnline`, `hub.subscribe`, `messaging.presenceRecipients`, `messaging.setTyping`, `messaging.touchPresence`, `raw.toString`, `socket.close`, `socket.on`, `socket.send`, `socketAuth.get`
-- Authentication: none
-- Authorization: PUBLIC
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -20048,7 +20048,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `blocks`, `greenfield_conversation_members`, `greenfield_conversations`, `greenfield_messaging_privacy`
 - Database writes: `greenfield_actor_presence`, `greenfield_conversation_members`
 - Storage: none observed
@@ -20062,11 +20062,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24201,11 +24201,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:64`
 - Handler: inline
 - Controller/service calls: `game.completeActivity`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24213,7 +24213,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_active_buffs`, `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_events`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`
 - Database writes: `SET`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_quest_progress`
 - Storage: none observed
@@ -24227,11 +24227,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24250,11 +24250,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:50`
 - Handler: inline
 - Controller/service calls: `game.listItems`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24262,7 +24262,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`
 - Database writes: none observed
 - Storage: none observed
@@ -24276,11 +24276,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24299,11 +24299,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:51`
 - Handler: inline
 - Controller/service calls: `game.listOutfitSets`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24311,7 +24311,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`
 - Database writes: none observed
 - Storage: none observed
@@ -24325,11 +24325,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24348,11 +24348,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:61`
 - Handler: inline
 - Controller/service calls: `game.care`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24360,7 +24360,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_active_buffs`, `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_equipped`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`, `greenfield_moliboo_skills`
 - Database writes: `SET`, `greenfield_moliboo_active_buffs`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_quest_progress`
 - Storage: none observed
@@ -24374,11 +24374,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24397,11 +24397,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:60`
 - Handler: inline
 - Controller/service calls: `game.equip`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24409,7 +24409,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_active_buffs`, `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_equipped`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`, `greenfield_moliboo_skills`, `greenfield_moliboo_user_outfits`
 - Database writes: `SET`, `greenfield_moliboo_equipped`, `greenfield_moliboo_events`, `greenfield_moliboo_quest_progress`
 - Storage: none observed
@@ -24423,11 +24423,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24446,11 +24446,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:62`
 - Handler: inline
 - Controller/service calls: `game.useSkill`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24458,7 +24458,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_active_buffs`, `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_equipped`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`, `greenfield_moliboo_skills`
 - Database writes: `SET`, `greenfield_moliboo_active_buffs`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_quest_progress`
 - Storage: none observed
@@ -24472,11 +24472,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24495,11 +24495,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:59`
 - Handler: inline
 - Controller/service calls: `game.characterState`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24507,7 +24507,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_moliboo_active_buffs`, `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_equipped`, `greenfield_moliboo_events`, `greenfield_moliboo_friendship`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`, `greenfield_moliboo_skills`
 - Database writes: none observed
 - Storage: none observed
@@ -24521,11 +24521,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24544,11 +24544,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:52`
 - Handler: inline
 - Controller/service calls: `game.inventory`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24556,7 +24556,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`
 - Database writes: none observed
 - Storage: none observed
@@ -24570,11 +24570,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24593,11 +24593,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:54`
 - Handler: inline
 - Controller/service calls: `game.listSavedOutfits`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24605,7 +24605,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_moliboo_user_outfits`
 - Database writes: none observed
 - Storage: none observed
@@ -24619,11 +24619,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24642,11 +24642,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:55`
 - Handler: inline
 - Controller/service calls: `game.saveOutfit`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24654,7 +24654,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`, `greenfield_moliboo_user_outfits`
 - Database writes: `SET`, `greenfield_moliboo_events`, `greenfield_moliboo_quest_progress`, `greenfield_moliboo_user_outfits`
 - Storage: none observed
@@ -24668,11 +24668,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24691,11 +24691,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:57`
 - Handler: inline
 - Controller/service calls: `game.deleteOutfit`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24703,7 +24703,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_user_outfits`
 - Database writes: `greenfield_moliboo_user_outfits`
 - Storage: none observed
@@ -24717,11 +24717,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24740,11 +24740,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:56`
 - Handler: inline
 - Controller/service calls: `game.updateOutfit`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24752,7 +24752,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quests`, `greenfield_moliboo_user_outfits`
 - Database writes: `greenfield_moliboo_user_outfits`, `outfit`
 - Storage: none observed
@@ -24766,11 +24766,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24789,11 +24789,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:65`
 - Handler: inline
 - Controller/service calls: `game.quests`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `social:read`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24801,7 +24801,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `404`, `500`
+- Expected errors: `401`, `403`, `404`, `500`
 - Database reads: `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quest_progress`, `greenfield_moliboo_quests`
 - Database writes: none observed
 - Storage: none observed
@@ -24815,11 +24815,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 404, 500
+- Contract errors: 401, 403, 404, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -24838,11 +24838,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Source file: `services/greenfield-api/src/app/register-moliboo-game-routes.ts:66`
 - Handler: inline
 - Controller/service calls: `game.claimQuest`
-- Authentication: none
-- Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
-- Capability/permission: none observed
+- Capability/permission: `profile:update`
 - Rate limit: none registered
 - Request params: none observed
 - Request query: none observed
@@ -24850,7 +24850,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `404`, `409`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
 - Database reads: `greenfield_moliboo_active_buffs`, `greenfield_moliboo_buff_definitions`, `greenfield_moliboo_inventory`, `greenfield_moliboo_items`, `greenfield_moliboo_outfit_sets`, `greenfield_moliboo_quest_progress`, `greenfield_moliboo_quests`
 - Database writes: `SET`, `greenfield_moliboo_friendship`, `greenfield_moliboo_inventory`, `greenfield_moliboo_quest_progress`
 - Storage: none observed
@@ -24864,11 +24864,11 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Status: candidate-registered-not-production-probed
 - Contract purpose: no mission-specific override; static/runtime record is authoritative
 - Contract owner: Platform
-- Contract authentication: none
-- Contract authorization: PUBLIC
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
 - Contract request: see static request evidence above
 - Contract success: status 200; see response evidence above
-- Contract errors: 400, 404, 409, 500
+- Contract errors: 400, 401, 403, 404, 409, 500
 - Contract pagination/filtering: none observed
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
@@ -27388,7 +27388,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.listModules`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27437,7 +27437,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.moduleDetail`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27486,7 +27486,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.githubReleases`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27535,7 +27535,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.listJobs`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27584,7 +27584,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.createJob`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27633,7 +27633,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.signingIdentities`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27682,7 +27682,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.versions`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27731,7 +27731,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.getJob`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27780,7 +27780,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.cancel`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27829,7 +27829,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.logs`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27878,7 +27878,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.publish`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27927,7 +27927,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.resume`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -27976,7 +27976,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.requestSigning`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -28025,7 +28025,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.signingStatus`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -28074,7 +28074,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `service.validate`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -28368,7 +28368,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.listVoip`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `social:read`
 - Rate limit: none registered
@@ -28417,7 +28417,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.registerVoip`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -28466,7 +28466,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `calls.deleteVoip`
 - Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `post:engage`
 - Rate limit: none registered
@@ -30377,7 +30377,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `accessExpiresAt.toISOString`, `appleAuthentication.completeAuthentication`, `mail.queueNewSignIn`, `refreshExpiresAt.toISOString`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered
@@ -30720,7 +30720,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Controller/service calls: `accessExpiresAt.toISOString`, `greenfieldSessions.issue`, `mail.queueNewSignIn`, `passkeys.verifyAuthentication`, `refreshExpiresAt.toISOString`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: none registered

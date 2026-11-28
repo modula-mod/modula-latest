@@ -8,8 +8,8 @@ Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 633 application / 900 runtime method routes
 Route evidence: local-candidate-runtime for feature branch integration/greenfield-signer-finish; not deployed
-Public routes: 151
-Authenticated routes: 378
+Public routes: 115
+Authenticated routes: 414
 Admin/internal routes: 104
 Mutating routes: 367
 Read-only routes: 266
