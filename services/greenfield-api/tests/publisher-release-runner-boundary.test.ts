@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises'
 import {sql} from 'kysely'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {createDb, type ModulaDb} from '../src/database/client.js'
-import {migrateDown} from '../src/database/migrate.js'
+import {migrateDown, migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {
   approvalFactsSha256,
@@ -87,7 +87,7 @@ describe('publisher signing governance static security boundary', () => {
   })
 })
 
-describeDb('publisher signing governance canonical-role PostgreSQL boundary through 095', () => {
+describeDb('publisher signing governance canonical-role PostgreSQL boundary through 098 (095 forward-only)', () => {
   let admin: ModulaDb
   let superuser: ModulaDb
   let runner: ModulaDb
@@ -861,10 +861,21 @@ describeDb('publisher signing governance canonical-role PostgreSQL boundary thro
   }, 60_000)
 
   it('rejects unsafe automated migration rollback without changing the ledger tip', async () => {
+    // The chain now runs through 098 (messaging features), so the
+    // forward-only 095 tip is only reached after rolling 096-098 back.
+    expect(await migrateDown(adminUrl!)).toBe('098_messaging_expiry_index_concurrently')
+    expect(await migrateDown(adminUrl!)).toBe('097_messaging_features_4')
+    expect(await migrateDown(adminUrl!)).toBe('096_social_gaps_v1')
     await expect(migrateDown(adminUrl!)).rejects.toThrow(/unsafe automated downgrade of 095 is prohibited/i)
     const tip = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(admin)
     expect(tip.rows[0]?.id).toBe('095_publisher_signing_integration_completion')
     const version = await sql<{value: string}>`SELECT value FROM schema_metadata WHERE key = 'schema_version'`.execute(admin)
     expect(version.rows[0]?.value).toBe('095')
+    // Restore the chain so later suites still see tip 098.
+    expect(await migrateUp(adminUrl!)).toEqual([
+      '096_social_gaps_v1', '097_messaging_features_4', '098_messaging_expiry_index_concurrently',
+    ])
+    const restoredTip = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(admin)
+    expect(restoredTip.rows[0]?.id).toBe('098_messaging_expiry_index_concurrently')
   })
 })

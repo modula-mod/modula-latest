@@ -387,12 +387,12 @@ jobs:
             --migrations-dir "${historical_migrations}" \
             --expected-tip 091_greenfield_online_signing_authority \
             --apply-baseline
-      - name: Primary CI database remains at schema 095
+      - name: Primary CI database remains at schema 098
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec tsx
-          scripts/verify-migration-tip.ts 095_publisher_signing_integration_completion
+          scripts/verify-migration-tip.ts 098_messaging_expiry_index_concurrently
       - name: Current-schema MP02 and MP02B database acceptance
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
@@ -700,4 +700,4 @@ jobs:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec tsx
-          scripts/verify-migration-tip.ts 095_publisher_signing_integration_completion
+          scripts/verify-migration-tip.ts 098_messaging_expiry_index_concurrently
