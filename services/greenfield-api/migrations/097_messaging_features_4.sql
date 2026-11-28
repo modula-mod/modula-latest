@@ -1,4 +1,4 @@
--- 093: messaging features 4 — pinned messages, saved messages, edit history,
+-- 097: messaging features 4 — pinned messages, saved messages, edit history,
 -- scheduled messages, disappearing messages, synced chat folders and pins,
 -- per-chat notification levels, quick replies, forwarding attribution and
 -- shared chat themes. Every feature is advertised in
@@ -11,7 +11,7 @@ ALTER TABLE greenfield_conversation_messages
   ADD COLUMN forwarded_from_sent_at TIMESTAMPTZ,
   ADD COLUMN expires_at TIMESTAMPTZ;
 -- The partial expiry index for the disappearing-message sweeper is built
--- CONCURRENTLY by 094 (outside the runner transaction) so the existing
+-- CONCURRENTLY by 098 (outside the runner transaction) so the existing
 -- greenfield_conversation_messages table is never write-locked for the build.
 
 -- ---- conversation-level shared settings ----------------------------------
@@ -110,5 +110,5 @@ GRANT SELECT ON
   TO modula_backup;
 
 INSERT INTO schema_metadata (key, value)
-VALUES ('schema_version', '093')
+VALUES ('schema_version', '097')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

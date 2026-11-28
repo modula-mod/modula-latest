@@ -7,7 +7,7 @@ import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {NO_TRANSACTION_DIRECTIVE, migrateDown, migrateStatus, migrateUp} from '../src/database/migrate.js'
 
 // Runner support for migrations that must run outside a transaction
-// (094_messaging_expiry_index_concurrently uses CREATE INDEX CONCURRENTLY).
+// (098_messaging_expiry_index_concurrently uses CREATE INDEX CONCURRENTLY).
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip

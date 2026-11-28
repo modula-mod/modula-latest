@@ -1,4 +1,4 @@
--- 092: social gaps v1 — mark conversation unread, story reactions and story
+-- 096: social gaps v1 — mark conversation unread, story reactions and story
 -- highlights. Story viewer lists reuse greenfield_story_views (028).
 --
 -- Every feature here is additive and advertised through capability flags;
@@ -54,5 +54,5 @@ GRANT SELECT ON
   TO modula_backup;
 
 INSERT INTO schema_metadata (key, value)
-VALUES ('schema_version', '092')
+VALUES ('schema_version', '096')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();

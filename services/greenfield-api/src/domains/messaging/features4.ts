@@ -5,7 +5,7 @@ import type {ModulaDb} from '../../database/client.js'
 import {MESSAGE_MAX, MessagingService, type ParticipantDto} from './service.js'
 
 /**
- * Messaging features 4 (migration 093): pinned messages, saved messages,
+ * Messaging features 4 (migration 097): pinned messages, saved messages,
  * edit history, scheduled messages, disappearing messages, synced chat
  * folders and pins, notification levels, quick replies, forwarding and chat
  * themes. Every method runs the same membership gate as the core routes

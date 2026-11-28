@@ -6,7 +6,7 @@ import {OutboxRepository} from '../outbox/repository.js'
 import {storyItemLiveCutoff, type StoryService} from './service.js'
 
 /**
- * Story viewer lists, story reactions and story highlights (migration 092).
+ * Story viewer lists, story reactions and story highlights (migration 096).
  * Every method is authenticated by the caller; ownership, visibility and
  * blocks are enforced here.
  */
