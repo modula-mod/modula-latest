@@ -9,6 +9,7 @@ import {uuidv7} from '../lib/uuidv7.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
 import {MailIdentityService} from '../mail/identity-service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
+import {MolibooGenesisService} from '../domains/moliboo-genesis/service.js'
 import {CredentialRegistryService} from '../auth/credentials/service.js'
 import {SecurityEventService} from '../auth/security-events/service.js'
 import {ChallengeService} from '../auth/challenges/service.js'
@@ -214,6 +215,16 @@ export class AccountService {
         metadata: {handle, emailVerificationRequired: true},
       })
     })
+
+    // MOLIBOO-GENESIS-01: a Personal Moliboo is born at registration.
+    // This runs AFTER the registration transaction commits and must NEVER
+    // fail registration: a failed birth is covered by the backfill on
+    // GET /v1/me/moliboo/genesis, which births the companion on first read.
+    try {
+      await new MolibooGenesisService(this.db).ensureGenesisForAccount(accountId)
+    } catch (error) {
+      console.error('moliboo genesis birth failed at registration; backfill will cover it', (error as Error).message)
+    }
 
     const result: {
       accountId: string

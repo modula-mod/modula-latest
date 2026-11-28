@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-27T19:37:26.300Z",
+  "capturedAt": "2026-11-28T15:15:54.253Z",
   "source": {
-    "branch": "integration/greenfield-signer-finish",
-    "headAtCapture": "7457e9017e6ccd4db220eb38ba12d96b9ef468a2",
+    "branch": "feature/moliboo-genesis-certificates",
+    "headAtCapture": "20561ad64454098c70e1c7e990038e34e64fe9fa",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "fda46241346b4939aaa0c80f7f91bc7211a6ad21e2c7e77334ce93ad92569274"
+    "apiSourceSha256": "8cd9ff65edf467e165315ec4c75bbb58b51b6b0b477e3996be4c1469edb1b67c"
   },
   "runtimeRoutes": [
     {
@@ -10315,6 +10315,154 @@
               "minLength": 1,
               "maxLength": 96,
               "pattern": "^[A-Za-z0-9._-]+$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/moliboo/genesis",
+      "path": "/v1/me/moliboo/genesis",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/moliboo/genesis",
+      "path": "/v1/me/moliboo/genesis",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/me/moliboo/genesis/name",
+      "path": "/v1/me/moliboo/genesis/name",
+      "prefix": "",
+      "schema": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/me/moliboo/certificates",
+      "path": "/v1/me/moliboo/certificates",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/me/moliboo/certificates",
+      "path": "/v1/me/moliboo/certificates",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/moliboos/certificates/:certificateId",
+      "path": "/v1/moliboos/certificates/:certificateId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "certificateId"
+          ],
+          "properties": {
+            "certificateId": {
+              "type": "string",
+              "pattern": "^MLB-CERT-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/moliboos/certificates/:certificateId",
+      "path": "/v1/moliboos/certificates/:certificateId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "certificateId"
+          ],
+          "properties": {
+            "certificateId": {
+              "type": "string",
+              "pattern": "^MLB-CERT-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/moliboo/certificates/:certificateId/signature",
+      "path": "/v1/admin/moliboo/certificates/:certificateId/signature",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "certificateId"
+          ],
+          "properties": {
+            "certificateId": {
+              "type": "string",
+              "pattern": "^MLB-CERT-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "signature",
+            "keyId"
+          ],
+          "properties": {
+            "signature": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{86}$"
+            },
+            "keyId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
             }
           }
         }
