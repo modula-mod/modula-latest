@@ -21,6 +21,8 @@ const TOTP_DIGITS = 6
 const TOTP_PERIOD_SECONDS = 30
 const TOTP_SECRET_BYTES = 20
 const TOTP_ENROLLMENT_TTL_SECONDS = 10 * 60
+const TOTP_STEP_UP_ATTEMPTS = 5
+const TOTP_STEP_UP_WINDOW_MS = 15 * 60_000
 
 const jsonb = (value: unknown) => sql<unknown>`${JSON.stringify(value)}::jsonb`
 
@@ -51,6 +53,7 @@ export class TotpService {
   private readonly credentials: CredentialRegistryService
   private readonly securityEvents: SecurityEventService
   private readonly recoveryCodes: RecoveryCodeService
+  private readonly stepUpAttempts = new Map<string, number[]>()
 
   constructor(
     private readonly db: Db,
@@ -312,6 +315,14 @@ export class TotpService {
       .where('revoked_at', 'is', null)
       .executeTakeFirst()
     if (!totp) throw authError('AUTH_METHOD_UNAVAILABLE')
+    // Same per-account limiter as password step-up: the enrollment challenge
+    // caps attempts per challenge, but step-up verification has no challenge,
+    // so without this a stolen bearer could guess 6-digit codes indefinitely.
+    const attemptNow = Date.now()
+    const recentStepUpAttempts = (this.stepUpAttempts.get(input.accountId) ?? []).filter(
+      at => attemptNow - at < TOTP_STEP_UP_WINDOW_MS,
+    )
+    if (recentStepUpAttempts.length >= TOTP_STEP_UP_ATTEMPTS) throw authError('RATE_LIMITED')
     const result = await verify({
       secret: this.decryptSecret(totp),
       token: normalizeCode(input.code),
@@ -320,7 +331,12 @@ export class TotpService {
       period: TOTP_PERIOD_SECONDS,
       epochTolerance: TOTP_PERIOD_SECONDS,
     })
-    if (!result.valid) throw authError('INVALID_CREDENTIALS')
+    if (!result.valid) {
+      recentStepUpAttempts.push(attemptNow)
+      this.stepUpAttempts.set(input.accountId, recentStepUpAttempts)
+      throw authError('INVALID_CREDENTIALS')
+    }
+    this.stepUpAttempts.delete(input.accountId)
     const now = new Date()
     await this.db.transaction().execute(async trx => {
       await trx
