@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-28T13:35:27.611Z",
+  "capturedAt": "2026-11-28T19:24:38.084Z",
   "source": {
-    "branch": "audit/totp-stepup-rate-limit",
-    "headAtCapture": "20561ad64454098c70e1c7e990038e34e64fe9fa",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "f2410d95450ddcd0ab72189e2484fbe666ed51fc62547cb4f62a5f17398f4e89"
+    "branch": "feature/intelligence-ui-server",
+    "headAtCapture": "7b5d30c7dc0cbe323a327cb4cac99dc3e9a0ce55",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "8fdcd6687c6fde6f0466f9404adc1bfd3668b522bf8c4162d24d8791996d0260"
   },
   "runtimeRoutes": [
     {
@@ -4380,6 +4380,24 @@
       "method": "HEAD",
       "url": "/v1/intelligence/missions",
       "path": "/v1/intelligence/missions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/approvals",
+      "path": "/v1/intelligence/approvals",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/approvals",
+      "path": "/v1/intelligence/approvals",
       "prefix": "",
       "schema": null,
       "config": null,

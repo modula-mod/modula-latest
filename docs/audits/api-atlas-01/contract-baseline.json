@@ -19504,6 +19504,63 @@
       "sourceContractSha256": "418cb548b04221fa1976d22bd4fe6e2e8d7851dbfaaeb1494854025044f80170"
     },
     {
+      "id": "GET /v1/intelligence/approvals",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "authenticated account id is passed into the service/repository scope",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": false,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [],
+        "query": [
+          "{status?: unknown"
+        ],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "cursor",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": true,
+          "previousCursor": false,
+          "stability": "route-specific stable ordering; inspect repository order fields"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "contract": null,
+      "sourceContractSha256": "773828859b0b1f759408c9996d09af5a9c4521d89f529ce0eff9c8e17df9d626"
+    },
+    {
       "id": "GET /v1/intelligence/missions",
       "authorization": {
         "visibility": "AUTHENTICATED",
@@ -19537,17 +19594,19 @@
       },
       "request": {
         "params": [],
-        "query": [],
+        "query": [
+          "{status?: unknown"
+        ],
         "body": [],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
         "pagination": {
-          "style": "none observed",
+          "style": "cursor",
           "defaultPageSize": null,
           "maximumPageSize": null,
-          "nextCursor": false,
+          "nextCursor": true,
           "previousCursor": false,
-          "stability": "not a list or unpaginated"
+          "stability": "route-specific stable ordering; inspect repository order fields"
         }
       },
       "response": {
@@ -19556,7 +19615,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "3376725ac0af54a8e355e75644b6172844e9dd9874524fde273a5a8504a38948"
+      "sourceContractSha256": "b10bbb2fbd55f73645a9ed659550f381924754e7b666073d1e31ad761d6482df"
     },
     {
       "id": "POST /v1/intelligence/missions",
@@ -20032,17 +20091,19 @@
       },
       "request": {
         "params": [],
-        "query": [],
+        "query": [
+          "{limit?: unknown"
+        ],
         "body": [],
         "explicitFastifySchema": false,
         "manualValidationObserved": false,
         "pagination": {
-          "style": "none observed",
+          "style": "cursor",
           "defaultPageSize": null,
           "maximumPageSize": null,
-          "nextCursor": false,
+          "nextCursor": true,
           "previousCursor": false,
-          "stability": "not a list or unpaginated"
+          "stability": "route-specific stable ordering; inspect repository order fields"
         }
       },
       "response": {
@@ -20051,7 +20112,7 @@
         "envelope": "Greenfield success/failure envelope (statically inferred)"
       },
       "contract": null,
-      "sourceContractSha256": "8085326008bc19cabf176f60e0a39aeda2aa46681a4523be2d67a342b7c5b575"
+      "sourceContractSha256": "969fc2e2494e4a459163930f2ce8ff6d06c75d7ca807da38df290dbd2d56bc9b"
     },
     {
       "id": "POST /v1/intelligence/missions/:missionId/proposals/:proposalId/execute",
