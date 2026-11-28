@@ -10283,7 +10283,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-native-endpoint-routes.ts:132",
+        "x-modula-source": "services/greenfield-api/src/app/register-native-endpoint-routes.ts:169",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
@@ -17165,7 +17165,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-native-endpoint-routes.ts:151",
+        "x-modula-source": "services/greenfield-api/src/app/register-native-endpoint-routes.ts:188",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",

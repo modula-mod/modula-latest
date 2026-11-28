@@ -356,7 +356,7 @@ This matrix distinguishes transport reachability from application authorization.
 | GET | `/v1/intelligence/missions/:missionId/ledger` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/intelligence/routes.ts:52` |
 | POST | `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/intelligence/routes.ts:94` |
 | POST | `/v1/intelligence/missions/:missionId/start` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/intelligence/routes.ts:38` |
-| GET | `/v1/intelligence/nodus/releases/latest` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:132` |
+| GET | `/v1/intelligence/nodus/releases/latest` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:169` |
 | POST | `/v1/internal/build-service/builds/:buildId/result` | no | no | no | no | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:76` |
 | POST | `/v1/internal/build-service/claims` | no | no | no | no | no | none | no | no | no | `services/greenfield-api/src/developers/routes.ts:75` |
 | GET | `/v1/internal/ssrf-check` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-routes.ts:2695` |
@@ -573,7 +573,7 @@ This matrix distinguishes transport reachability from application authorization.
 | POST | `/v1/push/voip-devices` | no | yes | no | no | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-calls-routes.ts:247` |
 | DELETE | `/v1/push/voip-devices/:registrationId` | no | yes | no | no | no | post:engage | no | no | no | `services/greenfield-api/src/app/register-calls-routes.ts:267` |
 | GET | `/v1/reels` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/app/register-routes.ts:2208` |
-| GET | `/v1/reels/:id` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:151` |
+| GET | `/v1/reels/:id` | no | yes | no | yes | no | none | no | no | no | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:188` |
 | GET | `/v1/registry/artifacts/:sha256` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/modules/routes/index.ts:461` |
 | GET | `/v1/registry/modules` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/modules/routes/index.ts:185` |
 | GET | `/v1/registry/modules/:moduleId` | yes | no | no | no | no | none | no | no | no | `services/greenfield-api/src/modules/routes/index.ts:309` |
