@@ -929,6 +929,21 @@
       "services/greenfield-api/src/domains/moderation/repository.ts#removeReportedContent"
     ]
   },
+  "POST /v1/admin/moliboo/certificates/:certificateId/signature": {
+    "reads": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_publisher_signing_keys"
+    ],
+    "writes": [
+      "greenfield_moliboo_genesis_certificates"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#applySignature"
+    ]
+  },
   "GET /v1/admin/ops/ai/executions": {
     "reads": [],
     "writes": [],
@@ -6636,6 +6651,68 @@
       "services/greenfield-api/src/premium/service.ts#setBadgeVisibility"
     ]
   },
+  "GET /v1/me/moliboo/certificates": {
+    "reads": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_moliboo_genesis_dna",
+      "greenfield_moliboo_genesis_instances"
+    ],
+    "writes": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_moliboo_genesis_dna",
+      "greenfield_moliboo_genesis_instances"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#ensureGenesisForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#getGenesisForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#listCertificatesForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#loadCompanion"
+    ]
+  },
+  "GET /v1/me/moliboo/genesis": {
+    "reads": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_moliboo_genesis_dna",
+      "greenfield_moliboo_genesis_instances"
+    ],
+    "writes": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_moliboo_genesis_dna",
+      "greenfield_moliboo_genesis_instances"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#ensureGenesisForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#getGenesisForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#loadCompanion"
+    ]
+  },
+  "POST /v1/me/moliboo/genesis/name": {
+    "reads": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_moliboo_genesis_dna",
+      "greenfield_moliboo_genesis_instances"
+    ],
+    "writes": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_moliboo_genesis_dna",
+      "greenfield_moliboo_genesis_instances"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#ensureGenesisForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#getGenesisForAccount",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#loadCompanion",
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#nameCompanion"
+    ]
+  },
   "GET /v1/me/moliboos/outfit": {
     "reads": [
       "greenfield_moliboo_characters",
@@ -8945,6 +9022,19 @@
       "services/greenfield-api/src/domains/moliboo-game/service.ts#catalogue",
       "services/greenfield-api/src/domains/moliboo-game/service.ts#claimQuest",
       "services/greenfield-api/src/domains/moliboo-game/service.ts#ownedSet"
+    ]
+  },
+  "GET /v1/moliboos/certificates/:certificateId": {
+    "reads": [
+      "greenfield_moliboo_genesis_certificates",
+      "greenfield_publisher_signing_keys"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moliboo-genesis/service.ts#verifyCertificateByRegistryId"
     ]
   },
   "GET /v1/moliboos/packs": {

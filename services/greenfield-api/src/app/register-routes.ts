@@ -73,6 +73,7 @@ import {registerPushRoutes} from './register-push-routes.js'
 import {registerMessagingRoutes} from './register-messaging-routes.js'
 import {callsCapabilities, registerCallsRoutes, type CallPolicyHooks} from './register-calls-routes.js'
 import {registerMolibooGameRoutes} from './register-moliboo-game-routes.js'
+import {registerMolibooGenesisRoutes} from './register-moliboo-genesis-routes.js'
 import {registerPremiumRoutes} from '../premium/routes.js'
 import type {PremiumAppleVerifier} from '../premium/apple-verifier.js'
 import {setPublicIdentityProjectionEnabled} from '../premium/badges.js'
@@ -2736,6 +2737,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   setPublicIdentityProjectionEnabled({premium: config.premium.enabled, verification: config.premium.verificationEnabled})
   await registerPremiumRoutes(app, db, config, {profileConfig, writeConfig}, {appleVerifier: options.premiumAppleVerifier})
   await registerMolibooGameRoutes(app, db, config, {feedConfig, writeConfig})
+  await registerMolibooGenesisRoutes(app, db, config, {feedConfig, writeConfig})
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   const publisherReleaseJobRunner = await registerPublisherConsoleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig}, options.publisherConsole)

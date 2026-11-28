@@ -1,13 +1,13 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 95 ordered up migrations, latest `095_publisher_signing_integration_completion.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 97 ordered up migrations, latest `100_moliboo_genesis_first100_seed.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 392
-- Tables with API/worker source references: 369
+- Production tables: 395
+- Tables with API/worker source references: 372
 - Orphan candidates requiring manual confirmation: 23
 - Write-only candidates: 40
 - Read-only candidates: 35
@@ -4043,6 +4043,57 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/domains/moliboo-game/service.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_moliboo_genesis_certificates`
+
+- Purpose: application state for greenfield moliboo genesis certificates
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `099_moliboo_genesis_registry.sql`
+- Routes reading: `POST /v1/admin/moliboo/certificates/:certificateId/signature`, `GET /v1/me/moliboo/certificates`, `GET /v1/me/moliboo/genesis`, `POST /v1/me/moliboo/genesis/name`, `GET /v1/moliboos/certificates/:certificateId`
+- Routes writing: `POST /v1/admin/moliboo/certificates/:certificateId/signature`, `GET /v1/me/moliboo/certificates`, `GET /v1/me/moliboo/genesis`, `POST /v1/me/moliboo/genesis/name`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-genesis/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-genesis/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_genesis_dna`
+
+- Purpose: application state for greenfield moliboo genesis dna
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `099_moliboo_genesis_registry.sql`
+- Routes reading: `GET /v1/me/moliboo/certificates`, `GET /v1/me/moliboo/genesis`, `POST /v1/me/moliboo/genesis/name`
+- Routes writing: `GET /v1/me/moliboo/certificates`, `GET /v1/me/moliboo/genesis`, `POST /v1/me/moliboo/genesis/name`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-genesis/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-genesis/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_moliboo_genesis_instances`
+
+- Purpose: application state for greenfield moliboo genesis instances
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `099_moliboo_genesis_registry.sql`
+- Routes reading: `GET /v1/me/moliboo/certificates`, `GET /v1/me/moliboo/genesis`, `POST /v1/me/moliboo/genesis/name`
+- Routes writing: `GET /v1/me/moliboo/certificates`, `GET /v1/me/moliboo/genesis`, `POST /v1/me/moliboo/genesis/name`
+- API/worker source reads: `services/greenfield-api/src/domains/moliboo-genesis/service.ts`
+- API/worker source writes: `services/greenfield-api/src/domains/moliboo-genesis/service.ts`
+- Disposition: active read/write or ledger/schema table
+
 ### `greenfield_moliboo_inventory`
 
 - Purpose: application state for greenfield moliboo inventory
@@ -4904,9 +4955,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `rotated_at`, `revoked_at`, `created_at`, `updated_at`
 - Migration introduced: `061_registry_publisher_signing_keys.sql`
-- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/registry/publishers/:publisherId/signing-keys`
+- Routes reading: `POST /v1/admin/moliboo/certificates/:certificateId/signature`, `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `GET /v1/modules/updates`, `GET /v1/moliboos/certificates/:certificateId`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/registry/publishers/:publisherId/signing-keys`
 - Routes writing: `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
-- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/publisher/signing-authority.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboo-genesis/service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/publisher/signing-authority.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
 
