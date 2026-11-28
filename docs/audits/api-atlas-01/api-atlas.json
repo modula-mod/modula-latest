@@ -1709,7 +1709,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -1808,7 +1808,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -1964,7 +1964,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -2066,7 +2066,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -3926,7 +3926,7 @@
         "sessionRequired": true,
         "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
@@ -5684,13 +5684,13 @@
       "controllerServices": [
         "repository.upsertModel"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -5700,7 +5700,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -5735,6 +5735,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -5792,13 +5793,13 @@
       "controllerServices": [
         "repository.registerPrompt"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -5808,7 +5809,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -5843,6 +5844,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -5898,13 +5900,13 @@
       "controllerServices": [
         "repository.upsertProvider"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -5914,7 +5916,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -5949,6 +5951,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -6004,13 +6007,13 @@
       "controllerServices": [
         "tools.declareTool"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -6020,7 +6023,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -6055,6 +6058,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -6942,13 +6946,13 @@
       "controllerServices": [
         "play.reviewQueue"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -6958,7 +6962,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -6990,6 +6994,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         403,
         404,
         500
@@ -7041,13 +7046,13 @@
       "controllerServices": [
         "play.decide"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -7057,7 +7062,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -7090,6 +7095,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -7581,13 +7587,13 @@
       "controllerServices": [
         "providerRuntime.diagnostics"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -7597,7 +7603,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -7629,6 +7635,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         403,
         404,
         500
@@ -7678,13 +7685,13 @@
       "controllerServices": [
         "repository.listProviders"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -7694,7 +7701,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -7726,6 +7733,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         403,
         404,
         500
@@ -7780,13 +7788,13 @@
       "controllerServices": [
         "credentials.store"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -7796,7 +7804,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -7833,6 +7841,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -7886,13 +7895,13 @@
       "controllerServices": [
         "providerRuntime.setProviderEnabled"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -7902,7 +7911,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -7937,6 +7946,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -7991,13 +8001,13 @@
       "controllerServices": [
         "providerRuntime.setProviderEnabled"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -8007,7 +8017,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -8042,6 +8052,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -8096,13 +8107,13 @@
       "controllerServices": [
         "providerRuntime.verifyProvider"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -8112,7 +8123,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -8146,6 +8157,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         403,
         404,
         500
@@ -8198,13 +8210,13 @@
       "controllerServices": [
         "providerRuntime.verifyProvider"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -8214,7 +8226,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -8251,6 +8263,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         403,
         404,
         409,
@@ -8304,13 +8317,13 @@
       "controllerServices": [
         "providerRuntime.diagnostics"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
         "visibility": "ADMIN",
-        "anonymousAllowed": true,
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": true,
@@ -8320,7 +8333,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
@@ -8352,6 +8365,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         403,
         404,
         500
@@ -11957,7 +11971,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -12288,7 +12302,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -12393,7 +12407,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -12498,7 +12512,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -12605,7 +12619,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -12718,7 +12732,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -12960,7 +12974,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -16298,7 +16312,7 @@
         "sessionRequired": true,
         "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
@@ -16519,7 +16533,7 @@
         "sessionRequired": true,
         "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
@@ -17190,7 +17204,7 @@
         "sessionRequired": true,
         "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
@@ -17411,7 +17425,7 @@
         "sessionRequired": true,
         "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
@@ -17531,7 +17545,7 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
@@ -17637,11 +17651,11 @@
         "serviceOperations": [
           "entitlements.read"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -17747,10 +17761,10 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -17847,7 +17861,7 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
@@ -17960,10 +17974,10 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18065,14 +18079,14 @@
         "serviceOperations": [
           "entitlements.read"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18175,14 +18189,14 @@
         "serviceOperations": [
           "events.publish"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18281,10 +18295,10 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18375,14 +18389,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18471,14 +18485,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18573,10 +18587,10 @@
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18681,14 +18695,14 @@
         "serviceOperations": [
           "jobs.enqueue"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18794,14 +18808,14 @@
         "serviceOperations": [
           "jobs.cancel"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -18904,14 +18918,14 @@
         "serviceOperations": [
           "jobs.execute"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19014,14 +19028,14 @@
         "serviceOperations": [
           "jobs.result"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19120,14 +19134,14 @@
         "serviceOperations": [
           "jobs.execute"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19230,14 +19244,14 @@
         "serviceOperations": [
           "jobs.execute"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19340,14 +19354,14 @@
         "serviceOperations": [
           "jobs.claim"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19448,14 +19462,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19553,14 +19567,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19681,14 +19695,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19806,14 +19820,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -19910,14 +19924,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20038,14 +20052,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20150,14 +20164,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20257,14 +20271,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20372,14 +20386,14 @@
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20486,14 +20500,14 @@
         "serviceOperations": [
           "secrets.use"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20590,14 +20604,14 @@
         "serviceOperations": [
           "entitlements.usage"
         ],
-        "moduleInstallationRequired": false,
+        "moduleInstallationRequired": true,
         "modulePermissionRequired": false,
         "ownership": {
           "rule": "service identity, product/release assertion, and declared operation are resolved server-side",
-          "accountScoped": false,
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -20926,12 +20940,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -21048,12 +21062,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -21180,12 +21194,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -21312,12 +21326,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -21444,12 +21458,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -21575,12 +21589,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -21848,12 +21862,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -27217,12 +27231,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -29480,13 +29494,13 @@
       "controllerServices": [
         "play.listSubmissions"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -29495,12 +29509,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -29528,6 +29542,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -29579,13 +29594,13 @@
       "controllerServices": [
         "play.submit"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -29594,12 +29609,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -29628,6 +29643,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -29692,13 +29708,13 @@
       "controllerServices": [
         "play.withdraw"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -29707,12 +29723,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -29741,6 +29757,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -35673,13 +35690,13 @@
       "controllerServices": [
         "play.capabilities"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -35688,12 +35705,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -35721,6 +35738,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -36210,7 +36228,7 @@
           "accountScoped": false,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "downstream-or-none"
         }
       },
@@ -36518,13 +36536,13 @@
       "controllerServices": [
         "play.listLobbies"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -36533,12 +36551,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -36566,6 +36584,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -36621,13 +36640,13 @@
       "controllerServices": [
         "play.createLobby"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -36636,12 +36655,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -36670,6 +36689,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -36737,13 +36757,13 @@
       "controllerServices": [
         "play.startSession"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -36752,12 +36772,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -36786,6 +36806,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -36951,13 +36972,13 @@
       "controllerServices": [
         "play.library"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -36966,12 +36987,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -36999,6 +37020,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -37050,13 +37072,13 @@
       "controllerServices": [
         "play.removeLibraryItem"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37065,12 +37087,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37099,6 +37121,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -37152,13 +37175,13 @@
       "controllerServices": [
         "play.upsertLibraryItem"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37167,12 +37190,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37201,6 +37224,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -37258,13 +37282,13 @@
       "controllerServices": [
         "play.getLobby"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37273,12 +37297,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37306,6 +37330,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -37361,13 +37386,13 @@
       "controllerServices": [
         "play.joinLobby"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37376,12 +37401,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37410,6 +37435,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -37472,13 +37498,13 @@
       "controllerServices": [
         "play.leaveLobby"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37487,12 +37513,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37521,6 +37547,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -37577,13 +37604,13 @@
       "controllerServices": [
         "play.setReady"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37592,12 +37619,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37626,6 +37653,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -37694,13 +37722,13 @@
         "socket.send",
         "socketAuth.get"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37742,6 +37770,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -37793,13 +37822,13 @@
       "controllerServices": [
         "play.startLobby"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37808,12 +37837,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37842,6 +37871,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -37901,13 +37931,13 @@
       "controllerServices": [
         "play.joinLobby"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -37916,12 +37946,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -37950,6 +37980,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -38010,13 +38041,13 @@
       "controllerServices": [
         "play.myAchievements"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -38025,12 +38056,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -38058,6 +38089,7 @@
         200
       ],
       "expectedErrors": [
+        401,
         404,
         500
       ],
@@ -38429,13 +38461,13 @@
       "controllerServices": [
         "play.unlockAchievement"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -38444,12 +38476,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -38478,6 +38510,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -38532,13 +38565,13 @@
       "controllerServices": [
         "play.endSession"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -38547,12 +38580,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -38581,6 +38614,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -38634,13 +38668,13 @@
       "controllerServices": [
         "play.heartbeat"
       ],
-      "authentication": "none",
+      "authentication": "greenfield bearer access session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
@@ -38649,12 +38683,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -38683,6 +38717,7 @@
       ],
       "expectedErrors": [
         400,
+        401,
         404,
         409,
         500
@@ -40888,7 +40923,7 @@
           "accountScoped": false,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -41382,12 +41417,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -41486,12 +41521,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -41595,12 +41630,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -45549,17 +45584,19 @@
         "socket.send",
         "socketAuth.get"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
@@ -45597,6 +45634,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -46829,7 +46868,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -46974,7 +47013,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -47122,7 +47161,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -47272,7 +47311,7 @@
           "accountScoped": false,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -47414,7 +47453,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -47560,7 +47599,7 @@
           "accountScoped": false,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -47701,7 +47740,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -47850,7 +47889,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -48464,7 +48503,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -48619,7 +48658,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -48931,7 +48970,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -49240,7 +49279,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -50148,7 +50187,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -50302,7 +50341,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -50485,7 +50524,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -50636,7 +50675,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -50798,7 +50837,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -50953,7 +50992,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -51105,7 +51144,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -51266,7 +51305,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -54988,7 +55027,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -55132,7 +55171,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -55432,7 +55471,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -55606,7 +55645,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -56210,7 +56249,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -56352,7 +56391,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -56503,7 +56542,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -56644,7 +56683,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -56795,7 +56834,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -56967,7 +57006,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -57127,7 +57166,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -57272,7 +57311,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -57411,7 +57450,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -58053,7 +58092,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -58263,27 +58302,29 @@
       "controllerServices": [
         "game.completeActivity"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58312,6 +58353,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -58376,27 +58419,29 @@
       "controllerServices": [
         "game.listItems"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58424,6 +58469,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -58480,27 +58527,29 @@
       "controllerServices": [
         "game.listOutfitSets"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58528,6 +58577,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -58584,27 +58635,29 @@
       "controllerServices": [
         "game.care"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58633,6 +58686,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -58703,27 +58758,29 @@
       "controllerServices": [
         "game.equip"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58752,6 +58809,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -58823,27 +58882,29 @@
       "controllerServices": [
         "game.useSkill"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58872,6 +58933,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -58942,27 +59005,29 @@
       "controllerServices": [
         "game.characterState"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -58990,6 +59055,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -59049,27 +59116,29 @@
       "controllerServices": [
         "game.inventory"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59097,6 +59166,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -59155,27 +59226,29 @@
       "controllerServices": [
         "game.listSavedOutfits"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59203,6 +59276,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -59254,27 +59329,29 @@
       "controllerServices": [
         "game.saveOutfit"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59303,6 +59380,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -59370,27 +59449,29 @@
       "controllerServices": [
         "game.deleteOutfit"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59419,6 +59500,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -59472,27 +59555,29 @@
       "controllerServices": [
         "game.updateOutfit"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59521,6 +59606,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -59585,27 +59672,29 @@
       "controllerServices": [
         "game.quests"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "social:read"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59633,6 +59722,8 @@
         200
       ],
       "expectedErrors": [
+        401,
+        403,
         404,
         500
       ],
@@ -59688,27 +59779,29 @@
       "controllerServices": [
         "game.claimQuest"
       ],
-      "authentication": "none",
+      "authentication": "legacy or bridged bearer session",
       "authorization": {
-        "visibility": "PUBLIC",
-        "anonymousAllowed": true,
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
         "optionalSession": false,
-        "sessionRequired": false,
-        "sessionKind": "none",
+        "sessionRequired": true,
+        "sessionKind": "legacy or bridged bearer session",
         "serviceAssertionRequired": false,
         "verifiedEmailRequired": false,
         "adminRequired": false,
-        "capabilities": [],
+        "capabilities": [
+          "profile:update"
+        ],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -59737,6 +59830,8 @@
       ],
       "expectedErrors": [
         400,
+        401,
+        403,
         404,
         409,
         500
@@ -66482,12 +66577,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -66592,12 +66687,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -66705,12 +66800,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -66813,12 +66908,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -66923,12 +67018,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67034,12 +67129,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67139,12 +67234,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67248,12 +67343,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67349,12 +67444,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67454,12 +67549,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67554,12 +67649,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67659,12 +67754,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67766,12 +67861,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67872,12 +67967,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -67970,12 +68065,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -68604,12 +68699,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -68707,12 +68802,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -68816,12 +68911,12 @@
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "not evident in the route handler; inspect downstream service",
-          "accountScoped": false,
-          "actorScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": true,
           "workspaceScoped": false,
           "parameterizedResource": true,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -69384,7 +69479,7 @@
           "accountScoped": false,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "downstream-or-none"
         }
       },
@@ -69517,7 +69612,7 @@
           "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "route-handler"
         }
       },
@@ -69639,7 +69734,7 @@
           "accountScoped": false,
           "actorScoped": false,
           "workspaceScoped": false,
-          "parameterizedResource": false,
+          "parameterizedResource": true,
           "evidenceStrength": "downstream-or-none"
         }
       },
@@ -71982,7 +72077,7 @@
       "authorization": {
         "visibility": "PUBLIC",
         "anonymousAllowed": true,
-        "optionalSession": false,
+        "optionalSession": true,
         "sessionRequired": false,
         "sessionKind": "none",
         "serviceAssertionRequired": false,
@@ -72817,7 +72912,7 @@
       "authorization": {
         "visibility": "PUBLIC",
         "anonymousAllowed": true,
-        "optionalSession": false,
+        "optionalSession": true,
         "sessionRequired": false,
         "sessionKind": "none",
         "serviceAssertionRequired": false,
@@ -73229,19 +73324,19 @@
         "sessionRequired": false,
         "sessionKind": "none",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,
@@ -73976,19 +74071,19 @@
         "sessionRequired": false,
         "sessionKind": "none",
         "serviceAssertionRequired": false,
-        "verifiedEmailRequired": false,
+        "verifiedEmailRequired": true,
         "adminRequired": false,
         "capabilities": [],
         "serviceOperations": [],
         "moduleInstallationRequired": false,
         "modulePermissionRequired": false,
         "ownership": {
-          "rule": "public/optional-viewer policy; downstream visibility checks must enforce privacy",
-          "accountScoped": false,
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
           "actorScoped": false,
           "workspaceScoped": false,
           "parameterizedResource": false,
-          "evidenceStrength": "downstream-or-none"
+          "evidenceStrength": "route-handler"
         }
       },
       "rateLimit": null,

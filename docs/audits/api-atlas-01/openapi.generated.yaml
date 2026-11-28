@@ -929,10 +929,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:235",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ai/prompts": {
@@ -949,10 +954,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:239",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ai/providers": {
@@ -969,10 +979,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:231",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ai/tools": {
@@ -989,10 +1004,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:243",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/commerce/entitlements": {
@@ -1258,10 +1278,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:121",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/gubic/submissions/{submissionId}/decision": {
@@ -1285,10 +1310,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:122",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/moderation/reports": {
@@ -1424,10 +1454,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:282",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/providers": {
@@ -1444,10 +1479,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:247",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/providers/{providerId}/credentials": {
@@ -1471,10 +1511,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:271",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/providers/{providerId}/disable": {
@@ -1498,10 +1543,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:263",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/providers/{providerId}/enable": {
@@ -1525,10 +1575,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:267",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/providers/{providerId}/health": {
@@ -1552,10 +1607,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:251",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/providers/{providerId}/verify": {
@@ -1579,10 +1639,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:255",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/ai/usage": {
@@ -1599,10 +1664,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/ai/routes.ts:286",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/admin/ops/atproto/connections/{connectionId}/revoke": {
@@ -7340,10 +7410,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:119",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
         "operationId": "post_v1_developer_gubic_submissions",
@@ -7358,10 +7433,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:118",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/developer/gubic/submissions/{submissionId}/withdraw": {
@@ -7385,10 +7465,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:120",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/developer/organisations": {
@@ -8989,10 +9074,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:51",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/categories": {
@@ -9189,10 +9279,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:69",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
         "operationId": "post_v1_gubic_games_gameId_lobbies",
@@ -9214,10 +9309,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:70",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/games/{gameId}/sessions": {
@@ -9241,10 +9341,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:57",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/games/{gameId}/versions": {
@@ -9288,10 +9393,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:53",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/library/{gameId}": {
@@ -9315,10 +9425,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:55",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "put": {
         "operationId": "put_v1_gubic_library_gameId",
@@ -9340,10 +9455,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:54",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/{lobbyId}": {
@@ -9367,10 +9487,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:72",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/{lobbyId}/join": {
@@ -9394,10 +9519,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:73",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/{lobbyId}/leave": {
@@ -9421,10 +9551,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:74",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/{lobbyId}/ready": {
@@ -9448,10 +9583,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:75",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/{lobbyId}/socket": {
@@ -9475,10 +9615,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:84",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/{lobbyId}/start": {
@@ -9502,10 +9647,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:76",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/lobbies/join": {
@@ -9522,10 +9672,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:71",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/me/achievements": {
@@ -9542,10 +9697,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:67",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/my-games": {
@@ -9647,10 +9807,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:60",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/sessions/{sessionId}/end": {
@@ -9674,10 +9839,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:59",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/gubic/sessions/{sessionId}/heartbeat": {
@@ -9701,10 +9871,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/gubic/routes.ts:58",
-        "x-modula-auth": "none",
+        "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/hashtags/suggest": {
@@ -11597,10 +11772,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-messaging-routes.ts:502",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/meta": {
@@ -14594,10 +14774,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:64",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/catalogue/items": {
@@ -14614,10 +14799,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:50",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/catalogue/outfits": {
@@ -14634,10 +14824,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:51",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/characters/{characterId}/care": {
@@ -14661,10 +14856,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:61",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/characters/{characterId}/equip": {
@@ -14688,10 +14888,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:60",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/characters/{characterId}/skills/{skillId}/use": {
@@ -14721,10 +14926,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:62",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/characters/{characterId}/state": {
@@ -14748,10 +14958,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:59",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/inventory": {
@@ -14768,10 +14983,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:52",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/outfits": {
@@ -14788,10 +15008,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:54",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
         "operationId": "post_v1_moliboo_outfits",
@@ -14806,10 +15031,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:55",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/outfits/{outfitId}": {
@@ -14833,10 +15063,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:57",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "patch": {
         "operationId": "patch_v1_moliboo_outfits_outfitId",
@@ -14858,10 +15093,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:56",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/quests": {
@@ -14878,10 +15118,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:65",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboo/quests/{questId}/claim": {
@@ -14905,10 +15150,15 @@
           }
         },
         "x-modula-source": "services/greenfield-api/src/app/register-moliboo-game-routes.ts:66",
-        "x-modula-auth": "none",
+        "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing",
-        "x-modula-contract": null
+        "x-modula-contract": null,
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/v1/moliboos/packs": {
