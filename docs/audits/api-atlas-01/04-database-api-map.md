@@ -1,14 +1,14 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 94 ordered up migrations, latest `094_messaging_expiry_index_concurrently.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 98 ordered up migrations, latest `098_messaging_expiry_index_concurrently.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 393
+- Production tables: 402
 - Tables with API/worker source references: 379
-- Orphan candidates requiring manual confirmation: 14
+- Orphan candidates requiring manual confirmation: 23
 - Write-only candidates: 40
 - Read-only candidates: 35
 
@@ -1163,7 +1163,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -1180,7 +1180,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -3101,7 +3101,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -3135,7 +3135,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -3256,9 +3256,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `POST /v1/module-runtime/actions/:targetModuleId/:actionId/:version`, `POST /v1/modules/:moduleId/functions/:functionId/:version/invoke`, `POST /v1/modules/:moduleId/host-function-requests/:requestId/complete`, `DELETE /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/uninstall-preview`, `GET /v1/modules/contributions`
-- Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/verify`
+- Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`
 - API/worker source reads: `services/greenfield-api/src/modules/contribution-service.ts`, `services/greenfield-api/src/modules/governed-function-service.ts`, `services/greenfield-api/src/modules/inter-module-action-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-worker/src/modules/contribution-registration-handler.ts`, `services/greenfield-worker/src/modules/schema-registration-handler.ts`
-- API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-worker/src/modules/contribution-registration-handler.ts`, `services/greenfield-worker/src/modules/schema-registration-handler.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/registry-authority-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-worker/src/modules/contribution-registration-handler.ts`, `services/greenfield-worker/src/modules/schema-registration-handler.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_data_retention`
@@ -3482,6 +3482,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: WRITE-ONLY CANDIDATE
 
+### `greenfield_module_quarantine_events`
+
+- Purpose: module registry/runtime state
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `093_publisher_release_governance_integrity.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
 ### `greenfield_module_quarantines`
 
 - Purpose: module registry/runtime state
@@ -3493,9 +3510,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `created_at`, `lifted_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`
-- Routes writing: `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/verify`
-- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/signature`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`
+- Routes writing: `POST /v1/admin/registry/releases/:releaseId/verify`
+- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-authority-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3716,7 +3733,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `POST /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install-plan`, `GET /v1/modules/:moduleId/installation-descriptor`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/rollback`, `POST /v1/modules/:moduleId/update`, `POST /v1/modules/:moduleId/update-plan`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/versions`, `GET /v1/registry/releases/:releaseId/descriptor`
 - Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`
-- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-authority-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3731,8 +3748,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Soft delete: none
 - Timestamps: `published_at`, `quarantined_at`, `revoked_at`, `superseded_at`, `created_at`, `updated_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
-- Routes reading: `POST /v1/admin/gubic/games/:gameId/review`, `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `GET /v1/gubic/categories`, `GET /v1/gubic/featured`, `GET /v1/gubic/games`, `GET /v1/gubic/games/:gameId`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/games/:gameId/versions`, `GET /v1/gubic/my-games`, `GET /v1/gubic/new-releases`, `GET /v1/gubic/publishers/:publisherId`, `GET /v1/module-host/:targetProductId/composition`, `POST /v1/modules/:moduleId/ai/requests`, `GET /v1/modules/:moduleId/backend`, `POST /v1/modules/:moduleId/backend/disable`, `POST /v1/modules/:moduleId/backend/discover`, `POST /v1/modules/:moduleId/backend/health`, `POST /v1/modules/:moduleId/disable`, `POST /v1/modules/:moduleId/enable`, `DELETE /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install`, `GET /v1/modules/:moduleId/install-descriptor`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/permissions/review`, `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `POST /v1/modules/:moduleId/rollback`, `GET /v1/modules/:moduleId/runtime`, `POST /v1/modules/:moduleId/services/:serviceId/invoke`, `POST /v1/modules/:moduleId/uninstall-preview`, `POST /v1/modules/:moduleId/update`, `GET /v1/modules/contributions`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/installed`, `GET /v1/modules/installed/:moduleId`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/providers/:capabilityRole`, `PUT /v1/providers/:capabilityRole/default`, `GET /v1/providers/:capabilityRole/resolve`, `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/signing-identities`, `GET /v1/publisher/modules/:moduleId/versions`, `POST /v1/publisher/release-jobs/:jobId/publish`, `POST /v1/publisher/release-jobs/:jobId/resume`, `GET /v1/registry/artifacts/:sha256`, `GET /v1/registry/modules`, `GET /v1/registry/modules/:moduleId`, `PUT /v1/registry/modules/:moduleId/rating`, `GET /v1/registry/modules/:moduleId/versions`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products`, `GET /v1/registry/products/:productId`, `GET /v1/registry/products/:productId/relationships`, `GET /v1/registry/releases/:releaseId/artifact`, `GET /v1/registry/releases/:releaseId/assets/:assetId`, `GET /v1/registry/releases/:releaseId/descriptor`
-- Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/quarantine`, `POST /v1/admin/registry/releases/:releaseId/revoke`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `POST /v1/admin/registry/sync`
+- Routes reading: `POST /v1/admin/gubic/games/:gameId/review`, `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `GET /v1/admin/registry/artifacts/orphans`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/developer/gubic/games/:gameId`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `GET /v1/gubic/categories`, `GET /v1/gubic/featured`, `GET /v1/gubic/games`, `GET /v1/gubic/games/:gameId`, `GET /v1/gubic/games/:gameId/eligibility`, `POST /v1/gubic/games/:gameId/install-plan`, `GET /v1/gubic/games/:gameId/versions`, `GET /v1/gubic/my-games`, `GET /v1/gubic/new-releases`, `GET /v1/gubic/publishers/:publisherId`, `GET /v1/module-host/:targetProductId/composition`, `POST /v1/modules/:moduleId/ai/requests`, `GET /v1/modules/:moduleId/backend`, `POST /v1/modules/:moduleId/backend/disable`, `POST /v1/modules/:moduleId/backend/discover`, `POST /v1/modules/:moduleId/backend/health`, `POST /v1/modules/:moduleId/disable`, `POST /v1/modules/:moduleId/enable`, `DELETE /v1/modules/:moduleId/install`, `POST /v1/modules/:moduleId/install`, `GET /v1/modules/:moduleId/install-descriptor`, `POST /v1/modules/:moduleId/install-plan`, `POST /v1/modules/:moduleId/install-preview`, `POST /v1/modules/:moduleId/package-install-plan`, `POST /v1/modules/:moduleId/permissions/review`, `DELETE /v1/modules/:moduleId/record-shares/:shareId`, `PATCH /v1/modules/:moduleId/record-shares/:shareId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection/:recordId/media`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId/media/:bindingId`, `PUT /v1/modules/:moduleId/records/:collection/:recordId/media/order`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/records/:collection/:recordId/shares`, `POST /v1/modules/:moduleId/rollback`, `GET /v1/modules/:moduleId/runtime`, `POST /v1/modules/:moduleId/services/:serviceId/invoke`, `POST /v1/modules/:moduleId/uninstall-preview`, `POST /v1/modules/:moduleId/update`, `GET /v1/modules/contributions`, `PATCH /v1/modules/installations/:installationId/update-policy`, `GET /v1/modules/installed`, `GET /v1/modules/installed/:moduleId`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`, `GET /v1/providers/:capabilityRole`, `PUT /v1/providers/:capabilityRole/default`, `GET /v1/providers/:capabilityRole/resolve`, `GET /v1/publisher/modules`, `GET /v1/publisher/modules/:moduleId`, `GET /v1/publisher/modules/:moduleId/github-releases`, `GET /v1/publisher/modules/:moduleId/release-jobs`, `POST /v1/publisher/modules/:moduleId/release-jobs`, `GET /v1/publisher/modules/:moduleId/signing-identities`, `GET /v1/publisher/modules/:moduleId/versions`, `POST /v1/publisher/release-jobs/:jobId/publish`, `POST /v1/publisher/release-jobs/:jobId/resume`, `GET /v1/registry/artifacts/:sha256`, `GET /v1/registry/modules`, `GET /v1/registry/modules/:moduleId`, `PUT /v1/registry/modules/:moduleId/rating`, `GET /v1/registry/modules/:moduleId/versions`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products`, `GET /v1/registry/products/:productId`, `GET /v1/registry/products/:productId/relationships`, `GET /v1/registry/releases/:releaseId/artifact`, `GET /v1/registry/releases/:releaseId/assets/:assetId`, `GET /v1/registry/releases/:releaseId/descriptor`
+- Routes writing: `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/releases/:releaseId/verify`, `POST /v1/admin/registry/sync`
 - API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/modules/artifact-closure-service.ts`, `services/greenfield-api/src/modules/contribution-service.ts`, `services/greenfield-api/src/modules/dependency-resolver.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/gubic-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/installation-service.ts`, `services/greenfield-api/src/modules/legacy-upgrade-progress.ts`, `services/greenfield-api/src/modules/marketplace-service.ts`, `services/greenfield-api/src/modules/media-binding-service.ts`, `services/greenfield-api/src/modules/permission-reconciliation-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-api/src/modules/record-sharing-service.ts`, `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/runtime-access.ts`, `services/greenfield-api/src/modules/runtime2-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-api/src/providers/service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`, `services/greenfield-worker/src/modules/disable-handler.ts`, `services/greenfield-worker/src/modules/enable-handler.ts`, `services/greenfield-worker/src/modules/installation-handler.ts`, `services/greenfield-worker/src/modules/standard2-runtime-registration.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`, `services/greenfield-worker/src/modules/update-handler.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/module-projector.ts`, `services/greenfield-worker/src/search/module-release-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/github-release-sync-service.ts`, `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: active read/write or ledger/schema table
@@ -3766,7 +3783,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Timestamps: `created_at`
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `POST /v1/admin/qa/moliboos/packs/:packId/restore`, `POST /v1/admin/qa/moliboos/packs/:packId/withdraw`, `GET /v1/modules/updates`, `GET /v1/moliboos/packs`, `GET /v1/moliboos/packs/:packId/download`, `GET /v1/moliboos/packs/:packId/manifest`, `GET /v1/moliboos/packs/catalog.json`
-- Routes writing: `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `POST /v1/admin/registry/releases/:releaseId/revoke`
+- Routes writing: `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - API/worker source reads: `services/greenfield-api/src/domains/comments/sticker-service.ts`, `services/greenfield-api/src/domains/moliboos/service.ts`, `services/greenfield-api/src/modules/distribution-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
@@ -4706,6 +4723,57 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/product-standard/ingest-service.ts`
 - Disposition: WRITE-ONLY CANDIDATE
 
+### `greenfield_publication_failure_events`
+
+- Purpose: application state for greenfield publication failure events
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `095_publisher_signing_integration_completion.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
+### `greenfield_publisher_identity_lifecycle_transitions`
+
+- Purpose: application state for greenfield publisher identity lifecycle transitions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `094_publisher_signing_governance_hardening.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
+### `greenfield_publisher_identity_registration_transitions`
+
+- Purpose: application state for greenfield publisher identity registration transitions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `093_publisher_release_governance_integrity.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
 ### `greenfield_publisher_namespaces`
 
 - Purpose: application state for greenfield publisher namespaces
@@ -4719,7 +4787,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `POST /v1/developer/products`, `POST /v1/developer/publishers/:publisherId/namespaces`
 - Routes writing: `POST /v1/admin/developer/namespaces/:namespace/verify`, `POST /v1/admin/registry/publishers/:publisherId/revoke`, `POST /v1/developer/publishers/:publisherId/namespaces`
-- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/signing-authority.ts`
+- API/worker source reads: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/signing-authority.ts`, `services/greenfield-api/src/publisher/signing-identity-service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4757,6 +4825,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_publisher_release_authority_principals`
+
+- Purpose: application state for greenfield publisher release authority principals
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `092_publisher_release_runner_boundary.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
 ### `greenfield_publisher_release_job_logs`
 
 - Purpose: application state for greenfield publisher release job logs
@@ -4790,6 +4875,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source reads: `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - API/worker source writes: `services/greenfield-api/src/publisher/release-job-core.ts`, `services/greenfield-api/src/publisher/release-job-processor.ts`, `services/greenfield-api/src/publisher/release-job-service.ts`
 - Disposition: active read/write or ledger/schema table
+
+### `greenfield_publisher_release_signing_claims`
+
+- Purpose: application state for greenfield publisher release signing claims
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `092_publisher_release_runner_boundary.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
 
 ### `greenfield_publisher_signing_audit_events`
 
@@ -4842,6 +4944,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source writes: `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
 
+### `greenfield_publisher_signing_key_lifecycle_transitions`
+
+- Purpose: application state for greenfield publisher signing key lifecycle transitions
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `094_publisher_signing_governance_hardening.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
 ### `greenfield_publisher_signing_keys`
 
 - Purpose: application state for greenfield publisher signing keys
@@ -4886,7 +5005,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -5045,6 +5164,40 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source reads: `services/greenfield-api/src/accounts/recovery.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`
 - Disposition: active read/write or ledger/schema table
+
+### `greenfield_registry_authority_events`
+
+- Purpose: application state for greenfield registry authority events
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `095_publisher_signing_integration_completion.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+
+### `greenfield_release_approval_decisions`
+
+- Purpose: module release artifact state
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `095_publisher_signing_integration_completion.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: none observed
+- API/worker source writes: none observed
+- Disposition: ORPHAN CANDIDATE — no static API/worker reference
 
 ### `greenfield_release_artifact_signatures`
 
@@ -5294,7 +5447,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -5311,7 +5464,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `093_messaging_features_4.sql`
+- Migration introduced: `097_messaging_features_4.sql`
 - Routes reading: none observed
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/features4.ts`
@@ -5481,7 +5634,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `092_social_gaps_v1.sql`
+- Migration introduced: `096_social_gaps_v1.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/media/stories/:mediaFile`, `GET /v1/profiles/:handle/highlights`, `POST /v1/stories/highlights`, `GET /v1/stories/highlights/:highlightId`, `PATCH /v1/stories/highlights/:highlightId`
 - Routes writing: `POST /v1/stories/highlights`, `PATCH /v1/stories/highlights/:highlightId`
 - API/worker source reads: `services/greenfield-api/src/domains/stories/social.ts`
@@ -5498,7 +5651,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `092_social_gaps_v1.sql`
+- Migration introduced: `096_social_gaps_v1.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/media/stories/:mediaFile`, `GET /v1/profiles/:handle/highlights`, `POST /v1/stories/highlights`, `GET /v1/stories/highlights/:highlightId`, `PATCH /v1/stories/highlights/:highlightId`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/stories/highlights`, `DELETE /v1/stories/highlights/:highlightId`, `PATCH /v1/stories/highlights/:highlightId`
 - API/worker source reads: `services/greenfield-api/src/domains/stories/social.ts`
@@ -5532,7 +5685,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Unique constraints: none observed
 - Soft delete: none
 - Timestamps: none observed
-- Migration introduced: `092_social_gaps_v1.sql`
+- Migration introduced: `096_social_gaps_v1.sql`
 - Routes reading: `GET /v1/stories/:groupId`, `DELETE /v1/stories/items/:itemId/reaction`, `PUT /v1/stories/items/:itemId/reaction`, `GET /v1/stories/items/:itemId/reactions`, `GET /v1/stories/items/:itemId/viewers`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `DELETE /v1/stories/items/:itemId/reaction`, `PUT /v1/stories/items/:itemId/reaction`
 - API/worker source reads: `services/greenfield-api/src/domains/stories/social.ts`
@@ -6705,8 +6858,17 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - `greenfield_connector_providers`
 - `greenfield_event_schema_registry`
 - `greenfield_extension_entity_metadata`
+- `greenfield_module_quarantine_events`
 - `greenfield_module_sync_sources`
 - `greenfield_notification_batches`
+- `greenfield_publication_failure_events`
+- `greenfield_publisher_identity_lifecycle_transitions`
+- `greenfield_publisher_identity_registration_transitions`
+- `greenfield_publisher_release_authority_principals`
+- `greenfield_publisher_release_signing_claims`
+- `greenfield_publisher_signing_key_lifecycle_transitions`
+- `greenfield_registry_authority_events`
+- `greenfield_release_approval_decisions`
 - `greenfield_schema_versions`
 - `intelligence_circuit_revisions`
 - `intelligence_circuits`

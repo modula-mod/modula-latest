@@ -213,21 +213,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 395,
+      "line": 410,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 423,
+      "line": 438,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 425,
+      "line": 440,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -483,6 +483,118 @@
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/publication-authority-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_PUBLICATION_AUTHORITY_DATABASE_URL is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-approver-main.ts",
+      "line": 11,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_RELEASE_APPROVER_DATABASE_URL is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 12,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_SIGNING_RUNNER_DATABASE_URL is required for the signing-only runner')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 14,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!signingProvider) throw new Error('A configured Vault Transit signing provider is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 51,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Release approver returned an inconsistent candidate digest')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 75,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (args.length !== 2) throw new Error('Usage: publisher:release-approver <job-id> <candidate-sha256>')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 83,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('MODULA_RELEASE_APPROVAL_DECISION_SOURCE must be GOVERNANCE_DECISION or AUTOMATED_TEST_POLICY')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 86,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Automated test release approval is restricted to NODE_ENV=test')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 94,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!/^prj_[0-9a-f-]{36}$/.test(jobId)) throw new Error('Release approval job ID is malformed')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 95,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!/^[0-9a-f]{64}$/.test(candidateSha256)) throw new Error('Release approval candidate SHA-256 is malformed')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 102,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`${label} must contain 3 to 240 safe reference characters`)"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-signing-runner.ts",
+      "line": 64,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (options.workerId.length < 3 || options.workerId.length > 240) throw new Error('Signing runner worker ID must contain 3 to 240 characters')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/signing-identity-service.ts",
+      "line": 229,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/signing-identity-service.ts",
+      "line": 253,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no rotated identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/signing-identity-service.ts",
+      "line": 263,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (result.rows[0]?.identity_id !== identityId) throw new Error('Signing identity authority returned an inconsistent identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/trust-verifier-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_TRUST_VERIFIER_DATABASE_URL is required')"
     },
     {
       "file": "services/greenfield-api/src/runtime/session-store.ts",
@@ -2420,21 +2532,21 @@
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 395,
+      "line": 410,
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 423,
+      "line": 438,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",
-      "line": 425,
+      "line": 440,
       "marker": "placeholder",
       "classification": "configuration-safety-guard",
       "excerpt": "refuse('placeholder database credentials are not allowed')"
@@ -2690,6 +2802,118 @@
       "marker": "placeholder",
       "classification": "contract-or-ui-placeholder-field",
       "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/publication-authority-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_PUBLICATION_AUTHORITY_DATABASE_URL is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-approver-main.ts",
+      "line": 11,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_RELEASE_APPROVER_DATABASE_URL is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 12,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_SIGNING_RUNNER_DATABASE_URL is required for the signing-only runner')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/release-job-runner-main.ts",
+      "line": 14,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!signingProvider) throw new Error('A configured Vault Transit signing provider is required')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 51,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Release approver returned an inconsistent candidate digest')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 75,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (args.length !== 2) throw new Error('Usage: publisher:release-approver <job-id> <candidate-sha256>')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 83,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('MODULA_RELEASE_APPROVAL_DECISION_SOURCE must be GOVERNANCE_DECISION or AUTOMATED_TEST_POLICY')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 86,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Automated test release approval is restricted to NODE_ENV=test')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 94,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!/^prj_[0-9a-f-]{36}$/.test(jobId)) throw new Error('Release approval job ID is malformed')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 95,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!/^[0-9a-f]{64}$/.test(candidateSha256)) throw new Error('Release approval candidate SHA-256 is malformed')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-release-approver.ts",
+      "line": 102,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`${label} must contain 3 to 240 safe reference characters`)"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/restricted-signing-runner.ts",
+      "line": 64,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (options.workerId.length < 3 || options.workerId.length > 240) throw new Error('Signing runner worker ID must contain 3 to 240 characters')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/signing-identity-service.ts",
+      "line": 229,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/signing-identity-service.ts",
+      "line": 253,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!identityId?.startsWith('psi_')) throw new Error('Signing identity authority returned no rotated identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/signing-identity-service.ts",
+      "line": 263,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (result.rows[0]?.identity_id !== identityId) throw new Error('Signing identity authority returned an inconsistent identity')"
+    },
+    {
+      "file": "services/greenfield-api/src/publisher/trust-verifier-main.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!databaseUrl) throw new Error('MODULA_TRUST_VERIFIER_DATABASE_URL is required')"
     },
     {
       "file": "services/greenfield-api/src/runtime/session-store.ts",
