@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import {describe, expect, it} from 'vitest'
 import {
   nativeEndpointOptionsFromEnv,
+  nodusReleaseDescriptorProblem,
   parseNodusReleaseDescriptor,
   registerNativeEndpointRoutes,
 } from '../src/app/register-native-endpoint-routes.js'
@@ -128,5 +129,47 @@ describe('GF native endpoints: GET /v1/reels/:id (no database)', () => {
       expect(res.json()).toMatchObject({ok: false, error: {code: 'VALIDATION_FAILED'}})
     }
     await app.close()
+  })
+})
+describe('GF native endpoints: Nodus release descriptor problems (operator-facing reasons)', () => {
+  it('returns null for a valid descriptor', () => {
+    expect(nodusReleaseDescriptorProblem(JSON.stringify(validDescriptor))).toBeNull()
+  })
+
+  it('names the first problem for each invalid shape', () => {
+    const first = validDescriptor.files[0]!
+    const cases: [unknown, RegExp][] = [
+      [undefined, /unset or blank/],
+      ['not json', /not valid JSON/],
+      [[], /must be a JSON object/],
+      [{...validDescriptor, schemaVersion: 2}, /schemaVersion must be 1/],
+      [{...validDescriptor, nodusVersion: ''}, /nodusVersion/],
+      [{...validDescriptor, artifactHash: 'sha256:XYZ'}, /artifactHash/],
+      [{...validDescriptor, manifestURL: 'http://cdn.example.test/m.json'}, /manifestURL/],
+      [{...validDescriptor, manifestSHA256: hex('B')}, /manifestSHA256/],
+      [{...validDescriptor, files: []}, /files must be a non-empty array/],
+      [{...validDescriptor, files: [{...first, path: '../escape'}]}, /files\[0\]\.path must be a safe relative path/],
+      [{...validDescriptor, files: [first, first]}, /duplicated/],
+      [{...validDescriptor, files: [{...first, url: 'http://cdn.example.test/a'}]}, /files\[0\]\.url/],
+      [{...validDescriptor, files: [{...first, sha256: 'zz'}]}, /files\[0\]\.sha256/],
+      [{...validDescriptor, files: [{...first, bytes: 0}]}, /files\[0\]\.bytes/],
+    ]
+    for (const [descriptor, pattern] of cases) {
+      const raw = typeof descriptor === 'string' || descriptor === undefined ? (descriptor as string | undefined) : JSON.stringify(descriptor)
+      expect(nodusReleaseDescriptorProblem(raw), JSON.stringify(descriptor)).toMatch(pattern)
+    }
+  })
+
+  it('parse and problem agree on every shape', () => {
+    expect(parseNodusReleaseDescriptor(JSON.stringify(validDescriptor))).toEqual(validDescriptor)
+    expect(nodusReleaseDescriptorProblem(JSON.stringify(validDescriptor))).toBeNull()
+    for (const bad of [
+      {...validDescriptor, schemaVersion: 2},
+      {...validDescriptor, files: []},
+      {...validDescriptor, files: [{...validDescriptor.files[0]!, bytes: -1}]},
+    ]) {
+      expect(parseNodusReleaseDescriptor(JSON.stringify(bad))).toBeNull()
+      expect(nodusReleaseDescriptorProblem(JSON.stringify(bad))).not.toBeNull()
+    }
   })
 })

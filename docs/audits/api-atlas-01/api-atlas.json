@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "integration/greenfield-signer-finish",
-      "sourceSha256": "fda46241346b4939aaa0c80f7f91bc7211a6ad21e2c7e77334ce93ad92569274",
-      "capturedAt": "2026-11-27T19:37:26.300Z",
+      "branch": "serverfix/nodus-reels-enablement",
+      "sourceSha256": "4001d7cff37635dc4c885ece747b461098fdb364ddf21e6c8ea84ac15be6a704",
+      "capturedAt": "2026-11-28T16:01:44.601Z",
       "routeCount": 900
     },
     "status": "PASS"
@@ -40766,7 +40766,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-native-endpoint-routes.ts",
-        "line": 132
+        "line": 169
       },
       "handler": "inline",
       "controllerServices": [],
@@ -69009,7 +69009,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/app/register-native-endpoint-routes.ts",
-        "line": 151
+        "line": 188
       },
       "handler": "inline",
       "controllerServices": [

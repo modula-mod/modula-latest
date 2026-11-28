@@ -74,39 +74,73 @@ function safeRelativePath(value: unknown): value is string {
  * Mirrors NodusModelRelease.validate() in Native so the server never serves a
  * descriptor the client would reject. Returns null for anything invalid.
  */
-export function parseNodusReleaseDescriptor(raw: string | undefined | null): NodusReleaseDescriptor | null {
-  if (!raw || !raw.trim()) return null
+/**
+ * First problem with a Nodus release descriptor, or null when it is valid.
+ * The server-side check mirrors NodusModelRelease.validate() in Native, so
+ * the server never serves a descriptor the client would reject. The
+ * operator-facing validator (scripts/validate-nodus-release-descriptor.ts)
+ * prints this instead of a bare "invalid", so a bad descriptor can be fixed
+ * before deploy instead of surfacing as a 404 at boot.
+ */
+export function nodusReleaseDescriptorProblem(raw: string | undefined | null): string | null {
+  if (!raw || !raw.trim()) return 'descriptor is unset or blank (no release will be served)'
   let value: any
   try {
     value = JSON.parse(raw)
   } catch {
-    return null
+    return 'descriptor is not valid JSON'
   }
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
-  if (value.schemaVersion !== 1) return null
-  if (typeof value.nodusVersion !== 'string' || !value.nodusVersion.trim() || value.nodusVersion.length > 64) return null
-  if (typeof value.artifactHash !== 'string' || !value.artifactHash.startsWith('sha256:') || !HEX64.test(value.artifactHash.slice(7))) return null
-  const manifestURL = httpsUrl(value.manifestURL)
-  if (!manifestURL) return null
-  if (typeof value.manifestSHA256 !== 'string' || !HEX64.test(value.manifestSHA256)) return null
-  if (!Array.isArray(value.files) || value.files.length === 0 || value.files.length > MAX_FILES) return null
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return 'descriptor must be a JSON object'
+  if (value.schemaVersion !== 1) return 'schemaVersion must be 1'
+  if (typeof value.nodusVersion !== 'string' || !value.nodusVersion.trim() || value.nodusVersion.length > 64) {
+    return 'nodusVersion must be a non-empty string of at most 64 characters'
+  }
+  if (typeof value.artifactHash !== 'string' || !value.artifactHash.startsWith('sha256:') || !HEX64.test(value.artifactHash.slice(7))) {
+    return 'artifactHash must be "sha256:" followed by 64 lowercase hex characters'
+  }
+  if (!httpsUrl(value.manifestURL)) return 'manifestURL must be an https URL without userinfo'
+  if (typeof value.manifestSHA256 !== 'string' || !HEX64.test(value.manifestSHA256)) {
+    return 'manifestSHA256 must be 64 lowercase hex characters'
+  }
+  if (!Array.isArray(value.files) || value.files.length === 0 || value.files.length > MAX_FILES) {
+    return `files must be a non-empty array of at most ${MAX_FILES} entries`
+  }
   const seen = new Set<string>()
-  const files: NodusReleaseFile[] = []
-  for (const file of value.files) {
-    if (!file || typeof file !== 'object') return null
-    if (!safeRelativePath(file.path) || file.path === 'nodus-manifest.json' || seen.has(file.path)) return null
+  for (const [index, file] of value.files.entries()) {
+    if (!file || typeof file !== 'object') return `files[${index}] must be an object`
+    if (!safeRelativePath(file.path)) return `files[${index}].path must be a safe relative path`
+    if (file.path === 'nodus-manifest.json') return 'files must not contain nodus-manifest.json (it is the manifest itself)'
+    if (seen.has(file.path)) return `files[${index}].path is duplicated: ${file.path}`
     seen.add(file.path)
-    const url = httpsUrl(file.url)
-    if (!url) return null
-    if (typeof file.sha256 !== 'string' || !HEX64.test(file.sha256)) return null
-    if (!Number.isSafeInteger(file.bytes) || file.bytes <= 0) return null
-    files.push({path: file.path, url, sha256: file.sha256, bytes: file.bytes})
+    if (!httpsUrl(file.url)) return `files[${index}].url must be an https URL without userinfo`
+    if (typeof file.sha256 !== 'string' || !HEX64.test(file.sha256)) {
+      return `files[${index}].sha256 must be 64 lowercase hex characters`
+    }
+    if (!Number.isSafeInteger(file.bytes) || file.bytes <= 0) {
+      return `files[${index}].bytes must be a positive integer`
+    }
   }
+  return null
+}
+
+/**
+ * Mirrors NodusModelRelease.validate() in Native so the server never serves a
+ * descriptor the client would reject. Returns null for anything invalid.
+ */
+export function parseNodusReleaseDescriptor(raw: string | undefined | null): NodusReleaseDescriptor | null {
+  if (nodusReleaseDescriptorProblem(raw) !== null) return null
+  const value = JSON.parse(raw as string)
+  const files: NodusReleaseFile[] = value.files.map((file: any) => ({
+    path: file.path,
+    url: file.url,
+    sha256: file.sha256,
+    bytes: file.bytes,
+  }))
   return {
     schemaVersion: 1,
     nodusVersion: value.nodusVersion,
     artifactHash: value.artifactHash,
-    manifestURL,
+    manifestURL: value.manifestURL,
     manifestSHA256: value.manifestSHA256,
     files,
   }
@@ -121,8 +155,11 @@ export async function registerNativeEndpointRoutes(
 ) {
   const iosRelease = parseNodusReleaseDescriptor(options.nodusReleaseIosJson)
   if (options.nodusReleaseIosJson?.trim() && !iosRelease) {
-    // Never log the descriptor itself; only that it was rejected.
-    app.log.warn('MODULA_NODUS_RELEASE_IOS_JSON is set but invalid; Nodus release endpoint stays 404')
+    // Never log the descriptor itself; only the reason it was rejected.
+    app.log.warn(
+      {problem: nodusReleaseDescriptorProblem(options.nodusReleaseIosJson)},
+      'MODULA_NODUS_RELEASE_IOS_JSON is set but invalid; Nodus release endpoint stays 404',
+    )
   }
   const reelsByIdEnabled = options.reelsByIdEnabled === true
   const discovery = new DiscoveryRepository(db, publicApiUrl)

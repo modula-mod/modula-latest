@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-27T19:37:26.300Z for branch `integration/greenfield-signer-finish`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-28T16:01:44.601Z for branch `serverfix/nodus-reels-enablement`; this does not claim deployment.
 
 - Runtime method routes: 900
 - Application routes: 633
@@ -386,7 +386,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Intelligence | GET | `/v1/intelligence/missions/:missionId/ledger` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:52` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/intelligence/missions/:missionId/proposals/:proposalId/execute` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:94` | candidate-registered-not-production-probed |
 | Intelligence | POST | `/v1/intelligence/missions/:missionId/start` | AUTHENTICATED | none | `services/greenfield-api/src/intelligence/routes.ts:38` | candidate-registered-not-production-probed |
-| Intelligence | GET | `/v1/intelligence/nodus/releases/latest` | PUBLIC | none | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:132` | candidate-registered-not-production-probed |
+| Intelligence | GET | `/v1/intelligence/nodus/releases/latest` | PUBLIC | none | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:169` | candidate-registered-not-production-probed |
 | Internal | POST | `/v1/internal/build-service/builds/:buildId/result` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/developers/routes.ts:76` | candidate-registered-not-production-probed |
 | Internal | POST | `/v1/internal/build-service/claims` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/developers/routes.ts:75` | candidate-registered-not-production-probed |
 | Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2695` | candidate-registered-not-production-probed |
@@ -603,7 +603,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | POST | `/v1/push/voip-devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:247` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/push/voip-devices/:registrationId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:267` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/reels` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2208` | candidate-registered-not-production-probed |
-| Feed | GET | `/v1/reels/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:151` | candidate-registered-not-production-probed |
+| Feed | GET | `/v1/reels/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:188` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/registry/artifacts/:sha256` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:461` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/registry/modules` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:185` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/registry/modules/:moduleId` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:309` | candidate-registered-not-production-probed |
@@ -17926,7 +17926,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/intelligence/nodus/releases/latest`
 - Public URL: `https://api.modula.digital/v1/intelligence/nodus/releases/latest`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-native-endpoint-routes.ts:132`
+- Source file: `services/greenfield-api/src/app/register-native-endpoint-routes.ts:169`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: none
@@ -28559,7 +28559,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/reels/:id`
 - Public URL: `https://api.modula.digital/v1/reels/:id`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-native-endpoint-routes.ts:151`
+- Source file: `services/greenfield-api/src/app/register-native-endpoint-routes.ts:188`
 - Handler: inline
 - Controller/service calls: `REEL_ID.test`, `discovery.getReel`
 - Authentication: legacy or bridged bearer session
