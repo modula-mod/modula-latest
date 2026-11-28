@@ -69,6 +69,7 @@ describeIfDb('GET /v1/registry/products tolerates a release with no manifest.com
       '093_publisher_release_governance_integrity',
       '094_publisher_signing_governance_hardening',
       '095_publisher_signing_integration_completion',
+      '102_cloud_model_providers',
     ])
 
     const created = await createServer(loadConfig())

@@ -1799,6 +1799,39 @@
       "services/greenfield-api/src/ai/repository.ts#listModels"
     ]
   },
+  "GET /v1/ai/preferences": {
+    "reads": [
+      "greenfield_ai_account_preferences"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/account-preferences.ts#getPreferences"
+    ]
+  },
+  "POST /v1/ai/preferences": {
+    "reads": [
+      "actors",
+      "greenfield_ai_account_preferences",
+      "greenfield_ai_providers"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_ai_account_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/account-preferences.ts#actorIdForAccount",
+      "services/greenfield-api/src/ai/account-preferences.ts#assertPreferredProviderExists",
+      "services/greenfield-api/src/ai/account-preferences.ts#getPreferences",
+      "services/greenfield-api/src/ai/account-preferences.ts#setPreferences",
+      "services/greenfield-api/src/ai/account-preferences.ts#syncMonthlyBudgetLimit"
+    ]
+  },
   "GET /v1/ai/providers": {
     "reads": [
       "greenfield_ai_providers"
@@ -1809,6 +1842,36 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/ai/repository.ts#listProviders"
+    ]
+  },
+  "DELETE /v1/ai/providers/:providerId/credentials": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/credential-service.ts#revoke"
+    ]
+  },
+  "GET /v1/ai/providers/:providerId/credentials": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/credential-service.ts#activePublicRecord"
+    ]
+  },
+  "POST /v1/ai/providers/:providerId/credentials": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/credential-service.ts#store"
     ]
   },
   "POST /v1/ai/requests": {
@@ -7066,7 +7129,8 @@
       "greenfield_extension_installations",
       "greenfield_module_permission_reviews",
       "greenfield_module_releases",
-      "greenfield_module_versions"
+      "greenfield_module_versions",
+      "the"
     ],
     "writes": [],
     "emits": [],

@@ -58,6 +58,10 @@ Each proposal can have at most one execution row. Mutating proposals carry a dur
 
 Ledger payload keys matching secrets, credentials, tokens, passwords, or API keys are redacted before persistence. Application logging already redacts authorization, cookies, tokens, credentials, secrets, API keys, connection strings and database URLs. Metrics use structural counters/status/duration only; objective text and record content are not labels.
 
+## Cloud provider credentials
+
+Provider API keys are scoped encrypted credentials (AES-256-GCM envelope; key from `MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY`), resolved account → platform → development. Platform keys are set by an operator; per-account keys are managed by the account itself through `POST /v1/ai/providers/:providerId/credentials` (store), `GET` (status only — never the key) and `DELETE` (revoke). Revocation marks the row `revoked`; the ciphertext stays for audit and can never be used again. Storing a replacement rotates the previous credential. Keys never appear in code, tests, docs, commit messages, the usage ledger, audit payloads or logs. An adapter refuses to run without a credential (`AI_PROVIDER_AUTH_FAILED`). No real provider key exists in the repository; tests use a fake placeholder key against stubbed fetch.
+
 Evidence stores references and metadata, not fabricated support. Provider chain-of-thought is neither required nor evidence.
 
 ## Database enforcement

@@ -1,4 +1,4 @@
-import type {GreenfieldAIRequestContract} from '@modula/greenfield-contracts'
+import type {GreenfieldAIProviderRoutingStrategy, GreenfieldAIRequestContract} from '@modula/greenfield-contracts'
 import type {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
@@ -8,6 +8,7 @@ import {GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js
 import type {GreenfieldSessionService} from '../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {AIProviderCredentialService} from './credential-service.js'
+import {AIAccountPreferencesService} from './account-preferences.js'
 import {GreenfieldAIGatewayService} from './gateway-service.js'
 import {GreenfieldAIProviderRuntimeService} from './provider-runtime-service.js'
 import {GreenfieldAIProductActionService} from './product-action-service.js'
@@ -30,6 +31,7 @@ export async function registerAiRoutes(
   const providerRuntime = new GreenfieldAIProviderRuntimeService(db, config)
   const productActions = new GreenfieldAIProductActionService(db, config)
   const credentials = new AIProviderCredentialService(db, config)
+  const preferences = new AIAccountPreferencesService(db)
   const streaming = new GreenfieldAIStreamingRuntime(db)
   const tools = new GreenfieldAIToolBroker(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
@@ -57,6 +59,91 @@ export async function registerAiRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     return reply.send(successEnvelope(await repository.listModels(), request.id))
+  })
+
+  app.get('/v1/ai/preferences', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    return reply.send(successEnvelope(await preferences.getPreferences(auth.accountId), request.id))
+  })
+
+  app.post('/v1/ai/preferences', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = ((request.body as any) ?? {}) as Record<string, unknown>
+      return reply.send(successEnvelope(await preferences.setPreferences({
+        accountId: auth.accountId,
+        allowRemoteCloud: typeof body.allowRemoteCloud === 'boolean' ? body.allowRemoteCloud : undefined,
+        defaultRoutingStrategy: typeof body.defaultRoutingStrategy === 'string' ? body.defaultRoutingStrategy as GreenfieldAIProviderRoutingStrategy : undefined,
+        preferredProviderId: body.preferredProviderId === null ? null : typeof body.preferredProviderId === 'string' ? body.preferredProviderId : undefined,
+        monthlyBudgetMinorUnits: body.monthlyBudgetMinorUnits === null ? null : typeof body.monthlyBudgetMinorUnits === 'number' ? body.monthlyBudgetMinorUnits : undefined,
+        requestId: request.id,
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'AI preferences update failed')
+    }
+  })
+
+  app.post('/v1/ai/providers/:providerId/credentials', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      const credential = recordOrEmpty(body.credential)
+      if (typeof credential.apiKey !== 'string' || credential.apiKey.trim().length === 0) {
+        throw moduleError('VALIDATION_FAILED', 'AI provider credential requires an apiKey')
+      }
+      return reply.send(successEnvelope(await credentials.store({
+        providerId: (request.params as {providerId: string}).providerId,
+        scopeType: 'account',
+        scopeId: auth.accountId,
+        credential,
+        requestId: request.id,
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'AI provider credential storage failed')
+    }
+  })
+
+  app.get('/v1/ai/providers/:providerId/credentials', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const providerId = (request.params as {providerId: string}).providerId
+    const record = await credentials.activePublicRecord(providerId, {scopeType: 'account', scopeId: auth.accountId})
+    return reply.send(successEnvelope(record ? {
+      providerId: record.providerId,
+      scopeType: record.scopeType,
+      hasCredential: true,
+      status: record.status,
+      lastVerifiedAt: record.lastVerifiedAt,
+    } : {
+      providerId,
+      scopeType: 'account',
+      hasCredential: false,
+      status: null,
+      lastVerifiedAt: null,
+    }, request.id))
+  })
+
+  app.delete('/v1/ai/providers/:providerId/credentials', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await credentials.revoke({
+        providerId: (request.params as {providerId: string}).providerId,
+        scopeType: 'account',
+        scopeId: auth.accountId,
+        requestId: request.id,
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'AI provider credential revocation failed')
+    }
   })
 
   app.post('/v1/modules/:moduleId/ai/actions/:actionId/executions', routeConfig.writeConfig, async (request, reply) => {

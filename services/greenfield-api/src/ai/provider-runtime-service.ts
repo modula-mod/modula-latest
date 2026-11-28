@@ -19,6 +19,8 @@ import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
 import {GreenfieldAIContextBuilder} from './context-builder.js'
 import {AIProviderCredentialService} from './credential-service.js'
+import {AIAccountPreferencesService} from './account-preferences.js'
+import {estimateCostMinorUnits, parseModelPricing} from './pricing.js'
 import {
   estimateTextUnits,
   isProviderExecutionError,
@@ -83,6 +85,7 @@ export class GreenfieldAIProviderRuntimeService {
   private readonly repository: GreenfieldAIRepository
   private readonly runtime: AIProviderRuntimeRepository
   private readonly credentials: AIProviderCredentialService
+  private readonly preferences: AIAccountPreferencesService
   private readonly resolver: GreenfieldAIProviderResolver
   private readonly policies: GreenfieldPolicyEngine
   private readonly audit: AuditRepository
@@ -99,6 +102,7 @@ export class GreenfieldAIProviderRuntimeService {
     this.repository = new GreenfieldAIRepository(db)
     this.runtime = new AIProviderRuntimeRepository(db)
     this.credentials = new AIProviderCredentialService(db, config)
+    this.preferences = new AIAccountPreferencesService(db)
     this.resolver = new GreenfieldAIProviderResolver(db)
     this.policies = new GreenfieldPolicyEngine(db)
     this.audit = new AuditRepository(db)
@@ -222,15 +226,21 @@ export class GreenfieldAIProviderRuntimeService {
       throw new ProviderExecutionError('AI_CONTEXT_TOO_LARGE', 'AI request exceeds configured input limit', false)
     }
 
+    // Account cloud preferences gate routing: local-first by default, cloud
+    // only when the account opted in. The account's preferred provider and
+    // routing strategy are the per-request selector — modules still cannot
+    // name a provider (see rejectProviderBoundPayload).
+    const preferences = await this.preferences.getPreferences(input.accountId)
     const routing = await this.resolver.resolve({
       requiredCapabilities,
       preferredModelId: input.preferredModelId,
-      preferredProviderId: input.preferredProviderId,
+      preferredProviderId: input.preferredProviderId ?? preferences.preferredProviderId ?? undefined,
       permittedProviders: input.permittedProviders ?? permittedProvidersFromManifest(input.manifest),
-      routingStrategy: input.routingStrategy ?? routingStrategyFromManifest(input.manifest),
+      routingStrategy: input.routingStrategy ?? routingStrategyFromManifest(input.manifest) ?? preferences.defaultRoutingStrategy,
       structuredOutput,
       streaming,
       allowDevelopmentMock: this.config.nodeEnv === 'test',
+      allowRemote: preferences.allowRemoteCloud,
     })
 
     try {
@@ -522,6 +532,15 @@ export class GreenfieldAIProviderRuntimeService {
         const structured = input.structuredOutput
           ? await this.validateOrRepairStructuredOutput(input, target, success, accumulatedUsage)
           : undefined
+        // Cost accrues from the resolved model's operator-set pricing
+        // metadata. Unknown pricing means no cost is recorded and a monthly
+        // budget does not bind for this model (see pricing.ts).
+        const model = await this.repository.requireModel(target.modelId)
+        const cost = estimateCostMinorUnits(accumulatedUsage, parseModelPricing(model.limits))
+        if (cost.providerCostMinorUnits !== undefined) {
+          accumulatedUsage.providerCostMinorUnits = (accumulatedUsage.providerCostMinorUnits ?? 0) + cost.providerCostMinorUnits
+          accumulatedUsage.currency = accumulatedUsage.currency ?? cost.currency
+        }
         await this.repository.updateRequestUsage(input.requestId, {
           status: 'completed',
           latencyMs: undefined,
@@ -1071,9 +1090,10 @@ function permittedProvidersFromManifest(manifest?: GreenfieldModuleManifest): st
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : undefined
 }
 
-function routingStrategyFromManifest(manifest?: GreenfieldModuleManifest): GreenfieldAIProviderRoutingStrategy {
+function routingStrategyFromManifest(manifest?: GreenfieldModuleManifest): GreenfieldAIProviderRoutingStrategy | undefined {
   const value = (manifest?.ai as Record<string, unknown> | undefined)?.routingStrategy
-  return value === 'fixed' || value === 'local-first' ? value : 'capability-first'
+  if (value === 'fixed' || value === 'capability-first' || value === 'cost-aware' || value === 'latency-aware' || value === 'privacy-first' || value === 'local-first') return value
+  return undefined
 }
 
 function metadataForProvider(policyContext: Record<string, unknown>): Record<string, unknown> {

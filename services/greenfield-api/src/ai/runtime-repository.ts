@@ -155,6 +155,16 @@ export class AIProviderRuntimeRepository {
       .execute()
   }
 
+  async revokeCredential(credentialId: string): Promise<boolean> {
+    const result = await this.db
+      .updateTable('ai_provider_credentials')
+      .set({status: 'revoked', updated_at: new Date()})
+      .where('credential_id', '=', credentialId)
+      .where('status', 'in', ['active', 'unverified', 'verification_failed'])
+      .executeTakeFirst()
+    return Number(result.numUpdatedRows ?? 0n) > 0
+  }
+
   async createExecution(input: CreateAIExecutionInput): Promise<AIExecutionRecord> {
     const now = new Date()
     const executionId = input.executionId ?? `ai-execution-${uuidv7()}`

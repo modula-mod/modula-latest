@@ -6,7 +6,9 @@ import {GreenfieldEventBus} from '../events/index.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
 import {GreenfieldAIContextBuilder} from './context-builder.js'
+import {AIAccountPreferencesService} from './account-preferences.js'
 import {GreenfieldAIRepository, recordFromJson} from './repository.js'
+import {isLocalProvider} from './providers/resolver.js'
 
 const PROVIDER_BOUND_KEYS = new Set(['provider', 'providerId', 'providerKind', 'providerPayload', 'providerOptions', 'modelProvider'])
 
@@ -32,6 +34,7 @@ export class GreenfieldAIGatewayService {
   private readonly audit: AuditRepository
   private readonly events: GreenfieldEventBus
   private readonly contextBuilder: GreenfieldAIContextBuilder
+  private readonly preferences: AIAccountPreferencesService
 
   constructor(private readonly db: ModulaDb) {
     this.repository = new GreenfieldAIRepository(db)
@@ -39,6 +42,7 @@ export class GreenfieldAIGatewayService {
     this.audit = new AuditRepository(db)
     this.events = new GreenfieldEventBus(db)
     this.contextBuilder = new GreenfieldAIContextBuilder(db)
+    this.preferences = new AIAccountPreferencesService(db)
   }
 
   async createRequest(input: GreenfieldAIRequestContract): Promise<GreenfieldAIGatewayAcceptedRequest> {
@@ -89,9 +93,26 @@ export class GreenfieldAIGatewayService {
       throw moduleError('FORBIDDEN', `AI request denied by policy: ${decision.code}`)
     }
 
+    // The account's cloud opt-in binds model resolution too: without it
+    // only local providers are resolvable, and the preferred provider (when
+    // set) narrows the permitted set. This keeps the ledger's model choice
+    // consistent with what the runtime service will actually execute.
+    const preferences = await this.preferences.getPreferences(input.accountId)
+    let permittedProviderIds: string[] | undefined
+    if (!preferences.allowRemoteCloud) {
+      permittedProviderIds = (await this.repository.listProviders())
+        .filter(provider => isLocalProvider(provider))
+        .map(provider => provider.providerId)
+    }
+    if (preferences.preferredProviderId) {
+      permittedProviderIds = permittedProviderIds
+        ? permittedProviderIds.filter(id => id === preferences.preferredProviderId)
+        : [preferences.preferredProviderId]
+    }
     const model = await this.repository.resolveModel({
       preferredModelId: input.preferredModelId,
       requiredCapabilities,
+      permittedProviderIds,
     })
     const context = await this.contextBuilder.build({
       accountId: input.accountId,

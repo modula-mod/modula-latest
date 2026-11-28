@@ -1,5 +1,7 @@
 import {moduleError} from '../../modules/module-errors.js'
 import type {GreenfieldAIProviderAdapter} from './contract.js'
+import {AnthropicGreenfieldAIProviderAdapter} from './anthropic-provider.js'
+import {GeminiGreenfieldAIProviderAdapter} from './gemini-provider.js'
 import {MockGreenfieldAIProviderAdapter} from './mock-provider.js'
 import {OllamaGreenfieldAIProviderAdapter} from './ollama-provider.js'
 import {OpenAIGreenfieldAIProviderAdapter} from './openai-provider.js'
@@ -43,6 +45,8 @@ export function createDefaultProviderAdapterRegistry(input: {
     }
   } else {
     registry.register(new OpenAIGreenfieldAIProviderAdapter('provider:openai'))
+    registry.register(new AnthropicGreenfieldAIProviderAdapter('provider:anthropic'))
+    registry.register(new GeminiGreenfieldAIProviderAdapter('provider:gemini'))
     registry.register(new OllamaGreenfieldAIProviderAdapter('provider:ollama'))
     registry.register(new OllamaGreenfieldAIProviderAdapter('provider:local'))
   }

@@ -28,6 +28,22 @@ export class GreenfieldAIQuotaService {
     const limits = await this.repository.activeLimits(input)
     const now = new Date()
     for (const limit of limits) {
+      // A monthly spend budget is a spend-so-far gate: the cost of the
+      // upcoming call is unknowable before it runs, so the call is refused
+      // when accrued spend already meets the budget. Cost accrues post-call
+      // in recordUsage from the model's pricing metadata.
+      if (limit.limit_kind === 'estimated-spend') {
+        const bucketStart = bucketStartFor(now, limit.window_seconds)
+        const consumed = await this.repository.consumedUnits(limit, bucketStart)
+        if (consumed >= limit.limit_value) {
+          throw new ProviderExecutionError(
+            'AI_QUOTA_EXCEEDED',
+            `AI monthly spend budget exceeded: ${limit.limit_kind}`,
+            false,
+          )
+        }
+        continue
+      }
       const units = unitsForPreflight(limit.limit_kind, limit.unit, input)
       if (units === undefined) continue
       const bucketStart = bucketStartFor(now, limit.window_seconds)
