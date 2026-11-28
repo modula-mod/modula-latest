@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-28T13:35:27.611Z",
+  "capturedAt": "2026-11-28T18:17:39.358Z",
   "source": {
-    "branch": "audit/totp-stepup-rate-limit",
-    "headAtCapture": "20561ad64454098c70e1c7e990038e34e64fe9fa",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "f2410d95450ddcd0ab72189e2484fbe666ed51fc62547cb4f62a5f17398f4e89"
+    "branch": "feature/cloud-model-providers",
+    "headAtCapture": "b56e3450243aa9636ce5196d7c00edb179df7901",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "75fe58f4640a4c840813b3d0482f4f1719cd263a1553f3ecce7da707e61e5f28"
   },
   "runtimeRoutes": [
     {
@@ -4902,6 +4902,69 @@
       "method": "HEAD",
       "url": "/v1/ai/models",
       "path": "/v1/ai/models",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/ai/preferences",
+      "path": "/v1/ai/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/ai/preferences",
+      "path": "/v1/ai/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/preferences",
+      "path": "/v1/ai/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/providers/:providerId/credentials",
+      "path": "/v1/ai/providers/:providerId/credentials",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/ai/providers/:providerId/credentials",
+      "path": "/v1/ai/providers/:providerId/credentials",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/ai/providers/:providerId/credentials",
+      "path": "/v1/ai/providers/:providerId/credentials",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/ai/providers/:providerId/credentials",
+      "path": "/v1/ai/providers/:providerId/credentials",
       "prefix": "",
       "schema": null,
       "config": null,

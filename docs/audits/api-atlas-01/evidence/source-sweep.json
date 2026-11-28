@@ -3,7 +3,7 @@
   "findings": [
     {
       "file": "services/greenfield-api/src/ai/provider-runtime-service.ts",
-      "line": 1065,
+      "line": 1084,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "if (providerId === 'provider:development-mock') return [{scopeType: 'development'}, {scopeType: 'platform'}]"
@@ -80,28 +80,28 @@
     },
     {
       "file": "services/greenfield-api/src/ai/providers/registry.ts",
-      "line": 3,
+      "line": 5,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "import {MockGreenfieldAIProviderAdapter} from './mock-provider.js'"
     },
     {
       "file": "services/greenfield-api/src/ai/providers/registry.ts",
-      "line": 32,
+      "line": 34,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))"
     },
     {
       "file": "services/greenfield-api/src/ai/providers/resolver.ts",
-      "line": 55,
+      "line": 62,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "if (provider.configurationMode === 'development-mock' && !input.allowDevelopmentMock) continue"
     },
     {
       "file": "services/greenfield-api/src/ai/providers/resolver.ts",
-      "line": 112,
+      "line": 120,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "provider.configurationMode === 'development-mock'"
@@ -2301,7 +2301,7 @@
   "productionReview": [
     {
       "file": "services/greenfield-api/src/ai/provider-runtime-service.ts",
-      "line": 1065,
+      "line": 1084,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "if (providerId === 'provider:development-mock') return [{scopeType: 'development'}, {scopeType: 'platform'}]"
@@ -2378,28 +2378,28 @@
     },
     {
       "file": "services/greenfield-api/src/ai/providers/registry.ts",
-      "line": 3,
+      "line": 5,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "import {MockGreenfieldAIProviderAdapter} from './mock-provider.js'"
     },
     {
       "file": "services/greenfield-api/src/ai/providers/registry.ts",
-      "line": 32,
+      "line": 34,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))"
     },
     {
       "file": "services/greenfield-api/src/ai/providers/resolver.ts",
-      "line": 55,
+      "line": 62,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "if (provider.configurationMode === 'development-mock' && !input.allowDevelopmentMock) continue"
     },
     {
       "file": "services/greenfield-api/src/ai/providers/resolver.ts",
-      "line": 112,
+      "line": 120,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "provider.configurationMode === 'development-mock'"

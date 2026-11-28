@@ -1,13 +1,13 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 95 ordered up migrations, latest `095_publisher_signing_integration_completion.sql`.
+Production PostgreSQL: 16.9; schema migration `073_backup_sequence_acl_defaults`; 73 applied migrations. Git contains 96 ordered up migrations, latest `102_cloud_model_providers.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 392
-- Tables with API/worker source references: 369
+- Production tables: 393
+- Tables with API/worker source references: 370
 - Orphan candidates requiring manual confirmation: 23
 - Write-only candidates: 40
 - Read-only candidates: 35
@@ -658,6 +658,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Routes writing: `GET /v1/messaging/socket`, `POST /v1/presence/heartbeat`
 - API/worker source reads: `services/greenfield-api/src/domains/messaging/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/messaging/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_ai_account_preferences`
+
+- Purpose: application state for greenfield ai account preferences
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `102_cloud_model_providers.sql`
+- Routes reading: `GET /v1/ai/preferences`, `POST /v1/ai/preferences`
+- Routes writing: `POST /v1/ai/preferences`
+- API/worker source reads: `services/greenfield-api/src/ai/account-preferences.ts`
+- API/worker source writes: `services/greenfield-api/src/ai/account-preferences.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_ai_models`

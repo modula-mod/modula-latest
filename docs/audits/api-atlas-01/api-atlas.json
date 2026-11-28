@@ -8,21 +8,21 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "audit/totp-stepup-rate-limit",
-      "sourceSha256": "f2410d95450ddcd0ab72189e2484fbe666ed51fc62547cb4f62a5f17398f4e89",
-      "capturedAt": "2026-11-28T13:35:27.611Z",
-      "routeCount": 900
+      "branch": "feature/cloud-model-providers",
+      "sourceSha256": "75fe58f4640a4c840813b3d0482f4f1719cd263a1553f3ecce7da707e61e5f28",
+      "capturedAt": "2026-11-28T18:17:39.358Z",
+      "routeCount": 907
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 900,
-    "applicationRuntimeRoutes": 633,
-    "mappedApplicationRoutes": 633,
+    "runtimeMethodRoutes": 907,
+    "applicationRuntimeRoutes": 638,
+    "mappedApplicationRoutes": 638,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 633,
+    "sourceRoutes": 638,
     "sourceOnlyRoutes": 0,
-    "explicitlyExcludedFrameworkRoutes": 267,
+    "explicitlyExcludedFrameworkRoutes": 269,
     "frameworkRoutes": [
       {
         "method": "OPTIONS",
@@ -592,6 +592,16 @@
       {
         "method": "HEAD",
         "path": "/v1/ai/models",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/ai/preferences",
+        "reason": "Fastify automatic HEAD companion for GET"
+      },
+      {
+        "method": "HEAD",
+        "path": "/v1/ai/providers/:providerId/credentials",
         "reason": "Fastify automatic HEAD companion for GET"
       },
       {
@@ -1361,7 +1371,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "900 = 633 application + 267 framework-derived"
+    "equation": "907 = 638 application + 269 framework-derived"
   },
   "routes": [
     {
@@ -5678,7 +5688,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 235
+        "line": 322
       },
       "handler": "inline",
       "controllerServices": [
@@ -5763,7 +5773,9 @@
       ],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/src/ai/pricing.ts"
+        ],
         "tests": []
       },
       "automatedTest": false,
@@ -5786,7 +5798,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 239
+        "line": 326
       },
       "handler": "inline",
       "controllerServices": [
@@ -5892,7 +5904,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 231
+        "line": 318
       },
       "handler": "inline",
       "controllerServices": [
@@ -5998,7 +6010,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 243
+        "line": 330
       },
       "handler": "inline",
       "controllerServices": [
@@ -7575,7 +7587,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 282
+        "line": 369
       },
       "handler": "inline",
       "controllerServices": [
@@ -7672,7 +7684,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 247
+        "line": 334
       },
       "handler": "inline",
       "controllerServices": [
@@ -7774,7 +7786,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 271
+        "line": 358
       },
       "handler": "inline",
       "controllerServices": [
@@ -7880,7 +7892,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 263
+        "line": 350
       },
       "handler": "inline",
       "controllerServices": [
@@ -7985,7 +7997,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 267
+        "line": 354
       },
       "handler": "inline",
       "controllerServices": [
@@ -8090,7 +8102,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 251
+        "line": 338
       },
       "handler": "inline",
       "controllerServices": [
@@ -8192,7 +8204,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 255
+        "line": 342
       },
       "handler": "inline",
       "controllerServices": [
@@ -8298,7 +8310,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 286
+        "line": 373
       },
       "handler": "inline",
       "controllerServices": [
@@ -13284,7 +13296,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 119
+        "line": 206
       },
       "handler": "inline",
       "controllerServices": [
@@ -13390,7 +13402,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 155
+        "line": 242
       },
       "handler": "inline",
       "controllerServices": [
@@ -13499,7 +13511,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 130
+        "line": 217
       },
       "handler": "inline",
       "controllerServices": [
@@ -13608,7 +13620,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 55
+        "line": 57
       },
       "handler": "inline",
       "controllerServices": [
@@ -13700,6 +13712,213 @@
       "contract": null
     },
     {
+      "id": "GET /v1/ai/preferences",
+      "domain": "Intelligence",
+      "method": "GET",
+      "effectiveRoute": "/v1/ai/preferences",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/ai/preferences",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/ai/routes.ts",
+        "line": 64
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "preferences.getPreferences"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_ai_account_preferences"
+        ],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/ai/account-preferences.ts#getPreferences"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [
+        "AI provider fabric"
+      ],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "POST /v1/ai/preferences",
+      "domain": "Intelligence",
+      "method": "POST",
+      "effectiveRoute": "/v1/ai/preferences",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/ai/preferences",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/ai/routes.ts",
+        "line": 71
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "preferences.setPreferences"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": false,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [],
+        "query": [],
+        "body": [
+          "any) ?? {}) as Record<string, unknown>"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_ai_account_preferences"
+        ],
+        "writes": [
+          "failed",
+          "greenfield_ai_account_preferences"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/ai/account-preferences.ts#getPreferences",
+          "services/greenfield-api/src/ai/account-preferences.ts#setPreferences",
+          "services/greenfield-api/src/ai/account-preferences.ts#syncMonthlyBudgetLimit"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [
+        "AI provider fabric"
+      ],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": []
+      },
+      "automatedTest": false,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
       "id": "GET /v1/ai/providers",
       "domain": "Intelligence",
       "method": "GET",
@@ -13709,7 +13928,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 48
+        "line": 50
       },
       "handler": "inline",
       "controllerServices": [
@@ -13801,6 +14020,318 @@
       "contract": null
     },
     {
+      "id": "DELETE /v1/ai/providers/:providerId/credentials",
+      "domain": "Intelligence",
+      "method": "DELETE",
+      "effectiveRoute": "/v1/ai/providers/:providerId/credentials",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/ai/providers/:providerId/credentials",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/ai/routes.ts",
+        "line": 133
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "credentials.revoke"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{providerId: string}).providerId,"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/ai/credential-service.ts#revoke"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [
+        "AI provider fabric"
+      ],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "scripts/verify-phase7e-ai-provider-runtime.mjs"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "GET /v1/ai/providers/:providerId/credentials",
+      "domain": "Intelligence",
+      "method": "GET",
+      "effectiveRoute": "/v1/ai/providers/:providerId/credentials",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/ai/providers/:providerId/credentials",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/ai/routes.ts",
+        "line": 112
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "credentials.activePublicRecord"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{providerId: string}).providerId"
+        ],
+        "query": [],
+        "body": [],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        401,
+        404,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/ai/credential-service.ts#activePublicRecord"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [
+        "AI provider fabric"
+      ],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "scripts/verify-phase7e-ai-provider-runtime.mjs"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
+      "id": "POST /v1/ai/providers/:providerId/credentials",
+      "domain": "Intelligence",
+      "method": "POST",
+      "effectiveRoute": "/v1/ai/providers/:providerId/credentials",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/ai/providers/:providerId/credentials",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/ai/routes.ts",
+        "line": 90
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "apiKey.trim",
+        "credentials.store"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "AUTHENTICATED",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": false,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "authenticated account id is passed into the service/repository scope",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{providerId: string}).providerId,"
+        ],
+        "query": [],
+        "body": [
+          "any) ?? {}"
+        ],
+        "explicitFastifySchema": false,
+        "manualValidationObserved": true,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [],
+        "writes": [],
+        "evidence": [
+          "services/greenfield-api/src/ai/credential-service.ts#store"
+        ],
+        "confidence": "partial-static"
+      },
+      "storage": [
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [
+        "AI provider fabric"
+      ],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "scripts/verify-phase7e-ai-provider-runtime.mjs"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.",
+      "contract": null
+    },
+    {
       "id": "POST /v1/ai/requests",
       "domain": "Intelligence",
       "method": "POST",
@@ -13810,7 +14341,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 166
+        "line": 253
       },
       "handler": "inline",
       "controllerServices": [
@@ -13916,7 +14447,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 186
+        "line": 273
       },
       "handler": "inline",
       "controllerServices": [
@@ -14019,7 +14550,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 198
+        "line": 285
       },
       "handler": "inline",
       "controllerServices": [
@@ -14122,7 +14653,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 209
+        "line": 296
       },
       "handler": "inline",
       "controllerServices": [
@@ -46321,7 +46852,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 62
+        "line": 149
       },
       "handler": "inline",
       "controllerServices": [
@@ -46481,7 +47012,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 78
+        "line": 165
       },
       "handler": "inline",
       "controllerServices": [
@@ -46642,7 +47173,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/ai/routes.ts",
-        "line": 94
+        "line": 181
       },
       "handler": "inline",
       "controllerServices": [
@@ -46713,7 +47244,8 @@
           "greenfield_extension_installations",
           "greenfield_module_permission_reviews",
           "greenfield_module_releases",
-          "greenfield_module_versions"
+          "greenfield_module_versions",
+          "the"
         ],
         "writes": [],
         "evidence": [
@@ -81722,6 +82254,38 @@
       "routeWrites": [
         "GET /v1/messaging/socket",
         "POST /v1/presence/heartbeat"
+      ],
+      "orphanCandidate": false,
+      "writeOnlyCandidate": false,
+      "readOnlyCandidate": false
+    },
+    {
+      "name": "greenfield_ai_account_preferences",
+      "columns": [],
+      "primaryKey": [],
+      "foreignKeys": [],
+      "indexes": [],
+      "uniqueConstraints": [],
+      "sourceState": "declared-in-migration-not-yet-captured-in-production",
+      "purpose": "application state for greenfield ai account preferences",
+      "ownershipColumns": [],
+      "softDelete": false,
+      "timestamps": [],
+      "migrationIntroduced": "102_cloud_model_providers.sql",
+      "sourceReads": [
+        "services/greenfield-api/src/ai/account-preferences.ts"
+      ],
+      "sourceWrites": [
+        "services/greenfield-api/src/ai/account-preferences.ts"
+      ],
+      "jobReads": [],
+      "jobWrites": [],
+      "routeReads": [
+        "GET /v1/ai/preferences",
+        "POST /v1/ai/preferences"
+      ],
+      "routeWrites": [
+        "POST /v1/ai/preferences"
       ],
       "orphanCandidate": false,
       "writeOnlyCandidate": false,
