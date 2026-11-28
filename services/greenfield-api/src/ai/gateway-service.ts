@@ -8,6 +8,7 @@ import {moduleError} from '../modules/module-errors.js'
 import {GreenfieldAIContextBuilder} from './context-builder.js'
 import {AIAccountPreferencesService} from './account-preferences.js'
 import {GreenfieldAIRepository, recordFromJson} from './repository.js'
+import {isLocalProvider} from './providers/resolver.js'
 
 const PROVIDER_BOUND_KEYS = new Set(['provider', 'providerId', 'providerKind', 'providerPayload', 'providerOptions', 'modelProvider'])
 
@@ -100,7 +101,7 @@ export class GreenfieldAIGatewayService {
     let permittedProviderIds: string[] | undefined
     if (!preferences.allowRemoteCloud) {
       permittedProviderIds = (await this.repository.listProviders())
-        .filter(provider => provider.kind === 'local' || provider.kind === 'ollama' || provider.kind === 'lm-studio')
+        .filter(provider => isLocalProvider(provider))
         .map(provider => provider.providerId)
     }
     if (preferences.preferredProviderId) {

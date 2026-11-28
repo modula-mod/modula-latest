@@ -1,8 +1,10 @@
-import {randomUUID} from 'node:crypto'
+import {randomBytes, randomUUID} from 'node:crypto'
 import {afterAll, afterEach, beforeAll, describe, expect, it, vi} from 'vitest'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {AIAccountPreferencesService} from '../src/ai/account-preferences.js'
+import {AIProviderCredentialService} from '../src/ai/credential-service.js'
+import type {AppConfig} from '../src/config/env.js'
 import {GreenfieldAIGatewayService} from '../src/ai/gateway-service.js'
 import {GreenfieldAIQuotaService} from '../src/ai/quota-service.js'
 import {GreenfieldAIRepository} from '../src/ai/repository.js'
@@ -208,6 +210,21 @@ describe('Cloud model provider adapters (stubbed fetch, fake credentials)', () =
     expect(completed.outputText).toBe('Hello Nebbi')
   })
 
+  it('Gemini stream with no content reports a failed execution, not an empty success', async () => {
+    const sse = [
+      'data: {"candidates":[{"finishReason":"SAFETY"}],"usageMetadata":{"promptTokenCount":14,"candidatesTokenCount":0,"totalTokenCount":14}}',
+      '',
+      '',
+    ].join('\n')
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(sse, {status: 200, headers: {'content-type': 'text/event-stream'}})))
+    const adapter = new GeminiGreenfieldAIProviderAdapter('provider:gemini')
+    const events = await collectEvents(adapter.stream(executionRequest({stream: true}), {providerId: 'provider:gemini', credentials: {apiKey: FAKE_API_KEY}}))
+    expect(events.map(event => event.type)).toEqual(['execution.started', 'reasoning.status', 'execution.failed'])
+    const failed = events[events.length - 1] as {failureCode?: string; retryable?: boolean}
+    expect(failed.failureCode).toBe('AI_PROVIDER_RESPONSE_INVALID')
+    expect(failed.retryable).toBe(false)
+  })
+
   it('Gemini discoverModels lists generateContent-capable models', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => jsonResponse({
       models: [
@@ -290,6 +307,7 @@ describeIfDb('Cloud model preferences, routing gate and budget', () => {
   let resolver: GreenfieldAIProviderResolver
   let quotas: GreenfieldAIQuotaService
   let gateway: GreenfieldAIGatewayService
+  let credentialService: AIProviderCredentialService
   let accountId = ''
   let actorId = ''
   let localProviderId = ''
@@ -307,6 +325,11 @@ describeIfDb('Cloud model preferences, routing gate and budget', () => {
     resolver = new GreenfieldAIProviderResolver(db)
     quotas = new GreenfieldAIQuotaService(db)
     gateway = new GreenfieldAIGatewayService(db)
+    const credentialKey = randomBytes(32)
+    credentialService = new AIProviderCredentialService(db, {
+      aiProviderCredentialEncryptionKey: {version: 1, key: credentialKey},
+      aiProviderCredentialEncryptionKeysByVersion: new Map([[1, credentialKey]]),
+    } as unknown as AppConfig)
 
     const suffix = randomUUID().slice(0, 8)
     accountId = `ai-cloud-account-${suffix}`
@@ -483,6 +506,53 @@ describeIfDb('Cloud model preferences, routing gate and budget', () => {
     await quotas.recordUsage({...input, usage: {inputTokens: 10, outputTokens: 10, providerCostMinorUnits: 100, currency: 'USD'}})
     await expect(quotas.assertWithinLimits(input)).rejects.toMatchObject({code: 'AI_QUOTA_EXCEEDED'})
     await preferences.setPreferences({accountId, monthlyBudgetMinorUnits: null})
+  })
+
+  it('preferredProviderId must name an existing provider', async () => {
+    await expect(preferences.setPreferences({accountId, preferredProviderId: 'provider:does-not-exist'}))
+      .rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await preferences.setPreferences({accountId, preferredProviderId: cloudProviderId})
+    expect((await preferences.getPreferences(accountId)).preferredProviderId).toBe(cloudProviderId)
+    await preferences.setPreferences({accountId, preferredProviderId: null})
+  })
+
+  it('preference-change audits carry the account actor id', async () => {
+    const before = new Date()
+    await preferences.setPreferences({accountId, allowRemoteCloud: true})
+    const audit = await db
+      .selectFrom('audit_events')
+      .select(['actor_id'])
+      .where('event_type', '=', 'ai.account.preferences.updated')
+      .where('account_id', '=', accountId)
+      .where('created_at', '>=', before)
+      .orderBy('created_at', 'desc')
+      .executeTakeFirstOrThrow()
+    expect(audit.actor_id).toBe(actorId)
+    await preferences.setPreferences({accountId, allowRemoteCloud: false})
+  })
+
+  it('account credentials reject non-HTTPS and non-public endpoints (SSRF guard)', async () => {
+    const storeAccount = (baseUrl: string) => credentialService.store({
+      providerId: cloudProviderId,
+      scopeType: 'account',
+      scopeId: accountId,
+      credential: {apiKey: FAKE_API_KEY, baseUrl},
+    })
+    await expect(storeAccount('http://api.example.com/v1')).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await expect(storeAccount('https://127.0.0.1:8080/v1')).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await expect(storeAccount('https://10.0.0.5/v1')).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await expect(storeAccount('https://169.254.169.254/latest/meta-data/')).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await expect(storeAccount('https://host.docker.internal:8080/v1')).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await expect(storeAccount('not a url')).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    const stored = await storeAccount('https://api.example.com/v1')
+    expect(stored).toMatchObject({providerId: cloudProviderId, scopeType: 'account', status: 'unverified'})
+    // Admin/platform scope keeps custom endpoints (self-hosted, operator-managed).
+    const platformStored = await credentialService.store({
+      providerId: cloudProviderId,
+      scopeType: 'platform',
+      credential: {apiKey: FAKE_API_KEY, baseUrl: 'http://localhost:8080/v1'},
+    })
+    expect(platformStored).toMatchObject({providerId: cloudProviderId, scopeType: 'platform'})
   })
 })
 

@@ -87,7 +87,7 @@ describe('publisher signing governance static security boundary', () => {
   })
 })
 
-describeDb('publisher signing governance canonical-role PostgreSQL boundary through 095', () => {
+describeDb('publisher signing governance canonical-role PostgreSQL boundary through 102', () => {
   let admin: ModulaDb
   let superuser: ModulaDb
   let runner: ModulaDb
@@ -861,10 +861,10 @@ describeDb('publisher signing governance canonical-role PostgreSQL boundary thro
   }, 60_000)
 
   it('rejects unsafe automated migration rollback without changing the ledger tip', async () => {
-    await expect(migrateDown(adminUrl!)).rejects.toThrow(/unsafe automated downgrade of 095 is prohibited/i)
+    await expect(migrateDown(adminUrl!)).rejects.toThrow(/unsafe automated downgrade of 102 is prohibited/i)
     const tip = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(admin)
-    expect(tip.rows[0]?.id).toBe('095_publisher_signing_integration_completion')
+    expect(tip.rows[0]?.id).toBe('102_cloud_model_providers')
     const version = await sql<{value: string}>`SELECT value FROM schema_metadata WHERE key = 'schema_version'`.execute(admin)
-    expect(version.rows[0]?.value).toBe('095')
+    expect(version.rows[0]?.value).toBe('102')
   })
 })

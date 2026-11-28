@@ -95,8 +95,14 @@ export class GeminiGreenfieldAIProviderAdapter implements GreenfieldAIProviderAd
         yield {type: 'reasoning.status', status: 'validating'}
       }
     }
+    if (!outputText) {
+      // A stream that ends without producing content (e.g. a safety block)
+      // is a failed execution, not an empty success — matching the
+      // non-stream path, which throws AI_PROVIDER_RESPONSE_INVALID.
+      yield {type: 'execution.failed', failureCode: 'AI_PROVIDER_RESPONSE_INVALID', retryable: false}
+      return
+    }
     if (request.structuredOutput) {
-      if (!outputText) throw new ProviderExecutionError('AI_PROVIDER_RESPONSE_INVALID', 'Gemini structured response was empty', false)
       const structured = parseStructuredObject(outputText)
       yield {type: 'execution.completed', outputText, structuredOutput: structured, usage}
     } else {

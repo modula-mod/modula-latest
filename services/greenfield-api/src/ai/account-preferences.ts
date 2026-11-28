@@ -79,6 +79,8 @@ export class AIAccountPreferencesService {
       updatedAt: new Date(),
     }
     validatePreferences(next)
+    await this.assertPreferredProviderExists(next.preferredProviderId)
+    const actorId = input.actorId ?? await this.actorIdForAccount(input.accountId)
     const now = new Date()
     await this.db
       .insertInto('greenfield_ai_account_preferences')
@@ -109,10 +111,25 @@ export class AIAccountPreferencesService {
         preferredProviderId: next.preferredProviderId,
         monthlyBudgetMinorUnits: next.monthlyBudgetMinorUnits,
       },
-      {type: 'aiAccountPreferences', id: next.accountId, actorId: input.actorId ?? null},
+      {type: 'aiAccountPreferences', id: next.accountId, actorId},
       {accountId: next.accountId, requestId: input.requestId ?? null, correlationId: input.correlationId ?? input.requestId ?? null},
     )
     return next
+  }
+
+  private async assertPreferredProviderExists(preferredProviderId: string | null): Promise<void> {
+    if (preferredProviderId === null) return
+    const row = await this.db
+      .selectFrom('greenfield_ai_providers')
+      .select('provider_id')
+      .where('provider_id', '=', preferredProviderId)
+      .executeTakeFirst()
+    if (!row) throw moduleError('VALIDATION_FAILED', `Unknown AI provider: ${preferredProviderId}`)
+  }
+
+  private async actorIdForAccount(accountId: string): Promise<string | null> {
+    const row = await this.db.selectFrom('actors').select('id').where('account_id', '=', accountId).orderBy('created_at', 'asc').executeTakeFirst()
+    return row?.id ?? null
   }
 
   /**

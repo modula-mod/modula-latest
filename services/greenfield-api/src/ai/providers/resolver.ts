@@ -112,9 +112,16 @@ function scoreCandidate(
   return {provider, model, score, reason: reasons.join(',')}
 }
 
-function isLocalProvider(provider: GreenfieldAIProviderDefinition): boolean {
+/**
+ * One shared definition of "local" for the gateway and the resolver, so the
+ * ledger's model choice can never disagree with what the resolver will
+ * execute. LM Studio is a self-hosted local model server, so it counts as
+ * local alongside Ollama and the local configuration modes.
+ */
+export function isLocalProvider(provider: GreenfieldAIProviderDefinition): boolean {
   return provider.kind === 'ollama' ||
     provider.kind === 'local' ||
+    provider.kind === 'lm-studio' ||
     provider.configurationMode === 'local' ||
     provider.configurationMode === 'local-runtime' ||
     provider.configurationMode === 'development-mock'
