@@ -1813,7 +1813,9 @@
   },
   "POST /v1/ai/preferences": {
     "reads": [
-      "greenfield_ai_account_preferences"
+      "actors",
+      "greenfield_ai_account_preferences",
+      "greenfield_ai_providers"
     ],
     "writes": [
       "failed",
@@ -1823,6 +1825,8 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/ai/account-preferences.ts#actorIdForAccount",
+      "services/greenfield-api/src/ai/account-preferences.ts#assertPreferredProviderExists",
       "services/greenfield-api/src/ai/account-preferences.ts#getPreferences",
       "services/greenfield-api/src/ai/account-preferences.ts#setPreferences",
       "services/greenfield-api/src/ai/account-preferences.ts#syncMonthlyBudgetLimit"

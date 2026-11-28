@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-28T18:17:39.358Z",
+  "capturedAt": "2026-11-28T19:00:16.581Z",
   "source": {
     "branch": "feature/cloud-model-providers",
-    "headAtCapture": "b56e3450243aa9636ce5196d7c00edb179df7901",
-    "worktreeDirtyAtCapture": false,
-    "apiSourceSha256": "75fe58f4640a4c840813b3d0482f4f1719cd263a1553f3ecce7da707e61e5f28"
+    "headAtCapture": "71f9a47e2cc8e49233452c1090791567e83938f1",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "72b6063baf9c6bb57dd4e1013ef8bd3262f549d1c46886173a6c1c41af4b402c"
   },
   "runtimeRoutes": [
     {

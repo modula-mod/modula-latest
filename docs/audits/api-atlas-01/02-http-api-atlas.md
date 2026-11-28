@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-28T18:17:39.358Z for branch `feature/cloud-model-providers`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-28T19:00:16.581Z for branch `feature/cloud-model-providers`; this does not claim deployment.
 
 - Runtime method routes: 907
 - Application routes: 638
@@ -6138,7 +6138,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `500`
-- Database reads: `greenfield_ai_account_preferences`
+- Database reads: `actors`, `greenfield_ai_account_preferences`, `greenfield_ai_providers`
 - Database writes: `failed`, `greenfield_ai_account_preferences`
 - Storage: none observed
 - Events produced: none observed

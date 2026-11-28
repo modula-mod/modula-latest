@@ -101,7 +101,7 @@
     },
     {
       "file": "services/greenfield-api/src/ai/providers/resolver.ts",
-      "line": 120,
+      "line": 127,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "provider.configurationMode === 'development-mock'"
@@ -2399,7 +2399,7 @@
     },
     {
       "file": "services/greenfield-api/src/ai/providers/resolver.ts",
-      "line": 120,
+      "line": 127,
       "marker": "mock",
       "classification": "development-adapter-or-comment",
       "excerpt": "provider.configurationMode === 'development-mock'"

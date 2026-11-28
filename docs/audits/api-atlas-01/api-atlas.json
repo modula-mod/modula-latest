@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "feature/cloud-model-providers",
-      "sourceSha256": "75fe58f4640a4c840813b3d0482f4f1719cd263a1553f3ecce7da707e61e5f28",
-      "capturedAt": "2026-11-28T18:17:39.358Z",
+      "sourceSha256": "72b6063baf9c6bb57dd4e1013ef8bd3262f549d1c46886173a6c1c41af4b402c",
+      "capturedAt": "2026-11-28T19:00:16.581Z",
       "routeCount": 907
     },
     "status": "PASS"
@@ -13884,13 +13884,17 @@
       ],
       "data": {
         "reads": [
-          "greenfield_ai_account_preferences"
+          "actors",
+          "greenfield_ai_account_preferences",
+          "greenfield_ai_providers"
         ],
         "writes": [
           "failed",
           "greenfield_ai_account_preferences"
         ],
         "evidence": [
+          "services/greenfield-api/src/ai/account-preferences.ts#actorIdForAccount",
+          "services/greenfield-api/src/ai/account-preferences.ts#assertPreferredProviderExists",
           "services/greenfield-api/src/ai/account-preferences.ts#getPreferences",
           "services/greenfield-api/src/ai/account-preferences.ts#setPreferences",
           "services/greenfield-api/src/ai/account-preferences.ts#syncMonthlyBudgetLimit"
@@ -76928,6 +76932,7 @@
       "sourceReads": [
         "services/greenfield-api/src/account-data/service.ts",
         "services/greenfield-api/src/accounts/service.ts",
+        "services/greenfield-api/src/ai/account-preferences.ts",
         "services/greenfield-api/src/ai/gateway-service.ts",
         "services/greenfield-api/src/ai/provider-runtime-service.ts",
         "services/greenfield-api/src/app/register-routes.ts",
@@ -76974,6 +76979,7 @@
         "PUT /v1/admin/qa/premium/:handle",
         "POST /v1/admin/qa/verification/appeals/:appealId/transitions",
         "POST /v1/admin/qa/verification/applications/:applicationId/transitions",
+        "POST /v1/ai/preferences",
         "POST /v1/ai/requests",
         "POST /v1/calls/:callId/accept",
         "POST /v1/calls/:callId/cancel",
@@ -82684,6 +82690,7 @@
       ],
       "migrationIntroduced": "024_phase7e_ai_platform_foundation.sql",
       "sourceReads": [
+        "services/greenfield-api/src/ai/account-preferences.ts",
         "services/greenfield-api/src/ai/repository.ts"
       ],
       "sourceWrites": [
@@ -82695,6 +82702,7 @@
         "POST /v1/admin/ai/models",
         "POST /v1/admin/ai/providers",
         "GET /v1/admin/ops/ai/providers",
+        "POST /v1/ai/preferences",
         "GET /v1/ai/providers"
       ],
       "routeWrites": [
