@@ -21,7 +21,7 @@ function expectMediaTypes(definition: string | undefined, expected: readonly str
   for (const mediaType of expected) expect(definition).toContain(mediaType)
 }
 
-describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 095', () => {
+describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and closeout migrations through 101', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -138,7 +138,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       '074_greenfield_v1_query_indexes', '075_greenfield_messaging',
       '076_greenfield_premium_entitlements', '077_optional_package_media',
       '078_gubic_game_catalogue', '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_publisher_release_runner_boundary', '093_publisher_release_governance_integrity', '094_publisher_signing_governance_hardening', '095_publisher_signing_integration_completion',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_publisher_release_runner_boundary', '093_publisher_release_governance_integrity', '094_publisher_signing_governance_hardening', '095_publisher_signing_integration_completion', '101_group_calls_and_call_ids',
     ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
@@ -146,7 +146,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('095')
+    expect(version.rows[0]?.value).toBe('101')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -155,7 +155,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('095_publisher_signing_integration_completion')
+    expect(applied.at(-1)).toBe('101_group_calls_and_call_ids')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)
@@ -179,6 +179,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(canonicalMolibooItems.rows[0]?.cosmetics).toBe(canonicalMolibooItems.rows[0]?.count)
     await client.end()
 
+    expect(await migrateDown(freshUrl)).toBe('101_group_calls_and_call_ids')
     await expect(migrateDown(freshUrl)).rejects.toThrow(/unsafe automated downgrade of 095 is prohibited/i)
     const hardened = new pg.Client({connectionString: freshUrl})
     await hardened.connect()
@@ -458,7 +459,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
     expect(await migrateUp(qaUrl)).toEqual([
       '076_greenfield_premium_entitlements', '077_optional_package_media', '078_gubic_game_catalogue',
       '079_story_attachment_pipeline', '080_push_notifications', '081_messaging_v2', '082_gubic_play_platform', '083_moliboo_game_systems',
-      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_publisher_release_runner_boundary', '093_publisher_release_governance_integrity', '094_publisher_signing_governance_hardening', '095_publisher_signing_integration_completion',
+      '084_moliboo_signed_packs', '085_publisher_release_console', '086_greenfield_communities', '087_greenfield_collections_and_drafts', '088_greenfield_premium_apple_sandbox', '089_messaging_v3', '090_calls_v1', '091_greenfield_online_signing_authority', '092_publisher_release_runner_boundary', '093_publisher_release_governance_integrity', '094_publisher_signing_governance_hardening', '095_publisher_signing_integration_completion', '101_group_calls_and_call_ids',
     ])
     const status = await migrateStatus(qaUrl)
     expect(status.pending).toEqual([])
@@ -473,7 +474,7 @@ describeIfDb.sequential('API-FIX-01, module-platform, distribution, Premium and 
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conname = 'greenfield_release_asset_blobs_media_type_check'
     `)
-    expect(version.rows[0]?.value).toBe('095')
+    expect(version.rows[0]?.value).toBe('101')
     expect(account.rows[0]?.count).toBe(1)
     expectMediaTypes(optionalMedia.rows[0]?.definition, mediaTypesAfter084)
     await after.end()

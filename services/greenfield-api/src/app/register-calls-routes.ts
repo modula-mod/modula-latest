@@ -4,6 +4,7 @@ import websocket from '@fastify/websocket'
 import type {CallsConfig} from '../config/env.js'
 import type {ModulaDb} from '../database/client.js'
 import {
+  CALL_ID_CODE_LENGTH,
   CALL_NEGOTIATION_TIMEOUT_MS,
   CALL_RECONNECT_GRACE_MS,
   CALL_RING_TIMEOUT_MS,
@@ -13,6 +14,7 @@ import {
   CALL_SIGNALLING_STALE_MS,
   CALL_TICKET_TTL_MS,
   isTerminal,
+  isValidIdempotencyKey,
 } from '../domains/calls/policy.js'
 import {CallError, CallsService, type CallActor, type CallTransition} from '../domains/calls/service.js'
 import {CallSignallingHub, FrameRateLimiter, isRelayType, parseClientFrame} from '../domains/calls/signalling-hub.js'
@@ -27,6 +29,8 @@ const CALL_ID = {type: 'string', pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-
 const callParams = {schema: {params: {type: 'object', additionalProperties: false, required: ['callId'], properties: {callId: CALL_ID}}}}
 const conversationParams = {schema: {params: {type: 'object', additionalProperties: false, required: ['id'], properties: {id: {type: 'string', minLength: 1, maxLength: 64}}}}}
 const registrationParams = {schema: {params: {type: 'object', additionalProperties: false, required: ['registrationId'], properties: {registrationId: {type: 'string', minLength: 1, maxLength: 64}}}}}
+/** Dialable call-ID codes: 8 digits, optionally grouped as "1234 5678" or "1234-5678". */
+const callIdCodeParams = {schema: {params: {type: 'object', additionalProperties: false, required: ['code'], properties: {code: {type: 'string', pattern: '^[0-9]{4}[ -]?[0-9]{4}$'}}}}}
 
 /** Capability block advertised in GET /v1/messaging/capabilities. Off unless every prerequisite is configured. */
 export function callsCapabilities(config: CallsConfig) {
@@ -35,7 +39,9 @@ export function callsCapabilities(config: CallsConfig) {
     audio: config.enabled,
     video: config.enabled,
     voipPush: config.enabled && config.voipTokenKey !== null,
-    maxParticipants: 2,
+    maxParticipants: config.groupMaxParticipants,
+    groupCalls: config.enabled && config.groupMaxParticipants > 2,
+    callIDs: {enabled: config.enabled, codeLength: CALL_ID_CODE_LENGTH, codeFormat: 'XXXX XXXX'},
     ringTimeoutMs: CALL_RING_TIMEOUT_MS,
     negotiationTimeoutMs: CALL_NEGOTIATION_TIMEOUT_MS,
     reconnectGraceMs: CALL_RECONNECT_GRACE_MS,
@@ -68,7 +74,7 @@ function bearer(header: unknown): string | null {
 }
 
 /**
- * 1:1 voice and video calls (CALLS-ARCHITECTURE.md). HTTP is the command and
+ * 1:1 and group voice/video calls (CALLS-ARCHITECTURE.md). HTTP is the command and
  * recovery boundary; the per-call WebSocket carries SDP/ICE relay and media
  * reports. Every route requires an authenticated actor and re-derives call
  * membership, blocks and state on each request.
@@ -94,24 +100,25 @@ export async function registerCallsRoutes(
   const actorOf = (auth: {actorId: string; sessionId: string; accountId: string}): CallActor => ({actorId: auth.actorId, sessionId: auth.sessionId, accountId: auth.accountId})
   const key = (request: any) => request.headers['idempotency-key']
 
-  /** Fan a committed transition out to both participants' messaging sockets and the call's signalling sockets. */
+  /** Fan a committed transition out to every participant's messaging socket and the call's signalling sockets. */
   const publish = (log: any, transition: CallTransition | null | undefined) => {
     if (!transition) return
     const {call} = transition
-    const participants = [call.initiator_actor_id, call.recipient_actor_id]
-    messagingHub.publish(participants, {
-      type: 'call.updated', callId: call.call_id, conversationId: call.conversation_id, state: call.state,
-      revision: call.revision, mediaKind: call.media_kind, initiatorActorId: call.initiator_actor_id,
-      event: transition.eventType, terminalReason: call.terminal_reason,
-    })
     void (async () => {
+      const participants = await calls.participantActorIds(call.call_id)
+      messagingHub.publish(participants, {
+        type: 'call.updated', callId: call.call_id, conversationId: call.conversation_id, state: call.state,
+        revision: call.revision, mediaKind: call.media_kind, initiatorActorId: call.initiator_actor_id,
+        event: transition.eventType, terminalReason: call.terminal_reason,
+      })
       const dtos = new Map(await Promise.all(participants.map(async id => [id, await calls.dtoFor(call, id)] as const)))
       signalling.broadcast(call.call_id, actorId => {
         const snapshot = dtos.get(actorId)
         if (!snapshot) return null
         if (transition.eventType === 'accepted') return {type: 'call.accepted', payload: {call: snapshot}}
         if (transition.eventType === 'media_disconnected') {
-          const owner = [call.initiator_actor_id, call.recipient_actor_id].sort()[0]
+          // The initiator owns the reconnect for a group call; 1:1 keeps the sorted-first owner.
+          const owner = call.kind === 'group' ? call.initiator_actor_id : [call.initiator_actor_id, call.recipient_actor_id].sort()[0]
           return {type: 'media.reconnect_required', payload: {call: snapshot, ownerActorId: owner, deadlineAt: call.state_deadline_at?.toISOString() ?? null}}
         }
         if (isTerminal(call.state)) return {type: `call.${call.state}`, payload: {call: snapshot, reason: call.terminal_reason}}
@@ -149,7 +156,7 @@ export async function registerCallsRoutes(
       const result = await calls.start(actorOf(auth), id, request.body, key(request), request.id)
       publish(request.log, result.transition)
       const status = result.replay || result.glare ? 200 : 201
-      return reply.code(status).send(successEnvelope({call: result.call, replay: result.replay, glare: result.glare}, request.id))
+      return reply.code(status).send(successEnvelope({call: result.call, replay: result.replay, glare: result.glare, notInvited: result.notInvited}, request.id))
     } catch (error) {
       return sendCallError(reply, error, request.id, 'Unable to start call')
     }
@@ -219,6 +226,73 @@ export async function registerCallsRoutes(
       return reply.send(successEnvelope(await calls.mediaCredentials(actorOf(auth), callId), request.id))
     } catch (error) {
       return sendCallError(reply, error, request.id, 'Unable to issue media credentials')
+    }
+  })
+
+  // ---- dialable call IDs -------------------------------------------------------------------
+  // A call ID is a per-account dialable alias for a person (8 digits, "1234 5678").
+  // Resolving one reveals nothing beyond a public callee card, and dialling one
+  // starts a 1:1 call in the existing accepted DM only — it never creates a DM.
+
+  app.post('/v1/calls/ids', write(), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    try {
+      const body = request.body
+      if (body !== undefined && body !== null && (typeof body !== 'object' || Object.keys(body as object).length > 0)) {
+        throw new CallError('VALIDATION_FAILED', 'This route takes no body fields')
+      }
+      if (!isValidIdempotencyKey(key(request))) throw new CallError('VALIDATION_FAILED', 'Idempotency-Key header (16-128 printable characters) is required')
+      const result = await calls.mintCallId(actorOf(auth))
+      return reply.code(result.isNew ? 201 : 200).send(successEnvelope({callId: result.callId}, request.id))
+    } catch (error) {
+      return sendCallError(reply, error, request.id, 'Unable to issue a call ID')
+    }
+  })
+
+  app.get('/v1/calls/ids/me', read(), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope({callId: await calls.myCallId(actorOf(auth))}, request.id))
+    } catch (error) {
+      return sendCallError(reply, error, request.id, 'Unable to load call ID')
+    }
+  })
+
+  app.delete('/v1/calls/ids/me', write(), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    try {
+      await calls.revokeCallId(actorOf(auth))
+      return reply.send(successEnvelope({revoked: true}, request.id))
+    } catch (error) {
+      return sendCallError(reply, error, request.id, 'Unable to revoke call ID')
+    }
+  })
+
+  app.get('/v1/calls/ids/:code', read(callIdCodeParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:read')
+    if (!auth) return
+    const {code} = request.params as {code: string}
+    try {
+      return reply.send(successEnvelope(await calls.resolveCallId(actorOf(auth), code), request.id))
+    } catch (error) {
+      return sendCallError(reply, error, request.id, 'Unable to resolve call ID')
+    }
+  })
+
+  app.post('/v1/calls/ids/:code/calls', write(callIdCodeParams), async (request, reply) => {
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    const {code} = request.params as {code: string}
+    try {
+      const result = await calls.startByCallId(actorOf(auth), code, request.body, key(request), request.id)
+      publish(request.log, result.transition)
+      const status = result.replay || result.glare ? 200 : 201
+      return reply.code(status).send(successEnvelope({call: result.call, replay: result.replay, glare: result.glare, notInvited: result.notInvited}, request.id))
+    } catch (error) {
+      return sendCallError(reply, error, request.id, 'Unable to start call')
     }
   })
 
@@ -350,16 +424,28 @@ export async function registerCallsRoutes(
         if (isRelayType(frame.type)) {
           if (current.state === 'ringing') { errorFrame('CALL_NOT_ACCEPTED', frame.messageId); return }
           if (current.direction === 'incoming' && current.answeredHere === false) { errorFrame('CALL_ALREADY_ANSWERED', frame.messageId); return }
+          if (current.kind === 'group') {
+            // Group mesh: only accepted participants signal, and signal frames
+            // are addressed to one participant (a mesh pair), never broadcast.
+            const mine = current.participants.find(p => p.id === actorId)
+            if (!mine || (mine.role !== 'initiator' && mine.response !== 'accepted')) { errorFrame('CALL_NOT_ACCEPTED', frame.messageId); return }
+            if (!frame.targetActorId || !current.participants.some(p => p.id === frame.targetActorId)) { errorFrame('INVALID_PAYLOAD', frame.messageId); return }
+          }
           if (frame.type === 'signal.offer') {
-            const owner = current.state === 'reconnecting'
-              ? [current.initiatorActorId, current.recipientActorId].sort()[0]
-              : current.initiatorActorId
-            if (owner !== actorId) { errorFrame('SIGNALLING_GLARE', frame.messageId); return }
+            if (current.kind === 'group') {
+              // Each mesh pair negotiates under its own id, owned by whoever offered first.
+              if (!signalling.offerOwner(callId, frame.negotiationId!, actorId)) { errorFrame('SIGNALLING_GLARE', frame.messageId); return }
+            } else {
+              const owner = current.state === 'reconnecting'
+                ? [current.initiatorActorId, current.recipientActorId].sort()[0]
+                : current.initiatorActorId
+              if (owner !== actorId) { errorFrame('SIGNALLING_GLARE', frame.messageId); return }
+            }
           }
           if (frame.type === 'signal.ice_candidate' && !signalling.allowCandidate(callId, actorId, frame.negotiationId!)) {
             errorFrame('TOO_MANY_CANDIDATES', frame.messageId); return
           }
-          ack(frame.messageId, {relayed: signalling.relay(callId, actorId, frame)})
+          ack(frame.messageId, {relayed: signalling.relay(callId, actorId, frame, frame.targetActorId ?? undefined) > 0})
           return
         }
         if (frame.type === 'media.connected' || frame.type === 'media.disconnected' || frame.type === 'media.reconnect_started') {

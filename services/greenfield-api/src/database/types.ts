@@ -1471,8 +1471,10 @@ export interface Database {
   greenfield_calls: {
     call_id: string
     conversation_id: string
+    kind: 'direct' | 'group'
+    max_participants: number
     initiator_actor_id: string
-    recipient_actor_id: string
+    recipient_actor_id: string | null
     media_kind: 'audio' | 'video'
     state: CallState
     revision: number
@@ -1493,7 +1495,7 @@ export interface Database {
   greenfield_call_participants: {
     call_id: string
     actor_id: string
-    role: 'initiator' | 'recipient'
+    role: 'initiator' | 'recipient' | 'participant'
     response: 'invited' | 'accepted' | 'declined'
     live: boolean
     selected_session_id: string | null
@@ -1573,6 +1575,14 @@ export interface Database {
     relay_only: boolean
     version: number
     updated_at: Date
+  }
+  greenfield_call_ids: {
+    code: string
+    actor_id: string
+    account_id: string
+    created_at: Date
+    revoked_at: Date | null
+    revoked_reason: 'user_removed' | null
   }
   greenfield_communities: {
     community_id: string

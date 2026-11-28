@@ -30,7 +30,7 @@ const CLIENT_TYPES = new Set([
   'client.ready', 'signal.offer', 'signal.answer', 'signal.ice_candidate', 'signal.ice_complete',
   'media.connected', 'media.disconnected', 'media.reconnect_started', 'call.end', 'ping',
 ])
-const ENVELOPE_KEYS = new Set(['protocolVersion', 'type', 'messageId', 'callId', 'negotiationId', 'expectedRevision', 'sentAt', 'payload'])
+const ENVELOPE_KEYS = new Set(['protocolVersion', 'type', 'messageId', 'callId', 'negotiationId', 'targetActorId', 'expectedRevision', 'sentAt', 'payload'])
 const MEDIA_DISCONNECT_REASONS = new Set(['ice_failed', 'ice_disconnected', 'network_change', 'audio_interrupted', 'unknown'])
 
 export type ClientFrame = {
@@ -38,6 +38,8 @@ export type ClientFrame = {
   messageId: string
   callId: string
   negotiationId: string | null
+  /** Addressee for signal.* frames in a group call; null means fan out to every other participant. */
+  targetActorId: string | null
   payload: Record<string, unknown>
 }
 
@@ -60,9 +62,12 @@ export function parseClientFrame(raw: string | Buffer, callId: string): ClientFr
   if (value.negotiationId !== undefined && value.negotiationId !== null && (typeof value.negotiationId !== 'string' || !ID.test(value.negotiationId))) {
     return {error: 'INVALID_NEGOTIATION_ID'}
   }
+  if (value.targetActorId !== undefined && value.targetActorId !== null && (typeof value.targetActorId !== 'string' || value.targetActorId.length === 0 || value.targetActorId.length > 128)) {
+    return {error: 'INVALID_PAYLOAD'}
+  }
   const payload = value.payload ?? {}
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return {error: 'INVALID_PAYLOAD'}
-  const frame: ClientFrame = {type: value.type, messageId: value.messageId, callId, negotiationId: value.negotiationId ?? null, payload}
+  const frame: ClientFrame = {type: value.type, messageId: value.messageId, callId, negotiationId: value.negotiationId ?? null, targetActorId: value.targetActorId ?? null, payload}
   const keys = Object.keys(payload)
   const only = (...allowed: string[]) => keys.every(key => allowed.includes(key))
   switch (frame.type) {
@@ -133,6 +138,8 @@ type CallRoom = {
 
 export class CallSignallingHub {
   private readonly rooms = new Map<string, CallRoom>()
+  /** First offer sender per (callId, negotiationId): the owner of that mesh-pair negotiation. Group calls only. */
+  private readonly offerOwners = new Map<string, Map<string, string>>()
 
   private room(callId: string): CallRoom {
     let room = this.rooms.get(callId)
@@ -191,22 +198,48 @@ export class CallSignallingHub {
     return {protocolVersion: CALL_SIGNALLING_PROTOCOL_VERSION, type, sequence: room.sequence, callId, sentAt: new Date().toISOString(), ...extra, payload}
   }
 
-  /** Relay to the other participant's selected (newest) socket. Returns whether a socket received it. */
-  relay(callId: string, fromActorId: string, frame: ClientFrame): boolean {
+  /**
+   * Relay a frame. With a target actor it goes to that participant's selected
+   * (newest) socket only (addressed mesh pair); without one it fans out to
+   * every other participant. Returns how many sockets received it.
+   */
+  relay(callId: string, fromActorId: string, frame: ClientFrame, targetActorId?: string | null): number {
     const room = this.rooms.get(callId)
-    if (!room) return false
+    if (!room) return 0
+    let delivered = 0
     for (const [actorId, peers] of room.peers) {
       if (actorId === fromActorId) continue
+      if (targetActorId && actorId !== targetActorId) continue
       const target = peers.at(-1)
       if (!target) continue
       try {
         target.send(this.frame(callId, frame.type, frame.payload, {messageId: frame.messageId, negotiationId: frame.negotiationId}))
-        return true
+        delivered += 1
       } catch {
-        return false
+        // A dead socket counts as undelivered; other recipients still get the frame.
       }
     }
-    return false
+    return delivered
+  }
+
+  /**
+   * Group-call offer ownership: the first sender of an offer for a
+   * (callId, negotiationId) owns that mesh-pair negotiation. A different
+   * sender offering under the same id is glare. 1:1 calls keep the
+   * initiator-owns rule in the route layer and never call this.
+   */
+  offerOwner(callId: string, negotiationId: string, actorId: string): boolean {
+    let owners = this.offerOwners.get(callId)
+    if (!owners) {
+      owners = new Map()
+      this.offerOwners.set(callId, owners)
+    }
+    const existing = owners.get(negotiationId)
+    if (!existing) {
+      owners.set(negotiationId, actorId)
+      return true
+    }
+    return existing === actorId
   }
 
   sendTo(callId: string, actorId: string, type: string, payload: Record<string, unknown>): void {
@@ -228,6 +261,7 @@ export class CallSignallingHub {
     if (!room) return
     for (const peers of room.peers.values()) for (const peer of [...peers]) peer.close(code, reason)
     this.rooms.delete(callId)
+    this.offerOwners.delete(callId)
   }
 
   closeActor(callId: string, actorId: string, code: number, reason: string): void {
