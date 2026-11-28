@@ -39,6 +39,15 @@ Modules must not construct OpenAI, Anthropic, local-runtime or other provider-sp
   - `/v1/admin/ai/prompts`;
   - `/v1/admin/ai/tools`.
 
+## Cloud providers (later addition)
+
+Direct cloud adapters for Anthropic and Google Gemini sit behind the same gateway (`services/greenfield-api/src/ai/providers/anthropic-provider.ts`, `gemini-provider.ts`; registry wiring in `providers/registry.ts`; migration 102 seeds the `provider:gemini` row and adds `greenfield_ai_account_preferences`). The provider is interchangeable — identity, personality and memory are assembled provider-neutrally and stay the same whichever model answers (see `greenfield-ai-provider-runtime.md`). Cloud is opt-in per account and local-first by default (see `greenfield-ai-routing.md`); cost is estimated from operator-set per-model pricing. Account self-service surfaces:
+
+  - `GET /v1/ai/preferences` / `POST /v1/ai/preferences` (cloud opt-in, default routing strategy, preferred provider, monthly budget);
+  - `POST /v1/ai/providers/:providerId/credentials` (store an account API key), `GET` (status only), `DELETE` (revoke).
+
+Seeded cloud providers/models stay `unconfigured` / `unavailable` / disabled until an operator configures credentials and enables a real model. No real API keys exist in the repository.
+
 ## Data Boundary
 
 The request ledger records provider, model, prompt reference, module, account, actor, installation, latency, token counts, cost estimate, status, retries and correlation data. It does not store provider payloads, prompt templates, note content, response bodies or streamed tokens.

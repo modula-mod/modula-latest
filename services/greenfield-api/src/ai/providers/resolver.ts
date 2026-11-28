@@ -20,6 +20,13 @@ export type GreenfieldAIProviderResolutionInput = {
   streaming?: boolean
   openCircuitDurationMs?: number
   allowDevelopmentMock?: boolean
+  /**
+   * Cloud providers may be selected. False means local providers only
+   * (fail-closed to local). Defaults to true for callers that do not
+   * enforce the account opt-in; the runtime service always passes the
+   * account's preference explicitly.
+   */
+  allowRemote?: boolean
 }
 
 type Candidate = {
@@ -53,6 +60,7 @@ export class GreenfieldAIProviderResolver {
       if (provider.status !== 'available') continue
       if (provider.configurationMode === 'disabled') continue
       if (provider.configurationMode === 'development-mock' && !input.allowDevelopmentMock) continue
+      if (input.allowRemote === false && !isLocalProvider(provider)) continue
       if (permittedProviders && !permittedProviders.has(provider.providerId)) continue
       if (input.preferredProviderId && input.routingStrategy === 'fixed' && provider.providerId !== input.preferredProviderId) continue
       const health = await this.runtime.latestProviderHealth(provider.providerId, model.modelId)

@@ -213,7 +213,7 @@ export class GreenfieldAIRepository {
     return toModelEntry(row)
   }
 
-  async resolveModel(input: {preferredModelId?: string; requiredCapabilities: string[]}): Promise<AIModelResolution> {
+  async resolveModel(input: {preferredModelId?: string; requiredCapabilities: string[]; permittedProviderIds?: string[]}): Promise<AIModelResolution> {
     const candidates = input.preferredModelId
       ? [await this.requireModel(input.preferredModelId)]
       : await this.listModels()
@@ -221,6 +221,7 @@ export class GreenfieldAIRepository {
     for (const model of candidates) {
       if (!model.enabled || model.availability !== 'available' || model.lifecycleStatus === 'retired') continue
       if (!capabilitiesSatisfied(model, input.requiredCapabilities)) continue
+      if (input.permittedProviderIds && !input.permittedProviderIds.includes(model.providerId)) continue
       const provider = await this.requireProvider(model.providerId)
       if (provider.status !== 'available') continue
       return {model, provider}
@@ -606,6 +607,7 @@ export function toModelEntry(row: Database['greenfield_ai_models']): GreenfieldA
     availability: row.availability,
     lifecycleStatus: row.lifecycle_status,
     enabled: row.enabled,
+    limits: recordFromJson(row.limits),
   }
 }
 

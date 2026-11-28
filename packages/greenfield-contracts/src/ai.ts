@@ -151,6 +151,13 @@ export interface GreenfieldAIModelRegistryEntry {
   availability: GreenfieldAIModelAvailability
   lifecycleStatus: GreenfieldAIModelLifecycleStatus
   enabled: boolean
+  /**
+   * Operator-set model metadata, including optional pricing
+   * (`inputPricePerMillionMinorUnits`, `outputPricePerMillionMinorUnits`,
+   * `currency`) used for cost estimation. Absent pricing means cost is
+   * unknown and a monthly budget does not bind for this model.
+   */
+  limits?: Record<string, unknown>
 }
 
 export interface GreenfieldAIPromptResource {

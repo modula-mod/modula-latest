@@ -123,6 +123,48 @@ export class AIProviderCredentialService {
     return record ? toPublicCredentialRecord(record) : null
   }
 
+  /**
+   * Revoke the active credential for a scope. The ciphertext row stays in
+   * the table with status `revoked` (auditable, never usable again) — the
+   * key material is not deleted, because the audit trail must be able to
+   * show which credential was revoked and when. Storing a replacement
+   * credential rotates the old one instead.
+   */
+  async revoke(input: {
+    providerId: string
+    scopeType: AIProviderCredentialScope['scopeType']
+    scopeId?: string | null
+    actorId?: string | null
+    requestId?: string | null
+    correlationId?: string | null
+  }): Promise<{revoked: boolean}> {
+    const record = await this.repository.activeCredential(input.providerId, input.scopeType, input.scopeId ?? null)
+    if (!record) return {revoked: false}
+    const revoked = await this.repository.revokeCredential(record.credential_id)
+    if (revoked) {
+      await this.audit.append(
+        'ai.provider.credential.revoked',
+        {credentialId: record.credential_id, providerId: input.providerId, scopeType: input.scopeType, scopeId: input.scopeId ?? null},
+        {type: 'aiProviderCredential', id: record.credential_id, actorId: input.actorId ?? null},
+        {accountId: input.scopeType === 'account' ? input.scopeId ?? null : null, requestId: input.requestId ?? null, correlationId: input.correlationId ?? input.requestId ?? null},
+      )
+      this.events.publish({
+        eventType: 'ai.provider.credential.revoked',
+        aggregateType: 'aiProviderCredential',
+        aggregateId: record.credential_id,
+        accountId: input.scopeType === 'account' ? input.scopeId ?? null : null,
+        actorId: input.actorId ?? null,
+        requestId: input.requestId ?? null,
+        correlationId: input.correlationId ?? input.requestId ?? null,
+        idempotencyKey: `ai-provider-credential-revoked:${record.credential_id}:${Date.now()}`,
+        visibility: 'internal',
+        classification: 'sensitive',
+        payload: {providerId: input.providerId, scopeType: input.scopeType, scopeId: input.scopeId ?? null},
+      }).catch(() => undefined)
+    }
+    return {revoked}
+  }
+
   async publishProviderEnabled(input: {providerId: string; enabled: boolean; actorId?: string | null; requestId?: string | null}): Promise<void> {
     await this.audit.append(
       input.enabled ? 'ai.provider.enabled' : 'ai.provider.disabled',

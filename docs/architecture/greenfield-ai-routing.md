@@ -14,9 +14,19 @@ Resolver inputs:
 - Preferred model and provider.
 - Permitted provider list.
 - Account and module policy context.
+- Account cloud preferences (`allowRemoteCloud`, default routing strategy, preferred provider, monthly budget).
 - Provider health and circuit state.
 - Structured output and streaming requirements.
 - Quota preflight status.
+
+## Account cloud gate
+
+Routing is local-first by default and cloud is opt-in per account (`greenfield_ai_account_preferences`, migration 102). The runtime and gateway load the account's preferences before resolution:
+
+- `allowRemoteCloud` defaults to `false`. While false, non-local providers are excluded from resolution entirely — a request that can only be served by a cloud model fails closed (`CAPABILITY_DISABLED`), it never silently falls back to cloud.
+- `defaultRoutingStrategy` defaults to `local-first`. A module manifest's declared strategy overrides the account default; an explicit per-request strategy overrides both.
+- `preferredProviderId` (optional) scores that provider's models first; with strategy `fixed` it is the only eligible provider.
+- `monthlyBudgetMinorUnits` (optional) is mirrored into an `estimated-spend` usage-limit row, so the existing quota machinery enforces it. The quota preflight refuses a call when accrued spend already meets the budget. Cost accrues post-call from operator-set per-model pricing in the model row's `limits` metadata (`inputPricePerMillionMinorUnits` / `outputPricePerMillionMinorUnits`); a model without pricing accrues no cost and a budget does not bind for it. Known limitation: quota buckets reset daily (see `bucketStartFor` in `quota-service.ts`), so a "monthly" budget currently counts only today's spend — it under-enforces across days and must be fixed before budgets are offered as a billing control.
 
 Resolver output:
 
