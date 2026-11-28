@@ -35,9 +35,13 @@ const envSchema = z.object({
   MODULA_WORKER_MEDIA_CLEANUP_ACTIVE_UPLOAD_GRACE_MS: z.coerce.number().int().min(60_000).default(3_600_000),
   MODULA_WORKER_MEDIA_CLEANUP_BATCH_SIZE: z.coerce.number().int().min(1).max(1_000).default(200),
   MODULA_MAIL_TRANSPORT: z.enum(['disabled', 'log', 'smtp']).optional(),
-  MODULA_MAIL_PROVISIONER_MODE: z.enum(['disabled', 'dry-run', 'hestia']).optional(),
+  MODULA_MAIL_PROVISIONER_MODE: z.enum(['disabled', 'dry-run', 'hestia', 'hestia-api']).optional(),
   MODULA_MAIL_DOMAIN: z.string().min(1).default('modula.digital'),
   MODULA_MAIL_HESTIA_USER: z.string().min(1).optional(),
+  MODULA_MAIL_HESTIA_API_URL: z.string().min(1).default('https://host.docker.internal:8083/api/'),
+  MODULA_MAIL_HESTIA_API_KEY: z.string().min(1).optional(),
+  MODULA_MAIL_HESTIA_API_SECRET: z.string().min(1).optional(),
+  MODULA_MAIL_HESTIA_API_CA_PATH: z.string().min(1).optional(),
   MODULA_MAIL_PROVISIONER_COMMAND_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
   MODULA_MAIL_DEFAULT_QUOTA_BYTES: z.coerce.number().int().positive().default(1_073_741_824),
   MODULA_MAIL_REQUIRED: z
@@ -115,9 +119,13 @@ export type WorkerConfig = {
   mediaCleanupActiveUploadGraceMs: number
   mediaCleanupBatchSize: number
   mailTransport: 'disabled' | 'log' | 'smtp'
-  mailProvisionerMode: 'disabled' | 'dry-run' | 'hestia'
+  mailProvisionerMode: 'disabled' | 'dry-run' | 'hestia' | 'hestia-api'
   mailDomain: string
   mailHestiaUser?: string
+  mailHestiaApiUrl: string
+  mailHestiaApiKey?: string
+  mailHestiaApiSecret?: string
+  mailHestiaApiCaPath?: string
   mailProvisionerCommandTimeoutMs: number
   mailDefaultQuotaBytes: number
   mailRequired: boolean
@@ -198,6 +206,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
   if (mailProvisionerMode === 'hestia' && !raw.MODULA_MAIL_HESTIA_USER) {
     refuse('MODULA_MAIL_HESTIA_USER is required when MODULA_MAIL_PROVISIONER_MODE=hestia')
   }
+  if (mailProvisionerMode === 'hestia-api') {
+    if (!raw.MODULA_MAIL_HESTIA_USER) {
+      refuse('MODULA_MAIL_HESTIA_USER is required when MODULA_MAIL_PROVISIONER_MODE=hestia-api')
+    }
+    if (!raw.MODULA_MAIL_HESTIA_API_KEY) {
+      refuse('MODULA_MAIL_HESTIA_API_KEY is required when MODULA_MAIL_PROVISIONER_MODE=hestia-api')
+    }
+    if (!raw.MODULA_MAIL_HESTIA_API_SECRET) {
+      refuse('MODULA_MAIL_HESTIA_API_SECRET is required when MODULA_MAIL_PROVISIONER_MODE=hestia-api')
+    }
+  }
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
   const encryptionKeysByVersion = new Map<number, Buffer>()
   let isEphemeral = false
@@ -249,6 +268,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     mailProvisionerMode,
     mailDomain: raw.MODULA_MAIL_DOMAIN,
     mailHestiaUser: raw.MODULA_MAIL_HESTIA_USER,
+    mailHestiaApiUrl: raw.MODULA_MAIL_HESTIA_API_URL,
+    mailHestiaApiKey: raw.MODULA_MAIL_HESTIA_API_KEY,
+    mailHestiaApiSecret: raw.MODULA_MAIL_HESTIA_API_SECRET,
+    mailHestiaApiCaPath: raw.MODULA_MAIL_HESTIA_API_CA_PATH,
     mailProvisionerCommandTimeoutMs: raw.MODULA_MAIL_PROVISIONER_COMMAND_TIMEOUT_MS,
     mailDefaultQuotaBytes: raw.MODULA_MAIL_DEFAULT_QUOTA_BYTES,
     mailRequired,

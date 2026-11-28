@@ -5,6 +5,7 @@ import {sql, type Transaction} from 'kysely'
 import type {WorkerConfig} from '../config.js'
 import type {Database, ModulaWorkerDb} from '../database.js'
 import {PermanentJobError, TransientJobError} from '../jobs/errors.js'
+import {HestiaApiMailProviderAdapter} from './hestia-api.js'
 
 const execFileAsync = promisify(execFile)
 
@@ -13,20 +14,20 @@ type MailIdentityPayload = {
   mailIdentityId?: unknown
 }
 
-type ProviderOperationResult = {
+export type ProviderOperationResult = {
   providerReference: string
   quotaBytes?: number | null
   storageUsedBytes?: number | null
 }
 
-type ProviderProvisionInput = {
+export type ProviderProvisionInput = {
   localPart: string
   domain: string
   address: string
   secret: string
 }
 
-type ProviderForwardInput = {
+export type ProviderForwardInput = {
   localPart: string
   domain: string
   address: string
@@ -35,7 +36,7 @@ type ProviderForwardInput = {
   keepLocalCopy: boolean
 }
 
-type MailProviderAdapter = {
+export type MailProviderAdapter = {
   providerId: string
   health(): Promise<{status: 'healthy' | 'disabled'; provider: string}>
   availability(input: {localPart: string; domain: string; address: string}): Promise<{available: boolean; reason: string | null}>
@@ -434,6 +435,7 @@ class HestiaMailProviderAdapter implements MailProviderAdapter {
 
 function createAdapter(config: WorkerConfig): MailProviderAdapter {
   if (config.mailProvisionerMode === 'hestia') return new HestiaMailProviderAdapter(config)
+  if (config.mailProvisionerMode === 'hestia-api') return new HestiaApiMailProviderAdapter(config)
   return new DryRunMailProviderAdapter()
 }
 
