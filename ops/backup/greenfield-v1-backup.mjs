@@ -2,7 +2,7 @@
 import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync} from 'node:fs'
 import {basename, dirname, join, resolve} from 'node:path'
 import {spawnSync} from 'node:child_process'
-import {commitBackupRun, offHostPushViaCli} from './greenfield-v1-backup-markers.mjs'
+import {commitBackupRun, offHostPushViaCli, resolveAcceptedBackupSource} from './greenfield-v1-backup-markers.mjs'
 
 process.umask(0o077)
 
@@ -30,8 +30,19 @@ if (expectedSourceRevision !== undefined) {
   if (!/^[0-9a-f]{40}$/.test(expectedSourceRevision)) fail('MODULA_BACKUP_EXPECTED_SOURCE_SHA must be an exact Git SHA')
   if (sourceRevision !== expectedSourceRevision) fail('production checkout does not match the expected backup source SHA')
 } else {
+  // The production checkout is deliberately pinned at the deployed revision
+  // while origin/main moves ahead, so "must equal origin/main" fails the
+  // scheduled backup every day main advances. Accept the checkout when it is
+  // either origin/main or the exact revision the production containers run,
+  // provided that deployed revision is an ancestor of origin/main (so the
+  // backup set still comes from a known mainline revision). The exact-SHA,
+  // on-main and clean-tree checks above still apply, and the container loop
+  // below still verifies the containers run this same revision.
   const originMain = git(['rev-parse', 'origin/main'])
-  if (sourceRevision !== originMain) fail('scheduled backup requires production checkout to match origin/main')
+  const deployedRevision = readDeployedRevision()
+  const deployedIsAncestor = deployedRevision !== null && gitIsAncestor(deployedRevision, originMain)
+  const accepted = resolveAcceptedBackupSource({sourceRevision, originMain, deployedRevision, deployedIsAncestor})
+  if (!accepted.accepted) fail(`scheduled backup requires production checkout to match origin/main (${originMain}) or the deployed revision (${deployedRevision ?? 'unknown'}); checkout is ${sourceRevision}`)
 }
 
 for (const container of [apiContainer, workerContainer]) {
@@ -133,6 +144,26 @@ function copyRequired(source, target) {
 
 function dockerInspect(container) {
   return JSON.parse(run('docker', ['inspect', container], process.env))[0]
+}
+
+function readDeployedRevision() {
+  try {
+    const revisions = [apiContainer, workerContainer].map(name => {
+      const running = dockerInspect(name)
+      if (running.State?.Running !== true) return null
+      const revision = running.Config?.Labels?.['org.opencontainers.image.revision']
+      return typeof revision === 'string' && /^[0-9a-f]{40}$/.test(revision) ? revision : null
+    })
+    if (revisions[0] === null || revisions[0] !== revisions[1]) return null
+    return revisions[0]
+  } catch {
+    return null
+  }
+}
+
+function gitIsAncestor(revision, ancestorOf) {
+  const result = spawnSync('git', ['-C', repo, 'merge-base', '--is-ancestor', revision, ancestorOf], {encoding: 'utf8'})
+  return result.status === 0
 }
 
 function git(args) {

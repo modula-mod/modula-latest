@@ -53,3 +53,35 @@ export function commitBackupRun({outputRoot, marker, backupDir, env = process.en
   writeMarker(outputRoot, 'last-success.json', committed)
   return committed
 }
+
+const SHA40 = /^[0-9a-f]{40}$/
+
+/**
+ * Decide whether a backup source checkout is acceptable.
+ *
+ * The scheduled backup runs from the production checkout, which is deliberately
+ * pinned at the deployed revision while origin/main moves ahead, so "must equal
+ * origin/main" fails the backup every day main advances (13 consecutive daily
+ * failures, 2026-11-16..28). Accept the checkout when it is either origin/main
+ * or the exact revision the production containers run, provided that deployed
+ * revision is an ancestor of origin/main -- so the backup set still comes from
+ * a known mainline revision. The caller still enforces exact-SHA, on-main and
+ * clean-tree before this check. An explicit MODULA_BACKUP_EXPECTED_SOURCE_SHA
+ * pin keeps its existing strict behaviour.
+ */
+export function resolveAcceptedBackupSource({sourceRevision, originMain, deployedRevision = null, deployedIsAncestor = false, expectedSha} = {}) {
+  if (typeof expectedSha === 'string') {
+    if (!SHA40.test(expectedSha)) return {accepted: false, reason: 'MODULA_BACKUP_EXPECTED_SOURCE_SHA must be an exact Git SHA'}
+    return sourceRevision === expectedSha
+      ? {accepted: true, basis: 'expected-sha'}
+      : {accepted: false, reason: 'production checkout does not match the expected backup source SHA'}
+  }
+  if (sourceRevision === originMain) return {accepted: true, basis: 'origin-main'}
+  if (
+    typeof deployedRevision === 'string' &&
+    SHA40.test(deployedRevision) &&
+    sourceRevision === deployedRevision &&
+    deployedIsAncestor === true
+  ) return {accepted: true, basis: 'deployed-revision'}
+  return {accepted: false, reason: 'scheduled backup requires production checkout to match origin/main or the deployed revision'}
+}
