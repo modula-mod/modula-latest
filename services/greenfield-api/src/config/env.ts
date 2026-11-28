@@ -162,6 +162,8 @@ const envSchema = z.object({
   MODULA_CALLS_TURN_SECRET: z.string().min(32).optional(),
   /** TURN credential lifetime in seconds (default 600, bounded 60..3600). */
   MODULA_CALLS_TURN_TTL_SECONDS: z.coerce.number().int().min(60).max(3600).default(600),
+  /** Maximum participants in a group call (mesh cap, default 6, bounded 2..8). 2 disables group calls. */
+  MODULA_CALLS_GROUP_MAX_PARTICIPANTS: z.coerce.number().int().min(2).max(8).default(6),
   /** Server-side pepper for signalling-ticket hashes. */
   MODULA_CALLS_TICKET_PEPPER: z.string().min(32).optional(),
   /** Base64 32-byte AES-256-GCM key for PushKit VoIP tokens at rest. VoIP push is off without it. */
@@ -615,6 +617,8 @@ export type CallsConfig = {
   turnUrls: string[]
   turnSecret: string | null
   turnTtlSeconds: number
+  /** Configured group-call participant cap (2..8). Group calls are off when this is 2. */
+  groupMaxParticipants: number
   ticketPepper: string | null
   voipTokenKey: Buffer | null
 }
@@ -642,6 +646,7 @@ function callsConfig(raw: z.infer<typeof envSchema>): CallsConfig {
     turnUrls,
     turnSecret: raw.MODULA_CALLS_TURN_SECRET ?? null,
     turnTtlSeconds: raw.MODULA_CALLS_TURN_TTL_SECONDS,
+    groupMaxParticipants: raw.MODULA_CALLS_GROUP_MAX_PARTICIPANTS,
     ticketPepper: raw.MODULA_CALLS_TICKET_PEPPER ?? null,
     voipTokenKey,
   }

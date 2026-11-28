@@ -61,6 +61,8 @@ describeIfDb('Calls v1: lifecycle, policy, TURN, VoIP registration and ticket-au
       ['POST', '/v1/conversations/c1/calls'], ['GET', `/v1/calls/${id}`], ['GET', '/v1/me/calls'],
       ['POST', `/v1/calls/${id}/accept`], ['POST', `/v1/calls/${id}/decline`], ['POST', `/v1/calls/${id}/cancel`], ['POST', `/v1/calls/${id}/end`],
       ['POST', `/v1/calls/${id}/signalling-ticket`], ['POST', `/v1/calls/${id}/media-credentials`],
+      ['POST', '/v1/calls/ids'], ['GET', '/v1/calls/ids/me'], ['DELETE', '/v1/calls/ids/me'],
+      ['GET', '/v1/calls/ids/12345678'], ['POST', '/v1/calls/ids/12345678/calls'],
       ['GET', '/v1/me/call-settings'], ['PATCH', '/v1/me/call-settings'],
       ['POST', '/v1/push/voip-devices'], ['GET', '/v1/push/voip-devices'], ['DELETE', '/v1/push/voip-devices/r1'],
     ]
@@ -70,7 +72,7 @@ describeIfDb('Calls v1: lifecycle, policy, TURN, VoIP registration and ticket-au
     }
     const u = await user('cap')
     const caps = (await authed(u.accessToken, 'GET', '/v1/messaging/capabilities')).json().data
-    expect(caps.calls).toMatchObject({enabled: true, audio: true, video: true, voipPush: true, maxParticipants: 2, ringTimeoutMs: 30_000, signallingProtocolVersion: 1})
+    expect(caps.calls).toMatchObject({enabled: true, audio: true, video: true, voipPush: true, maxParticipants: 6, groupCalls: true, callIDs: {enabled: true, codeLength: 8, codeFormat: 'XXXX XXXX'}, ringTimeoutMs: 30_000, signallingProtocolVersion: 1})
   })
 
   it('runs ring, accept and end with idempotent commands, role checks and history', async () => {
@@ -332,6 +334,107 @@ describeIfDb('Calls v1: lifecycle, policy, TURN, VoIP registration and ticket-au
     expect((await hashes()).every(t => t.consumed_at === null)).toBe(true)
   })
 
+  it('runs a group call: ring, decline-one, first accept, late join, media to active, leave, end', async () => {
+    const [a, b, c, d, outsider] = [await user('gca'), await user('gcb'), await user('gcc'), await user('gcd'), await user('gco')]
+    const group = await groupChat(a, [b, c, d])
+    const started = await authed(a.accessToken, 'POST', `/v1/conversations/${group}/calls`, {mediaKind: 'audio'}, idem())
+    expect(started.statusCode, started.body).toBe(201)
+    const call = started.json().data.call
+    expect(call).toMatchObject({kind: 'group', state: 'ringing', revision: 1, maxParticipants: 6, participantCount: 4, recipientActorId: null, other: null})
+    expect(call.participants.map((x: any) => x.role).sort()).toEqual(['initiator', 'participant', 'participant', 'participant'])
+    expect((await authed(outsider.accessToken, 'GET', `/v1/calls/${call.id}`)).statusCode).toBe(404)
+
+    // d declines while ringing; the call keeps ringing for b and c.
+    expect((await authed(d.accessToken, 'POST', `/v1/calls/${call.id}/decline`, {}, idem())).statusCode).toBe(200)
+    const ringing = (await authed(a.accessToken, 'GET', `/v1/calls/${call.id}`)).json().data.call
+    expect(ringing.state).toBe('ringing')
+    expect(ringing.participants.find((x: any) => x.id === d.actorId)).toMatchObject({response: 'declined'})
+    expect((await authed(d.accessToken, 'POST', `/v1/calls/${call.id}/media-credentials`, {})).statusCode).toBe(409)
+
+    // First accept moves ringing -> connecting; a second accept while connecting is a join.
+    expect((await authed(b.accessToken, 'POST', `/v1/calls/${call.id}/accept`, {}, idem())).json().data.call).toMatchObject({state: 'connecting'})
+    const joined = await authed(c.accessToken, 'POST', `/v1/calls/${call.id}/accept`, {}, idem())
+    expect(joined.statusCode, joined.body).toBe(200)
+    expect(joined.json().data.call).toMatchObject({state: 'connecting', participantCount: 4})
+    expect(joined.json().data.call.participants.find((x: any) => x.id === c.actorId)).toMatchObject({response: 'accepted'})
+
+    // Media: initiator + b connect on independent negotiations; any two connected means active.
+    const path = `/v1/calls/${call.id}/signalling`
+    const sa = await openSignalling(path, (await authed(a.accessToken, 'POST', `/v1/calls/${call.id}/signalling-ticket`, {})).json().data.ticket)
+    const sb = await openSignalling(path, (await authed(b.accessToken, 'POST', `/v1/calls/${call.id}/signalling-ticket`, {})).json().data.ticket)
+    await waitFor(() => sa.events.some(e => e.type === 'server.ready') && sb.events.some(e => e.type === 'server.ready'))
+    const gframe = (type: string, payload: Record<string, unknown>, negotiationId: string, targetActorId?: string) => JSON.stringify({
+      protocolVersion: 1, type, messageId: `m-${Math.random().toString(36).slice(2, 12)}`, callId: call.id, negotiationId,
+      ...(targetActorId ? {targetActorId} : {}), payload,
+    })
+    // Unaddressed signal frames are rejected in a group call; addressed ones reach only the target.
+    sa.ws.send(gframe('signal.offer', {sdp: 'v=0 offer'}, 'nego-group-a'))
+    await waitFor(() => sa.events.some(e => e.type === 'error' && e.payload.code === 'INVALID_PAYLOAD'))
+    sa.ws.send(gframe('signal.offer', {sdp: 'v=0 offer'}, 'nego-group-a', b.actorId))
+    await waitFor(() => sb.events.some(e => e.type === 'signal.offer'))
+    expect(sb.events.find(e => e.type === 'signal.offer')).toMatchObject({payload: {sdp: 'v=0 offer'}})
+    sa.ws.send(gframe('media.connected', {iceType: 'relay', audio: true, video: false}, 'nego-group-a'))
+    sb.ws.send(gframe('media.connected', {iceType: 'relay', audio: true, video: false}, 'nego-group-b'))
+    await waitFor(() => sa.events.some(e => e.type === 'call.snapshot' && e.payload.call.state === 'active'))
+    expect((await authed(a.accessToken, 'GET', `/v1/calls/${call.id}`)).json().data.call.state).toBe('active')
+
+    // b leaves; a + c remain live so the call stays active. History shows it for every participant.
+    expect((await authed(b.accessToken, 'POST', `/v1/calls/${call.id}/end`, {}, idem())).json().data.call).toMatchObject({state: 'active'})
+    const afterLeave = (await authed(c.accessToken, 'GET', `/v1/calls/${call.id}`)).json().data.call
+    expect(afterLeave.participants.find((x: any) => x.id === b.actorId)).toMatchObject({response: 'accepted'})
+    const history = (await authed(c.accessToken, 'GET', `/v1/me/calls?conversationId=${group}`)).json().data
+    expect(history.items[0]).toMatchObject({id: call.id, kind: 'group', state: 'active'})
+    expect((await authed(outsider.accessToken, 'GET', '/v1/me/calls')).json().data.items.map((x: any) => x.id)).not.toContain(call.id)
+
+    const ended = await authed(a.accessToken, 'POST', `/v1/calls/${call.id}/end`, {}, idem())
+    expect(ended.json().data.call).toMatchObject({state: 'ended'})
+    sa.ws.terminate()
+    sb.ws.terminate()
+  })
+
+  it('ends a group call as declined when every invitee declines', async () => {
+    const [a, b, c] = [await user('gda'), await user('gdb'), await user('gdc')]
+    const group = await groupChat(a, [b, c])
+    const call = (await authed(a.accessToken, 'POST', `/v1/conversations/${group}/calls`, {mediaKind: 'audio'}, idem())).json().data.call
+    expect((await authed(b.accessToken, 'POST', `/v1/calls/${call.id}/decline`, {}, idem())).statusCode).toBe(200)
+    expect((await authed(a.accessToken, 'GET', `/v1/calls/${call.id}`)).json().data.call.state).toBe('ringing')
+    expect((await authed(c.accessToken, 'POST', `/v1/calls/${call.id}/decline`, {}, idem())).statusCode).toBe(200)
+    expect((await authed(a.accessToken, 'GET', `/v1/calls/${call.id}`)).json().data.call.state).toBe('declined')
+  })
+
+  it('mints, resolves and dials call IDs, and hides unresolvable codes', async () => {
+    const [a, b, stranger] = [await user('ida'), await user('idb'), await user('ids')]
+    const convo = await directChat(a, b)
+    expect((await authed(a.accessToken, 'GET', '/v1/calls/ids/me')).statusCode).toBe(404)
+    const minted = await authed(b.accessToken, 'POST', '/v1/calls/ids', {}, idem())
+    expect(minted.statusCode).toBe(201)
+    const code = minted.json().data.callId.code as string
+    expect(code).toMatch(/^[1-9][0-9]{7}$/)
+    expect(minted.json().data.callId.formatted).toBe(`${code.slice(0, 4)} ${code.slice(4)}`)
+    const again = await authed(b.accessToken, 'POST', '/v1/calls/ids', {}, idem())
+    expect(again.statusCode).toBe(200)
+    expect(again.json().data.callId.code).toBe(code)
+    const resolved = await authed(a.accessToken, 'GET', `/v1/calls/ids/${code.slice(0, 4)}%20${code.slice(4)}`)
+    expect(resolved.statusCode, resolved.body).toBe(200)
+    expect(resolved.json().data.callee).toMatchObject({id: b.actorId, handle: b.handle, callable: true})
+    expect((await authed(a.accessToken, 'GET', '/v1/calls/ids/12345678')).statusCode).toBe(404)
+    expect((await authed(a.accessToken, 'GET', '/v1/calls/ids/1234')).statusCode).toBe(400)
+    const dialled = await authed(a.accessToken, 'POST', `/v1/calls/ids/${code}/calls`, {mediaKind: 'audio'}, idem())
+    expect(dialled.statusCode, dialled.body).toBe(201)
+    expect(dialled.json().data.call).toMatchObject({conversationId: convo, kind: 'direct', state: 'ringing'})
+    await authed(a.accessToken, 'POST', `/v1/calls/${dialled.json().data.call.id}/cancel`, {}, idem())
+    expect((await authed(stranger.accessToken, 'POST', '/v1/calls/ids', {}, idem())).statusCode).toBe(201)
+    const strangerCode = (await authed(stranger.accessToken, 'GET', '/v1/calls/ids/me')).json().data.callId.code as string
+    expect((await authed(a.accessToken, 'GET', `/v1/calls/ids/${strangerCode}`)).statusCode).toBe(404)
+    expect((await authed(a.accessToken, 'POST', `/v1/calls/ids/${strangerCode}/calls`, {mediaKind: 'audio'}, idem())).statusCode).toBe(404)
+    expect((await authed(b.accessToken, 'DELETE', '/v1/calls/ids/me')).statusCode).toBe(200)
+    expect((await authed(b.accessToken, 'GET', '/v1/calls/ids/me')).statusCode).toBe(404)
+    expect((await authed(a.accessToken, 'GET', `/v1/calls/ids/${code}`)).statusCode).toBe(404)
+    const reminted = await authed(b.accessToken, 'POST', '/v1/calls/ids', {}, idem())
+    expect(reminted.statusCode).toBe(201)
+    expect(reminted.json().data.callId.code).not.toBe(code)
+  })
+
   it('tells foreground devices about calls over the messaging socket', async () => {
     const [a, b] = [await user('msa'), await user('msb')]
     const convo = await directChat(a, b)
@@ -386,6 +489,13 @@ describeIfDb('Calls v1: lifecycle, policy, TURN, VoIP registration and ticket-au
     await follow(b, a)
     const res = await authed(a.accessToken, 'POST', '/v1/conversations', {handle: b.handle})
     expect(res.statusCode, res.body).toBeLessThan(300)
+    return res.json().data.conversation.id as string
+  }
+
+  async function groupChat(a: {actorId: string; accessToken: string; handle: string}, members: {actorId: string; handle: string}[]) {
+    for (const member of members) await follow(member, a)
+    const res = await authed(a.accessToken, 'POST', '/v1/groups', {title: `group-${runSuffix}-${counter}`, handles: members.map(m => m.handle)})
+    expect(res.statusCode, res.body).toBe(201)
     return res.json().data.conversation.id as string
   }
 

@@ -1,4 +1,4 @@
-import {createHash, createHmac, randomBytes} from 'node:crypto'
+import {createHash, createHmac, randomBytes, randomInt} from 'node:crypto'
 import type {CallState, CallTerminalReason} from '../../database/types.js'
 
 /**
@@ -26,6 +26,12 @@ export const CALL_START_PER_HOUR = 20
 export const CALL_UNANSWERED_TO_RECIPIENT_PER_HOUR = 5
 export const CALL_CREDENTIALS_PER_HOUR = 6
 export const CALL_HISTORY_MAX_LIMIT = 50
+/** A group call needs at least the initiator plus two invitees. */
+export const CALL_GROUP_MIN_PARTICIPANTS = 3
+/** Hard mesh ceiling; the configured cap (MODULA_CALLS_GROUP_MAX_PARTICIPANTS) never exceeds this. */
+export const CALL_GROUP_MAX_PARTICIPANTS = 8
+/** Dialable call-ID codes are 8 digits, first digit 1-9, displayed as "XXXX XXXX". */
+export const CALL_ID_CODE_LENGTH = 8
 
 export const LIVE_CALL_STATES: readonly CallState[] = ['ringing', 'connecting', 'active', 'reconnecting']
 export const TERMINAL_CALL_STATES: readonly CallState[] = ['declined', 'cancelled', 'missed', 'ended', 'failed']
@@ -78,6 +84,8 @@ export function policyOutcome(state: CallState): CallState | null {
   return null
 }
 
+export type CallRole = 'initiator' | 'recipient' | 'participant'
+
 export type CallCommand = 'accept' | 'decline' | 'cancel' | 'end'
 
 /** Endpoint-specific reason enums. Never free text. */
@@ -92,21 +100,24 @@ export const COMMAND_REASONS: Readonly<Record<CallCommand, readonly CallTerminal
  * Resolve a lifecycle command for the actor's role and the current state.
  * `end` while still ringing maps to the role's natural command (cancel or
  * decline) so a client hanging up early always lands in the right terminal
- * state.
+ * state. A group `participant` resolves exactly like the 1:1 `recipient`;
+ * joins, withdrawals and leaves in connecting/active states are handled in
+ * the service before this pure function is consulted.
  */
 export function resolveCommand(
   command: CallCommand,
-  role: 'initiator' | 'recipient',
+  role: CallRole,
   state: CallState,
 ): {to: CallState; reason: CallTerminalReason | null; event: 'accepted' | 'declined' | 'cancelled' | 'ended'} | {error: 'FORBIDDEN' | 'INVALID_STATE'} {
   if (isTerminal(state)) return {error: 'INVALID_STATE'}
   if (command === 'end' && state === 'ringing') command = role === 'initiator' ? 'cancel' : 'decline'
+  const isResponder = role === 'recipient' || role === 'participant'
   switch (command) {
     case 'accept':
-      if (role !== 'recipient') return {error: 'FORBIDDEN'}
+      if (!isResponder) return {error: 'FORBIDDEN'}
       return state === 'ringing' ? {to: 'connecting', reason: null, event: 'accepted'} : {error: 'INVALID_STATE'}
     case 'decline':
-      if (role !== 'recipient') return {error: 'FORBIDDEN'}
+      if (!isResponder) return {error: 'FORBIDDEN'}
       return state === 'ringing' ? {to: 'declined', reason: 'declined', event: 'declined'} : {error: 'INVALID_STATE'}
     case 'cancel':
       if (role !== 'initiator') return {error: 'FORBIDDEN'}
@@ -181,4 +192,23 @@ export function iceServersFor(input: {
 
 export function isValidIdempotencyKey(value: unknown): value is string {
   return typeof value === 'string' && /^[\x21-\x7e]{16,128}$/.test(value)
+}
+
+// ---- dialable call IDs ----------------------------------------------------
+
+/** Random 8-digit call-ID code, first digit 1-9. Never sequential. */
+export function newCallIdCode(): string {
+  return String(randomInt(10_000_000, 100_000_000))
+}
+
+/** Accept "12345678", "1234 5678" or "1234-5678"; anything else is null. */
+export function normalizeCallIdCode(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const compact = value.replace(/[\s-]/g, '')
+  return /^[1-9][0-9]{7}$/.test(compact) ? compact : null
+}
+
+/** Display form of a stored code: "1234 5678". */
+export function formatCallIdCode(code: string): string {
+  return `${code.slice(0, 4)} ${code.slice(4)}`
 }

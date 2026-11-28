@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-14T15:33:43.469Z
-Route evidence: local-candidate-runtime captured 2026-11-28T13:35:27.611Z for branch `audit/totp-stepup-rate-limit`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-11-28T17:49:32.669Z for branch `serverfix/group-calls-ids`; this does not claim deployment.
 
-- Runtime method routes: 900
-- Application routes: 633
-- Automatically generated HEAD routes: 266
+- Runtime method routes: 907
+- Application routes: 638
+- Automatically generated HEAD routes: 268
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `900 = 633 application + 267 framework-derived`
+- Reconciliation: `907 = 638 application + 269 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,10 +17,10 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 633 |
+| yes | yes | not yet | candidate-registered | 638 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 267 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 269 |
 
 ## Error contract
 
@@ -209,14 +209,19 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Module Runtime | POST | `/v1/backend/products/:productId/usage` | SERVICE/WORKER | none | `services/greenfield-api/src/backend-fabric/routes.ts:342` | candidate-registered-not-production-probed |
 | Account | GET | `/v1/board/layout` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1086` | candidate-registered-not-production-probed |
 | Account | PATCH | `/v1/board/layout` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-routes.ts:1096` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/calls/:callId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:158` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/calls/:callId/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:182` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/calls/:callId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:182` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/calls/:callId/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:182` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/calls/:callId/end` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:182` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/calls/:callId/media-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:209` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/calls/:callId/signalling` | PUBLIC | none | `services/greenfield-api/src/app/register-calls-routes.ts:286` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/calls/:callId/signalling-ticket` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:198` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/calls/:callId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:165` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/:callId/accept` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:189` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/:callId/cancel` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:189` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/:callId/decline` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:189` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/:callId/end` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:189` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/:callId/media-credentials` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:216` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/calls/:callId/signalling` | PUBLIC | none | `services/greenfield-api/src/app/register-calls-routes.ts:360` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/:callId/signalling-ticket` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:205` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/ids` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:237` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/calls/ids/:code` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:274` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/calls/ids/:code/calls` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:285` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/calls/ids/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:263` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/calls/ids/me` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:253` | candidate-registered-not-production-probed |
 | Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:173` | candidate-registered-not-production-probed |
 | Comments | PATCH | `/v1/comments/:commentId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:155` | candidate-registered-not-production-probed |
 | Comments | DELETE | `/v1/comments/:commentId/pin` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-phase6s-routes.ts:199` | candidate-registered-not-production-probed |
@@ -263,7 +268,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | GET | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:86` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/conversations` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:107` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/conversations/:id/archive` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:277` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/conversations/:id/calls` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:144` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/conversations/:id/calls` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:151` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:126` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/conversations/:id/messages` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:138` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/conversations/:id/messages/:messageId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-messaging-routes.ts:200` | candidate-registered-not-production-probed |
@@ -392,9 +397,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2695` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/link-previews` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:46` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/link-safety` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-composer-routes.ts:58` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/call-settings` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:227` | candidate-registered-not-production-probed |
-| Platform | PATCH | `/v1/me/call-settings` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:237` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/me/calls` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:171` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/call-settings` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:301` | candidate-registered-not-production-probed |
+| Platform | PATCH | `/v1/me/call-settings` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:311` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/me/calls` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:178` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/me/collections` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:77` | candidate-registered-not-production-probed |
 | Platform | POST | `/v1/me/collections` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:88` | candidate-registered-not-production-probed |
 | Platform | DELETE | `/v1/me/collections/:collectionId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-collections-drafts-routes.ts:129` | candidate-registered-not-production-probed |
@@ -599,9 +604,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Platform | DELETE | `/v1/push/devices/:token` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:69` | candidate-registered-not-production-probed |
 | Platform | GET | `/v1/push/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:84` | candidate-registered-not-production-probed |
 | Platform | PATCH | `/v1/push/preferences` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-push-routes.ts:94` | candidate-registered-not-production-probed |
-| Platform | GET | `/v1/push/voip-devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:257` | candidate-registered-not-production-probed |
-| Platform | POST | `/v1/push/voip-devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:247` | candidate-registered-not-production-probed |
-| Platform | DELETE | `/v1/push/voip-devices/:registrationId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:267` | candidate-registered-not-production-probed |
+| Platform | GET | `/v1/push/voip-devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:331` | candidate-registered-not-production-probed |
+| Platform | POST | `/v1/push/voip-devices` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:321` | candidate-registered-not-production-probed |
+| Platform | DELETE | `/v1/push/voip-devices/:registrationId` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-calls-routes.ts:341` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/reels` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:2208` | candidate-registered-not-production-probed |
 | Feed | GET | `/v1/reels/:id` | AUTHENTICATED | none | `services/greenfield-api/src/app/register-native-endpoint-routes.ts:151` | candidate-registered-not-production-probed |
 | Modules | GET | `/v1/registry/artifacts/:sha256` | PUBLIC | none | `services/greenfield-api/src/modules/routes/index.ts:461` | candidate-registered-not-production-probed |
@@ -9253,7 +9258,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId`
 - Public URL: `https://api.modula.digital/v1/calls/:callId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:158`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:165`
 - Handler: inline
 - Controller/service calls: `calls.snapshot`
 - Authentication: legacy or bridged bearer session
@@ -9269,7 +9274,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_calls`, `profiles`
+- Database reads: `greenfield_call_participants`, `greenfield_calls`, `profiles`
 - Database writes: `greenfield_call_device_invitations`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_call_signalling_tickets`, `greenfield_calls`
 - Storage: none observed
 - Events produced: none observed
@@ -9302,7 +9307,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/accept`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/accept`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:182`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:189`
 - Handler: inline
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
@@ -9318,7 +9323,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_calls`, `profiles`, `push_device_tokens`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_calls`, `profiles`, `push_device_tokens`
 - Database writes: `greenfield_call_device_invitations`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_call_signalling_tickets`, `greenfield_calls`
 - Storage: none observed
 - Events produced: none observed
@@ -9351,7 +9356,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/cancel`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:182`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:189`
 - Handler: inline
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
@@ -9367,7 +9372,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_calls`, `profiles`, `push_device_tokens`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_calls`, `profiles`, `push_device_tokens`
 - Database writes: `greenfield_call_device_invitations`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_call_signalling_tickets`, `greenfield_calls`
 - Storage: none observed
 - Events produced: none observed
@@ -9400,7 +9405,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/decline`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/decline`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:182`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:189`
 - Handler: inline
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
@@ -9416,7 +9421,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_calls`, `profiles`, `push_device_tokens`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_calls`, `profiles`, `push_device_tokens`
 - Database writes: `greenfield_call_device_invitations`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_call_signalling_tickets`, `greenfield_calls`
 - Storage: none observed
 - Events produced: none observed
@@ -9449,7 +9454,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/end`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/end`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:182`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:189`
 - Handler: inline
 - Controller/service calls: `CallsService.expiredFrom`, `calls.command`
 - Authentication: legacy or bridged bearer session
@@ -9465,7 +9470,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_calls`, `profiles`, `push_device_tokens`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_calls`, `profiles`, `push_device_tokens`
 - Database writes: `greenfield_call_device_invitations`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_call_signalling_tickets`, `greenfield_calls`
 - Storage: none observed
 - Events produced: none observed
@@ -9498,7 +9503,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/media-credentials`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/media-credentials`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:209`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:216`
 - Handler: inline
 - Controller/service calls: `calls.mediaCredentials`
 - Authentication: legacy or bridged bearer session
@@ -9547,9 +9552,9 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/signalling`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/signalling`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:286`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:360`
 - Handler: inline
-- Controller/service calls: `CallsService.expiredFrom`, `bindings.get`, `calls.command`, `calls.reportMedia`, `calls.socketSnapshot`, `calls.stillAuthorized`, `limiter.take`, `recheck.unref`, `signalling.allowCandidate`, `signalling.firstSeen`, `signalling.join`, `signalling.relay`, `socket.close`, `socket.on`, `socket.send`, `stale.unref`
+- Controller/service calls: `CallsService.expiredFrom`, `bindings.get`, `calls.command`, `calls.reportMedia`, `calls.socketSnapshot`, `calls.stillAuthorized`, `limiter.take`, `participants.find`, `participants.some`, `recheck.unref`, `signalling.allowCandidate`, `signalling.firstSeen`, `signalling.join`, `signalling.offerOwner`, `signalling.relay`, `socket.close`, `socket.on`, `socket.send`, `stale.unref`
 - Authentication: none
 - Authorization: PUBLIC
 - Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
@@ -9596,7 +9601,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/calls/:callId/signalling-ticket`
 - Public URL: `https://api.modula.digital/v1/calls/:callId/signalling-ticket`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:198`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:205`
 - Handler: inline
 - Controller/service calls: `calls.issueTicket`
 - Authentication: legacy or bridged bearer session
@@ -9612,7 +9617,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
-- Database reads: `blocks`, `greenfield_calls`, `push_device_tokens`
+- Database reads: `blocks`, `greenfield_call_participants`, `greenfield_calls`, `push_device_tokens`
 - Database writes: `greenfield_call_signalling_tickets`
 - Storage: none observed
 - Events produced: none observed
@@ -9634,6 +9639,251 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
 - Versioning/compatibility: HTTP v1; no mission-specific compatibility override
 - Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/calls/ids</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/calls/ids`
+- Public URL: `https://api.modula.digital/v1/calls/ids`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:237`
+- Handler: inline
+- Controller/service calls: `calls.mintCallId`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: not evident in the route handler; inspect downstream service
+- Workspace rule: none observed
+- Capability/permission: `post:engage`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `greenfield_call_ids`
+- Database writes: `greenfield_call_ids`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/calls/ids/:code</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/calls/ids/:code`
+- Public URL: `https://api.modula.digital/v1/calls/ids/:code`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:274`
+- Handler: inline
+- Controller/service calls: `calls.resolveCallId`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: not evident in the route handler; inspect downstream service
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: `{code: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_ids`, `greenfield_call_settings`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>POST /v1/calls/ids/:code/calls</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: POST
+- Effective route: `/v1/calls/ids/:code/calls`
+- Public URL: `https://api.modula.digital/v1/calls/ids/:code/calls`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:285`
+- Handler: inline
+- Controller/service calls: `calls.startByCallId`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: not evident in the route handler; inspect downstream service
+- Workspace rule: none observed
+- Capability/permission: `post:engage`
+- Rate limit: none registered
+- Request params: `{code: string}`
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `actors`, `blocks`, `greenfield_accounts`, `greenfield_call_ids`, `greenfield_call_participants`, `greenfield_call_push_tokens`, `greenfield_call_settings`, `greenfield_calls`, `greenfield_conversation_members`, `greenfield_conversations`, `profiles`, `push_device_tokens`
+- Database writes: `greenfield_call_device_invitations`, `greenfield_call_events`, `greenfield_call_participants`, `greenfield_call_signalling_tickets`, `greenfield_calls`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
+
+</details>
+
+<details>
+<summary><code>DELETE /v1/calls/ids/me</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: DELETE
+- Effective route: `/v1/calls/ids/me`
+- Public URL: `https://api.modula.digital/v1/calls/ids/me`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:263`
+- Handler: inline
+- Controller/service calls: `calls.revokeCallId`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: not evident in the route handler; inspect downstream service
+- Workspace rule: none observed
+- Capability/permission: `post:engage`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: none observed
+- Database writes: `greenfield_call_ids`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 400, 401, 403, 404, 409, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/calls/ids/me</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Platform
+- Method: GET
+- Effective route: `/v1/calls/ids/me`
+- Public URL: `https://api.modula.digital/v1/calls/ids/me`
+- API version: v1
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:253`
+- Handler: inline
+- Controller/service calls: `calls.myCallId`
+- Authentication: legacy or bridged bearer session
+- Authorization: AUTHENTICATED
+- Ownership rule: not evident in the route handler; inspect downstream service
+- Workspace rule: none observed
+- Capability/permission: `social:read`
+- Rate limit: none registered
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `403`, `404`, `500`
+- Database reads: `greenfield_call_ids`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Contract purpose: no mission-specific override; static/runtime record is authoritative
+- Contract owner: Platform
+- Contract authentication: legacy or bridged bearer session
+- Contract authorization: AUTHENTICATED
+- Contract request: see static request evidence above
+- Contract success: status 200; see response evidence above
+- Contract errors: 401, 403, 404, 500
+- Contract pagination/filtering: none observed
+- Idempotency/concurrency: not separately declared; implementation semantics remain authoritative
+- Versioning/compatibility: HTTP v1; no mission-specific compatibility override
+- Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
 </details>
 
@@ -11899,7 +12149,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/conversations/:id/calls`
 - Public URL: `https://api.modula.digital/v1/conversations/:id/calls`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:144`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:151`
 - Handler: inline
 - Controller/service calls: `calls.start`
 - Authentication: legacy or bridged bearer session
@@ -15254,7 +15504,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15303,7 +15553,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15352,7 +15602,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15401,7 +15651,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15450,7 +15700,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15499,7 +15749,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -15548,7 +15798,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: `services/greenfield-api/tests/messaging-v3.integration.test.ts`
+- Tests: `services/greenfield-api/tests/calls.integration.test.ts`, `services/greenfield-api/tests/messaging-v3.integration.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -18220,7 +18470,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/me/call-settings`
 - Public URL: `https://api.modula.digital/v1/me/call-settings`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:227`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:301`
 - Handler: inline
 - Controller/service calls: `calls.getSettings`
 - Authentication: legacy or bridged bearer session
@@ -18269,7 +18519,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/me/call-settings`
 - Public URL: `https://api.modula.digital/v1/me/call-settings`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:237`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:311`
 - Handler: inline
 - Controller/service calls: `calls.updateSettings`
 - Authentication: legacy or bridged bearer session
@@ -18318,7 +18568,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/me/calls`
 - Public URL: `https://api.modula.digital/v1/me/calls`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:171`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:178`
 - Handler: inline
 - Controller/service calls: `calls.history`
 - Authentication: legacy or bridged bearer session
@@ -18334,7 +18584,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `500`
-- Database reads: `greenfield_calls`, `greenfield_conversation_members`, `profiles`
+- Database reads: `greenfield_call_participants`, `greenfield_calls`, `greenfield_conversation_members`, `profiles`
 - Database writes: none observed
 - Storage: none observed
 - Events produced: none observed
@@ -28363,7 +28613,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/push/voip-devices`
 - Public URL: `https://api.modula.digital/v1/push/voip-devices`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:257`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:331`
 - Handler: inline
 - Controller/service calls: `calls.listVoip`
 - Authentication: legacy or bridged bearer session
@@ -28412,7 +28662,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/push/voip-devices`
 - Public URL: `https://api.modula.digital/v1/push/voip-devices`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:247`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:321`
 - Handler: inline
 - Controller/service calls: `calls.registerVoip`
 - Authentication: legacy or bridged bearer session
@@ -28461,7 +28711,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/push/voip-devices/:registrationId`
 - Public URL: `https://api.modula.digital/v1/push/voip-devices/:registrationId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:267`
+- Source file: `services/greenfield-api/src/app/register-calls-routes.ts:341`
 - Handler: inline
 - Controller/service calls: `calls.deleteVoip`
 - Authentication: legacy or bridged bearer session

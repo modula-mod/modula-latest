@@ -3,10 +3,11 @@ import {afterEach, describe, expect, it} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {callsCapabilities} from '../src/app/register-calls-routes.js'
 import {
-  CALL_TRANSITIONS, LIVE_CALL_STATES, TERMINAL_CALL_STATES, canTransition, deadlineFor, expiryOutcome, hashTicket,
-  isValidIdempotencyKey, newTicket, policyOutcome, resolveCommand, turnCredentials, uuidv7,
+  CALL_TRANSITIONS, LIVE_CALL_STATES, TERMINAL_CALL_STATES, canTransition, deadlineFor, expiryOutcome, formatCallIdCode,
+  hashTicket, isValidIdempotencyKey, newCallIdCode, newTicket, normalizeCallIdCode, policyOutcome, resolveCommand,
+  turnCredentials, uuidv7,
 } from '../src/domains/calls/policy.js'
-import {FrameRateLimiter, parseClientFrame} from '../src/domains/calls/signalling-hub.js'
+import {CallSignallingHub, FrameRateLimiter, parseClientFrame} from '../src/domains/calls/signalling-hub.js'
 
 const CALL = '01900000-0000-7000-8000-000000000001'
 
@@ -44,6 +45,31 @@ describe('call state machine', () => {
     expect(resolveCommand('end', 'recipient', 'active')).toMatchObject({to: 'ended'})
     expect(resolveCommand('decline', 'recipient', 'connecting')).toEqual({error: 'INVALID_STATE'})
     expect(resolveCommand('end', 'initiator', 'ended')).toEqual({error: 'INVALID_STATE'})
+  })
+
+  it('resolves group participant commands exactly like the 1:1 recipient', () => {
+    expect(resolveCommand('accept', 'participant', 'ringing')).toMatchObject({to: 'connecting', event: 'accepted'})
+    expect(resolveCommand('decline', 'participant', 'ringing')).toMatchObject({to: 'declined', event: 'declined'})
+    expect(resolveCommand('cancel', 'participant', 'ringing')).toEqual({error: 'FORBIDDEN'})
+    expect(resolveCommand('end', 'participant', 'ringing')).toMatchObject({to: 'declined', event: 'declined'})
+    expect(resolveCommand('end', 'participant', 'active')).toMatchObject({to: 'ended'})
+    // Joins in connecting/active are a service-level path, not a state-machine edge.
+    expect(resolveCommand('accept', 'participant', 'connecting')).toEqual({error: 'INVALID_STATE'})
+  })
+
+  it('mints random 8-digit call-ID codes and normalizes their display forms', () => {
+    const codes = new Set(Array.from({length: 200}, () => newCallIdCode()))
+    expect(codes.size).toBe(200)
+    for (const code of codes) expect(code).toMatch(/^[1-9][0-9]{7}$/)
+    expect(formatCallIdCode('12345678')).toBe('1234 5678')
+    expect(normalizeCallIdCode('1234 5678')).toBe('12345678')
+    expect(normalizeCallIdCode('1234-5678')).toBe('12345678')
+    expect(normalizeCallIdCode('12345678')).toBe('12345678')
+    expect(normalizeCallIdCode('02345678')).toBeNull()
+    expect(normalizeCallIdCode('1234567')).toBeNull()
+    expect(normalizeCallIdCode('123456789')).toBeNull()
+    expect(normalizeCallIdCode('abcdefgh')).toBeNull()
+    expect(normalizeCallIdCode(12345678)).toBeNull()
   })
 })
 
@@ -90,6 +116,13 @@ describe('signalling frame validation', () => {
     expect(parseClientFrame(frame({type: 'signal.ice_candidate', negotiationId: 'nego-0001', payload: {candidate: 'candidate:1', sdpMid: '0', sdpMLineIndex: 0}}), CALL)).toMatchObject({type: 'signal.ice_candidate'})
   })
 
+  it('accepts an addressed target actor and rejects a malformed one', () => {
+    const parsed: any = parseClientFrame(frame({type: 'signal.offer', negotiationId: 'nego-0001', targetActorId: 'actor-00000002', payload: {sdp: 'v=0'}}), CALL)
+    expect(parsed.targetActorId).toBe('actor-00000002')
+    expect(parseClientFrame(frame({type: 'signal.offer', negotiationId: 'nego-0001', targetActorId: '', payload: {sdp: 'v=0'}}), CALL)).toEqual({error: 'INVALID_PAYLOAD'})
+    expect(parseClientFrame(frame({type: 'signal.offer', negotiationId: 'nego-0001', targetActorId: 42, payload: {sdp: 'v=0'}}), CALL)).toEqual({error: 'INVALID_PAYLOAD'})
+  })
+
   it('rejects unknown fields, wrong calls, bad versions and oversize media descriptions', () => {
     expect(parseClientFrame(frame({extra: 1}), CALL)).toEqual({error: 'UNKNOWN_FIELD'})
     expect(parseClientFrame(frame({protocolVersion: 2}), CALL)).toEqual({error: 'UNSUPPORTED_PROTOCOL'})
@@ -112,6 +145,39 @@ describe('signalling frame validation', () => {
     for (let i = 0; i < 150; i++) if (limiter.take(now)) allowed++
     expect(allowed).toBe(100)
     expect(limiter.take(now + 100)).toBe(true)
+  })
+})
+
+describe('group signalling relay', () => {
+  const peer = (actorId: string, received: any[]) => ({
+    actorId, sessionId: `session-${actorId}`, send: (frame: any) => received.push(frame), close: () => {},
+  })
+  const offer = (from: string, negotiationId = 'nego-0001') => ({
+    type: 'signal.offer', messageId: `m-${from}`, callId: CALL, negotiationId, targetActorId: null, payload: {sdp: 'v=0'},
+  })
+
+  it('fans a relay out to every other participant and addresses a targeted frame to one', () => {
+    const hub = new CallSignallingHub()
+    const a: any[] = []; const b: any[] = []; const c: any[] = []
+    hub.join(CALL, peer('actor-a', a))
+    hub.join(CALL, peer('actor-b', b))
+    hub.join(CALL, peer('actor-c', c))
+    expect(hub.relay(CALL, 'actor-a', offer('actor-a'))).toBe(2)
+    expect(b).toHaveLength(1)
+    expect(c).toHaveLength(1)
+    expect(a).toHaveLength(0)
+    expect(hub.relay(CALL, 'actor-a', offer('actor-a'), 'actor-c')).toBe(1)
+    expect(b).toHaveLength(1)
+    expect(c).toHaveLength(2)
+    expect(hub.relay(CALL, 'actor-a', offer('actor-a'), 'actor-nobody')).toBe(0)
+  })
+
+  it('gives each mesh-pair negotiation to its first offer sender', () => {
+    const hub = new CallSignallingHub()
+    expect(hub.offerOwner(CALL, 'nego-0001', 'actor-a')).toBe(true)
+    expect(hub.offerOwner(CALL, 'nego-0001', 'actor-a')).toBe(true)
+    expect(hub.offerOwner(CALL, 'nego-0001', 'actor-b')).toBe(false)
+    expect(hub.offerOwner(CALL, 'nego-0002', 'actor-b')).toBe(true)
   })
 })
 
@@ -139,9 +205,16 @@ describe('calls configuration and capability', () => {
     expect(loadConfig().calls.enabled).toBe(false)
     process.env.MODULA_CALLS_TICKET_PEPPER = 'p'.repeat(40)
     const config = loadConfig().calls
-    expect(config).toMatchObject({enabled: true, turnTtlSeconds: 600})
-    expect(callsCapabilities(config)).toMatchObject({enabled: true, voipPush: false, maxParticipants: 2})
+    expect(config).toMatchObject({enabled: true, turnTtlSeconds: 600, groupMaxParticipants: 6})
+    expect(callsCapabilities(config)).toMatchObject({
+      enabled: true, voipPush: false, maxParticipants: 6, groupCalls: true,
+      callIDs: {enabled: true, codeLength: 8, codeFormat: 'XXXX XXXX'},
+    })
     expect(JSON.stringify(callsCapabilities(config))).not.toContain('t'.repeat(40))
+    process.env.MODULA_CALLS_GROUP_MAX_PARTICIPANTS = '2'
+    expect(callsCapabilities(loadConfig().calls)).toMatchObject({maxParticipants: 2, groupCalls: false})
+    process.env.MODULA_CALLS_GROUP_MAX_PARTICIPANTS = '9'
+    expect(() => loadConfig()).toThrow()
   })
 
   it('rejects weak secrets and out-of-range credential lifetimes', () => {

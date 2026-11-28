@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-11-28T13:35:27.611Z",
+  "capturedAt": "2026-11-28T17:49:32.669Z",
   "source": {
-    "branch": "audit/totp-stepup-rate-limit",
-    "headAtCapture": "20561ad64454098c70e1c7e990038e34e64fe9fa",
-    "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "f2410d95450ddcd0ab72189e2484fbe666ed51fc62547cb4f62a5f17398f4e89"
+    "branch": "serverfix/group-calls-ids",
+    "headAtCapture": "0bf52ff80b22f462d42092383558115b0fecd2a3",
+    "worktreeDirtyAtCapture": false,
+    "apiSourceSha256": "bb0d3226e530142150f30232719c615c82b6edd5c46b17ae109624f43d52133d"
   },
   "runtimeRoutes": [
     {
@@ -8824,6 +8824,111 @@
           }
         },
         "hide": true
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/calls/ids",
+      "path": "/v1/calls/ids",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/calls/ids/me",
+      "path": "/v1/calls/ids/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/calls/ids/me",
+      "path": "/v1/calls/ids/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/calls/ids/me",
+      "path": "/v1/calls/ids/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/calls/ids/:code",
+      "path": "/v1/calls/ids/:code",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "pattern": "^[0-9]{4}[ -]?[0-9]{4}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/calls/ids/:code",
+      "path": "/v1/calls/ids/:code",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "pattern": "^[0-9]{4}[ -]?[0-9]{4}$"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/calls/ids/:code/calls",
+      "path": "/v1/calls/ids/:code/calls",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "pattern": "^[0-9]{4}[ -]?[0-9]{4}$"
+            }
+          }
+        }
       },
       "config": null,
       "handler": ""
